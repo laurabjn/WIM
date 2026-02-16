@@ -1,14 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
-   "pipeline": {
-    "dev": {
-      "cache": false
-    },
-    "build": {},
-    "lint": {},
-    "test": {}
-  },
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

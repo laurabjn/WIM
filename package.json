@@ -1,16 +1,18 @@
 {
-  "name": "wim-frontend",
+  "name": "wim",
   "private": true,
   "scripts": {
     "build": "turbo run build",
     "dev:web": "turbo dev --filter=web",
     "dev:mobile": "turbo dev --filter=mobile",
+    "dev:api": "turbo dev --filter=api",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
     "prettier": "^3.7.4",
+    "ts-node": "^10.9.2",
     "turbo": "^2.8.9",
     "typescript": "5.9.2"
   },
