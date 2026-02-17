@@ -1,1 +1,13 @@
-{ "common": { "hello": "Bonjour" } }
+{
+  "common": {
+    "appName": "World Is Mine",
+    "continue": "Continuer",
+    "cancel": "Annuler"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe"
+  }
+}

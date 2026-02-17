@@ -1,0 +1,36 @@
+import i18n from "i18next";
+import {initReactI18next} from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {en, fr} from "@wim/i18n";
+
+const STORAGE_KEY = "wim.locale";
+
+async function getSavedLocale(): Promise<"fr" | "en"> {
+  const saved = await AsyncStorage.getItem(STORAGE_KEY);
+  return saved === "en" ? "en" : "fr";
+}
+
+export async function initI18n() {
+  const locale = await getSavedLocale();
+
+  await i18n
+    .use(initReactI18next)
+    .init({
+      resources: {
+        fr: {translation: fr},
+        en: {translation: en}
+      },
+      lng: locale,
+      fallbackLng: "fr",
+      interpolation: {escapeValue: false}
+    });
+
+  return i18n;
+}
+
+export async function setLocale(locale: "fr" | "en") {
+  await AsyncStorage.setItem(STORAGE_KEY, locale);
+  await i18n.changeLanguage(locale);
+}
+
+export default i18n;

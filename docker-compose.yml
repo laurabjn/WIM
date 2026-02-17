@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:15
+    container_name: wim_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wim
+      POSTGRES_PASSWORD: wim
+      POSTGRES_DB: wim
+    ports:
+      - "5432:5432"
+    volumes:
+      - wim_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wim -d wim"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: wim_api_image
+    container_name: wim_migrate
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://wim:wim@db:5432/wim
+    command: sh -c "npx prisma migrate deploy"
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: wim_api_image
+    container_name: wim_api
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://wim:wim@db:5432/wim
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/api/node_modules
+    command: npm run start:dev
+
+volumes:
+  wim_pg:

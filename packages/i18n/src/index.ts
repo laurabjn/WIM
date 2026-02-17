@@ -1,5 +1,3 @@
-import fr from "./locales/fr.json";
-import en from "./locales/en.json";
-
-export const messages = { fr, en };
-export type Locale = keyof typeof messages;
+export { default as fr } from "./locales/fr.json";
+export { default as en } from "./locales/en.json";
+export type { Locales, Messages } from "./types";
