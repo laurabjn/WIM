@@ -26,3 +26,27 @@ model User {
 
   @@map("users")
 }
+
+model Home {
+  id          String   @id @default(uuid())
+  ownerId     String
+  title       String
+  description String?
+  address     String?
+  city        String
+  country     String
+
+  // Géolocalisation (Sprint 0)
+  latitude    Decimal  @db.Decimal(9, 6)
+  longitude   Decimal  @db.Decimal(9, 6)
+
+  capacity    Int
+  homeType    String
+  amenities   Json?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([city, country])
+  @@index([latitude, longitude]) // ✅ utile pour bounding box
+}
