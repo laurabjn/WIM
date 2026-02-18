@@ -17,11 +17,19 @@ export async function initI18n() {
     .use(initReactI18next)
     .init({
       resources: {
-        fr: {translation: fr},
-        en: {translation: en}
+        fr: {
+          common: fr.common,
+          auth: fr.auth,
+        },
+        en: {
+          common: en.common,
+          auth: en.auth,
+        },
       },
       lng: locale,
       fallbackLng: "fr",
+      ns: ["common", "auth"],
+      defaultNS: "common",
       interpolation: {escapeValue: false}
     });
 
