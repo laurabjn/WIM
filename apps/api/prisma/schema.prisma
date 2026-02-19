@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum IdentityStatus {
+  NOT_VERIFIED
+  IN_PROGRESS
+  VERIFIED
+  REFUSED
+}
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
@@ -20,6 +27,8 @@ model User {
   country      String?
   languages    Json?
   isAdmin      Boolean  @default(false) @map("is_admin")
+
+  identityStatus IdentityStatus @default(NOT_VERIFIED)
 
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")

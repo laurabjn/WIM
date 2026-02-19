@@ -1,24 +1,32 @@
-// src/application/use-cases/register-user.usecase.ts
-import { Email } from '../../domain/value-objects/email.vo';
+import { RegisterUserInput } from '../dto/register-user.dto';
 import { User } from '../../domain/entities/user.entity';
 import { UserRepository } from '../../domain/repositories/user.repository';
+import { Injectable, Inject } from '@nestjs/common';
+import { PasswordHasher } from '../../shared/utils/password-hasher';
+import { TOKENS } from '../tokens/tokens';
+import { UserAlreadyExistsError } from 'src/domain/errors/user-already-exist.error';
 
-type Input = { email: string };
-type Output = { userId: string };
-
+@Injectable()
 export class RegisterUserUseCase {
-  constructor(private readonly userRepo: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    @Inject(TOKENS.PASSWORD_HASHER)
+    private readonly passwordHasher: PasswordHasher,
+  ) {}
 
-  async execute(input: Input): Promise<Output> {
-    const email = Email.create(input.email);
+  async execute(input: RegisterUserInput): Promise<User> {
+    const existing = await this.userRepository.findByEmail(input.email);
+    if (existing) {
+      throw new UserAlreadyExistsError(input.email);
+    }
 
-    const exists = await this.userRepo.existsByEmail(email.value);
-    if (exists) throw new Error('Email already used');
+    const passwordHash = await this.passwordHasher.hash(input.password);
 
-    const user = User.create({ email });
-
-    await this.userRepo.save(user);
-
-    return { userId: user.id };
+    return this.userRepository.create({
+      email: input.email,
+      passwordHash,
+      firstName: input.firstName,
+      lastName: input.lastName,
+    });
   }
 }

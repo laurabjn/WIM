@@ -1,4 +1,3 @@
-// src/application/tokens/tokens.ts
 export const TOKENS = {
-  UserRepository: Symbol('UserRepository'),
+  PASSWORD_HASHER: Symbol('PASSWORD_HASHER'),
 } as const;

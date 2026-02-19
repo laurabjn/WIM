@@ -1,18 +1,44 @@
-// src/domain/entities/user.entity.ts
 import { randomUUID } from 'crypto';
-import { Email } from '../value-objects/email.vo';
 
-type CreateUserParams = {
-  email: Email;
-};
+export enum IdentityStatus {
+  NOT_VERIFIED = 'NOT_VERIFIED',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+}
+
+export interface CreateUserPayload {
+  email: string;
+  passwordHash: string;
+  firstName: string;
+  lastName: string;
+}
 
 export class User {
   private constructor(
     public readonly id: string,
-    public readonly email: Email,
+    public readonly email: string,
+    public readonly firstName: string,
+    public readonly lastName: string,
+    public readonly passwordHash: string,
+    public readonly avatarUrl?: string,
+    public readonly bio?: string,
+    public readonly city?: string,
+    public readonly country?: string,
+    public readonly languages?: string,
+    public readonly isAdmin: boolean = false,
+    public readonly identityStatus: IdentityStatus = IdentityStatus.NOT_VERIFIED,
+    public readonly createdAt: Date = new Date(),
+    public readonly updatedAt: Date = new Date(),
   ) {}
 
-  static create(params: CreateUserParams): User {
-    return new User(randomUUID(), params.email);
+  static create(params: CreateUserPayload): User {
+    return new User(
+      randomUUID(),
+      params.email,
+      params.passwordHash,
+      params.firstName,
+      params.lastName,
+    );
   }
 }
