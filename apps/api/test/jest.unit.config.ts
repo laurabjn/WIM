@@ -1,4 +1,3 @@
-// test/jest.unit.config.ts
 import type { Config } from 'jest';
 
 const config: Config = {

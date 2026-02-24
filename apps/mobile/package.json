@@ -7,19 +7,23 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
     "expo": "~54.0.33",
     "expo-status-bar": "~3.0.9",
     "i18next": "^25.8.11",
-    "react": "19.1.0",
     "react-i18next": "^16.5.4",
     "react-native": "0.81.5"
   },
   "devDependencies": {
-    "@types/react": "*",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "29.5.14",
+    "@types/react": "~19.1.10",
+    "jest-expo": "^54.0.17",
     "typescript": "~5.9.2"
   },
   "private": true

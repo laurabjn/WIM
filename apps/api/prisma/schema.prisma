@@ -57,5 +57,5 @@ model Home {
   updatedAt   DateTime @updatedAt
 
   @@index([city, country])
-  @@index([latitude, longitude]) // ✅ utile pour bounding box
+  @@index([latitude, longitude]) 
 }

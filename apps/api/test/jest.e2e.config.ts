@@ -1,13 +1,20 @@
-// test/jest.e2e.config.ts
 import type { Config } from 'jest';
 
 const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/e2e'],
+  rootDir: '../',
   moduleFileExtensions: ['ts', 'js', 'json'],
-  testMatch: ['**/*.spec.ts'],
+  testMatch: ['<rootDir>/test/e2e/**/*.e2e-spec.ts'],
   clearMocks: true,
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/src/$1',
+  },
+  globals: {
+    'ts-jest': {
+      tsconfig: '<rootDir>/tsconfig.json',
+    },
+  },
 };
 
 export default config;

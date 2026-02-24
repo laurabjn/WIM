@@ -8,6 +8,13 @@
     "login": "Login",
     "register": "Sign up",
     "email": "Email",
-    "password": "Password"
+    "password": "Password",
+    "title": "Create an account",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "submit": "Create my account",
+    "requiredFields": "All fields are required",
+    "passwordRules": "Password must contain at least 8 characters, one uppercase letter and one digit",
+    "genericError": "An error occurred"
   }
 }

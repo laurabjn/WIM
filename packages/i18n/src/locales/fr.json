@@ -8,6 +8,15 @@
     "login": "Connexion",
     "register": "Inscription",
     "email": "Email",
-    "password": "Mot de passe"
+    "password": "Mot de passe",
+    "title": "Créer un compte",
+    "emailLabel": "Email",
+    "passwordLabel": "Mot de passe",
+    "firstNameLabel": "Prénom",
+    "lastNameLabel": "Nom",
+    "submit": "Créer mon compte",
+    "requiredFields": "Tous les champs sont obligatoires",
+    "passwordRules": "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre",
+    "genericError": "Une erreur est survenue"
   }
 }
