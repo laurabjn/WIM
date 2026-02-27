@@ -15,6 +15,8 @@
     "submit": "Create my account",
     "requiredFields": "All fields are required",
     "passwordRules": "Password must contain at least 8 characters, one uppercase letter and one digit",
-    "genericError": "An error occurred"
+    "genericError": "An error occurred",
+    "LoggingIn": "Logging in...",
+    "invalidCredentials": "Invalid email or password"
   }
 }

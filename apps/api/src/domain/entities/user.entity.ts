@@ -36,9 +36,9 @@ export class User {
     return new User(
       randomUUID(),
       params.email,
-      params.passwordHash,
       params.firstName,
       params.lastName,
+      params.passwordHash,
     );
   }
 }

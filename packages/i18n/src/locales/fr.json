@@ -17,6 +17,8 @@
     "submit": "Créer mon compte",
     "requiredFields": "Tous les champs sont obligatoires",
     "passwordRules": "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre",
-    "genericError": "Une erreur est survenue"
+    "genericError": "Une erreur est survenue",
+    "LoggingIn": "Connexion en cours...",
+    "invalidCredentials": "Email ou mot de passe invalide"
   }
 }

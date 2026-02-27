@@ -11,3 +11,19 @@ export interface AuthUser {
   firstName?: string | null;
   lastName?: string | null;
 }
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface LoginResult {
+  user: {
+    id: string;
+    email: string;
+    firstName?: string | null;
+    lastName?: string | null;
+  };
+  accessToken: string;
+  refreshToken: string;
+}
