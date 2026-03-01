@@ -1,9 +1,9 @@
-import { UserRepository } from '../../domain/repositories/user.repository';
 import { Injectable, Inject } from '@nestjs/common';
-import { PasswordHasher } from '../../shared/utils/password-hasher';
+import { PasswordHasher } from '../../../shared/utils/password-hasher';
 import { TOKENS } from '../tokens/tokens';
-import { InvalidCredentialsError } from 'src/domain/errors/invalid-credentiels.errors';
 import { LoginUserInput } from '../dto/login-user.dto';
+import { InvalidCredentialsError } from 'src/domain/auth/errors/invalid-credentiels.errors';
+import { UserRepository } from 'src/domain/auth/repositories/user.repository';
 
 @Injectable()
 export class LoginUserUseCase {

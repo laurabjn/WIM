@@ -1,8 +1,8 @@
-import { LoginUser } from "../dtos/loginUser";
+import { LoginResult, LoginUser } from "../dtos/loginUser";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3002/api';
 
-export async function loginUserApi(payload: LoginUser) {
+export async function loginUserApi(payload: LoginUser): Promise<LoginResult> {
   const response = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -18,5 +18,5 @@ export async function loginUserApi(payload: LoginUser) {
     throw new Error(message);
   }
 
-  return data.user;
+  return data as LoginResult;
 }

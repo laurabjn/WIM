@@ -3,8 +3,16 @@ import { useTranslation } from "react-i18next";
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { loginUserApi } from '../application/loginUser.usecase';
 
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isStrongPassword(password: string): boolean {
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+}
+
 export const LoginScreen: React.FC = () => {
-    const { t } = useTranslation("auth");
+  const { t } = useTranslation("auth");
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,6 +28,16 @@ export const LoginScreen: React.FC = () => {
       return;
     }
 
+    if (!isValidEmail(email)) {
+      setError(t('invalidEmail'));
+      return;
+    }
+
+    if (!isStrongPassword(password)) {
+      setError(t('weakPassword'));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const result = await loginUserApi({ email, password });
@@ -27,7 +45,7 @@ export const LoginScreen: React.FC = () => {
       // TODO: navigate vers l’écran principal
       console.log('Logged in user:', result.user);
     } catch (err: any) {
-      setError(err.message ?? 'Login failed');
+      setError(err.message ?? t('genericError'));
     } finally {
       setIsSubmitting(false);
     }

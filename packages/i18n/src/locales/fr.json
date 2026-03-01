@@ -19,6 +19,19 @@
     "passwordRules": "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre",
     "genericError": "Une erreur est survenue",
     "LoggingIn": "Connexion en cours...",
-    "invalidCredentials": "Email ou mot de passe invalide"
+    "invalidCredentials": "Email ou mot de passe invalide",
+    "forgotPasswordTitle": "Mot de passe oublié",
+    "forgotPasswordDescription": "Entrez votre email pour recevoir un lien de réinitialisation.",
+    "sendResetLink": "Envoyer le lien de réinitialisation",
+    "sendingResetLink": "Envoi en cours...",
+    "resetPasswordTitle": "Réinitialiser le mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "resettingPassword": "Réinitialisation en cours...",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "missingToken": "Token manquant.",
+    "resetSuccess": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
+    "resetErrorPasswordsDontMatch": "Les mots de passe ne correspondent pas.",
+    "forgotSuccess": "Si un compte existe pour cet email, un lien de réinitialisation a été envoyé."
   }
 }

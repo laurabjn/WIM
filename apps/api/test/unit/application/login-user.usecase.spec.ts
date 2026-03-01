@@ -1,8 +1,8 @@
-import { LoginUserUseCase } from 'src/application/use-cases/login-user.usecase';
-import { InvalidCredentialsError } from 'src/domain/errors/invalid-credentiels.errors';
-import { UserRepository } from 'src/domain/repositories/user.repository';
+import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.usecase';
+import { IdentityStatus } from 'src/domain/auth/entities/user.entity';
+import { InvalidCredentialsError } from 'src/domain/auth/errors/invalid-credentiels.errors';
+import { UserRepository } from 'src/domain/auth/repositories/user.repository';
 import { PasswordHasher } from 'src/shared/utils/password-hasher';
-import { IdentityStatus } from 'src/domain/entities/user.entity';
 
 describe('LoginUserUseCase', () => {
   let useCase: LoginUserUseCase;
@@ -13,6 +13,7 @@ describe('LoginUserUseCase', () => {
     userRepository = {
       findByEmail: jest.fn(),
       create: jest.fn(),
+      updatePasswordHash: jest.fn(),
     };
 
     passwordHasher = {

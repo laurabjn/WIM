@@ -7,12 +7,18 @@ import {
   Post,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterUserUseCase } from 'src/application/use-cases/register-user.usecase';
-import { UserAlreadyExistsError } from 'src/domain/errors/user-already-exist.error';
-import { RegisterDto } from '../dtos/register.dto';
-import { InvalidCredentialsError } from 'src/domain/errors/invalid-credentiels.errors';
-import { LoginUserUseCase } from 'src/application/use-cases/login-user.usecase';
-import { LoginDto } from '../dtos/login.dto';
+import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.usecase';
+import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.usecase';
+import { InvalidCredentialsError } from 'src/domain/auth/errors/invalid-credentiels.errors';
+import { UserAlreadyExistsError } from 'src/domain/auth/errors/user-already-exist.error';
+import { LoginDto } from '../dtos/auth/login.dto';
+import { RegisterDto } from '../dtos/auth/register.dto';
+import { ResetPasswordUseCase } from 'src/application/auth/use-cases/reset-password.usecase';
+import { RequestPasswordResetUseCase } from 'src/application/auth/use-cases/request-password-reset.usecase';
+import { ResetPasswordDto } from '../dtos/auth/reset-password.dto';
+import { InvalidPasswordResetTokenError } from 'src/domain/auth/errors/invalid-password-reset-token.error';
+import { PasswordResetTokenExpiredError } from 'src/domain/auth/errors/expired-password.errors';
+import { ForgotPasswordDto } from '../dtos/auth/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +26,8 @@ export class AuthController {
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly jwtService: JwtService,
+    private readonly requestPasswordResetUseCase: RequestPasswordResetUseCase,
+    private readonly resetPasswordUseCase: ResetPasswordUseCase,
   ) {}
 
   @Post('register')
@@ -75,6 +83,43 @@ export class AuthController {
         throw new BadRequestException('Invalid email or password');
       }
       throw error;
+    }
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    console.log(
+      '[FORGOT PASSWORD] Received request for email:',
+      dto.email,
+      'and locale:',
+      dto.locale,
+    );
+    await this.requestPasswordResetUseCase.execute(dto.email, dto.locale);
+
+    return {
+      message:
+        'If an account exists for this email, a password reset link has been sent.',
+    };
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    try {
+      await this.resetPasswordUseCase.execute({
+        token: dto.token,
+        newPassword: dto.newPassword,
+      });
+      return { message: 'Password has been reset successfully.' };
+    } catch (e) {
+      if (e instanceof InvalidPasswordResetTokenError) {
+        throw new BadRequestException('Invalid password reset token');
+      }
+      if (e instanceof PasswordResetTokenExpiredError) {
+        throw new BadRequestException('Password reset token has expired');
+      }
+      throw new BadRequestException('Unable to reset password');
     }
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../../domain/repositories/user.repository';
-import { User, CreateUserPayload } from '../../domain/entities/user.entity';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { UserRepository } from 'src/domain/auth/repositories/user.repository';
+import { CreateUserPayload, User } from 'src/domain/auth/entities/user.entity';
 
 @Injectable()
 export class UserPrismaRepository implements UserRepository {
@@ -11,12 +11,7 @@ export class UserPrismaRepository implements UserRepository {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) return null;
 
-    return User.create({
-      email: user.email,
-      passwordHash: user.passwordHash,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    });
+    return User.fromPersistence(user);
   }
 
   async create(params: CreateUserPayload): Promise<User> {
@@ -29,11 +24,20 @@ export class UserPrismaRepository implements UserRepository {
       },
     });
 
-    return User.create({
-      email: created.email,
-      passwordHash: created.passwordHash,
-      firstName: created.firstName,
-      lastName: created.lastName,
+    return User.fromPersistence(created);
+  }
+
+  async updatePasswordHash(
+    userId: string,
+    passwordHash: string,
+  ): Promise<void> {
+    const result = await this.prisma.user.updateMany({
+      where: { id: userId },
+      data: { passwordHash },
     });
+
+    if (result.count === 0) {
+      throw new Error(`UserNotFound: cannot update password for id=${userId}`);
+    }
   }
 }

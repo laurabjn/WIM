@@ -1,10 +1,10 @@
 import { RegisterUserInput } from '../dto/register-user.dto';
-import { User } from '../../domain/entities/user.entity';
-import { UserRepository } from '../../domain/repositories/user.repository';
 import { Injectable, Inject } from '@nestjs/common';
-import { PasswordHasher } from '../../shared/utils/password-hasher';
+import { PasswordHasher } from '../../../shared/utils/password-hasher';
 import { TOKENS } from '../tokens/tokens';
-import { UserAlreadyExistsError } from 'src/domain/errors/user-already-exist.error';
+import { UserAlreadyExistsError } from 'src/domain/auth/errors/user-already-exist.error';
+import { UserRepository } from 'src/domain/auth/repositories/user.repository';
+import { User } from 'src/domain/auth/entities/user.entity';
 
 @Injectable()
 export class RegisterUserUseCase {
@@ -22,11 +22,13 @@ export class RegisterUserUseCase {
 
     const passwordHash = await this.passwordHasher.hash(input.password);
 
-    return this.userRepository.create({
+    const user = await this.userRepository.create({
       email: input.email,
-      passwordHash,
       firstName: input.firstName,
       lastName: input.lastName,
+      passwordHash,
     });
+
+    return user;
   }
 }

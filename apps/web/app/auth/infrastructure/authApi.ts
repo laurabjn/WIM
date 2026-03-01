@@ -43,3 +43,42 @@ export async function loginUserApi(payload: { email: string; password: string })
 
   return data as LoginResult;
 }
+
+export async function requestPasswordResetApi(
+  email: string,
+  locale: 'fr' | 'en',
+): Promise<void> {
+  const response = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ email, locale }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  console.log('API response:', { status: response.status, data });
+
+  if (!response.ok) {
+    const message = data?.message || 'Failed to request password reset';
+    throw new Error(message);
+  }
+}
+
+export async function resetPasswordApi(payload: {
+  token: string;
+  newPassword: string;
+}): Promise<void> {
+  const response = await fetch(`${API_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  console.log('API response:', { status: response.status, data });
+  if (!response.ok) {
+    const message = data?.message || 'Failed to reset password';
+    throw new Error(message);
+  }
+}

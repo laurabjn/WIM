@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import type { User as PrismaUser } from '@prisma/client';
 
 export enum IdentityStatus {
   NOT_VERIFIED = 'NOT_VERIFIED',
@@ -39,6 +40,28 @@ export class User {
       params.firstName,
       params.lastName,
       params.passwordHash,
+    );
+  }
+
+  /**
+   * Mapping depuis la couche infra (Prisma → domaine)
+   */
+  static fromPersistence(prismaUser: PrismaUser): User {
+    return new User(
+      prismaUser.id,
+      prismaUser.email,
+      prismaUser.firstName,
+      prismaUser.lastName,
+      prismaUser.passwordHash,
+      prismaUser.avatarUrl ?? undefined,
+      prismaUser.bio ?? undefined,
+      prismaUser.city ?? undefined,
+      prismaUser.country ?? undefined,
+      prismaUser.languages ? JSON.stringify(prismaUser.languages) : undefined,
+      prismaUser.isAdmin,
+      prismaUser.identityStatus as IdentityStatus,
+      prismaUser.createdAt,
+      prismaUser.updatedAt,
     );
   }
 }

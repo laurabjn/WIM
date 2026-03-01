@@ -1,8 +1,8 @@
 import { PasswordHasher } from 'src/shared/utils/password-hasher';
-import { RegisterUserUseCase } from 'src/application/use-cases/register-user.usecase';
-import { UserAlreadyExistsError } from 'src/domain/errors/user-already-exist.error';
-import { UserRepository } from 'src/domain/repositories/user.repository';
-import { IdentityStatus } from 'src/domain/entities/user.entity';
+import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.usecase';
+import { UserRepository } from 'src/domain/auth/repositories/user.repository';
+import { IdentityStatus } from 'src/domain/auth/entities/user.entity';
+import { UserAlreadyExistsError } from 'src/domain/auth/errors/user-already-exist.error';
 
 describe('RegisterUserUseCase', () => {
   let useCase: RegisterUserUseCase;
@@ -13,6 +13,7 @@ describe('RegisterUserUseCase', () => {
     userRepository = {
       findByEmail: jest.fn(),
       create: jest.fn(),
+      updatePasswordHash: jest.fn(),
     };
 
     passwordHasher = {

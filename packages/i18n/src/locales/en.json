@@ -17,6 +17,19 @@
     "passwordRules": "Password must contain at least 8 characters, one uppercase letter and one digit",
     "genericError": "An error occurred",
     "LoggingIn": "Logging in...",
-    "invalidCredentials": "Invalid email or password"
+    "invalidCredentials": "Invalid email or password",
+    "forgotPasswordTitle": "Forgot password",
+    "forgotPasswordDescription": "Enter your email to receive a reset link.",
+    "sendResetLink": "Send reset link",
+    "sendingResetLink": "Sending...",
+    "resetPasswordTitle": "Reset password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "resettingPassword": "Resetting...",
+    "resetPassword": "Reset password",
+    "missingToken": "Missing token.",
+    "resetSuccess": "Your password has been reset successfully. You can now log in.",
+    "resetErrorPasswordsDontMatch": "Passwords do not match.",
+    "forgotSuccess": "If an account exists for this email, a reset link has been sent."
   }
 }

@@ -1,2 +1,4 @@
 export const USER_REPOSITORY = Symbol('USER_REPOSITORY');
 export const PASSWORD_HASHER = Symbol('PASSWORD_HASHER');
+export const PASSWORD_RESET_TOKEN = Symbol('PASSWORD_RESET_TOKEN');
+export const EMAIL_SENDER = Symbol('EMAIL_SENDER');

@@ -1,7 +1,7 @@
 import { loginUserApi } from "./loginUser.usecase";
 
 describe('loginUser (mobile)', () => {
-  const API_URL = 'http://localhost:3000';
+  const API_URL = 'http://localhost:3002/api';
 
   beforeEach(() => {
     (global as any).fetch = jest.fn();

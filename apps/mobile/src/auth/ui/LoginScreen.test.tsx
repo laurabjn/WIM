@@ -1,9 +1,15 @@
-import { render, screen, fireEvent } from '@testing-library/react-native';
-import * as loginUserApi from '../application/loginUser.usecase';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { LoginScreen } from './LoginScreen';
 
+jest.mock('../application/loginUser.usecase', () => ({
+  loginUserApi: jest.fn(),
+}));
+
+import { loginUserApi } from '../application/loginUser.usecase';
+
+const mockLogin = loginUserApi as jest.Mock
+
 describe('<LoginScreen />', () => {
-  const mockLogin = jest.spyOn(loginUserApi, 'loginUserApi');
 
   beforeEach(() => {
     mockLogin.mockReset();
@@ -20,7 +26,10 @@ describe('<LoginScreen />', () => {
     fireEvent.changeText(passwordInput, 'abc123');
     fireEvent.press(submitButton);
 
-    expect(mockLogin).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockLogin).not.toHaveBeenCalled();
+    });
+
     const error = await screen.findByTestId('error-message');
     expect(error).toBeTruthy();
   });
@@ -36,7 +45,10 @@ describe('<LoginScreen />', () => {
     fireEvent.changeText(passwordInput, 'SuperPass1');
     fireEvent.press(submitButton);
 
-    expect(mockLogin).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockLogin).not.toHaveBeenCalled();
+    });
+
     const error = await screen.findByTestId('error-message');
     expect(error).toBeTruthy();
   });
@@ -48,9 +60,11 @@ describe('<LoginScreen />', () => {
 
     fireEvent.press(submitButton);
 
+    await waitFor(() => {
+      expect(mockLogin).not.toHaveBeenCalled();
+    });
+
     const error = await screen.findByTestId('error-message');
     expect(error).toBeTruthy();
-
-    expect(mockLogin).not.toHaveBeenCalled();
   });
 });
