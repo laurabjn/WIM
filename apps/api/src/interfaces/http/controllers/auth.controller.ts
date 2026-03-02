@@ -5,7 +5,9 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.usecase';
 import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.usecase';
@@ -86,15 +88,17 @@ export class AuthController {
     }
   }
 
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(/*@Res({ passthrough: true }) res: Response*/) {
+    return {
+      message: 'Logged out',
+    };
+  }
+
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   async forgotPassword(@Body() dto: ForgotPasswordDto) {
-    console.log(
-      '[FORGOT PASSWORD] Received request for email:',
-      dto.email,
-      'and locale:',
-      dto.locale,
-    );
     await this.requestPasswordResetUseCase.execute(dto.email, dto.locale);
 
     return {

@@ -7,6 +7,8 @@
   "auth": {
     "login": "Login",
     "register": "Sign up",
+    "logout": "Logout",
+    "loggedOut": "You have been logged out",
     "email": "Email",
     "password": "Password",
     "title": "Create an account",

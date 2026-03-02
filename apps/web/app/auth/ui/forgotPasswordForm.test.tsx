@@ -3,6 +3,11 @@ import userEvent from '@testing-library/user-event';
 import * as usecase from '../application/requestPasswordReset.usecase';
 import { ForgotPasswordForm } from './forgotPasswordForm';
 
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => key,
+  useLocale: () => 'fr',
+}));
+
 describe('<ForgotPasswordForm />', () => {
   const mockRequest = jest.spyOn(usecase, 'requestPasswordReset');
 
@@ -21,7 +26,7 @@ describe('<ForgotPasswordForm />', () => {
     await userEvent.type(emailInput, 'test@example.com');
     await userEvent.click(submitButton);
 
-    expect(mockRequest).toHaveBeenCalledWith('test@example.com');
+    expect(mockRequest).toHaveBeenCalledWith('test@example.com', 'fr');
   });
 
   it('should show success message on success', async () => {

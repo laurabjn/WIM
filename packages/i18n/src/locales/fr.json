@@ -7,6 +7,8 @@
   "auth": {
     "login": "Connexion",
     "register": "Inscription",
+    "logout": "Déconnexion",
+    "loggedOut": "Vous avez été déconnecté",
     "email": "Email",
     "password": "Mot de passe",
     "title": "Créer un compte",

@@ -2,11 +2,13 @@ import { PasswordResetTokenRepository } from 'src/domain/auth/repositories/passw
 import { RequestPasswordResetUseCase } from 'src/application/auth/use-cases/request-password-reset.usecase';
 import { IdentityStatus } from 'src/domain/auth/entities/user.entity';
 import { UserRepository } from 'src/domain/auth/repositories/user.repository';
+import { EmailSenderPort } from 'src/application/notifications/ports/email-sender.port';
 
 describe('RequestPasswordResetUseCase', () => {
   let useCase: RequestPasswordResetUseCase;
   let userRepository: jest.Mocked<UserRepository>;
   let tokenRepository: jest.Mocked<PasswordResetTokenRepository>;
+  let emailSender: jest.Mocked<EmailSenderPort>;
 
   beforeEach(() => {
     userRepository = {
@@ -20,10 +22,16 @@ describe('RequestPasswordResetUseCase', () => {
       verify: jest.fn(),
     };
 
+    emailSender = {
+      send: jest.fn(),
+    } as any;
+
     useCase = new RequestPasswordResetUseCase(
       userRepository,
       tokenRepository,
       3600,
+      emailSender,
+      'https://localhost:3001',
     );
   });
 
@@ -42,21 +50,26 @@ describe('RequestPasswordResetUseCase', () => {
 
     tokenRepository.sign.mockResolvedValue('jwt-reset-token');
 
-    const result = await useCase.execute('test@example.com');
+    await useCase.execute('test@example.com', 'fr');
 
     expect(tokenRepository.sign).toHaveBeenCalledWith(
       { userId: 'user-1' },
       3600,
     );
-    expect(result).toEqual({ token: 'jwt-reset-token' });
+    expect(emailSender.send).toHaveBeenCalledTimes(1);
+
+    const callArgs = emailSender.send.mock.calls[0][0];
+    expect(callArgs.to).toBe('test@example.com');
+    expect(callArgs.subject).toBeDefined();
+    expect(callArgs.html).toContain('reset-password');
   });
 
   it('should not reveal if user does not exist', async () => {
     userRepository.findByEmail.mockResolvedValue(null);
 
-    const result = await useCase.execute('unknown@example.com');
+    await useCase.execute('unknown@example.com', 'fr');
 
     expect(tokenRepository.sign).not.toHaveBeenCalled();
-    expect(result).toEqual({ token: null });
+    expect(emailSender.send).not.toHaveBeenCalled();
   });
 });
