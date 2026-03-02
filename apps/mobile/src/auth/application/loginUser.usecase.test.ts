@@ -12,7 +12,7 @@ describe('loginUser (mobile)', () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        user: { id: 'uuid-1', email: 'test@example.com' },
+        user: { id: 'uuid-1', email: 'test@example.com', firstName: 'Test', lastName: 'User', isAdmin: false },
         accessToken: 'access',
         refreshToken: 'refresh',
       }),
@@ -25,5 +25,8 @@ describe('loginUser (mobile)', () => {
 
     expect(fetch).toHaveBeenCalled();
     expect(result.user.email).toBe('test@example.com');
+    expect(result.user.firstName).toBe('Test');
+    expect(result.user.lastName).toBe('User');
+    expect(result.user.isAdmin).toBe(false);
   });
 });

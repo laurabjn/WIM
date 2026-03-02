@@ -23,6 +23,7 @@ export interface LoginResult {
     email: string;
     firstName?: string | null;
     lastName?: string | null;
+    isAdmin: boolean;
   };
   accessToken: string;
   refreshToken: string;

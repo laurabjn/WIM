@@ -35,5 +35,16 @@
     "resetSuccess": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
     "resetErrorPasswordsDontMatch": "Les mots de passe ne correspondent pas.",
     "forgotSuccess": "Si un compte existe pour cet email, un lien de réinitialisation a été envoyé."
+  },
+  "admin": {
+    "adminTitle": "Tableau de bord administrateur",
+    "adminSubtitle": "Vue réservée aux administrateurs.",
+    "adminTableHeaderName": "Fonctionnalité",
+    "adminTableHeaderValue": "Statut",
+    "adminFeatureIdentity": "Vérification d'identité",
+    "adminFeatureMatching": "Matching & modération",
+    "adminFeatureBilling": "Facturation & abonnements",
+    "adminComingSoon": "À venir",
+    "adminNoAccess": "Vous n’avez pas accès à cette page."
   }
 }

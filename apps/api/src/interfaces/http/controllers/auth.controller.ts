@@ -61,9 +61,14 @@ export class AuthController {
       const user = await this.loginUserUseCase.execute({
         email: dto.email,
         password: dto.password,
+        isAdmin: dto.isAdmin,
       });
 
-      const payload = { sub: user.id, email: user.email };
+      const payload = {
+        sub: user.id,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      };
 
       const accessToken = await this.jwtService.signAsync(payload, {
         expiresIn: '15m',

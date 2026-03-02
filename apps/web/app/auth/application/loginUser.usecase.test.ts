@@ -15,6 +15,7 @@ describe('loginUser use case', () => {
         email: 'test@example.com',
         firstName: 'Laura',
         lastName: 'Bojon',
+        isAdmin: false,
       },
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
@@ -37,6 +38,7 @@ describe('loginUser use case', () => {
       body: JSON.stringify({
         email: 'test@example.com',
         password: 'secretPassword123',
+        isAdmin: false,
       }),
     });
 
