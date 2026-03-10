@@ -17,6 +17,11 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface RegisterResult {
+  user: AuthUser;
+  identityRedirectUrl?: string;
+}
+
 export interface LoginResult {
   user: {
     id: string;

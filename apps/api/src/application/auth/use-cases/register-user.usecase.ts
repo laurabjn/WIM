@@ -27,6 +27,12 @@ export class RegisterUserUseCase {
       firstName: input.firstName,
       lastName: input.lastName,
       passwordHash,
+      avatarUrl: input.avatarUrl,
+      bio: input.bio,
+      country: input.country,
+      nationality: input.nationality,
+      phone: input.phone,
+      birthDate: input.birthDate,
     });
 
     return user;

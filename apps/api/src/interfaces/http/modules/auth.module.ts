@@ -16,6 +16,7 @@ import { PASSWORD_RESET_TOKEN } from 'src/application/auth/tokens/tokens';
 import { ResetPasswordUseCase } from 'src/application/auth/use-cases/reset-password.usecase';
 import { RequestPasswordResetUseCase } from 'src/application/auth/use-cases/request-password-reset.usecase';
 import { ConsoleEmailSender } from 'src/infrastructure/notifications/console-email.sender';
+import { IdentityModule } from './identity.module';
 
 const ACCESS_TOKEN_TTL = '15m';
 
@@ -26,6 +27,7 @@ const ACCESS_TOKEN_TTL = '15m';
       secret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret',
       signOptions: { expiresIn: ACCESS_TOKEN_TTL },
     }),
+    IdentityModule,
   ],
   providers: [
     PrismaService,

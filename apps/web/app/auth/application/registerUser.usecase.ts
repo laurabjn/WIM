@@ -1,6 +1,6 @@
-import { RegisterUserPayload, AuthUser } from "../dtos/authUser";
+import { RegisterUserPayload, RegisterResult } from "../dtos/authUser";
 import { registerUserApi } from "../infrastructure/authApi";
 
-export async function registerUser(payload: RegisterUserPayload): Promise<AuthUser> {
+export async function registerUser(payload: RegisterUserPayload): Promise<RegisterResult> {
   return registerUserApi(payload);
 }

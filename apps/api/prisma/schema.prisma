@@ -23,8 +23,10 @@ model User {
   lastName  String? @map("last_name")
   avatarUrl String? @map("avatar_url")
   bio       String?
-  city      String?
   country   String?
+  nationality  String?
+  phone        String?
+  birthDate    DateTime? @map("birth_date")
   languages Json?
   isAdmin   Boolean @default(false) @map("is_admin")
 

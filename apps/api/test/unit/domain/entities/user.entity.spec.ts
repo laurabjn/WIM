@@ -7,6 +7,12 @@ describe('User', () => {
       firstName: 'Laura',
       lastName: 'Smith',
       passwordHash: 'securePassword123',
+      avatarUrl: null,
+      bio: null,
+      country: null,
+      nationality: null,
+      phone: null,
+      birthDate: null,
     });
 
     expect(user.email).toBe('laura@example.com');

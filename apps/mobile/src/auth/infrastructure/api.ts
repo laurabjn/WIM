@@ -1,8 +1,8 @@
-import { RegisterUser } from "../dtos/registerUser";
+import { RegisterUser, RegisterUserResponse } from "../dtos/registerUser";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3002/api';
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
 
-export async function registerUserApi(payload: RegisterUser) {
+export async function registerUserApi(payload: RegisterUser): Promise<RegisterUserResponse> {
 
   const res = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
@@ -12,9 +12,14 @@ export async function registerUserApi(payload: RegisterUser) {
 
   const data = await res.json().catch(() => ({}));
 
+  console.log('Register API response:', { status: res.status, data });
+
   if (!res.ok) {
     throw new Error(data?.message ?? 'Registration failed');
   }
 
-  return data.user;
+  return {
+    user: data.user,
+    identityRedirectUrl: data.identityRedirectUrl,
+  };
 }

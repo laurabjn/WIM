@@ -30,4 +30,22 @@ export class RegisterDto {
 
   @IsBoolean()
   isAdmin?: boolean;
+
+  @IsString()
+  avatarUrl?: string;
+
+  @IsString()
+  bio?: string;
+
+  @IsString()
+  country?: string;
+
+  @IsString()
+  nationality?: string;
+
+  @IsString()
+  phone?: string;
+
+  @IsString()
+  birthDate?: string;
 }

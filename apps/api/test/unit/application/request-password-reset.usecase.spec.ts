@@ -13,8 +13,10 @@ describe('RequestPasswordResetUseCase', () => {
   beforeEach(() => {
     userRepository = {
       findByEmail: jest.fn(),
+      findById: jest.fn(),
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
+      updateIdentityStatus: jest.fn(),
     };
 
     tokenRepository = {
@@ -43,6 +45,12 @@ describe('RequestPasswordResetUseCase', () => {
       firstName: 'Laura',
       lastName: 'Bojon',
       isAdmin: false,
+      avatarUrl: null,
+      bio: null,
+      country: null,
+      nationality: null,
+      phone: null,
+      birthDate: null,
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),

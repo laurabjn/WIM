@@ -13,6 +13,12 @@ export interface CreateUserPayload {
   passwordHash: string;
   firstName: string;
   lastName: string;
+  avatarUrl: string;
+  bio: string;
+  country: string;
+  nationality: string;
+  phone: string;
+  birthDate: string;
 }
 
 export class User {
@@ -22,10 +28,12 @@ export class User {
     public readonly firstName: string,
     public readonly lastName: string,
     public readonly passwordHash: string,
-    public readonly avatarUrl?: string,
-    public readonly bio?: string,
-    public readonly city?: string,
-    public readonly country?: string,
+    public readonly avatarUrl: string,
+    public readonly bio: string,
+    public readonly country: string,
+    public readonly nationality: string,
+    public readonly phone: string,
+    public readonly birthDate: string,
     public readonly languages?: string,
     public readonly isAdmin: boolean = false,
     public readonly identityStatus: IdentityStatus = IdentityStatus.NOT_VERIFIED,
@@ -40,6 +48,17 @@ export class User {
       params.firstName,
       params.lastName,
       params.passwordHash,
+      params.avatarUrl,
+      params.bio,
+      params.country,
+      params.nationality,
+      params.phone,
+      params.birthDate,
+      '',
+      false,
+      IdentityStatus.NOT_VERIFIED,
+      new Date(),
+      new Date(),
     );
   }
 
@@ -53,11 +72,13 @@ export class User {
       prismaUser.firstName,
       prismaUser.lastName,
       prismaUser.passwordHash,
-      prismaUser.avatarUrl ?? undefined,
-      prismaUser.bio ?? undefined,
-      prismaUser.city ?? undefined,
-      prismaUser.country ?? undefined,
-      prismaUser.languages ? JSON.stringify(prismaUser.languages) : undefined,
+      prismaUser.avatarUrl,
+      prismaUser.bio,
+      prismaUser.country,
+      prismaUser.nationality ?? '',
+      prismaUser.phone,
+      prismaUser.birthDate.toISOString(),
+      prismaUser.languages ? JSON.stringify(prismaUser.languages) : '',
       prismaUser.isAdmin,
       prismaUser.identityStatus as IdentityStatus,
       prismaUser.createdAt,

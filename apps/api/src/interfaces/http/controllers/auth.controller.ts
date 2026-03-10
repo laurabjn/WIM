@@ -5,9 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Res,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.usecase';
 import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.usecase';
@@ -21,6 +19,8 @@ import { ResetPasswordDto } from '../dtos/auth/reset-password.dto';
 import { InvalidPasswordResetTokenError } from 'src/domain/auth/errors/invalid-password-reset-token.error';
 import { PasswordResetTokenExpiredError } from 'src/domain/auth/errors/expired-password.errors';
 import { ForgotPasswordDto } from '../dtos/auth/forgot-password.dto';
+import { IdentityStatus } from 'src/domain/auth/entities/user.entity';
+import { StartIdentityVerificationUseCase } from 'src/application/auth/use-cases/start-identity-verification.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -30,26 +30,92 @@ export class AuthController {
     private readonly jwtService: JwtService,
     private readonly requestPasswordResetUseCase: RequestPasswordResetUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
+    private readonly startIdentityVerificationUseCase: StartIdentityVerificationUseCase,
   ) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() dto: RegisterDto) {
     try {
+      console.log('REGISTER step A - dto received', dto);
+
       const user = await this.registerUserUseCase.execute({
         email: dto.email,
         password: dto.password,
         firstName: dto.firstName,
         lastName: dto.lastName,
+        birthDate: dto.birthDate,
+        nationality: dto.nationality,
+        country: dto.country,
+        phone: dto.phone,
+        bio: dto.bio,
+        avatarUrl: dto.avatarUrl,
       });
 
-      const { passwordHash, ...safeUser } = user as any;
+      console.log('REGISTER step B - user created', user);
 
-      return { user: safeUser };
+      const payload = {
+        sub: user.id,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        birthDate: user.birthDate,
+        nationality: user.nationality,
+        country: user.country,
+        phone: user.phone,
+        bio: user.bio,
+        avatarUrl: user.avatarUrl,
+      };
+
+      console.log('REGISTER step C - payload built', payload);
+
+      const accessToken = await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_ACCESS_SECRET,
+        expiresIn: '15m',
+      });
+
+      console.log('REGISTER step D - access token ok');
+
+      const refreshToken = await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_REFRESH_SECRET,
+        expiresIn: '7d',
+      });
+
+      console.log('REGISTER step E - refresh token ok');
+
+      /*const { redirectUrl } =
+        await this.startIdentityVerificationUseCase.execute({
+          userId: user.id,
+        });*/
+      const redirectUrl = 'https://example.com/identity/mock';
+
+      console.log('REGISTER step F - identity verification ok', redirectUrl);
+
+      return {
+        accessToken,
+        refreshToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isAdmin: user.isAdmin,
+          identityStatus: IdentityStatus.IN_PROGRESS,
+          birthDate: user.birthDate,
+          nationality: user.nationality,
+          country: user.country,
+          phone: user.phone,
+          bio: user.bio,
+          avatarUrl: user.avatarUrl,
+        },
+        identityRedirectUrl: redirectUrl,
+      };
     } catch (error) {
+      console.error('REGISTER ERROR FULL =', error);
+
       if (error instanceof UserAlreadyExistsError) {
         throw new BadRequestException('Email already in use');
       }
+
       throw error;
     }
   }

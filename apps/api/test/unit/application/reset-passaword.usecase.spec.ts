@@ -13,8 +13,10 @@ describe('ResetPasswordUseCase', () => {
   beforeEach(() => {
     userRepository = {
       findByEmail: jest.fn(),
+      findById: jest.fn(),
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
+      updateIdentityStatus: jest.fn(),
     } as any;
 
     tokenRepository = {

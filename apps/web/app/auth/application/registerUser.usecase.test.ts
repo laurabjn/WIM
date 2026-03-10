@@ -18,7 +18,7 @@ describe('registerUser use case', () => {
 
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ user: fakeUser }),
+      json: async () => ({ user: fakeUser, identityRedirectUrl: 'http://redirect.url' }),
     });
 
     const result = await registerUser({
@@ -42,7 +42,10 @@ describe('registerUser use case', () => {
       credentials: 'include',
     });
 
-    expect(result).toEqual(fakeUser);
+    expect(result).toEqual({
+      user: fakeUser,
+      identityRedirectUrl: 'http://redirect.url',
+    });
   });
 
   it('should throw on API error', async () => {

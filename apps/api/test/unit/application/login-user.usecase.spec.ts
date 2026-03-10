@@ -12,8 +12,10 @@ describe('LoginUserUseCase', () => {
   beforeEach(() => {
     userRepository = {
       findByEmail: jest.fn(),
+      findById: jest.fn(),
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
+      updateIdentityStatus: jest.fn(),
     };
 
     passwordHasher = {
@@ -32,6 +34,12 @@ describe('LoginUserUseCase', () => {
       firstName: 'Laura',
       lastName: 'Bojon',
       isAdmin: false,
+      avatarUrl: 'https://example.com/avatar.jpg',
+      bio: 'Hello, I am Laura!',
+      country: 'USA',
+      nationality: 'American',
+      phone: '+1234567890',
+      birthDate: '1990-01-01',
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -72,6 +80,12 @@ describe('LoginUserUseCase', () => {
       firstName: 'Laura',
       lastName: 'Bojon',
       isAdmin: false,
+      avatarUrl: 'https://example.com/avatar.jpg',
+      bio: 'Hello, I am Laura!',
+      country: 'USA',
+      nationality: 'American',
+      phone: '+1234567890',
+      birthDate: '1990-01-01',
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),

@@ -1,10 +1,9 @@
-import React from 'react';
-import { RegisterForm } from '../../auth/ui/registerForm';
+import { RegisterWizard } from '../../auth/ui/registerWizard';
 
 export default function RegisterPage() {
   return (
-    <main>
-      <RegisterForm />
+    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+      <RegisterWizard />
     </main>
   );
 }

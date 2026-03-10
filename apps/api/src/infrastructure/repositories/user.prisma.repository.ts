@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { UserRepository } from 'src/domain/auth/repositories/user.repository';
-import { CreateUserPayload, User } from 'src/domain/auth/entities/user.entity';
+import {
+  CreateUserPayload,
+  IdentityStatus,
+  User,
+} from 'src/domain/auth/entities/user.entity';
 
 @Injectable()
 export class UserPrismaRepository implements UserRepository {
@@ -14,6 +18,12 @@ export class UserPrismaRepository implements UserRepository {
     return User.fromPersistence(user);
   }
 
+  async findById(id: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) return null;
+    return User.fromPersistence(user);
+  }
+
   async create(params: CreateUserPayload): Promise<User> {
     const created = await this.prisma.user.create({
       data: {
@@ -21,6 +31,12 @@ export class UserPrismaRepository implements UserRepository {
         passwordHash: params.passwordHash,
         firstName: params.firstName,
         lastName: params.lastName,
+        birthDate: params.birthDate,
+        avatarUrl: params.avatarUrl,
+        bio: params.bio,
+        country: params.country,
+        nationality: params.nationality,
+        phone: params.phone,
       },
     });
 
@@ -39,5 +55,15 @@ export class UserPrismaRepository implements UserRepository {
     if (result.count === 0) {
       throw new Error(`UserNotFound: cannot update password for id=${userId}`);
     }
+  }
+
+  async updateIdentityStatus(
+    userId: string,
+    status: IdentityStatus,
+  ): Promise<void> {
+    await this.prisma.user.updateMany({
+      where: { id: userId },
+      data: { identityStatus: status as any },
+    });
   }
 }

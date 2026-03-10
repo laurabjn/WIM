@@ -1,8 +1,13 @@
-import { RegisterUserPayload, AuthUser, LoginResult } from '../dtos/authUser';
+import {
+  RegisterUserPayload,
+  AuthUser,
+  LoginResult,
+  RegisterResult
+} from '../dtos/authUser';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api';
 
-export async function registerUserApi(payload: RegisterUserPayload): Promise<AuthUser> {
+export async function registerUserApi(payload: RegisterUserPayload): Promise<RegisterResult> {
   const response = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
     headers: {
@@ -20,7 +25,10 @@ export async function registerUserApi(payload: RegisterUserPayload): Promise<Aut
     throw new Error(message);
   }
 
-  return data.user as AuthUser;
+  return {
+    user: data.user as AuthUser,
+    identityRedirectUrl: data.identityRedirectUrl as string | undefined,
+  };
 }
 
 export async function loginUserApi(payload: { email: string; password: string }): Promise<LoginResult> {

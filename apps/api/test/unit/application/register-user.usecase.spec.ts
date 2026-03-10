@@ -12,8 +12,10 @@ describe('RegisterUserUseCase', () => {
   beforeEach(() => {
     userRepository = {
       findByEmail: jest.fn(),
+      findById: jest.fn(),
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
+      updateIdentityStatus: jest.fn(),
     };
 
     passwordHasher = {
@@ -35,6 +37,12 @@ describe('RegisterUserUseCase', () => {
       firstName: 'John',
       lastName: 'Doe',
       isAdmin: false,
+      avatarUrl: 'https://example.com/avatar.jpg',
+      bio: 'Hello, I am John!',
+      country: 'USA',
+      nationality: 'American',
+      phone: '+1234567890',
+      birthDate: '1990-01-01',
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -45,6 +53,12 @@ describe('RegisterUserUseCase', () => {
       password: 'secret123',
       firstName: 'John',
       lastName: 'Doe',
+      avatarUrl: 'https://example.com/avatar.jpg',
+      bio: 'Hello, I am John!',
+      country: 'USA',
+      nationality: 'American',
+      phone: '+1234567890',
+      birthDate: '1990-01-01',
     });
 
     expect(userRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
@@ -54,6 +68,12 @@ describe('RegisterUserUseCase', () => {
       passwordHash: 'hashed-password',
       firstName: 'John',
       lastName: 'Doe',
+      avatarUrl: 'https://example.com/avatar.jpg',
+      bio: 'Hello, I am John!',
+      country: 'USA',
+      nationality: 'American',
+      phone: '+1234567890',
+      birthDate: '1990-01-01',
     });
 
     expect(result).toMatchObject({
@@ -70,6 +90,12 @@ describe('RegisterUserUseCase', () => {
       firstName: 'Existing',
       lastName: 'User',
       isAdmin: false,
+      avatarUrl: 'https://example.com/avatar.jpg',
+      bio: 'Hello, I am Existing!',
+      country: 'USA',
+      nationality: 'American',
+      phone: '+1234567890',
+      birthDate: '1990-01-01',
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -81,6 +107,12 @@ describe('RegisterUserUseCase', () => {
         password: 'secret123',
         firstName: 'John',
         lastName: 'Doe',
+        avatarUrl: 'https://example.com/avatar.jpg',
+        bio: 'Hello, I am John!',
+        country: 'USA',
+        nationality: 'American',
+        phone: '+1234567890',
+        birthDate: '1990-01-01',
       }),
     ).rejects.toBeInstanceOf(UserAlreadyExistsError);
 

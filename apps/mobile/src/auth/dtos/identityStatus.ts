@@ -1,0 +1,6 @@
+export enum IdentityStatus {
+  NOT_VERIFIED = 'NOT_VERIFIED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+}

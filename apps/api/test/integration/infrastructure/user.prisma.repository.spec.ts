@@ -23,6 +23,12 @@ describe('UserPrismaRepository (integration)', () => {
       lastName: 'Smith',
       email: 'laura@example.com',
       passwordHash: 'hashedpassword',
+      avatarUrl: null,
+      bio: null,
+      country: null,
+      nationality: null,
+      phone: null,
+      birthDate: null,
     });
 
     const user = await repo.findByEmail('laura@example.com');
