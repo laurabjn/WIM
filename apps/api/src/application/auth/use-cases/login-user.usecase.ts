@@ -14,7 +14,8 @@ export class LoginUserUseCase {
   ) {}
 
   async execute(input: LoginUserInput) {
-    const user = await this.userRepository.findByEmail(input.email);
+    const email = input.email.trim().toLowerCase();
+    const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
       throw new InvalidCredentialsError();
@@ -34,7 +35,6 @@ export class LoginUserUseCase {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      isAdmin: user.isAdmin,
       identityStatus: user.identityStatus,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,

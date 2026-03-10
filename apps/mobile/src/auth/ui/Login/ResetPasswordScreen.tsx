@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { resetPassword } from '../application/resetPassword.usecase';
 import { useTranslation } from 'react-i18next';
+import { resetPassword } from '../../application/resetPassword.usecase';
 
 interface ResetPasswordScreenProps {
   token: string;

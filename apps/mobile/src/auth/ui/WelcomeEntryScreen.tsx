@@ -6,68 +6,57 @@ import {
   Image,
   StyleSheet,
 } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../../../navigation/authStack';
-import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthStackParamList } from '../../navigation/authStack';
+import { useTranslation } from 'react-i18next';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterWelcome'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'WelcomeEntry'>;
 
-export const RegisterWelcomeScreen: React.FC<Props> = ({ navigation }) => {
+export const WelcomeEntryScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation(['auth', 'common']);
 
-  function handleGuidedTour() {
-    // TODO : plus tard tu feras une vraie visite guidée
-    // navigation.navigate('Onboarding');
+  function handleRegister() {
+    navigation.navigate('RegisterStart');
   }
 
-  function handleAccessApp() {
-    // TODO : basculer vers la navigation principale
-    // navigation.reset({ index: 0, routes: [{ name: 'AppHome' }] });
+  function handleLogin() {
+      navigation.navigate('Login');
   }
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.container}>
-
         <View style={styles.card}>
           <View style={styles.centerSection}>
             <Image
-              source={require('../../../../assets/logo.jpg')}
+              source={require('../../../assets/logo.jpg')}
               style={styles.logo}
               resizeMode="contain"
             />
 
-            <Text style={styles.title}>{t('auth:welcomeTitle')}</Text>
+            <Text style={styles.title}>{t('auth:goToWim')}</Text>
           </View>
 
           <View style={styles.bottomSection}>
             <TouchableOpacity
               style={styles.secondaryButton}
-              onPress={handleGuidedTour}
+              onPress={handleRegister}
               activeOpacity={0.9}
             >
               <Text style={styles.secondaryButtonText}>
-                {t('auth:guidedTour')}
+                {t('auth:register.signUpWithEmail')}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.buttonWrapper}
-              onPress={handleAccessApp}
+              style={styles.secondaryButton}
+              onPress={handleLogin}
               activeOpacity={0.9}
             >
-              <LinearGradient
-                colors={['#52D1A6', '#2DA7F3']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={styles.primaryButton}
-              >
-                <Text style={styles.primaryButtonText}>
-                  {t('auth:goToWim')}
-                </Text>
-              </LinearGradient>
+              <Text style={styles.secondaryButtonText}>
+                {t('auth:login.login')}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -91,7 +80,7 @@ const styles = StyleSheet.create({
 
   stepLabel: {
     alignSelf: 'flex-start',
-    marginLeft: 6,
+    marginLeft: 4,
     marginBottom: 8,
     fontSize: 14,
     color: '#B0B0B0',
@@ -112,13 +101,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
   },
 
   logo: {
     width: 64,
     height: 64,
-    marginBottom: 24,
+    marginBottom: 20,
   },
 
   title: {
@@ -145,25 +134,7 @@ const styles = StyleSheet.create({
 
   secondaryButtonText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#111111',
-  },
-
-  buttonWrapper: {
-    width: '100%',
-  },
-
-  primaryButton: {
-    width: '100%',
-    height: 48,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  primaryButtonText: {
-    fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#111111',
   },
 });

@@ -28,9 +28,6 @@ export class RegisterDto {
   @IsString()
   lastName?: string;
 
-  @IsBoolean()
-  isAdmin?: boolean;
-
   @IsString()
   avatarUrl?: string;
 

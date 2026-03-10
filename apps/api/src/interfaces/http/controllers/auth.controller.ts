@@ -127,13 +127,11 @@ export class AuthController {
       const user = await this.loginUserUseCase.execute({
         email: dto.email,
         password: dto.password,
-        isAdmin: dto.isAdmin,
       });
 
       const payload = {
         sub: user.id,
         email: user.email,
-        isAdmin: user.isAdmin,
       };
 
       const accessToken = await this.jwtService.signAsync(payload, {
@@ -152,6 +150,7 @@ export class AuthController {
         refreshToken,
       };
     } catch (error) {
+      console.error('LOGIN ERROR FULL =', error);
       if (error instanceof InvalidCredentialsError) {
         throw new BadRequestException('Invalid email or password');
       }

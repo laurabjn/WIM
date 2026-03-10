@@ -15,15 +15,16 @@ export class RegisterUserUseCase {
   ) {}
 
   async execute(input: RegisterUserInput): Promise<User> {
-    const existing = await this.userRepository.findByEmail(input.email);
+    const email = input.email.toLowerCase();
+    const existing = await this.userRepository.findByEmail(email);
     if (existing) {
-      throw new UserAlreadyExistsError(input.email);
+      throw new UserAlreadyExistsError(email);
     }
 
     const passwordHash = await this.passwordHasher.hash(input.password);
 
     const user = await this.userRepository.create({
-      email: input.email,
+      email: email,
       firstName: input.firstName,
       lastName: input.lastName,
       passwordHash,

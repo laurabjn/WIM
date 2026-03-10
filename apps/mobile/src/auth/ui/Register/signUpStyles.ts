@@ -4,8 +4,8 @@ export const signupStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F4F4F5',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 20,
   },
 
   content: {
@@ -15,14 +15,12 @@ export const signupStyles = StyleSheet.create({
   },
 
   card: {
-    width: '88%',
-    minHeight: 620,
+    flex: 1,
     backgroundColor: '#FFFFFF',
     borderRadius: 32,
     paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 20,
-    elevation: 4,
+    paddingTop: 40,
+    paddingBottom: 24,
     justifyContent: 'space-between',
   },
 
@@ -147,6 +145,8 @@ export const signupStyles = StyleSheet.create({
 
   buttonWrapper: {
     width: '100%',
+    gap: 12,
+    paddingBottom: 10,
   },
 
   primaryButton: {

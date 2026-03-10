@@ -190,16 +190,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F4F4F5',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 20,
   },
   card: {
-    width: '88%',
-    backgroundColor: '#FFF',
+    flex: 1,
+    backgroundColor: '#FFFFFF',
     borderRadius: 32,
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-    elevation: 4,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 24,
     justifyContent: 'space-between',
   },
   header: {
@@ -249,6 +249,8 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     marginTop: 16,
+    gap: 12,
+    paddingBottom: 10,
   },
   primaryButton: {
     height: 56,
