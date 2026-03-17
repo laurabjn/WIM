@@ -6,6 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -48,69 +51,81 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.backButtonText}>←</Text>
-            </TouchableOpacity>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          <View style={styles.container}>
+            <View style={styles.card}>
+              <View style={styles.header}>
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={() => navigation.goBack()}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.backButtonText}>←</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.centerSection}>
+                <Image
+                  source={require('../../../../assets/logo.jpg')}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+
+                <Text style={styles.title}>{t('auth:login.forgotPasswordSearchTitle')}</Text>
+                <Text style={styles.description}>
+                  {t('auth:login.forgotPasswordSearchDescription')}
+                </Text>
+              </View>
+
+              <View style={styles.bottomSection}>
+                <TextInput
+                  testID="forgot-password-email-input"
+                  style={styles.input}
+                  placeholder={t('auth:login.email')}
+                  placeholderTextColor="#B4B4B4"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+
+                {error && (
+                  <Text testID="forgot-password-error" style={styles.errorText}>
+                    {error}
+                  </Text>
+                )}
+
+                {success && (
+                  <Text testID="forgot-password-success" style={styles.successText}>
+                    {success}
+                  </Text>
+                )}
+
+                <TouchableOpacity
+                  testID="forgot-password-submit-button"
+                  style={[styles.submitButton, isSubmitting && styles.buttonDisabled]}
+                  onPress={handleSubmit}
+                  disabled={isSubmitting}
+                  activeOpacity={0.9}
+                >
+                  <Text style={styles.submitButtonText}>
+                    {isSubmitting ? t('auth:login.sendingResetLink') : t('auth:login.login')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-
-          <View style={styles.centerSection}>
-            <Image
-              source={require('../../../../assets/logo.jpg')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-
-            <Text style={styles.title}>{t('auth:login.forgotPasswordSearchTitle')}</Text>
-            <Text style={styles.description}>
-              {t('auth:login.forgotPasswordSearchDescription')}
-            </Text>
-          </View>
-
-          <View style={styles.bottomSection}>
-            <TextInput
-              testID="forgot-password-email-input"
-              style={styles.input}
-              placeholder={t('auth:login.email')}
-              placeholderTextColor="#B4B4B4"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-            />
-
-            {error && (
-              <Text testID="forgot-password-error" style={styles.errorText}>
-                {error}
-              </Text>
-            )}
-
-            {success && (
-              <Text testID="forgot-password-success" style={styles.successText}>
-                {success}
-              </Text>
-            )}
-
-            <TouchableOpacity
-              testID="forgot-password-submit-button"
-              style={[styles.submitButton, isSubmitting && styles.buttonDisabled]}
-              onPress={handleSubmit}
-              disabled={isSubmitting}
-              activeOpacity={0.9}
-            >
-              <Text style={styles.submitButtonText}>
-                {isSubmitting ? t('auth:login.sendingResetLink') : t('auth:login.login')}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -121,11 +136,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F3F4',
   },
 
+  scrollContent: {
+    flexGrow: 1,
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#F3F3F4',
-    paddingHorizontal: 14,
-    paddingVertical: 20,
   },
 
   card: {
@@ -188,7 +205,8 @@ const styles = StyleSheet.create({
   },
 
   bottomSection: {
-    gap: 10,
+    gap: 20,
+    marginBottom: 50,
   },
 
   input: {
@@ -203,7 +221,7 @@ const styles = StyleSheet.create({
   },
 
   submitButton: {
-    height: 48,
+    height: 52,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: '#E4E4E4',

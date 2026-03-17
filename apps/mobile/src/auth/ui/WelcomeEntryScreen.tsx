@@ -74,8 +74,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F3F3F4',
-    paddingHorizontal: 14,
-    paddingVertical: 20,
   },
 
   stepLabel: {
@@ -119,11 +117,11 @@ const styles = StyleSheet.create({
 
   bottomSection: {
     gap: 12,
-    paddingBottom: 10,
+    paddingBottom: 30,
   },
 
   secondaryButton: {
-    height: 48,
+    height: 58,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: '#E4E4E4',

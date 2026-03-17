@@ -10,6 +10,9 @@ import { Text, View } from 'react-native';
 import { WelcomeEntryScreen } from '../auth/ui/WelcomeEntryScreen';
 import { LoginScreen } from '../auth/ui/Login/LoginScreen';
 import { ForgotPasswordScreen } from '../auth/ui/Login/ForgotPasswordScreen';
+import { RegisterStep3Screen } from '../auth/ui/Register/RegisterStep3Screen';
+import { RegisterStep4Screen } from '../auth/ui/Register/RegisterStep4Screen';
+import { RegisterStep5Screen } from '../auth/ui/Register/RegisterStep5Screen';
 
 export type AuthStackParamList = {
   WelcomeEntry: undefined;
@@ -18,14 +21,35 @@ export type AuthStackParamList = {
   ForgotPassword: undefined;
   RegisterStep1: undefined;
   RegisterStep2: {
-    email: string;
-    password: string;
+    firstName: string;
+    lastName: string;
+    birthDate: string;
+  };
+  RegisterStep3: {
     firstName: string;
     lastName: string;
     birthDate: string;
     nationality: string;
     country: string;
+  };
+  RegisterStep4: {
+    firstName: string;
+    lastName: string;
+    birthDate: string;
+    nationality: string;
+    country: string;
+    email: string;
     phone: string;
+  };
+  RegisterStep5: {
+    firstName: string;
+    lastName: string;
+    birthDate: string;
+    nationality: string;
+    country: string;
+    email: string;
+    phone: string;
+    password: string;
   };
   RegisterIdentity: { identityRedirectUrl?: string };
   RegisterHousing: undefined;
@@ -34,14 +58,6 @@ export type AuthStackParamList = {
 
 const Stack = createStackNavigator<AuthStackParamList>();
 
-function DummyScreen() {
-  return (
-    <View>
-      <Text>Dummy</Text>
-    </View>
-  );
-}
-
 export const AuthStackNavigator: React.FC = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="WelcomeEntry" component={WelcomeEntryScreen} />
@@ -49,6 +65,9 @@ export const AuthStackNavigator: React.FC = () => (
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="RegisterStep1" component={RegisterStep1Screen} />
     <Stack.Screen name="RegisterStep2" component={RegisterStep2Screen} />
+    <Stack.Screen name="RegisterStep3" component={RegisterStep3Screen} />
+    <Stack.Screen name="RegisterStep4" component={RegisterStep4Screen} />
+    <Stack.Screen name="RegisterStep5" component={RegisterStep5Screen} />
     <Stack.Screen name="RegisterIdentity" component={RegisterIdentityScreen} />
     <Stack.Screen name="RegisterHousing" component={RegisterHousingScreen} />
     <Stack.Screen name="RegisterWelcome" component={RegisterWelcomeScreen} />

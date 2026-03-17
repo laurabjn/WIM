@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../../navigation/authStack';
 import { useTranslation } from 'react-i18next';
 import { signupStyles as s } from './signUpStyles';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterHousing'>;
@@ -77,88 +78,96 @@ export const RegisterHousingScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <View style={s.container}>
-      <View style={s.card}>
-        <View style={s.header}>
-          <TouchableOpacity style={s.backButton} onPress={() => navigation.goBack()}>
-            <Text style={s.backButtonText}>←</Text>
-          </TouchableOpacity>
-          <Text style={s.headerTitle}>{t('auth:register.title')}</Text>
-        </View>
-
-        <View style={s.form}>
-          <TextInput
-            style={s.input}
-            placeholder={`${t('auth:register.housingTitle')} *`}
-            value={title}
-            onChangeText={setTitle}
-            placeholderTextColor="#9CA3AF"
-          />
-          <TextInput
-            style={s.input}
-            placeholder={`${t('auth:register.housingType')} *`}
-            value={type}
-            onChangeText={setType}
-            placeholderTextColor="#9CA3AF"
-          />
-          <TextInput
-            style={s.input}
-            placeholder={`${t('auth:register.housingLocation')} *`}
-            value={location}
-            onChangeText={setLocation}
-            placeholderTextColor="#9CA3AF"
-          />
-          <TextInput
-            style={s.input}
-            placeholder={`${t('auth:register.housingCapacity')} *`}
-            value={capacity}
-            onChangeText={setCapacity}
-            placeholderTextColor="#9CA3AF"
-            keyboardType="number-pad"
-          />
-
-          <TouchableOpacity style={s.uploadField} onPress={pickHousingPhoto}>
-            <View style={s.uploadLeft}>
-              <Text style={s.uploadIcon}>⇪</Text>
-              <Text style={s.uploadText}>{t('auth:register.housingPhoto')}</Text>
+    <SafeAreaView style={s.safeArea} edges={['top', 'bottom']}>
+      <ScrollView
+        contentContainerStyle={s.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={s.container}>
+          <View style={s.card}>
+            <View style={s.header}>
+              <TouchableOpacity style={s.backButton} onPress={() => navigation.goBack()}>
+                <Text style={s.backButtonText}>←</Text>
+              </TouchableOpacity>
+              <Text style={s.headerTitle}>{t('auth:register.title')}</Text>
             </View>
-          </TouchableOpacity>
 
-          {photoUri && (
-            <View style={s.previewContainer}>
-              <Image source={{ uri: photoUri }} style={s.previewImage} />
-              <TouchableOpacity onPress={() => setPhotoUri(null)}>
-                <Text style={s.removePhotoText}>{t('common:delete')}</Text>
+            <View style={s.form}>
+              <TextInput
+                style={s.input}
+                placeholder={`${t('auth:register.housingTitle')} *`}
+                value={title}
+                onChangeText={setTitle}
+                placeholderTextColor="#9CA3AF"
+              />
+              <TextInput
+                style={s.input}
+                placeholder={`${t('auth:register.housingType')} *`}
+                value={type}
+                onChangeText={setType}
+                placeholderTextColor="#9CA3AF"
+              />
+              <TextInput
+                style={s.input}
+                placeholder={`${t('auth:register.housingLocation')} *`}
+                value={location}
+                onChangeText={setLocation}
+                placeholderTextColor="#9CA3AF"
+              />
+              <TextInput
+                style={s.input}
+                placeholder={`${t('auth:register.housingCapacity')} *`}
+                value={capacity}
+                onChangeText={setCapacity}
+                placeholderTextColor="#9CA3AF"
+                keyboardType="number-pad"
+              />
+
+              <TouchableOpacity style={s.uploadField} onPress={pickHousingPhoto}>
+                <View style={s.uploadLeft}>
+                  <Text style={s.uploadIcon}>⇪</Text>
+                  <Text style={s.uploadText}>{t('auth:register.housingPhoto')}</Text>
+                </View>
+              </TouchableOpacity>
+
+              {photoUri && (
+                <View style={s.previewContainer}>
+                  <Image source={{ uri: photoUri }} style={s.previewImage} />
+                  <TouchableOpacity onPress={() => setPhotoUri(null)}>
+                    <Text style={s.removePhotoText}>{t('common:delete')}</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {error && <Text style={s.errorText}>{error}</Text>}
+            </View>
+
+            <View style={s.footer}>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                style={s.buttonWrapper}
+                onPress={handleContinue}
+              >
+                <LinearGradient
+                  colors={
+                    isFormValid
+                      ? ['#52D1A6', '#2DA7F3']
+                      : ['#BFE8DC', '#B8D8EF']
+                  }
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={s.primaryButton}
+                >
+                  <Text style={s.primaryText}>
+                    {isSubmitting ? t('auth:register.creatingAccount') : t('common:continue')}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
-          )}
-
-          {error && <Text style={s.errorText}>{error}</Text>}
+          </View>
         </View>
-
-        <View style={s.footer}>
-          <TouchableOpacity
-            activeOpacity={0.9}
-            style={s.buttonWrapper}
-            onPress={handleContinue}
-          >
-            <LinearGradient
-              colors={
-                isFormValid
-                  ? ['#52D1A6', '#2DA7F3']
-                  : ['#BFE8DC', '#B8D8EF']
-              }
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={s.primaryButton}
-            >
-              <Text style={s.primaryText}>
-                {isSubmitting ? t('auth:register.creatingAccount') : t('common:continue')}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };

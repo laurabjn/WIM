@@ -11,6 +11,7 @@ import { AuthStackParamList } from '../../../navigation/authStack';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScrollView } from 'react-native-gesture-handler';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterWelcome'>;
 
@@ -29,49 +30,55 @@ export const RegisterWelcomeScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.container}>
 
-        <View style={styles.card}>
-          <View style={styles.centerSection}>
-            <Image
-              source={require('../../../../assets/logo.jpg')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+          <View style={styles.card}>
+            <View style={styles.centerSection}>
+              <Image
+                source={require('../../../../assets/logo.jpg')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
 
-            <Text style={styles.title}>{t('auth:welcomeTitle')}</Text>
-          </View>
+              <Text style={styles.title}>{t('auth:welcomeTitle')}</Text>
+            </View>
 
-          <View style={styles.bottomSection}>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={handleGuidedTour}
-              activeOpacity={0.9}
-            >
-              <Text style={styles.secondaryButtonText}>
-                {t('auth:guidedTour')}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.buttonWrapper}
-              onPress={handleAccessApp}
-              activeOpacity={0.9}
-            >
-              <LinearGradient
-                colors={['#52D1A6', '#2DA7F3']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={styles.primaryButton}
+            <View style={styles.bottomSection}>
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={handleGuidedTour}
+                activeOpacity={0.9}
               >
-                <Text style={styles.primaryButtonText}>
-                  {t('auth:goToWim')}
+                <Text style={styles.secondaryButtonText}>
+                  {t('auth:guidedTour')}
                 </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.buttonWrapper}
+                onPress={handleAccessApp}
+                activeOpacity={0.9}
+              >
+                <LinearGradient
+                  colors={['#52D1A6', '#2DA7F3']}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={styles.primaryButton}
+                >
+                  <Text style={styles.primaryButtonText}>
+                    {t('auth:goToWim')}
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -82,11 +89,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F3F4',
   },
 
+  scrollContent: {
+    flexGrow: 1,
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#F3F3F4',
-    paddingHorizontal: 14,
-    paddingVertical: 20,
   },
 
   stepLabel: {
@@ -130,7 +139,7 @@ const styles = StyleSheet.create({
 
   bottomSection: {
     gap: 12,
-    paddingBottom: 10,
+    paddingBottom: 40,
   },
 
   secondaryButton: {

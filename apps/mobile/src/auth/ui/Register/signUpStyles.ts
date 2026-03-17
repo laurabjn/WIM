@@ -1,11 +1,18 @@
 import { StyleSheet } from 'react-native';
 
 export const signupStyles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F4F4F5',
+  },
+
+  scrollContent: {
+    flexGrow: 1,
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#F4F4F5',
-    paddingHorizontal: 14,
-    paddingVertical: 20,
   },
 
   content: {

@@ -15,6 +15,15 @@ export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.container}>
         <View style={styles.card}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.backButtonText}>←</Text>
+            </TouchableOpacity>
+          </View>
+          
           <View style={styles.centerSection}>
             <Image
               source={require('../../../../assets/logo.jpg')}
@@ -62,13 +71,11 @@ export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: '#F4F4F5',
   },
   container: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
-    paddingHorizontal: 14,
-    paddingVertical: 20,
+    backgroundColor: '#F4F4F5',
   },
   card: {
     flex: 1,
@@ -78,6 +85,24 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 24,
     justifyContent: 'space-between',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 100,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#111111',
   },
   logo: {
     width: 64,
@@ -99,6 +124,7 @@ const styles = StyleSheet.create({
   },
   bottomSection: {
     gap: 12,
+    marginBottom: 20,
   },
   legalText: {
     fontSize: 11,
@@ -139,6 +165,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
+    marginBottom: 20,
   },
   primaryButtonText: {
     fontSize: 14,

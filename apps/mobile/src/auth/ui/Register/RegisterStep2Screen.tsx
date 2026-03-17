@@ -1,54 +1,39 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../../navigation/authStack';
 import { useTranslation } from 'react-i18next';
-import { registerUserApi } from '../../infrastructure/api';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as ImagePicker from 'expo-image-picker';
-import { uploadProfileImage } from '../../infrastructure/upload/uploadProfileImage';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Picker } from '@react-native-picker/picker';
+import {
+  NATIONALITY_OPTIONS,
+  COUNTRY_OPTIONS,
+} from '../../../utils/locationOptions';
+import { Stepper } from '../components/Stepper';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep2'>;
 
 export const RegisterStep2Screen: React.FC<Props> = ({ route, navigation }) => {
   const { t } = useTranslation(['auth', 'common']);
-  const { email, password, firstName, lastName, birthDate, nationality, country, phone } =
-    route.params;
+  const { firstName, lastName, birthDate } = route.params;
 
-  const [bio, setBio] = useState('');
-  const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null);
+  const [nationality, setNationality] = useState('');
+  const [country, setCountry] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const BIO_MAX_LENGTH = 200;
 
   const isFormValid = useMemo(() => {
-    return (
-      bio.trim() !== ''
-      && profilePhotoUri !== null
-    );
-  }, [bio, profilePhotoUri]);
-
-  async function pickProfilePhoto() {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (status !== 'granted') {
-      Alert.alert(
-        t('auth:register.permission'),
-        t('auth:register.permissionDescription')
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.85,
-      allowsEditing: true,
-      aspect: [1, 1],
-    });
-
-    if (!result.canceled) {
-      setProfilePhotoUri(result.assets[0]?.uri ?? null);
-    }
-  }
+    return nationality.trim() !== '' && country.trim() !== '';
+  }, [nationality, country]);
 
   async function handleContinue() {
     setError(null);
@@ -58,114 +43,129 @@ export const RegisterStep2Screen: React.FC<Props> = ({ route, navigation }) => {
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      const avatarUrl = profilePhotoUri
-      ? await uploadProfileImage(profilePhotoUri)
-        : undefined;
-
-      const { identityRedirectUrl } = await registerUserApi({
-        email,
-        password,
-        firstName,
-        lastName,
-        birthDate,
-        nationality,
-        country,
-        phone,
-        bio,
-        avatarUrl,
-        isAdmin: false,
-      });
-
-      navigation.navigate('RegisterIdentity', {
-        identityRedirectUrl,
-      });
-    } catch (err: any) {
-      setError(err.message ?? t('genericError'));
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigation.navigate('RegisterStep3', {
+      firstName,
+      lastName,
+      birthDate,
+      nationality,
+      country,
+    });
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text>←</Text>
-          </TouchableOpacity>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <KeyboardAvoidingView
+        style={styles.keyboardContainer}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={styles.container}>
+          <View style={styles.card}>
+            <View style={styles.header}>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={styles.backButtonText}>←</Text>
+              </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
-        </View>
-
-        <View style={styles.content}>
-          <TouchableOpacity style={styles.uploadField} onPress={pickProfilePhoto}>
-            <View style={styles.uploadLeft}>
-              <Text style={styles.uploadIcon}>⇪</Text>
-              <Text style={styles.uploadText}>{t('auth:register.picture')}</Text>
+              <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
             </View>
-          </TouchableOpacity>
 
-          {profilePhotoUri && (
-            <View style={styles.previewContainer}>
-              <Image source={{ uri: profilePhotoUri }} style={styles.previewImage} />
-              <TouchableOpacity onPress={() => setProfilePhotoUri(null)}>
-                <Text style={styles.removePhotoText}>{t('common:delete')}</Text>
+            <View style={styles.content}>
+              <Stepper current={2} total={5} />
+
+              <Text style={styles.sectionTitle}>
+                {t('auth:register.whereAreYouFrom')}
+              </Text>
+
+              <View style={styles.form}>
+                <View style={styles.pickerWrapper}>
+                  <Picker
+                    selectedValue={nationality}
+                    onValueChange={(itemValue) => setNationality(itemValue)}
+                    style={styles.picker}
+                  >
+                    <Picker.Item
+                      label={t('auth:register.nationality')}
+                      value=""
+                      color="#C0C0C0"
+                    />
+                    {NATIONALITY_OPTIONS.map((item) => (
+                      <Picker.Item
+                        key={item}
+                        label={t(`auth:nationalities.${item}`)}
+                        value={item}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+
+                <View style={styles.pickerWrapper}>
+                  <Picker
+                    selectedValue={country}
+                    onValueChange={(itemValue) => setCountry(itemValue)}
+                    style={styles.picker}
+                  >
+                    <Picker.Item
+                      label={t('auth:register.countryOfResidence')}
+                      value=""
+                      color="#C0C0C0"
+                    />
+                    {COUNTRY_OPTIONS.map((item) => (
+                      <Picker.Item
+                        key={item}
+                        label={t(`auth:countries.${item}`)}
+                        value={item}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+
+                {error && <Text style={styles.errorText}>{error}</Text>}
+              </View>
+            </View>
+
+            <View style={styles.footer}>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={handleContinue}
+                style={styles.buttonWrapper}
+              >
+                <LinearGradient
+                  colors={
+                    isFormValid
+                      ? ['#52D1A6', '#2DA7F3']
+                      : ['#BFE8DC', '#B8D8EF']
+                  }
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={styles.primaryButton}
+                >
+                  <Text style={styles.primaryText}>{t('common:continue')}</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
-          )}
-
-          <TextInput
-            style={styles.bioInput}
-            placeholder={`${t('auth:register.biography')} *`}
-            placeholderTextColor="#B0B0B0"
-            value={bio}
-            onChangeText={setBio}
-            multiline
-            textAlignVertical="top"
-          />
-
-          {error && <Text style={styles.errorText}>{error}</Text>}
+          </View>
         </View>
-
-        <View style={styles.footer}>
-          <TouchableOpacity
-            activeOpacity={0.9}
-            style={styles.buttonWrapper}
-            onPress={handleContinue}
-          >
-            <LinearGradient
-              colors={
-                isFormValid
-                  ? ['#52D1A6', '#2DA7F3']
-                  : ['#BFE8DC', '#B8D8EF']
-              }
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={styles.primaryButton}
-            >
-              <Text style={styles.primaryText}>
-                {isSubmitting && isFormValid ? t('auth:register.creatingAccount') : t('common:continue')}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F4F4F5',
+  },
+
+  keyboardContainer: {
+    flex: 1,
+    backgroundColor: '#F4F4F5',
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#F4F4F5',
-    paddingHorizontal: 14,
-    paddingVertical: 20,
   },
 
   card: {
@@ -173,15 +173,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 32,
     paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 24,
+    paddingTop: 24,
+    paddingBottom: 28,
     justifyContent: 'space-between',
   },
 
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
 
   backButton: {
@@ -201,95 +201,61 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#111111',
   },
 
   content: {
     flex: 1,
-    justifyContent: 'flex-start',
-    paddingTop: 80,
-  },
-
-  uploadField: {
-    height: 44,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    paddingHorizontal: 14,
     justifyContent: 'center',
-    marginBottom: 14,
   },
 
-  uploadLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  uploadIcon: {
-    fontSize: 14,
-    marginRight: 10,
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '700',
     color: '#111111',
+    textAlign: 'center',
+    marginBottom: 18,
   },
 
-  uploadText: {
-    fontSize: 13,
-    color: '#111111',
-    fontWeight: '500',
+  form: {
+    marginTop: 8,
   },
 
-  previewContainer: {
-    marginBottom: 12,
-    alignItems: 'flex-start',
-  },
-
-  previewImage: {
-    width: 90,
-    height: 90,
+  pickerWrapper: {
+    height: 48,
     borderRadius: 14,
-    marginBottom: 6,
-  },
-
-  removePhotoText: {
-    fontSize: 12,
-    color: '#DC2626',
-    fontWeight: '500',
-  },
-
-  bioInput: {
-    minHeight: 44,
-    maxHeight: 100,
-    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 13,
-    color: '#111111',
+    borderColor: '#EAEAEA',
+    marginBottom: 12,
+    justifyContent: 'center',
+    overflow: 'hidden',
     backgroundColor: '#FFFFFF',
   },
 
+  picker: {
+    height: 58,
+    width: '100%',
+    color: '#111111',
+  },
+
   errorText: {
-    marginTop: 10,
+    marginTop: 4,
     fontSize: 12,
     color: '#DC2626',
     textAlign: 'center',
   },
 
   footer: {
-    marginTop: 20,
     width: '100%',
   },
 
   buttonWrapper: {
     width: '100%',
-    gap: 12,
-    paddingBottom: 10,
   },
 
   primaryButton: {
-    width: '100%',
     height: 56,
     borderRadius: 999,
     alignItems: 'center',

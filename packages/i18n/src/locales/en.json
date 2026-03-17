@@ -9,7 +9,8 @@
     "edit": "Edit"
 
   },
-  "auth": {    "welcomeTitle": "Welcome to Wim!",
+  "auth": {    
+    "welcomeTitle": "Welcome to Wim!",
     "guidedTour": "Guided tour",
     "goToWim": "Go to Wim",
     "register": {
@@ -21,6 +22,7 @@
       "title": "Create a Wim account",
       "email": "Email",
       "password": "Password",
+      "confirmPassword": "Confirm password",
       "birthdate": "Birthdate",
       "nationality": "Nationality",
       "countryOfResidence": "Country of residence",
@@ -39,7 +41,14 @@
       "housingCapacity": "Hosting capacity",
       "housingPhoto": "Main photo of the housing",
       "permission": "Permission required",
-      "permissionDescription": "We need access to your photos to choose an image."
+      "permissionDescription": "We need access to your photos to choose an image.",
+      "invalidPhone": "Invalid phone number",
+      "whoAreYou": "Who are you ?",
+      "whereAreYouFrom": "Where are you from ?",
+      "yourContact": "Your contacts",
+      "personalizedProfile": "Personalize your profile",
+      "createPassword": "Create a password",
+      "passwordRules": "Password must contain at least 8 characters, one uppercase letter and one digit"
     },
     "identity": {
       "pending": "Your verification is still pending. Please try again in a few moments.",
@@ -73,6 +82,26 @@
       "resetSuccess": "Your password has been reset successfully. You can now log in.",
       "resetErrorPasswordsDontMatch": "Passwords do not match.",
       "forgotSuccess": "If an account exists for this email, a reset link has been sent."
+    },
+    "nationalities": {
+      "french": "French",
+      "belgian": "Belgian",
+      "spanish": "Spanish",
+      "italian": "Italian",
+      "german": "German",
+      "british": "British",
+      "american": "American",
+      "canadian": "Canadian"
+    },
+    "countries": {
+      "france": "France",
+      "belgium": "Belgium",
+      "spain": "Spain",
+      "italy": "Italy",
+      "germany": "Germany",
+      "unitedKingdom": "United Kingdom",
+      "unitedStates": "United States",
+      "canada": "Canada"
     },
     "logout": "Logout",
     "loggedOut": "You have been logged out",
