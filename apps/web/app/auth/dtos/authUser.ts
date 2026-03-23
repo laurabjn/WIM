@@ -3,7 +3,28 @@ export interface RegisterUserPayload {
   password: string;
   firstName?: string;
   lastName?: string;
+  birthDate?: string;
+  nationality?: string;
+  country?: string;
+  phone?: string;
+  bio?: string;
+  avatarUrl?: string;
+  isAdmin: boolean;
 }
+
+export type RegisterFormData = {
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  nationality: string;
+  country: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+  bio: string;
+  avatarFile: File | null;
+};
 
 export interface AuthUser {
   id: string;

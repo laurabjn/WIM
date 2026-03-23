@@ -17,7 +17,7 @@
     "next-env.d.ts",
     "next.config.js",
     ".next/types/**/*.ts"
-, "jest.config.cjs", "jest.setup.js"  ],
+, "jest.config.cjs", "jest.setup.js", "postcss.config.mts"  ],
   "exclude": [
     "node_modules"
   ]

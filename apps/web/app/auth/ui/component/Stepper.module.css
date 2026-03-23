@@ -1,0 +1,39 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.circleActive {
+  background: #42c7d6;
+}
+
+.circleInactive {
+  background: #d9d9d9;
+}
+
+.text {
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.textActive {
+  color: #ffffff;
+}
+
+.textInactive {
+  color: #7d7d7d;
+}

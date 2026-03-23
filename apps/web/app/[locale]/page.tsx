@@ -1,14 +1,20 @@
 "use client";
 
+import { AuthForm } from "app/auth/ui/form/AuthForm";
 import {useTranslations} from "next-intl";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
-  const t = useTranslations("common");
+  const t = useTranslations();
+  const router = useRouter();
 
   return (
-    <main style={{padding: 24}}>
-      <h1>{t("appName")}</h1>
-      <p>{t("continue")}</p>
-    </main>
+    <AuthForm
+      welcomeTitle={t("auth.goToWim")}
+      createAccountLabel={t("auth.register.signUpWithEmail")}
+      loginLabel={t("auth.login.login")}
+      onCreateAccount={() => router.push("/register")}
+      onLogin={() => router.push("/login")}
+    />
   );
 }

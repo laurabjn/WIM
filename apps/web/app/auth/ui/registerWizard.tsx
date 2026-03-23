@@ -4,8 +4,19 @@ import React, { useState } from 'react';
 import { registerUser } from '../application/registerUser.usecase';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { RegisterStep1Form } from './form/RegisterStep1Form';
+import { RegisterStep2Form } from './form/Registerstep2Form';
+import { RegisterStep3Form } from './form/RegisterStep3Form';
+import { RegisterStep4Form } from './form/RegisterStep4Form';
+import { RegisterStep5Form } from './form/RegisterStep5Form';
+import { RegisterIdentityForm } from './form/RegisterIdentityForm';
+import { RegisterHousingForm } from './form/RegisterHousingForm';
+import { RegisterWelcome } from './RegisterWelcome';
+import styles from './registerWizard.module.css';
+import Image from 'next/image';
+import { uploadProfileImage } from '../infrastructure/uploadProfileImage';
 
-type Step = 0 | 1 | 2 | 3 | 4 | 5;
+type Step = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 export const RegisterWizard: React.FC = () => {
   const router = useRouter();
@@ -14,13 +25,14 @@ export const RegisterWizard: React.FC = () => {
   const [step, setStep] = useState<Step>(0);
 
   const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName]   = useState('');
+  const [lastName, setLastName] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [nationality, setNationality] = useState('');
   const [country, setCountry] = useState('');
-  const [email, setEmail]     = useState('');
-  const [phone, setPhone]     = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [bio, setBio] = useState('');
   const [identityRedirectUrl, setIdentityRedirectUrl] = useState<string | null>(null);
@@ -34,137 +46,172 @@ export const RegisterWizard: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const cardClasses =
-    'w-full max-w-md bg-white rounded-[32px] shadow-md px-6 py-8 flex flex-col gap-6';
-
-  const primaryButtonClasses =
-    'w-full h-12 bg-gradient-to-r from-emerald-400 to-sky-400 rounded-full text-white font-semibold flex items-center justify-center disabled:opacity-60';
-
-  const inputClasses =
-    'w-full h-11 rounded-full border border-gray-200 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300';
-
   if (step === 0) {
     return (
-      <div className={cardClasses}>
-        <div className="flex-1 flex flex-col items-center justify-center gap-6">
-          Logo
-          <h1 className="text-xl font-semibold text-center">
-            {t('auth.register.signUpTitle')}
-          </h1>
-          <p className="text-xs text-gray-500 text-center">
-            {t('auth.register.usageConditions')}
-          </p>
-          <div className="w-full flex flex-col gap-3 mt-4">
-            <button className="h-11 rounded-full border border-gray-200 flex items-center justify-center text-sm gap-2">
-              {/* icône Google à ajouter si tu veux */}
-              <span>{t('auth.register.googleSignUp')}</span>
-            </button>
-            <button className="h-11 rounded-full border border-gray-200 flex items-center justify-center text-sm gap-2">
-              <span>{t('auth.register.signUpWithApple')}</span>
-            </button>
-          </div>
-        </div>
+      <div className={styles.page}>
+        <div className={styles.container}>
+          <div className={styles.centerBlock}>
+            <div className={styles.logo}>
+              <Image src="/logo.jpg" alt="Wim" width={42} height={42} />
+            </div>
 
-        <button
-          className={primaryButtonClasses}
-          onClick={() => setStep(1)}
-        >
-          {t('auth.register.signUpWithEmail')}
-        </button>
+            <h1 className={styles.title}>
+              {t('auth.register.signUpTitle')}
+            </h1>
+
+            <p className={styles.description}>
+              {t('auth.register.usageConditions')}
+            </p>
+
+            <div className={styles.actions}>
+              <button className={styles.secondaryButton}>
+                <span>{t('auth.register.googleSignUp')}</span>
+              </button>
+
+              <button className={styles.secondaryButton}>
+                <span>{t('auth.register.signUpWithApple')}</span>
+              </button>
+            </div>
+          </div>
+
+          <button
+            className={styles.primaryButton}
+            onClick={() => setStep(1)}
+          >
+            {t('auth.register.signUpWithEmail')}
+          </button>
+        </div>
       </div>
     );
   }
 
   if (step === 1) {
+    const isValid =
+      lastName.trim() !== '' &&
+      firstName.trim() !== '' &&
+      birthDate.trim() !== '';
+
     return (
-      <div className={cardClasses}>
-        <header className="flex items-center gap-3 mb-2">
-          <button
-            onClick={() => setStep(0)}
-            className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center"
-          >
-            ←
-          </button>
-          <h1 className="text-lg font-semibold">{t('auth.register.title')}</h1>
-        </header>
-
-        <div className="flex flex-col gap-3">
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.lastName')}
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.firstName')}
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.birthdate')}
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.nationality')}
-            value={nationality}
-            onChange={(e) => setNationality(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.countryOfResidence')}
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.email')}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.phone')}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.password')}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-
-        <button
-          className={primaryButtonClasses}
-          onClick={() => setStep(2)}
-        >
-          {t('continue')}
-        </button>
-      </div>
+      <RegisterStep1Form
+        title={t('auth.register.title')}
+        sectionTitle={t('auth.register.whoAreYou')}
+        lastNameLabel={t('auth.register.lastName')}
+        firstNameLabel={t('auth.register.firstName')}
+        birthDateLabel={t('auth.register.birthdate')}
+        continueLabel={t('common.continue')}
+        lastName={lastName}
+        firstName={firstName}
+        birthDate={birthDate}
+        onLastNameChange={setLastName}
+        onFirstNameChange={setFirstName}
+        onBirthDateChange={setBirthDate}
+        onBack={() => setStep(0)}
+        onContinue={() => setStep(2)}
+        isContinueDisabled={!isValid}
+      />
     );
   }
 
   if (step === 2) {
+    const isValid = nationality.trim() !== '' && country.trim() !== '';
+
+    return (
+      <RegisterStep2Form
+        title={t('auth.register.title')}
+        sectionTitle={t('auth.register.whereAreYouFrom')}
+        nationalityLabel={t('auth.register.nationality')}
+        countryLabel={t('auth.register.countryOfResidence')}
+        continueLabel={t('common.continue')}
+        nationality={nationality}
+        country={country}
+        onNationalityChange={setNationality}
+        onCountryChange={setCountry}
+        onBack={() => setStep(1)}
+        onContinue={() => setStep(3)}
+        isContinueDisabled={!isValid}
+      />
+    );
+  }
+
+  if (step === 3) {
+  const isValid = email.trim() !== '' && phone.trim() !== '';
+
+    return (
+      <RegisterStep3Form
+        title={t('auth.register.title')}
+        sectionTitle={t('auth.register.yourContact')}
+        emailLabel={t('auth.register.email')}
+        phoneLabel={t('auth.register.phone')}
+        continueLabel={t('common.continue')}
+        email={email}
+        phone={phone}
+        onEmailChange={setEmail}
+        onPhoneChange={setPhone}
+        onBack={() => setStep(2)}
+        onContinue={() => setStep(4)}
+        isContinueDisabled={!isValid}
+      />
+    );
+  }
+
+  if (step === 4) {
+    const isPasswordValid = /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+    const isValid =
+      password.trim() !== '' &&
+      confirmPassword.trim() !== '' &&
+      password === confirmPassword &&
+      isPasswordValid;
+    
+    return (
+      <RegisterStep4Form
+        title={t('auth.register.title')}
+        sectionTitle={t('auth.register.createPassword')}
+        passwordLabel={t('auth.register.password')}
+        confirmPasswordLabel={t('auth.register.confirmPassword')}
+        continueLabel={t('common.continue')}
+        password={password}
+        confirmPassword={confirmPassword}
+        onPasswordChange={setPassword}
+        onConfirmPasswordChange={setConfirmPassword}
+        onBack={() => setStep(3)}
+        onContinue={() => setStep(5)}
+        isContinueDisabled={!isValid}
+      />
+    );
+  }
+
+  if (step === 5) {
     async function handleContinue() {
       setError(null);
       setIsSubmitting(true);
+
       try {
-        // TODO : uploader avatarFile et obtenir avatarUrl si on veut le stocker dès maintenant
+        let avatarUrl: string | undefined = undefined;
+
+        if (avatarFile) {
+          avatarUrl = await uploadProfileImage(avatarFile);
+        }
+
+        const normalizedBirthDate = birthDate
+          ? new Date(birthDate).toISOString()
+          : birthDate;
+        
         const { identityRedirectUrl } = await registerUser({
           email,
           password,
           firstName,
           lastName,
+          birthDate: normalizedBirthDate,
+          nationality,
+          country,
+          phone,
+          bio,
+          avatarUrl,
+          isAdmin: false,
         });
 
         setIdentityRedirectUrl(identityRedirectUrl ?? null);
-        setStep(3);
+        setStep(6);
       } catch (err: any) {
         setError(err.message ?? t('genericError'));
       } finally {
@@ -172,184 +219,102 @@ export const RegisterWizard: React.FC = () => {
       }
     }
 
+    const isValid = bio.trim() !== '' && avatarFile !== null;
+
     return (
-      <div className={cardClasses}>
-        <header className="flex items-center gap-3 mb-2">
-          <button
-            onClick={() => setStep(1)}
-            className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center"
-          >
-            ←
-          </button>
-          <h1 className="text-lg font-semibold">{t('auth.register.title')}</h1>
-        </header>
-
-        <div className="flex flex-col gap-3">
-          <label className="w-full h-11 rounded-full border border-dashed border-gray-300 flex items-center px-4 text-sm gap-3 cursor-pointer">
-            <span>📤</span>
-            <span>{t('auth.register.picture')}</span>
-            <input
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0] ?? null;
-                setAvatarFile(file);
-              }}
-            />
-          </label>
-          <textarea
-            className="w-full min-h-[120px] rounded-2xl border border-gray-200 px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-300"
-            placeholder={t('auth.register.biography')}
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-          />
-          {error && <p className="text-sm text-red-500">{error}</p>}
-        </div>
-
-        <button
-          className={primaryButtonClasses}
-          onClick={handleContinue}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? t('auth.register.creatingAccount') : t('continue')}
-        </button>
-      </div>
+      <RegisterStep5Form
+        title={t('auth.register.title')}
+        pictureLabel={t('auth.register.picture')}
+        biographyLabel={t('auth.register.biography')}
+        continueLabel={t('common.continue')}
+        creatingAccountLabel={t('auth.register.creatingAccount')}
+        bio={bio}
+        avatarFile={avatarFile}
+        error={error}
+        isSubmitting={isSubmitting}
+        onBioChange={setBio}
+        onAvatarChange={setAvatarFile}
+        onBack={() => setStep(4)}
+        onContinue={handleContinue}
+        isContinueDisabled={!isValid}
+      />
     );
   }
 
-  if (step === 3) {
+  if (step === 6) {
     function handleOpenIdentity() {
       if (!identityRedirectUrl) return;
       window.location.assign(identityRedirectUrl);
     }
 
     function handleDoneIdentity() {
-      // plus tard: appeler /identity/status et vérifier VERIFIED
-      setStep(4);
+      // TODO plus tard :
+      // appeler ton endpoint /identity/status
+      // vérifier que le statut est VERIFIED
+      setStep(7);
     }
 
     return (
-      <div className={cardClasses}>
-        <header className="flex items-center gap-3 mb-2">
-          <button
-            onClick={() => setStep(2)}
-            className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center"
-          >
-            ←
-          </button>
-          <h1 className="text-lg font-semibold">{t('auth.register.title')}</h1>
-        </header>
+      <RegisterIdentityForm
+        title={t('auth.register.title')}
+        sectionTitle={t('auth.register.identityVerification')}
+        continueLabel={t('common.continue')}
+        identityRedirectUrl={identityRedirectUrl}
+        onBack={() => setStep(5)}
+        onOpenIdentity={handleOpenIdentity}
+        onContinue={handleDoneIdentity}
+      />
 
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <p className="text-base font-semibold text-center mb-6">
-            {t('auth.register.identityVerification')}
-          </p>
-          <button
-            className="mb-4 h-11 px-6 rounded-full border border-gray-200 text-sm"
-            onClick={handleOpenIdentity}
-            disabled={!identityRedirectUrl}
-          >
-            {t('auth.register.beginIdentityVerification')}
-          </button>
-          <p className="text-xs text-gray-500 text-center px-6">
-            {t('auth.register.afterIdentityVerification')}
-          </p>
-        </div>
-
-        <button
-          className={primaryButtonClasses}
-          onClick={handleDoneIdentity}
-        >
-          {t('continue')}
-        </button>
-      </div>
     );
   }
 
-    if (step === 4) {
+  if (step === 7) {
+    const isValid =
+      housingTitle.trim() !== '' &&
+      housingType.trim() !== '' &&
+      housingLocation.trim() !== '' &&
+      housingCapacity.trim() !== '' &&
+      housingPhoto !== null;
+
     return (
-      <div className={cardClasses}>
-        <header className="flex items-center gap-3 mb-2">
-          <button
-            onClick={() => setStep(3)}
-            className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center"
-          >
-            ←
-          </button>
-          <h1 className="text-lg font-semibold">{t('auth.register.title')}</h1>
-        </header>
-
-        <div className="flex flex-col gap-3">
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.housingTitle')}
-            value={housingTitle}
-            onChange={(e) => setHousingTitle(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.housingType')}
-            value={housingType}
-            onChange={(e) => setHousingType(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.housingLocation')}
-            value={housingLocation}
-            onChange={(e) => setHousingLocation(e.target.value)}
-          />
-          <input
-            className={inputClasses}
-            placeholder={t('auth.register.housingCapacity')}
-            value={housingCapacity}
-            onChange={(e) => setHousingCapacity(e.target.value)}
-          />
-          <label className="w-full h-11 rounded-full border border-dashed border-gray-300 flex items-center px-4 text-sm gap-3 cursor-pointer">
-            <span>📤</span>
-            <span>{t('auth.register.housingPhoto')}</span>
-            <input
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0] ?? null;
-                setHousingPhoto(file);
-              }}
-            />
-          </label>
-        </div>
-
-        <button
-          className={primaryButtonClasses}
-          onClick={() => setStep(5)}
-        >
-          {t('continue')}
-        </button>
-      </div>
+      <RegisterHousingForm
+        title={t('auth.register.title')}
+        housingTitleLabel={t('auth.register.housingTitle')}
+        housingTypeLabel={t('auth.register.housingType')}
+        housingLocationLabel={t('auth.register.housingLocation')}
+        housingCapacityLabel={t('auth.register.housingCapacity')}
+        housingPhotoLabel={t('auth.register.housingPhoto')}
+        continueLabel={t('common.continue')}
+        housingTitle={housingTitle}
+        housingType={housingType}
+        housingLocation={housingLocation}
+        housingCapacity={housingCapacity}
+        housingPhoto={housingPhoto}
+        onHousingTitleChange={setHousingTitle}
+        onHousingTypeChange={setHousingType}
+        onHousingLocationChange={setHousingLocation}
+        onHousingCapacityChange={setHousingCapacity}
+        onHousingPhotoChange={setHousingPhoto}
+        onBack={() => setStep(6)}
+        onContinue={() => setStep(8)}
+        isContinueDisabled={!isValid}
+      />
     );
   }
 
-  return (
-    <div className={cardClasses}>
-      <div className="flex-1 flex flex-col items-center justify-center gap-6">
-        Logo
-        <h1 className="text-xl font-semibold text-center">
-          {t('auth.register.welcomeTitle')}
-        </h1>
-      </div>
+  if (step === 8) {
+    return (
+    <RegisterWelcome
+      welcomeTitle={t('auth.welcomeTitle')}
+      guidedTourLabel={t('auth.guidedTour')}
+      goToWimLabel={t('auth.goToWim')}
+      onGuidedTour={() => {
+        // TODO guided tour
+      }}
+      onGoToWim={() => router.push('/')}
+    />
+    );
+  }
 
-      <div className="flex flex-col gap-3">
-        <button className="h-11 rounded-full border border-gray-200 text-sm">
-          {t('auth.register.guidedTour')}
-        </button>
-        <button
-          className={primaryButtonClasses}
-          onClick={() => router.push('/')}
-        >
-          {t('auth.register.goToWim')}
-        </button>
-      </div>
-    </div>
-  );
+  return null;
 };

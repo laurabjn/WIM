@@ -17,6 +17,7 @@ export async function registerUserApi(payload: RegisterUserPayload): Promise<Reg
     body: JSON.stringify(payload),
   });
 
+  console.log('API request:', { url: `${API_URL}/auth/register`, payload });
   const data = await response.json().catch(() => ({}));
   console.log('API response:', { status: response.status, data });
 
