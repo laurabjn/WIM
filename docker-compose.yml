@@ -24,6 +24,7 @@ services:
     image: wim_api_image
     container_name: wim_api
     restart: unless-stopped
+    working_dir: /app/apps/api
     environment:
       NODE_ENV: development
       PORT: 3000
@@ -38,17 +39,17 @@ services:
       db:
         condition: service_healthy
 
-migrate:
-  image: wim_api_image
-  container_name: wim_migrate
-  restart: "no"
-  working_dir: /app/apps/api
-  depends_on:
-    db:
-      condition: service_healthy
-  environment:
-    DATABASE_URL: postgresql://wim:wim@db:5432/wim
-  command: sh -c "npx prisma generate --schema=prisma/schema.prisma && npx prisma migrate deploy --schema=prisma/schema.prisma"
+  migrate:
+    image: wim_api_image
+    container_name: wim_migrate
+    restart: "no"
+    working_dir: /app/apps/api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://wim:wim@db:5432/wim
+    command: sh -c "npx prisma generate --schema=prisma/schema.prisma && npx prisma migrate deploy --schema=prisma/schema.prisma"
 
 volumes:
   wim_pg:
