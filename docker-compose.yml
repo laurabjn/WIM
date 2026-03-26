@@ -31,9 +31,6 @@ services:
       DATABASE_URL: postgresql://wim:wim@db:5432/wim
     ports:
       - "3000:3000"
-    volumes:
-      - .:/app
-      - node_modules:/app/node_modules
     command: sh ./docker-entrypoint.sh
     depends_on:
       db:
@@ -53,4 +50,3 @@ services:
 
 volumes:
   wim_pg:
-  node_modules:
