@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -7,28 +8,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum IdentityStatus {
+  NOT_VERIFIED
+  IN_PROGRESS
+  VERIFIED
+  REFUSED
+}
+
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String?  @map("password_hash")
+  id           String  @id @default(uuid())
+  email        String  @unique
+  passwordHash String? @map("password_hash")
 
-  firstName    String?  @map("first_name")
-  lastName     String?  @map("last_name")
-  avatarUrl    String?  @map("avatar_url")
-  bio          String?
-  city         String?
-  country      String?
-  languages    Json?
-  isAdmin      Boolean  @default(false) @map("is_admin")
+  firstName String? @map("first_name")
+  lastName  String? @map("last_name")
+  avatarUrl String? @map("avatar_url")
+  bio       String?
+  country   String?
+  nationality  String?
+  phone        String?
+  birthDate    DateTime? @map("birth_date")
+  languages Json?
+  isAdmin   Boolean @default(false) @map("is_admin")
 
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  identityStatus IdentityStatus @default(NOT_VERIFIED)
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("users")
 }
 
 model Home {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   ownerId     String
   title       String
   description String?
@@ -37,16 +49,16 @@ model Home {
   country     String
 
   // Géolocalisation (Sprint 0)
-  latitude    Decimal  @db.Decimal(9, 6)
-  longitude   Decimal  @db.Decimal(9, 6)
+  latitude  Decimal @db.Decimal(9, 6)
+  longitude Decimal @db.Decimal(9, 6)
 
-  capacity    Int
-  homeType    String
-  amenities   Json?
+  capacity  Int
+  homeType  String
+  amenities Json?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([city, country])
-  @@index([latitude, longitude]) // ✅ utile pour bounding box
+  @@index([latitude, longitude])
 }

@@ -13,7 +13,7 @@ describe('WebSocket Gateway (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-    await app.listen(0); // port aléatoire
+    await app.listen(0);
 
     const server = app.getHttpServer();
     const address = server.address();

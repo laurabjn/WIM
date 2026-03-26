@@ -1,14 +1,21 @@
-// test/unit/domain/entities/user.entity.spec.ts
-import { Email } from '../../../../src/domain/value-objects/email.vo';
-import { User } from '../../../../src/domain/entities/user.entity';
+import { User } from 'src/domain/auth/entities/user.entity';
 
 describe('User', () => {
   it('should create a user with email', () => {
     const user = User.create({
-      email: Email.create('laura@example.com'),
+      email: 'laura@example.com',
+      firstName: 'Laura',
+      lastName: 'Smith',
+      passwordHash: 'securePassword123',
+      avatarUrl: null,
+      bio: null,
+      country: null,
+      nationality: null,
+      phone: null,
+      birthDate: null,
     });
 
-    expect(user.email.value).toBe('laura@example.com');
+    expect(user.email).toBe('laura@example.com');
     expect(user.id).toBeDefined();
   });
 });

@@ -1,7 +1,7 @@
 import i18n from "i18next";
 import {initReactI18next} from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {en, fr} from "@wim/i18n";
+import {en, fr} from "../../../../packages/i18n/src";
 
 const STORAGE_KEY = "wim.locale";
 

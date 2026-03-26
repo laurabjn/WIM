@@ -1,8 +1,5 @@
-// test/integration/infrastructure/user.prisma.repository.spec.ts
 import { PrismaService } from '../../../src/infrastructure/database/prisma/prisma.service';
 import { UserPrismaRepository } from '../../../src/infrastructure/repositories/user.prisma.repository';
-import { Email } from '../../../src/domain/value-objects/email.vo';
-import { User } from '../../../src/domain/entities/user.entity';
 
 describe('UserPrismaRepository (integration)', () => {
   const prisma = new PrismaService();
@@ -17,17 +14,26 @@ describe('UserPrismaRepository (integration)', () => {
   });
 
   beforeEach(async () => {
-    // reset table
     await prisma.user.deleteMany();
   });
 
   it('should save user and detect existing email', async () => {
-    const email = Email.create('laura@example.com');
-    const user = User.create({ email });
+    await repo.create({
+      firstName: 'Laura',
+      lastName: 'Smith',
+      email: 'laura@example.com',
+      passwordHash: 'hashedpassword',
+      avatarUrl: null,
+      bio: null,
+      country: null,
+      nationality: null,
+      phone: null,
+      birthDate: null,
+    });
 
-    await repo.save(user);
+    const user = await repo.findByEmail('laura@example.com');
 
-    const exists = await repo.existsByEmail('laura@example.com');
-    expect(exists).toBe(true);
+    expect(user).not.toBeNull();
+    expect(user?.email).toBe('laura@example.com');
   });
 });

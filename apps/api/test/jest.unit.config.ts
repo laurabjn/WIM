@@ -1,13 +1,15 @@
-// test/jest.unit.config.ts
 import type { Config } from 'jest';
 
 const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['<rootDir>/unit'],
-  moduleFileExtensions: ['ts', 'js', 'json'],
-  testMatch: ['**/*.spec.ts'],
-  clearMocks: true,
+  rootDir: '../',
+  testMatch: ['<rootDir>/test/unit/**/*.spec.ts'],
+  moduleFileExtensions: ['js', 'json', 'ts'],
+  transform: {
+    '^.+\\.(t|j)s$': 'ts-jest',
+  },
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/src/$1',
+  },
 };
 
 export default config;

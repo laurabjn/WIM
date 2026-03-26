@@ -1,24 +1,69 @@
-// src/infrastructure/repositories/user.prisma.repository.ts
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../../domain/repositories/user.repository';
-import { User as DomainUser } from '../../domain/entities/user.entity';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { UserRepository } from 'src/domain/auth/repositories/user.repository';
+import {
+  CreateUserPayload,
+  IdentityStatus,
+  User,
+} from 'src/domain/auth/entities/user.entity';
 
 @Injectable()
 export class UserPrismaRepository implements UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async existsByEmail(email: string): Promise<boolean> {
-    const found = await this.prisma.user.findUnique({ where: { email } });
-    return !!found;
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) return null;
+
+    return User.fromPersistence(user);
   }
 
-  async save(user: DomainUser): Promise<void> {
-    await this.prisma.user.create({
+  async findById(id: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) return null;
+    return User.fromPersistence(user);
+  }
+
+  async create(params: CreateUserPayload): Promise<User> {
+    const created = await this.prisma.user.create({
       data: {
-        id: user.id,
-        email: user.email.value,
+        email: params.email,
+        passwordHash: params.passwordHash,
+        firstName: params.firstName,
+        lastName: params.lastName,
+        birthDate: params.birthDate,
+        avatarUrl: params.avatarUrl,
+        bio: params.bio,
+        country: params.country,
+        nationality: params.nationality,
+        phone: params.phone,
       },
+    });
+
+    return User.fromPersistence(created);
+  }
+
+  async updatePasswordHash(
+    userId: string,
+    passwordHash: string,
+  ): Promise<void> {
+    const result = await this.prisma.user.updateMany({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    if (result.count === 0) {
+      throw new Error(`UserNotFound: cannot update password for id=${userId}`);
+    }
+  }
+
+  async updateIdentityStatus(
+    userId: string,
+    status: IdentityStatus,
+  ): Promise<void> {
+    await this.prisma.user.updateMany({
+      where: { id: userId },
+      data: { identityStatus: status as any },
     });
   }
 }

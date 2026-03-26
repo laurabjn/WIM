@@ -1,17 +1,46 @@
-import React from "react";
-import { Text, View } from "react-native";
-import { useTranslation } from "react-i18next";
-import { initI18n } from "./src/i18n/i18n";
+import 'react-native-gesture-handler';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { initI18n } from './src/i18n/i18n';
+import { AuthStackNavigator } from './src/navigation/authStack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { enableScreens } from 'react-native-screens';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Text, View } from 'react-native';
 
-initI18n();
+enableScreens();
+
+const Stack = createNativeStackNavigator();
+
+function TestScreen() {
+  return (
+    <View>
+      <Text>Test</Text>
+    </View>
+  );
+}
 
 export default function App() {
-  const { t } = useTranslation("common");
-  
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    async function setup() {
+      await initI18n();
+      setReady(true);
+    }
+    setup();
+  }, []);
+
+  if (!ready) return null;
+
   return (
-    <View style={{ padding: 24 }}>
-      <Text>{t("appName")}</Text>
-      <Text>{t("continue")}</Text>
-    </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <AuthStackNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

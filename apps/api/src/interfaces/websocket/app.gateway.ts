@@ -12,7 +12,8 @@ import { ConfigService } from '@nestjs/config';
 @WebSocketGateway({
   namespace: '/ws',
   cors: {
-    origin: '*',
+    origin: 'http://localhost:3001',
+    credentials: true,
   },
 })
 export class AppGateway {
