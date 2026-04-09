@@ -36,6 +36,21 @@ services:
       db:
         condition: service_healthy
 
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    image: wim_web_image
+    container_name: wim_web
+    restart: unless-stopped
+    working_dir: /app/apps/web
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      NEXT_PUBLIC_API_URL: https://api.ton-domaine.fr
+    ports:
+      - "3001:3001"
+
   migrate:
     image: wim_api_image
     container_name: wim_migrate

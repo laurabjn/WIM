@@ -22,6 +22,7 @@ export async function saveSession(session: AuthSession): Promise<void> {
   await AsyncStorage.setItem(ACCESS_TOKEN_KEY, session.accessToken);
   await AsyncStorage.setItem(REFRESH_TOKEN_KEY, session.refreshToken);
   await AsyncStorage.setItem(USER_KEY, JSON.stringify(session.user));
+  console.log('Session saved:', session);
 }
 
 export async function getSession(): Promise<AuthSession | null> {

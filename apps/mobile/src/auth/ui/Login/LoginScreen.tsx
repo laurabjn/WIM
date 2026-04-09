@@ -17,6 +17,7 @@ import { AuthStackParamList } from '../../../navigation/authStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesome } from '@expo/vector-icons';
 import { loginUser } from '../../application/loginUser.usecase';
+import { saveSession } from 'src/auth/infrastructure/authStorage';
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -26,9 +27,11 @@ function isStrongPassword(password: string): boolean {
   return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
 }
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'Login'> & {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-export const LoginScreen: React.FC<Props> = ({ navigation }) => {
+export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated }) => {
   const { t } = useTranslation(['auth', 'common']);
 
   const [email, setEmail] = useState('');
@@ -60,6 +63,19 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
       const result = await loginUser({ email, password });
       // TODO: stocker tokens (SecureStore, MMKV, etc.)
       // TODO: navigate vers l’écran principal
+      await saveSession({
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          firstName: result.user.firstName ?? null,
+          lastName: result.user.lastName ?? null,
+          isAdmin: result.user.isAdmin ?? false,
+        },
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+      });
+      console.log('Session saved successfully');
+      setIsAuthenticated(true);
     } catch (err: any) {
       console.log('Login error:', err);
       setError(err.message ?? t('auth:genericError'));

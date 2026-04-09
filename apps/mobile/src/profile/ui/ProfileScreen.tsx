@@ -1,0 +1,191 @@
+import React, { useEffect, useState } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+import { ProfileHeaderCard } from './components/ProfileHeaderCard';
+import { UserHomeCard } from './components/UserHomeCard';
+import { ProfileMenuList } from './components/ProfileMenuList';
+import { useMyProfile } from '../infrastructure/hook/useMyProfile';
+import { useMyHomes } from '../infrastructure/hook/useMyHomes';
+import { useTranslation } from 'react-i18next';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { clearSession, getSession } from 'src/auth/infrastructure/authStorage';
+import { ProfileStackParamList } from 'src/navigation/type/profileStack';
+
+type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated }) => {
+  const { t } = useTranslation('profile');
+  const [token, setToken] = useState<string | null>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadSession() {
+      try {
+        const session = await getSession();
+        setToken(session?.accessToken ?? null);
+        console.log('Loaded session:', session);
+      } catch (error) {
+        console.log('Error loading session:', error);
+        setToken(null);
+      } finally {
+        setIsSessionLoading(false);
+      }
+    }
+
+    loadSession();
+  }, []);
+
+  function confirmLogout() {
+    Alert.alert(
+      t('logOutTitle'),
+      t('confirmLogOut'),
+      [
+        { text: t('logOutCancel'), style: 'cancel' },
+        {
+          text: t('logout'),
+          style: 'destructive',
+          onPress: handleLogout,
+        },
+      ],
+    );
+  }
+
+  async function handleLogout() {
+    try {
+      await clearSession();
+
+      setToken(null);
+
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.log('Logout error:', error);
+    }
+  }
+
+  const {
+    profile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useMyProfile(token);
+
+  const {
+    homes,
+    isLoading: isHomesLoading,
+    error: homesError,
+  } = useMyHomes(token);
+
+  if (isSessionLoading || isProfileLoading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator />
+        <Text>{t('loading')}</Text>
+      </View>
+    );
+  }
+
+  if (profileError || !profile) {
+    return (
+      <View style={styles.centered}>
+        <Text>{profileError ?? t('profileNotFound')}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
+        <ProfileHeaderCard
+          profile={profile}
+          onPressEdit={() => {
+            console.log('Aller à Modifier profil');
+            navigation.navigate('EditProfile');
+          }}
+        />
+
+        <Text style={styles.sectionTitle}>{t('homes')}</Text>
+
+        {isHomesLoading ? (
+          <ActivityIndicator />
+        ) : homesError ? (
+          <Text>{homesError}</Text>
+        ) : homes.length === 0 ? (
+          <Text style={styles.emptyText}>{t('noHomes')}</Text>
+        ) : (
+          <View style={styles.homesList}>
+            {homes.map((home) => (
+              <UserHomeCard
+                key={home.id}
+                home={home}
+                onPressEdit={(homeId) => {
+                  console.log('Modifier logement', homeId);
+                }}
+                onPressCard={(homeId) => {
+                  console.log('Voir logement', homeId);
+                }}
+              />
+            ))}
+          </View>
+        )}
+
+        <View style={styles.menuSection}>
+          <ProfileMenuList
+            onPressFavorites={() => navigation.navigate('Favorites')}
+            onPressSettings={() => navigation.navigate('Settings', { profile })}
+            onPressPreferences={() => navigation.navigate('Preferences', { profile })}
+            onPressHelp={() => console.log('Aide')}
+            onPressLegal={() => console.log('Juridique')}
+            onPressLogout={confirmLogout}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: '#F7F7F7',
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F7F7F7',
+  },
+  container: {
+    padding: 16,
+    paddingBottom: 110,
+  },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#F7F7F7',
+  },
+  sectionTitle: {
+    marginTop: 20,
+    marginBottom: 12,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1F1F1F',
+  },
+  homesList: {
+    gap: 14,
+  },
+  menuSection: {
+    marginTop: 18,
+  },
+  emptyText: {
+    fontSize: 13,
+    color: '#666',
+  },
+});

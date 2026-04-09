@@ -8,20 +8,14 @@ import { enableScreens } from 'react-native-screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Text, View } from 'react-native';
+import { RootNavigator } from 'src/navigation/rootNavigator';
 
 enableScreens();
 
 const Stack = createNativeStackNavigator();
 
-function TestScreen() {
-  return (
-    <View>
-      <Text>Test</Text>
-    </View>
-  );
-}
-
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -38,7 +32,10 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <NavigationContainer>
-          <AuthStackNavigator />
+          <RootNavigator
+            isAuthenticated={isAuthenticated}
+            setIsAuthenticated={setIsAuthenticated}
+          />
         </NavigationContainer>
       </SafeAreaProvider>
     </GestureHandlerRootView>
