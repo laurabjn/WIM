@@ -56,13 +56,24 @@ export type AuthStackParamList = {
   RegisterWelcome: undefined;
 };
 
+type Props = {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
 const Stack = createStackNavigator<AuthStackParamList>();
 
-export const AuthStackNavigator: React.FC = () => (
+export const AuthStackNavigator: React.FC<Props> = ({ setIsAuthenticated }) => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="WelcomeEntry" component={WelcomeEntryScreen} />
     <Stack.Screen name="RegisterStart" component={RegisterStartScreen} />
-    <Stack.Screen name="Login" component={LoginScreen} />
+    <Stack.Screen name="Login">
+      {(props) => (
+        <LoginScreen
+          {...props}
+          setIsAuthenticated={setIsAuthenticated}
+        />
+      )}
+    </Stack.Screen>
     <Stack.Screen name="RegisterStep1" component={RegisterStep1Screen} />
     <Stack.Screen name="RegisterStep2" component={RegisterStep2Screen} />
     <Stack.Screen name="RegisterStep3" component={RegisterStep3Screen} />
@@ -70,7 +81,14 @@ export const AuthStackNavigator: React.FC = () => (
     <Stack.Screen name="RegisterStep5" component={RegisterStep5Screen} />
     <Stack.Screen name="RegisterIdentity" component={RegisterIdentityScreen} />
     <Stack.Screen name="RegisterHousing" component={RegisterHousingScreen} />
-    <Stack.Screen name="RegisterWelcome" component={RegisterWelcomeScreen} />
+    <Stack.Screen name="RegisterWelcome">
+      {(props) => (
+        <RegisterWelcomeScreen
+          {...props}
+          setIsAuthenticated={setIsAuthenticated}
+        />
+      )}
+    </Stack.Screen>
     <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
   </Stack.Navigator>
 );

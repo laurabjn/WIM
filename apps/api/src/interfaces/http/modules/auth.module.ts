@@ -17,6 +17,8 @@ import { ResetPasswordUseCase } from 'src/application/auth/use-cases/reset-passw
 import { RequestPasswordResetUseCase } from 'src/application/auth/use-cases/request-password-reset.usecase';
 import { ConsoleEmailSender } from 'src/infrastructure/notifications/console-email.sender';
 import { IdentityModule } from './identity.module';
+import { JwtStrategy } from '../jwt.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 const ACCESS_TOKEN_TTL = '15m';
 
@@ -28,6 +30,7 @@ const ACCESS_TOKEN_TTL = '15m';
       signOptions: { expiresIn: ACCESS_TOKEN_TTL },
     }),
     IdentityModule,
+    PassportModule,
   ],
   providers: [
     PrismaService,
@@ -35,6 +38,7 @@ const ACCESS_TOKEN_TTL = '15m';
     BcryptPasswordHasher,
     JwtPasswordResetTokenAdapter,
     ConsoleEmailSender,
+    JwtStrategy,
     {
       provide: PASSWORD_RESET_TOKEN,
       useExisting: JwtPasswordResetTokenAdapter,

@@ -13,9 +13,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from 'react-native-gesture-handler';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterWelcome'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterWelcome'> & {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-export const RegisterWelcomeScreen: React.FC<Props> = ({ navigation }) => {
+export const RegisterWelcomeScreen: React.FC<Props> = ({ navigation, setIsAuthenticated }) => {
   const { t } = useTranslation(['auth', 'common']);
 
   function handleGuidedTour() {
@@ -24,8 +26,7 @@ export const RegisterWelcomeScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   function handleAccessApp() {
-    // TODO : basculer vers la navigation principale
-    // navigation.reset({ index: 0, routes: [{ name: 'AppHome' }] });
+    setIsAuthenticated(true);
   }
 
   return (
