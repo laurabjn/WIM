@@ -26,6 +26,8 @@ model User {
   phone             String?
   preferredLocale   String         @default("fr")
   travelPreferences Json?
+  
+  homes Home[]
 
   @@map("users")
 }
@@ -43,11 +45,26 @@ model Home {
   capacity    Int
   homeType    String
   amenities   Json?
+  carExchangeAccepted Boolean     @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  owner   User        @relation(fields: [ownerId], references: [id])
+  photos  HomePhoto[]
+
   @@index([city, country])
   @@index([latitude, longitude])
+}
+
+model HomePhoto {
+  id       String   @id @default(uuid())
+  homeId   String
+  url      String
+  position Int
+
+  home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
+
+  @@map("home_photos")
 }
 
 enum IdentityStatus {

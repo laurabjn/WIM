@@ -12,7 +12,7 @@ export const RootNavigator: React.FC<Props> = ({
   setIsAuthenticated,
 }) => {
   return isAuthenticated ? (
-    <AppTabsNavigator />
+    <AppTabsNavigator setIsAuthenticated={setIsAuthenticated} />
   ) : (
     <AuthStackNavigator setIsAuthenticated={setIsAuthenticated} />
   );
