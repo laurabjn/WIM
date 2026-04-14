@@ -13,7 +13,8 @@
     "profile": "Profile",
     "notProvided": "Not provided",
     "notVerified": "Not verified",
-    "verified": "Verified"
+    "verified": "Verified",
+    "save": "Save"
   },
   "auth": {    
     "welcomeTitle": "Welcome to Wim!",
@@ -141,6 +142,21 @@
     "confirmLogOut": "Are you sure you want to logout ?",
     "logOutCancel": "Cancel",
     "report": "Report this host",
+    "editprofile": {
+      "title": "Edit my profile",
+      "changePhoto": "Edit photo",
+      "favoriteEnvironment": "Favorite environment",
+      "presentation": "Presentation",
+      "namePlaceholder": "Name",
+      "agePlaceholder": "Age",
+      "bioPlaceholder": "Biography",
+      "languages": "Spoken languages",
+      "searchLanguagePlaceholder": "Search a language",
+      "savedTitle": "Profile",
+      "savedMessage": "Profile updated",
+      "errorTitle": "Error",
+      "errorMessage": "Unable to save changes"
+    },
     "settings": {
       "title": "Settings",
       "account": "Account",
@@ -240,6 +256,10 @@
       "1m": "1 month",
       "2m": "2 months",
       "3m": "3 months"
+    },
+    "languages": {
+      "english": "English",
+      "french": "French"
     }
   },
   "admin": {

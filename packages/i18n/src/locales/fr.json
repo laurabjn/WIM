@@ -13,7 +13,8 @@
     "profile": "Profile",
     "notProvided": "Non renseigné",
     "notVerified": "Non vérifié",
-    "verified": "Vérifié"
+    "verified": "Vérifié",
+    "save": "Enregistrer"
   },
   "profile": {
     "exchange": "Échange",
@@ -39,6 +40,21 @@
     "confirmLogOut": "Voulez-vous vraiment vous déconnecter ?",
     "logOutCancel": "Annuler",
     "report": "Signaler cet échangeur",
+    "editProfile": {
+      "title": "Editer mon profil",
+      "changePhoto": "Modifier la photo",
+      "favoriteEnvironment": "Environnement favoris",
+      "presentation": "Présentation",
+      "namePlaceholder": "Nom",
+      "agePlaceholder": "Âge",
+      "bioPlaceholder": "Biographie",
+      "languages": "Langues parlées",
+      "searchLanguagePlaceholder": "Rechercher une langue",
+      "savedTitle": "Profil",
+      "savedMessage": "Profil mis à jour",
+      "errorTitle": "Erreur",
+      "errorMessage": "Impossible d'enregistrer les modifications"
+    },
     "settings": {
       "title": "Paramètres du compte",
       "account": "Compte",
@@ -141,6 +157,10 @@
       "1m": "1 mois",
       "2m": "2 mois",
       "3m": "3 mois"
+    },
+    "language": {
+      "english": "Anglais",
+      "french": "Français"
     }
   },
   "auth": {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -17,12 +17,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { clearSession, getSession } from 'src/auth/infrastructure/authStorage';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
+import { useFocusEffect } from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated }) => {
+export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated, route }) => {
   const { t } = useTranslation('profile');
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -75,13 +76,31 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated 
     profile,
     isLoading: isProfileLoading,
     error: profileError,
+    reload: reloadProfile,
+    setProfile
   } = useMyProfile(token);
 
   const {
     homes,
     isLoading: isHomesLoading,
     error: homesError,
+    reloadHomes: reloadHomes,
   } = useMyHomes(token);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (token) {
+        reloadProfile();
+        reloadHomes();
+      }
+    }, [token, reloadProfile, reloadHomes])
+  );
+
+  useEffect(() => {
+    if (route.params?.updatedProfile) {
+      setProfile(route.params.updatedProfile);
+    }
+  }, [route.params?.updatedProfile, setProfile]);
 
   if (isSessionLoading || isProfileLoading) {
     return (
@@ -107,7 +126,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated 
           profile={profile}
           onPressEdit={() => {
             console.log('Aller à Modifier profil');
-            navigation.navigate('EditProfile');
+            navigation.navigate('EditProfile', { profile });
           }}
         />
 

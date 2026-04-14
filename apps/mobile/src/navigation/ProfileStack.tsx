@@ -7,6 +7,7 @@ import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
 import { SettingsScreen } from 'src/profile/ui/SettingsScreen';
 import { PreferencesScreen } from 'src/profile/ui/PreferencesScreen';
 import { FavoritesScreen } from 'src/profile/ui/favorite/FavoritesScreen';
+import { EditProfileScreen } from 'src/profile/ui/EditProfileScreen';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -27,11 +28,15 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
     <Stack.Navigator>
       <Stack.Screen
         name="ProfileMain"
-        component={(props: NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'>) =>
-          <ProfileScreen {...props} setIsAuthenticated={setIsAuthenticated} />
-        }
         options={{ headerShown: false }}
-      />
+      >
+        {(props: NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'>) => (
+          <ProfileScreen
+            {...props}
+            setIsAuthenticated={setIsAuthenticated}
+          />
+        )}
+      </Stack.Screen>
       <Stack.Screen
         name="PublicProfile"
         component={ProfilePublicScreen}
@@ -39,7 +44,7 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       />
       <Stack.Screen
         name="EditProfile"
-        component={TestScreen}
+        component={EditProfileScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

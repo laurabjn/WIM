@@ -26,6 +26,17 @@ export function useMyHomes(token: string | null) {
     }
   }, [token]);
 
+  // async function saveHome(payload: Partial<MyHome>) {
+  //   if (!token) {
+  //     throw new Error('Missing token');
+  //   }
+
+  //   const updated = await updateMyHome(token, payload);
+  //   setHomes(updated);
+  //   return updated;
+  // }
+
+
   useEffect(() => {
     loadHomes();
   }, [token]);

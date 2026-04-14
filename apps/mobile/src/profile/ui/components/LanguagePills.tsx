@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet } from 'react-native';
 
 type Props = {
@@ -6,6 +7,8 @@ type Props = {
 };
 
 export function LanguagePills({ languages = [] }: Props) {
+  const { t } = useTranslation('profile');
+
   if (!Array.isArray(languages) || languages.length === 0) {
     return null;
   }
@@ -14,7 +17,7 @@ export function LanguagePills({ languages = [] }: Props) {
     <View style={styles.container}>
       {languages.map((language) => (
         <View key={language} style={styles.pill}>
-          <Text style={styles.pillText}>{language}</Text>
+          <Text style={styles.pillText}>{t(`profile:language.${language}`)}</Text>
         </View>
       ))}
     </View>
