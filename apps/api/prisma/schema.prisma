@@ -28,6 +28,8 @@ model User {
   travelPreferences Json?
   
   homes Home[]
+  
+  supportRequests   SupportRequest[]
 
   @@map("users")
 }
@@ -65,6 +67,23 @@ model HomePhoto {
   home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
   @@map("home_photos")
+}
+
+model SupportRequest {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  userEmail    String   @map("user_email")
+  userFullName String?  @map("user_full_name")
+  topic     String
+  subject   String
+  message   String
+  status    String   @default("open")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("support_requests")
 }
 
 enum IdentityStatus {

@@ -1,10 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -21,16 +19,19 @@ import { NumberChip } from './components/NumberChip';
 import { ToggleRow } from './components/ToggleRow';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { UserProfile } from '@wim/shared';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { useTranslation } from 'react-i18next';
 import { StayDurationSlider } from './components/StayDurationSlider';
+import { getSession } from 'src/auth/infrastructure/authStorage';
+import { updateMyProfile } from '../infrastructure/profile.api';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Preferences'>;
 
 export function PreferencesScreen({ route, navigation }: Props) {
   const { t } = useTranslation(['profile', 'auth']);
-  const { profile } = route.params;
+  const profileRef = useRef(route.params.profile);
+  const profile = profileRef.current;
 
   const initialPreferences = profile.travelPreferences ?? {
     preferredCountries: [],
@@ -41,6 +42,7 @@ export function PreferencesScreen({ route, navigation }: Props) {
     flexibleDates: null,
     preferredCities: [],
     preferredContinents: [],
+    preferredDestinationsByRegion: {},
     stayDuration: null,
     preferredSeasons: [],
     essentialAmenities: [],
@@ -52,6 +54,10 @@ export function PreferencesScreen({ route, navigation }: Props) {
 
   const [isSaving, setIsSaving] = useState(false);
   const [searchCity, setSearchCity] = useState('');
+  const [preferredDestinationsByRegion, setPreferredDestinationsByRegion] =
+    useState<Record<string, string[]>>(
+      initialPreferences.preferredDestinationsByRegion ?? {},
+    );
   const [preferredContinents, setPreferredContinents] = useState<string[]>(
     initialPreferences.preferredContinents ?? [],
   );
@@ -80,6 +86,17 @@ export function PreferencesScreen({ route, navigation }: Props) {
     initialPreferences.petsAccepted ?? false,
   );
 
+  useEffect(() => {
+    const updatedSelection = route.params?.updatedRegionSelection;
+
+    if (!updatedSelection) return;
+
+    setPreferredDestinationsByRegion((prev) => ({
+      ...prev,
+      [updatedSelection.region]: updatedSelection.selectedItems,
+    }));
+  }, [route.params?.updatedRegionSelection]);
+
   function toggleItem(
     key: string,
     list: string[],
@@ -95,8 +112,14 @@ export function PreferencesScreen({ route, navigation }: Props) {
   async function handleSave() {
     try {
       setIsSaving(true);
-      const updatedProfile: UserProfile = {
-        ...profile,
+
+      const session = await getSession();
+
+      if (!session?.accessToken) {
+        throw new Error('Missing token');
+      }
+
+      const updatedProfile = await updateMyProfile(session.accessToken, {
         travelPreferences: {
           ...profile.travelPreferences,
           preferredCountries: profile.travelPreferences.preferredCountries ?? [],
@@ -106,7 +129,10 @@ export function PreferencesScreen({ route, navigation }: Props) {
           carExchangeAccepted: profile.travelPreferences.carExchangeAccepted ?? null,
           flexibleDates: profile.travelPreferences.flexibleDates ?? null,
           preferredCities: searchCity ? [searchCity] : [],
-          preferredContinents,
+          preferredContinents: Object.keys(preferredDestinationsByRegion).filter(
+            (region) => (preferredDestinationsByRegion[region]?.length ?? 0) > 0,
+          ),
+          preferredDestinationsByRegion,
           stayDuration,
           preferredSeasons,
           essentialAmenities,
@@ -115,10 +141,23 @@ export function PreferencesScreen({ route, navigation }: Props) {
           travelingWithChildren,
           petsAccepted,
         },
-      };
+      });
 
-      console.log('PREFERENCES TO SAVE:', updatedProfile.travelPreferences);
-      navigation.goBack();
+      console.log(
+        'UPDATED PROFILE FROM API:',
+        JSON.stringify(updatedProfile, null, 2),
+      );
+      console.log(
+        'UPDATED DESTINATIONS BY REGION:',
+        JSON.stringify(
+          updatedProfile.travelPreferences?.preferredDestinationsByRegion,
+          null,
+          2,
+        ),
+      );
+      navigation.navigate('ProfileMain', {
+        updatedProfile,
+      });
     } catch (error) {
       console.log('Error saving preferences:', error);
     } finally {
@@ -132,32 +171,66 @@ export function PreferencesScreen({ route, navigation }: Props) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
-        <Text style={styles.sectionTitle}>{t('profile:preferencesTravel.title')}</Text>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.headerIconButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.headerIcon}>←</Text>
+          </TouchableOpacity>
+
+          <View style={styles.headerTitleWrapper}>
+            <Text style={styles.headerTitle}>
+              {t('profile:preferencesTravel.title')}
+            </Text>
+          </View>
+        </View>
+
+        <Text style={styles.sectionTitle}>{t('profile:preferencesTravel.preferredDestinations')}</Text>
         <Text style={styles.sectionSubtitle}>
           {t('profile:preferencesTravel.subtitle')}
         </Text>
 
-        <View style={styles.searchBox}>
-          <TextInput
-            value={searchCity}
-            onChangeText={setSearchCity}
-            placeholder={t('profile:preferencesTravel.search')}
-            placeholderTextColor="#8D8D8D"
-            style={styles.searchInput}
-          />
-        </View>
-
         <View style={styles.grid}>
-          {CONTINENTS.map((item) => (
-            <ChoiceChip
-              key={item}
-              label={t(`profile:continent.${item}`)}
-              selected={preferredContinents.includes(item)}
-              onPress={() =>
-                toggleItem(item, preferredContinents, setPreferredContinents)
-              }
-            />
-          ))}
+          {CONTINENTS.map((item) => {
+            const selectedCount =
+              preferredDestinationsByRegion[item]?.length ?? 0;
+
+            const isSelected = selectedCount > 0;
+
+            return (
+              <TouchableOpacity
+                key={item}
+                style={[
+                  styles.regionCard,
+                  isSelected && styles.regionCardSelected,
+                ]}
+                activeOpacity={0.85}
+                onPress={() =>
+                  navigation.navigate('RegionDestinations', {
+                    profile,
+                    region: item,
+                    selectedItems: preferredDestinationsByRegion[item] ?? [],
+                  })
+                }
+              >
+                <Text
+                  style={[
+                    styles.regionCardTitle,
+                    isSelected && styles.regionCardTitleSelected,
+                  ]}
+                >
+                  {t(`profile:continent.${item}`)}
+                </Text>
+
+                {isSelected ? (
+                  <Text style={styles.regionCardSubtitleSelected}>
+                    {selectedCount} {t('profile:preferencesTravel.selectedItems')}
+                  </Text>
+                ) : null}
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         <Text style={styles.sectionTitle}>{t('auth:register.housingType')}</Text>
@@ -262,11 +335,18 @@ export function PreferencesScreen({ route, navigation }: Props) {
             disabled={isSaving}
             activeOpacity={0.85}
           >
-            <Text style={styles.saveButtonText}>
-              {isSaving
-                ? t('profile:preferencesTravel.savingInProgress')
-                : t('profile:preferencesTravel.save')}
-            </Text>
+            <LinearGradient
+              colors={['#52D1A6', '#2DA7F3']}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={styles.primaryButton}
+            >
+              <Text style={styles.saveButtonText}>
+                {isSaving
+                  ? t('profile:preferencesTravel.savingInProgress')
+                  : t('profile:preferencesTravel.save')}
+              </Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -285,7 +365,35 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
-    paddingBottom: 120,
+    paddingBottom: 110,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 18,
+  },
+  headerIconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitleWrapper: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerIcon: {
+    fontSize: 16,
+    color: '#111111',
+  },
+  headerTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111111',
   },
   sectionTitle: {
     fontSize: 16,
@@ -324,6 +432,35 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 14,
   },
+  regionCard: {
+    minWidth: '47%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#E2E2E2',
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  regionCardSelected: {
+    backgroundColor: '#4ECC9A',
+    borderColor: '#4ECC9A',
+  },
+  regionCardTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1F1F1F',
+    textAlign: 'center',
+  },
+  regionCardTitleSelected: {
+    color: '#FFFFFF',
+  },
+  regionCardSubtitleSelected: {
+    fontSize: 11,
+    color: '#EAFBF4',
+    marginTop: 4,
+  },
   durationLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -354,7 +491,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   saveButton: {
-    backgroundColor: '#111111',
     borderRadius: 22,
     paddingVertical: 16,
     alignItems: 'center',
@@ -367,5 +503,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
+  },
+  primaryButton: {
+    width: '100%',
+    height: 58,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

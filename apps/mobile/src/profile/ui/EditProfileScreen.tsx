@@ -136,6 +136,13 @@ export function EditProfileScreen({ route, navigation }: Props) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.headerIconButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.headerIcon}>←</Text>
+          </TouchableOpacity>
+          
           <TouchableOpacity onPress={handleSave} disabled={isSaving}>
             <Text style={styles.headerSaveText}>
               {t('common:save')}

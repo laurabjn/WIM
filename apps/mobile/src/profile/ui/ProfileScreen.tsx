@@ -98,6 +98,10 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
 
   useEffect(() => {
     if (route.params?.updatedProfile) {
+      console.log(
+        'PROFILE SCREEN RECEIVED UPDATED PROFILE:',
+        JSON.stringify(route.params.updatedProfile, null, 2),
+      );
       setProfile(route.params.updatedProfile);
     }
   }, [route.params?.updatedProfile, setProfile]);
@@ -160,7 +164,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
             onPressFavorites={() => navigation.navigate('Favorites')}
             onPressSettings={() => navigation.navigate('Settings', { profile })}
             onPressPreferences={() => navigation.navigate('Preferences', { profile })}
-            onPressHelp={() => console.log('Aide')}
+            onPressHelp={() => navigation.navigate('Help')}
             onPressLegal={() => console.log('Juridique')}
             onPressLogout={confirmLogout}
           />

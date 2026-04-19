@@ -8,6 +8,8 @@ import { SettingsScreen } from 'src/profile/ui/SettingsScreen';
 import { PreferencesScreen } from 'src/profile/ui/PreferencesScreen';
 import { FavoritesScreen } from 'src/profile/ui/favorite/FavoritesScreen';
 import { EditProfileScreen } from 'src/profile/ui/EditProfileScreen';
+import { HelpScreen } from 'src/profile/ui/HelpScreen';
+import { RegionDestinationsScreen } from 'src/profile/ui/RegionDestinationsScreen';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -60,6 +62,16 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Help"
+        component={HelpScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="RegionDestinations"
+        component={RegionDestinationsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

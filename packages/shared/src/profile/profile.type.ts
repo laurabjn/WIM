@@ -18,6 +18,7 @@ export interface TravelPreferences {
   flexibleDates: boolean | null;
   preferredCities?: string[];
   preferredContinents?: string[];
+  preferredDestinationsByRegion?: Record<string, string[]>;
   stayDuration?: typeof STAY_DURATIONS[number] | null;
   preferredSeasons?: string[];
   essentialAmenities?: string[];
