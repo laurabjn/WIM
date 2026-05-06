@@ -8,10 +8,10 @@ import {
   Alert,
 } from 'react-native';
 import { ProfileHeaderCard } from './components/ProfileHeaderCard';
-import { UserHomeCard } from './components/UserHomeCard';
+import { UserHomeCard } from '../../home/ui/components/UserHomeCard';
 import { ProfileMenuList } from './components/ProfileMenuList';
 import { useMyProfile } from '../infrastructure/hook/useMyProfile';
-import { useMyHomes } from '../infrastructure/hook/useMyHomes';
+import { useMyHomes } from '../../home/infrastructure/hooks/useMyHomes';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -25,6 +25,7 @@ type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
 
 export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated, route }) => {
   const { t } = useTranslation('profile');
+  
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
 

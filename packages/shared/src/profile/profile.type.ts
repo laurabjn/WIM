@@ -62,19 +62,3 @@ export interface MyHome {
   isAvailable?: boolean;
   pricePerNight?: number | null;
 }
-
-export interface FavoriteHome {
-  id: string;
-  title: string;
-  city: string;
-  country: string;
-  imageUrl: string | null;
-  averageRating?: number | null;
-  reviewsCount?: number;
-  bedrooms?: number | null;
-  beds?: number | null;
-  pricePerNight?: number | null;
-  ownerAvatarUrl?: string | null;
-  seasonalBadge?: string | null;
-  isAvailable?: boolean;
-}

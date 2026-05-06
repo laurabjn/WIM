@@ -20,6 +20,8 @@ export async function registerUserApi(payload: RegisterUser): Promise<RegisterUs
   }
 
   return {
+    accessToken: data.accessToken,
+    refreshToken: data.refreshToken,
     user: data.user,
     identityRedirectUrl: data.identityRedirectUrl,
   };

@@ -3,16 +3,19 @@ import { RegisterStartScreen } from '../auth/ui/Register/RegisterStartScreen';
 import { RegisterStep1Screen } from '../auth/ui/Register/RegisterStep1Screen';
 import { RegisterStep2Screen } from '../auth/ui/Register/RegisterStep2Screen';
 import { RegisterIdentityScreen } from '../auth/ui/Register/RegisterIdentityScreen';
-import { RegisterHousingScreen } from '../auth/ui/Register/RegisterHousingScreen';
+import { RegisterHousingStep1Screen } from '../auth/ui/Register/homes/RegisterHousingStep1Screen';
 import { RegisterWelcomeScreen } from '../auth/ui/Register/RegisterWelcomeScreen';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Text, View } from 'react-native';
 import { WelcomeEntryScreen } from '../auth/ui/WelcomeEntryScreen';
 import { LoginScreen } from '../auth/ui/Login/LoginScreen';
 import { ForgotPasswordScreen } from '../auth/ui/Login/ForgotPasswordScreen';
 import { RegisterStep3Screen } from '../auth/ui/Register/RegisterStep3Screen';
 import { RegisterStep4Screen } from '../auth/ui/Register/RegisterStep4Screen';
 import { RegisterStep5Screen } from '../auth/ui/Register/RegisterStep5Screen';
+import { RegisterHousingStep2Screen } from 'src/auth/ui/Register/homes/RegisterHousingStep2Screen';
+import { RegisterHousingStep3Screen } from 'src/auth/ui/Register/homes/RegisterHousingStep3Screen';
+import { RegisterHousingStep4Screen } from 'src/auth/ui/Register/homes/RegisterHousingStep4Screen';
+import { PickedPhoto } from '@wim/shared/home/home.type';
 
 export type AuthStackParamList = {
   WelcomeEntry: undefined;
@@ -52,7 +55,23 @@ export type AuthStackParamList = {
     password: string;
   };
   RegisterIdentity: { identityRedirectUrl?: string };
-  RegisterHousing: undefined;
+  RegisterHousingStep1: undefined;
+  RegisterHousingStep2: { photos: PickedPhoto[] };
+  RegisterHousingStep3: {
+    photos: PickedPhoto[];
+    description: string
+  };
+  RegisterHousingStep4: {
+    photos: PickedPhoto[];
+    description: string;
+    location: {
+      address: string;
+      city: string;
+      country: string;
+      latitude?: number | null;
+      longitude?: number | null;
+    };
+  };
   RegisterWelcome: undefined;
 };
 
@@ -80,7 +99,10 @@ export const AuthStackNavigator: React.FC<Props> = ({ setIsAuthenticated }) => (
     <Stack.Screen name="RegisterStep4" component={RegisterStep4Screen} />
     <Stack.Screen name="RegisterStep5" component={RegisterStep5Screen} />
     <Stack.Screen name="RegisterIdentity" component={RegisterIdentityScreen} />
-    <Stack.Screen name="RegisterHousing" component={RegisterHousingScreen} />
+    <Stack.Screen name="RegisterHousingStep1" component={RegisterHousingStep1Screen} />
+    <Stack.Screen name="RegisterHousingStep2" component={RegisterHousingStep2Screen} />
+    <Stack.Screen name="RegisterHousingStep3" component={RegisterHousingStep3Screen} />
+    <Stack.Screen name="RegisterHousingStep4" component={RegisterHousingStep4Screen} />
     <Stack.Screen name="RegisterWelcome">
       {(props) => (
         <RegisterWelcomeScreen

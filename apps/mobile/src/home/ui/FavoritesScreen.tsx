@@ -12,51 +12,83 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
-import { useFavoriteHomes } from 'src/profile/infrastructure/hook/useFavoriteHome';
-import { FavoriteHomeCard } from './component/FavoriteHomeCard';
+import { FavoriteHomeCard } from './components/FavoriteHomeCard';
+import { addFavoriteHome, listFavoriteHomes, removeFavoriteHome } from '../infrastructure/home.api';
+import { Home } from '@wim/shared/home/home.type';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Favorites'>;
 
 export function FavoritesScreen({ navigation }: Props) {
   const { t } = useTranslation('profile');
+
+  const [homes, setHomes] = useState<Home[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
+  const [isLoadingHomes, setIsLoadingHomes] = useState(true);
 
   useEffect(() => {
-    async function loadSession() {
+    async function loadFavorites() {
       try {
         const session = await getSession();
-        setToken(session?.accessToken ?? null);
+        const accessToken = session?.accessToken ?? null;
+
+        setToken(accessToken);
+
+        if (!accessToken) return;
+
+        const favoriteHomes = await listFavoriteHomes(accessToken);
+        setHomes(favoriteHomes.map((home) => ({ ...home, isFavorite: true })));
       } catch (error) {
-        console.log('Error loading session:', error);
-        setToken(null);
+        console.log('Error loading favorites:', error);
       } finally {
         setIsSessionLoading(false);
+        setIsLoadingHomes(false);
       }
     }
 
-    loadSession();
+    loadFavorites();
   }, []);
 
-  const {
-    favorites,
-    isLoading,
-    error,
-  } = useFavoriteHomes(token);
+  async function toggleFavorite(homeId: string) {
+    if (!token) return;
 
-  if (isSessionLoading || isLoading) {
+    const currentHome = homes.find((home) => home.id === homeId);
+    if (!currentHome) return;
+
+    const nextIsFavorite = !currentHome.isFavorite;
+
+    setHomes((prev) =>
+      prev.map((home) =>
+        home.id === homeId
+          ? { ...home, isFavorite: nextIsFavorite }
+          : home,
+      ),
+    );
+
+    try {
+      if (nextIsFavorite) {
+        await addFavoriteHome(token, homeId);
+      } else {
+        await removeFavoriteHome(token, homeId);
+      }
+    } catch (error) {
+      setHomes((prev) =>
+        prev.map((home) =>
+          home.id === homeId
+            ? { ...home, isFavorite: !nextIsFavorite }
+            : home,
+        ),
+      );
+
+      console.log('Toggle favorite error:', error);
+    }
+  }
+
+  if (isSessionLoading || isLoadingHomes) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator />
         <Text>{t('favorites.loading', 'Chargement des favoris...')}</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text>{error}</Text>
       </View>
     );
   }
@@ -88,23 +120,21 @@ export function FavoritesScreen({ navigation }: Props) {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {favorites.length === 0 ? (
+        {homes.length === 0 ? (
           <View style={styles.emptyWrapper}>
             <Text style={styles.emptyText}>
               {t('favorites.empty', 'Aucun logement favori pour le moment')}
             </Text>
           </View>
         ) : (
-          favorites.map((home) => (
+          homes.map((home) => (
             <FavoriteHomeCard
               key={home.id}
               home={home}
               onPress={(homeId) => {
-                console.log('Open favorite home:', homeId);
+                navigation.navigate('HomeDetails', { homeId });
               }}
-              onPressFavorite={(homeId) => {
-                console.log('Remove favorite:', homeId);
-              }}
+              onPressFavorite={toggleFavorite}
             />
           ))
         )}

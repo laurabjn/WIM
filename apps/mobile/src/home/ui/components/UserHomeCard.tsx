@@ -1,4 +1,4 @@
-import { MyHome } from '@wim/shared';
+import { Home } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
 import {
   View,
@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 type Props = {
-  home: MyHome;
+  home: Home;
   onPressEdit: (homeId: string) => void;
   onPressCard?: (homeId: string) => void;
   hideEditButton?: boolean;
@@ -18,6 +18,12 @@ type Props = {
 export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }: Props) {
   const { t } = useTranslation('profile');
     
+  const coverUrl =
+    home.photos?.[0]?.url ??
+    'https://via.placeholder.com/400x220.png?text=Home';
+
+  const hostRating = home.owner?.rating ?? null;
+
   return (
     <TouchableOpacity
       activeOpacity={0.9}
@@ -28,8 +34,7 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
         <Image
           source={{
             uri:
-              home.imageUrl ??
-              'https://via.placeholder.com/400x220.png?text=Home',
+              coverUrl,
           }}
           style={styles.image}
         />
@@ -50,7 +55,7 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
             {home.title}
           </Text>
           <Text style={styles.rating}>
-            ★ {home.averageRating?.toFixed(1) ?? '0.0'}
+            ★ {home.owner.rating ?? '0.0'}
           </Text>
         </View>
 
@@ -63,7 +68,7 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
         </Text>
 
         <View style={styles.bottomRow}>
-          {home.isAvailable ? (
+          {home.isAvailableForExchange ? (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{t('available')}</Text>
             </View>

@@ -1,9 +1,9 @@
-import { MyHome } from '@wim/shared';
+import { Home } from '@wim/shared/home/home.type';
 import { useCallback, useEffect, useState } from 'react';
-import { fetchMyHomes } from '../home.api';
+import { getHomeById, listMyHomes } from 'src/home/infrastructure/home.api';
 
 export function useMyHomes(token: string | null) {
-  const [homes, setHomes] = useState<MyHome[]>([]);
+  const [homes, setHomes] = useState<Home[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +17,7 @@ export function useMyHomes(token: string | null) {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await fetchMyHomes(token);
+      const data = await listMyHomes(token);
       setHomes(data);
     } catch (err) {
       setError('Erreur lors du chargement des logements');
@@ -26,7 +26,7 @@ export function useMyHomes(token: string | null) {
     }
   }, [token]);
 
-  // async function saveHome(payload: Partial<MyHome>) {
+  // async function saveHome(payload: Partial<Home>) {
   //   if (!token) {
   //     throw new Error('Missing token');
   //   }

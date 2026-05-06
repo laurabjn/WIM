@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { FavoriteHome } from '@wim/shared';
 import { useTranslation } from 'react-i18next';
+import { Home } from '@wim/shared/home/home.type';
 
 type Props = {
-  home: FavoriteHome;
+  home: Home;
   onPress: (homeId: string) => void;
   onPressFavorite?: (homeId: string) => void;
 };
@@ -20,7 +20,7 @@ export function FavoriteHomeCard({
   onPress,
   onPressFavorite,
 }: Props) {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation(['home', 'profile']);
   return (
     <TouchableOpacity
       style={styles.card}
@@ -31,7 +31,7 @@ export function FavoriteHomeCard({
         <Image
           source={{
             uri:
-              home.imageUrl ??
+              home.photos?.[0]?.url ??
               'https://via.placeholder.com/500x300.png?text=Home',
           }}
           style={styles.image}
@@ -44,9 +44,9 @@ export function FavoriteHomeCard({
           <Text style={styles.favoriteIcon}>★</Text>
         </TouchableOpacity>
 
-        {home.ownerAvatarUrl ? (
+        {home.owner.avatarUrl ? (
           <Image
-            source={{ uri: home.ownerAvatarUrl }}
+            source={{ uri: home.owner.avatarUrl }}
             style={styles.ownerAvatar}
           />
         ) : null}
@@ -79,11 +79,7 @@ export function FavoriteHomeCard({
         </Text>
 
         <View style={styles.bottomRow}>
-          {home.seasonalBadge ? (
-            <View style={styles.badgeSeason}>
-              <Text style={styles.badgeSeasonText}>{home.seasonalBadge}</Text>
-            </View>
-          ) : home.isAvailable ? (
+          {home.isAvailableForExchange ? (
             <View style={styles.badgeAvailable}>
               <Text style={styles.badgeAvailableText}>{t('available')}</Text>
             </View>

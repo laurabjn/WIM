@@ -5,6 +5,7 @@ import { WebsocketModule } from './interfaces/websocket/websocket.module';
 import { UploadsModule } from './interfaces/http/modules/uploads.module';
 import { ProfileModule } from './interfaces/http/modules/profile.module';
 import { SupportModule } from './interfaces/http/modules/support.module';
+import { HomeModule } from './interfaces/http/modules/home.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SupportModule } from './interfaces/http/modules/support.module';
     UploadsModule,
     ProfileModule,
     SupportModule,
+    HomeModule,
   ],
 })
 export class AppModule {}

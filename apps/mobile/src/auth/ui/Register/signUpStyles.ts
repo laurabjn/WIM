@@ -188,6 +188,14 @@ export const signupStyles = StyleSheet.create({
     opacity: 0.6,
   },
 
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#111111',
+    textAlign: 'center',
+    marginBottom: 18,
+  },
+
   centerContent: {
     flex: 1,
     alignItems: 'center',

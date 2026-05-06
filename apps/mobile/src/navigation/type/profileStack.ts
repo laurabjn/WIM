@@ -19,4 +19,5 @@ export type ProfileStackParamList = {
   Settings: { profile: UserProfile };
   PublicProfile: { userId: string };
   Help: undefined;
+  HomeDetails: { homeId: string };
 };

@@ -20,6 +20,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { uploadProfileImage } from '../../infrastructure/upload/uploadProfileImage';
 import { Stepper } from '../components/Stepper';
+import { clearSession, saveSession } from 'src/auth/infrastructure/authStorage';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep5'>;
 
@@ -89,7 +90,7 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
         ? await uploadProfileImage(profilePhotoUri)
         : undefined;
 
-      const { identityRedirectUrl } = await registerUserApi({
+      const session = await registerUserApi({
         firstName,
         lastName,
         birthDate,
@@ -100,11 +101,20 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
         password,
         bio,
         avatarUrl,
-        isAdmin: false,
+      });
+
+      await clearSession();
+      await saveSession({
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
+          user: {
+            ...session.user,
+            isAdmin: session.user.isAdmin ?? false,
+          },
       });
 
       navigation.navigate('RegisterIdentity', {
-        identityRedirectUrl,
+        identityRedirectUrl: session.identityRedirectUrl,
       });
     } catch (err: any) {
       setError(err?.message ?? t('auth:genericError'));

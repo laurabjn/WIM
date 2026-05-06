@@ -6,20 +6,13 @@ import { View, Text } from 'react-native';
 import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
 import { SettingsScreen } from 'src/profile/ui/SettingsScreen';
 import { PreferencesScreen } from 'src/profile/ui/PreferencesScreen';
-import { FavoritesScreen } from 'src/profile/ui/favorite/FavoritesScreen';
+import { FavoritesScreen } from 'src/home/ui/FavoritesScreen';
 import { EditProfileScreen } from 'src/profile/ui/EditProfileScreen';
 import { HelpScreen } from 'src/profile/ui/HelpScreen';
 import { RegionDestinationsScreen } from 'src/profile/ui/RegionDestinationsScreen';
+import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
-
-function TestScreen() {
-  return (
-    <View>
-      <Text>Test</Text>
-    </View>
-  );
-}
 
 type Props = {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -72,6 +65,11 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       <Stack.Screen
         name="RegionDestinations"
         component={RegionDestinationsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="HomeDetails"
+        component={HomeDetailsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
