@@ -95,7 +95,22 @@
       "licenses": "Licences open source",
       "about": "À propos",
       "dangerZone": "Zone dangereuse",
-      "deleteAccount": "Supprimer mon compte"
+      "deleteAccount": "Supprimer mon compte",
+      "themeLight": "Clair",
+      "themeDark": "Sombre",
+      "themeSystem": "Système",
+      "verified": "Vérifié",
+      "refused": "Refusé",
+      "inProgress": "En cours",
+      "notVerified": "Non vérifié",
+      "verificationDelay": "La vérification peut prendre jusqu’à 24h. Le statut sera mis à jour ici, notamment si la vérification est refusée.",
+      "freeTrial": "Essai gratuit",
+      "monthlyPlan": "Abonnement mensuel",
+      "yearlyPlan": "Abonnement annuel",
+      "preciseLocation": "Afficher une localisation précise",
+      "customize": "Personnaliser",
+      "kilometers": "Kilomètres",
+      "miles": "Miles"
     },
     "preferencesTravel": {
       "title": "Préférences de voyage",

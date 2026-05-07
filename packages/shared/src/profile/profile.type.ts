@@ -9,6 +9,13 @@ export const STAY_DURATIONS = [
   '3m'
 ];
 
+export enum IdentityStatus {
+  NOT_VERIFIED = 'NOT_VERIFIED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+}
+
 export interface TravelPreferences {
   preferredCountries: string[];
   preferredHomeTypes: string[];
@@ -47,6 +54,7 @@ export interface UserProfile {
   reviewsCount?: number;
   exchangesCount?: number;
   homesCount?: number;
+  identityStatus?: IdentityStatus | null;
 }
 
 export interface MyHome {

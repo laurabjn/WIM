@@ -196,7 +196,22 @@
       "currency": "Currency",
       "distanceUnit": "Distance unit",
       "assistance": "Assistance",
-      "deleteAccount": "Delete my account"
+      "deleteAccount": "Delete my account",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System default",
+      "verified": "Verified",
+      "notVerified": "Not verified",
+      "inProgress": "Verification in progress",
+      "refused": "Refused",
+      "verificationDelay": "Verification can take up to 24 hours. If your status is still 'in progress' after this delay, please contact our support.",
+      "freeTrial": "Free trial",
+      "monthlyPlan": "Monthly plan",
+      "yearlyPlan": "Yearly plan",
+      "preciseLocation": "Show my precise location on my profile",
+      "customize": "Customize",
+      "kilometers": "Kilometers",
+      "miles": "Miles"
     },
     "preferencesTravel": {
       "title": "Travel preferences",
