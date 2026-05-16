@@ -4,6 +4,7 @@ import {
   LoginResult,
   RegisterResult
 } from '../dtos/authUser';
+import { saveSession } from './authStorage';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api';
 
@@ -17,9 +18,8 @@ export async function registerUserApi(payload: RegisterUserPayload): Promise<Reg
     body: JSON.stringify(payload),
   });
 
-  console.log('API request:', { url: `${API_URL}/auth/register`, payload });
   const data = await response.json().catch(() => ({}));
-  console.log('API response:', { status: response.status, data });
+  // console.log('API response:', { status: response.status, data });
 
   if (!response.ok) {
     const message = data?.message || 'Registration failed';
@@ -49,6 +49,8 @@ export async function loginUserApi(payload: { email: string; password: string })
     const message = data?.message || 'Login failed';
     throw new Error(message);
   }
+
+  saveSession(data as LoginResult);
 
   return data as LoginResult;
 }

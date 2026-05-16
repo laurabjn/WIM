@@ -57,4 +57,28 @@ export class UploadsController {
       url: `/uploads/avatars/${file.filename}`,
     };
   }
+
+  @Post('home')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/homes',
+        filename: generateFilename,
+      }),
+      fileFilter: imageFileFilter,
+      limits: {
+        fileSize: 5 * 1024 * 1024,
+      },
+    }),
+  )
+  uploadHome(@UploadedFile() file?: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+
+    return {
+      filename: file.filename,
+      url: `/uploads/homes/${file.filename}`,
+    };
+  }
 }

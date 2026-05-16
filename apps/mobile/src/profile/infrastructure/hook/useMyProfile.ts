@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { UserProfile } from '@wim/shared';
 import { getMyProfile, updateMyProfile } from '../profile.api';
 
@@ -7,7 +7,7 @@ export function useMyProfile(token: string | null) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadProfile() {
+  const loadProfile = useCallback(async () => {
     if (!token) {
       setIsLoading(false);
       setError('Missing token');
@@ -19,7 +19,6 @@ export function useMyProfile(token: string | null) {
 
     try {
       const data = await getMyProfile(token);
-      console.log('PROFILE DATA:', data);
       setProfile(data);
     } catch (err) {
       console.log('useMyProfile catch:', err);
@@ -32,7 +31,7 @@ export function useMyProfile(token: string | null) {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [token]);
 
   async function saveProfile(payload: Partial<UserProfile>) {
     if (!token) {
@@ -46,7 +45,7 @@ export function useMyProfile(token: string | null) {
 
   useEffect(() => {
     loadProfile();
-  }, [token]);
+  }, [loadProfile]);
 
   return {
     profile,
@@ -54,5 +53,6 @@ export function useMyProfile(token: string | null) {
     error,
     reload: loadProfile,
     saveProfile,
+    setProfile
   };
 }

@@ -50,7 +50,7 @@ export const RegisterIdentityScreen: React.FC<Props> = ({
       console.log('Identity verification status:', status);
 
       if (status === 'VERIFIED') {
-        navigation.navigate('RegisterHousing');
+        navigation.navigate('RegisterHousingStep1');
         return;
       }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -8,22 +8,24 @@ import {
   Alert,
 } from 'react-native';
 import { ProfileHeaderCard } from './components/ProfileHeaderCard';
-import { UserHomeCard } from './components/UserHomeCard';
+import { UserHomeCard } from '../../home/ui/components/UserHomeCard';
 import { ProfileMenuList } from './components/ProfileMenuList';
 import { useMyProfile } from '../infrastructure/hook/useMyProfile';
-import { useMyHomes } from '../infrastructure/hook/useMyHomes';
+import { useMyHomes } from '../../home/infrastructure/hooks/useMyHomes';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { clearSession, getSession } from 'src/auth/infrastructure/authStorage';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
+import { useFocusEffect } from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated }) => {
+export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated, route }) => {
   const { t } = useTranslation('profile');
+  
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
 
@@ -75,13 +77,35 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated 
     profile,
     isLoading: isProfileLoading,
     error: profileError,
+    reload: reloadProfile,
+    setProfile
   } = useMyProfile(token);
 
   const {
     homes,
     isLoading: isHomesLoading,
     error: homesError,
+    reloadHomes: reloadHomes,
   } = useMyHomes(token);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (token) {
+        reloadProfile();
+        reloadHomes();
+      }
+    }, [token, reloadProfile, reloadHomes])
+  );
+
+  useEffect(() => {
+    if (route.params?.updatedProfile) {
+      console.log(
+        'PROFILE SCREEN RECEIVED UPDATED PROFILE:',
+        JSON.stringify(route.params.updatedProfile, null, 2),
+      );
+      setProfile(route.params.updatedProfile);
+    }
+  }, [route.params?.updatedProfile, setProfile]);
 
   if (isSessionLoading || isProfileLoading) {
     return (
@@ -107,7 +131,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated 
           profile={profile}
           onPressEdit={() => {
             console.log('Aller à Modifier profil');
-            navigation.navigate('EditProfile');
+            navigation.navigate('EditProfile', { profile });
           }}
         />
 
@@ -141,7 +165,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated 
             onPressFavorites={() => navigation.navigate('Favorites')}
             onPressSettings={() => navigation.navigate('Settings', { profile })}
             onPressPreferences={() => navigation.navigate('Preferences', { profile })}
-            onPressHelp={() => console.log('Aide')}
+            onPressHelp={() => navigation.navigate('Help')}
             onPressLegal={() => console.log('Juridique')}
             onPressLogout={confirmLogout}
           />

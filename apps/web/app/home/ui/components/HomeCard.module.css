@@ -1,0 +1,52 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  width: 100%;
+  background: #fff;
+  border-radius: 22px;
+  padding: 10px;
+  margin-bottom: 18px;
+
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.12);
+  text-decoration: none;
+  color: inherit;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 130px;
+  height: 92px;
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #ddd;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.content {
+  min-width: 0;
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #111;
+}
+
+.subtitle {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #222;
+}
+
+.details {
+  margin: 0;
+  font-size: 13px;
+  color: #777;
+}

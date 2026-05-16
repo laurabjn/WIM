@@ -20,7 +20,7 @@ import { IdentityModule } from './identity.module';
 import { JwtStrategy } from '../jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 
-const ACCESS_TOKEN_TTL = '15m';
+const ACCESS_TOKEN_TTL = '30m';
 
 @Module({
   controllers: [AuthController],

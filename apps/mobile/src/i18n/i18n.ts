@@ -21,16 +21,18 @@ export async function initI18n() {
           common: fr.common,
           auth: fr.auth,
           profile: fr.profile,
+          home: fr.home,
         },
         en: {
           common: en.common,
           auth: en.auth,
           profile: en.profile,
+          home: en.home,
         },
       },
       lng: locale,
       fallbackLng: "fr",
-      ns: ["common", "auth", "profile"],
+      ns: ["common", "auth", "profile", "home"],
       defaultNS: "common",
       interpolation: {escapeValue: false}
     });

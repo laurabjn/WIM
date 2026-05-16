@@ -9,6 +9,13 @@ export const STAY_DURATIONS = [
   '3m'
 ];
 
+export enum IdentityStatus {
+  NOT_VERIFIED = 'NOT_VERIFIED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+}
+
 export interface TravelPreferences {
   preferredCountries: string[];
   preferredHomeTypes: string[];
@@ -18,6 +25,7 @@ export interface TravelPreferences {
   flexibleDates: boolean | null;
   preferredCities?: string[];
   preferredContinents?: string[];
+  preferredDestinationsByRegion?: Record<string, string[]>;
   stayDuration?: typeof STAY_DURATIONS[number] | null;
   preferredSeasons?: string[];
   essentialAmenities?: string[];
@@ -46,6 +54,7 @@ export interface UserProfile {
   reviewsCount?: number;
   exchangesCount?: number;
   homesCount?: number;
+  identityStatus?: IdentityStatus | null;
 }
 
 export interface MyHome {
@@ -60,20 +69,4 @@ export interface MyHome {
   beds?: number | null;
   isAvailable?: boolean;
   pricePerNight?: number | null;
-}
-
-export interface FavoriteHome {
-  id: string;
-  title: string;
-  city: string;
-  country: string;
-  imageUrl: string | null;
-  averageRating?: number | null;
-  reviewsCount?: number;
-  bedrooms?: number | null;
-  beds?: number | null;
-  pricePerNight?: number | null;
-  ownerAvatarUrl?: string | null;
-  seasonalBadge?: string | null;
-  isAvailable?: boolean;
 }

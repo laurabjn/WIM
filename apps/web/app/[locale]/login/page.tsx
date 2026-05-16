@@ -20,7 +20,7 @@ export default function LoginPage() {
       appleSignUpLabel={t('auth.login.loginWithApple')}
       onBack={() => router.push('/')}
       onForgotPassword={() => router.push('/forgot-password')}
-      onSuccess={() => router.push('/')}
+      onSuccess={() => router.push('/menu')}
     />
   );
 }

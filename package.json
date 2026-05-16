@@ -12,15 +12,16 @@
     "check-types": "turbo run check-types"
   },
   "dependencies": {
+    "lucide-react": "^1.16.0",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
     "prettier": "^3.7.4",
+    "react-test-renderer": "19.1.0",
     "ts-node": "^10.9.2",
     "turbo": "^2.8.9",
-    "typescript": "5.9.2",
-    "react-test-renderer": "19.1.0"
+    "typescript": "5.9.2"
   },
   "engines": {
     "node": ">=18"

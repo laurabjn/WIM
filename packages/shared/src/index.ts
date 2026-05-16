@@ -5,3 +5,4 @@ export * from './utils/emailRules';
 export * from './utils/passwordRules';
 export * from './profile/profile.type';
 export * from './utils/travelOption';
+export * from './utils/languagesOptions';

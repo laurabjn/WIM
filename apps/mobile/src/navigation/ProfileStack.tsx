@@ -6,17 +6,13 @@ import { View, Text } from 'react-native';
 import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
 import { SettingsScreen } from 'src/profile/ui/SettingsScreen';
 import { PreferencesScreen } from 'src/profile/ui/PreferencesScreen';
-import { FavoritesScreen } from 'src/profile/ui/favorite/FavoritesScreen';
+import { FavoritesScreen } from 'src/home/ui/FavoritesScreen';
+import { EditProfileScreen } from 'src/profile/ui/EditProfileScreen';
+import { HelpScreen } from 'src/profile/ui/HelpScreen';
+import { RegionDestinationsScreen } from 'src/profile/ui/RegionDestinationsScreen';
+import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
-
-function TestScreen() {
-  return (
-    <View>
-      <Text>Test</Text>
-    </View>
-  );
-}
 
 type Props = {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,11 +23,15 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
     <Stack.Navigator>
       <Stack.Screen
         name="ProfileMain"
-        component={(props: NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'>) =>
-          <ProfileScreen {...props} setIsAuthenticated={setIsAuthenticated} />
-        }
         options={{ headerShown: false }}
-      />
+      >
+        {(props: NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'>) => (
+          <ProfileScreen
+            {...props}
+            setIsAuthenticated={setIsAuthenticated}
+          />
+        )}
+      </Stack.Screen>
       <Stack.Screen
         name="PublicProfile"
         component={ProfilePublicScreen}
@@ -39,7 +39,7 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       />
       <Stack.Screen
         name="EditProfile"
-        component={TestScreen}
+        component={EditProfileScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -55,6 +55,21 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Help"
+        component={HelpScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="RegionDestinations"
+        component={RegionDestinationsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="HomeDetails"
+        component={HomeDetailsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

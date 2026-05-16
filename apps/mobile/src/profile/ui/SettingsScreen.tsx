@@ -9,12 +9,15 @@ import { useTranslation } from 'react-i18next';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
+import { IdentityStatus } from 'src/auth/dtos/identityStatus';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
 
-export function SettingsScreen({ route }: Props) {
+export function SettingsScreen({ route, navigation }: Props) {
   const { t, i18n } = useTranslation(['profile', 'common', 'auth']);
   const { profile } = route.params;
+
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
 
   const [pushNotifications, setPushNotifications] = useState(false);
   const [smsNotifications, setSmsNotifications] = useState(false);
@@ -23,9 +26,13 @@ export function SettingsScreen({ route }: Props) {
   const [marketingEmails, setMarketingEmails] = useState(false);
 
   const [profileVisible, setProfileVisible] = useState(true);
-  const [showLocation, setShowLocation] = useState(true);
+  const [showPreciseLocation, setShowPreciseLocation] = useState(false);
   const [showAge, setShowAge] = useState(true);
   const [allowMessages, setAllowMessages] = useState(true);
+
+  const [currency, setCurrency] = useState<'EUR' | 'USD' | 'GBP'>('EUR');
+  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km');
+  const [subscriptionPlan, setSubscriptionPlan] = useState<'free' | 'monthly' | 'yearly'>('free');
 
   const fullName = useMemo(() => {
     return `${profile.firstName} ${profile.lastName}`.trim();
@@ -60,6 +67,59 @@ export function SettingsScreen({ route }: Props) {
     ]);
   }
 
+  function openThemeSelector() {
+    Alert.alert(t('profile:settings.theme'), '', [
+      {
+        text: t('profile:settings.themeLight', 'Clair'),
+        onPress: () => setTheme('light'),
+      },
+      {
+        text: t('profile:settings.themeDark', 'Sombre'),
+        onPress: () => setTheme('dark'),
+      },
+      {
+        text: t('profile:settings.themeSystem', 'Système'),
+        onPress: () => setTheme('system'),
+      },
+      { text: t('common:cancel'), style: 'cancel' },
+    ]);
+  }
+
+  function openSubscriptionSelector() {
+    Alert.alert(t('profile:settings.subscription'), '', [
+      {
+        text: t('profile:settings.freeTrial', 'Essai gratuit'),
+        onPress: () => setSubscriptionPlan('free'),
+      },
+      {
+        text: t('profile:settings.monthlyPlan', 'Abonnement mensuel'),
+        onPress: () => setSubscriptionPlan('monthly'),
+      },
+      {
+        text: t('profile:settings.yearlyPlan', 'Abonnement annuel'),
+        onPress: () => setSubscriptionPlan('yearly'),
+      },
+      { text: t('common:cancel'), style: 'cancel' },
+    ]);
+  }
+
+  function openCurrencySelector() {
+    Alert.alert(t('profile:settings.currency'), '', [
+      { text: 'EUR (€)', onPress: () => setCurrency('EUR') },
+      { text: 'USD ($)', onPress: () => setCurrency('USD') },
+      { text: 'GBP (£)', onPress: () => setCurrency('GBP') },
+      { text: t('common:cancel'), style: 'cancel' },
+    ]);
+  }
+
+  function openDistanceUnitSelector() {
+    Alert.alert(t('profile:settings.distanceUnit'), '', [
+      { text: t('profile:settings.kilometers', 'Kilomètres'), onPress: () => setDistanceUnit('km') },
+      { text: t('profile:settings.miles', 'Miles'), onPress: () => setDistanceUnit('mi') },
+      { text: t('common:cancel'), style: 'cancel' },
+    ]);
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
@@ -68,25 +128,25 @@ export function SettingsScreen({ route }: Props) {
             icon="◎"
             label={t('profile:settings.personalInfo')}
             value={fullName || t('common:notProvided')}
-            onPress={() => notImplemented('Informations personnelles')}
+            onPress={() => navigation.navigate('EditProfile', { profile })}
           />
           <SettingsRow
             icon="✉"
             label={t('auth:register.email')}
             value={displayedEmail}
-            onPress={() => notImplemented('Email')}
+            onPress={() => navigation.navigate('EditProfile', { profile })}
           />
           <SettingsRow
             icon="⌕"
             label={t('auth:register.phone')}
             value={displayedPhone}
-            onPress={() => notImplemented('Téléphone')}
+            onPress={() => navigation.navigate('EditProfile', { profile })}
           />
           <SettingsRow
             icon="⌂"
             label={t('auth:register.password')}
             value="••••••••"
-            onPress={() => notImplemented('Mot de passe')}
+            onPress={() => navigation.navigate('EditProfile', { profile })}
           />
         </SettingsSection>
 
@@ -94,8 +154,14 @@ export function SettingsScreen({ route }: Props) {
           <SettingsRow
             icon="◐"
             label={t('profile:settings.theme')}
-            value="système"
-            onPress={() => notImplemented('Thème')}
+            value={
+              theme === 'system'
+                ? t('profile:settings.themeSystem', 'Système')
+                : theme === 'dark'
+                  ? t('profile:settings.themeDark', 'Sombre')
+                  : t('profile:settings.themeLight', 'Clair')
+            }
+            onPress={openThemeSelector}
           />
         </SettingsSection>
 
@@ -103,9 +169,28 @@ export function SettingsScreen({ route }: Props) {
           <SettingsRow
             icon="▣"
             label={t('profile:settings.verificationStatus')}
-            value="Vérifié"
-            valueColor="#35B77C"
-            onPress={() => notImplemented('Statut de vérification')}
+            value={
+              profile.identityStatus === IdentityStatus.VERIFIED
+                ? t('profile:settings.verified')
+                : profile.identityStatus === IdentityStatus.REJECTED
+                  ? t('profile:settings.refused')
+                  : profile.identityStatus === IdentityStatus.IN_PROGRESS
+                    ? t('profile:settings.inProgress')
+                    : t('profile:settings.notVerified')
+            }
+            valueColor={
+              profile.identityStatus === IdentityStatus.VERIFIED
+                ? '#35B77C'
+                : profile.identityStatus === IdentityStatus.REJECTED
+                  ? '#DC2626'
+                  : '#D88500'
+            }
+            onPress={() =>
+              Alert.alert(
+                t('profile:settings.verificationStatus'),
+                t('profile:settings.verificationDelay'),
+              )
+            }
           />
         </SettingsSection>
 
@@ -113,14 +198,21 @@ export function SettingsScreen({ route }: Props) {
           <SettingsRow
             icon="◌"
             label={t('profile:settings.subscription')}
-            value="Actif"
+            value={
+              subscriptionPlan === 'free'
+                ? t('profile:settings.freeTrial')
+                : subscriptionPlan === 'monthly'
+                  ? t('profile:settings.monthlyPlan')
+                  : t('profile:settings.yearlyPlan')
+            }
             valueColor="#35B77C"
-            onPress={() => notImplemented('Abonnement')}
+            onPress={openSubscriptionSelector}
           />
+
           <SettingsRow
             icon="▤"
             label={t('profile:settings.manageSubscription')}
-            onPress={() => notImplemented('Gérer l’abonnement')}
+            onPress={() => notImplemented('Gestion du paiement')}
           />
         </SettingsSection>
 
@@ -164,24 +256,28 @@ export function SettingsScreen({ route }: Props) {
             value={profileVisible}
             onValueChange={setProfileVisible}
           />
+
           <SettingsSwitchRow
             icon="⌖"
-            label={t('profile:settings.locationSharing')}
-            value={showLocation}
-            onValueChange={setShowLocation}
+            label={t('profile:settings.preciseLocation')}
+            value={showPreciseLocation}
+            onValueChange={setShowPreciseLocation}
           />
+
           <SettingsSwitchRow
             icon="◌"
             label={t('profile:settings.yearSharing')}
             value={showAge}
             onValueChange={setShowAge}
           />
+
           <SettingsSwitchRow
             icon="✉"
             label={t('profile:settings.allowMessage')}
             value={allowMessages}
             onValueChange={setAllowMessages}
           />
+
           <SettingsRow
             icon="◧"
             label={t('profile:settings.dataSharing')}
@@ -193,26 +289,33 @@ export function SettingsScreen({ route }: Props) {
           <SettingsRow
             icon="♡"
             label={t('profile:settings.managePreferences')}
-            value="Personnaliser"
-            onPress={() => notImplemented('Gérer mes préférences')}
+            value={t('profile:settings.customize')}
+            onPress={() => navigation.navigate('Preferences', { profile })}
           />
+
           <SettingsRow
             icon="⌘"
             label={t('profile:settings.language')}
             value={displayedLocale}
             onPress={() => notImplemented('Langue')}
           />
+
           <SettingsRow
             icon="€"
             label={t('profile:settings.currency')}
-            value="EUR (€)"
-            onPress={() => notImplemented('Devise')}
+            value={`${currency} ${currency === 'EUR' ? '(€)' : currency === 'USD' ? '($)' : '(£)'}`}
+            onPress={openCurrencySelector}
           />
+
           <SettingsRow
             icon="⌁"
             label={t('profile:settings.distanceUnit')}
-            value="Kilomètres"
-            onPress={() => notImplemented('Unité de distance')}
+            value={
+              distanceUnit === 'km'
+                ? t('profile:settings.kilometers', 'Kilomètres')
+                : t('profile:settings.miles', 'Miles')
+            }
+            onPress={openDistanceUnitSelector}
           />
         </SettingsSection>
 

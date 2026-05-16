@@ -1,0 +1,40 @@
+.profilePage {
+  min-height: 100vh;
+  background: #f7f7f7;
+  padding-top: 86px;
+}
+
+.content {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 52px 24px;
+
+  display: grid;
+  grid-template-columns: 560px 330px;
+  gap: 52px;
+  align-items: start;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionTitle {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #111111;
+}
+
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}

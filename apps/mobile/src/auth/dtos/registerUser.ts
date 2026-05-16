@@ -13,6 +13,8 @@ export interface RegisterUser {
 }
 
 export interface RegisterUserResponse {
+  accessToken: string;
+  refreshToken: string;
   user: {
     id: string;
     email: string;

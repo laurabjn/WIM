@@ -7,9 +7,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { ProfileHeaderCard } from './components/ProfileHeaderCard';
-import { UserHomeCard } from './components/UserHomeCard';
+import { UserHomeCard } from '../../home/ui/components/UserHomeCard';
 import { ProfileMenuList } from './components/ProfileMenuList';
-import { useMyHomes } from '../infrastructure/hook/useMyHomes';
+import { useMyHomes } from '../../home/infrastructure/hooks/useMyHomes';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

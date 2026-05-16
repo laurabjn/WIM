@@ -18,6 +18,6 @@ WORKDIR /app
 COPY --from=builder /app /app
 
 WORKDIR /app/apps/web
-EXPOSE 3001
+EXPOSE 3000
 
-CMD ["npm", "run", "start", "--", "-p", "3001"]
+CMD ["npm", "run", "start", "--", "-p", "3000"]

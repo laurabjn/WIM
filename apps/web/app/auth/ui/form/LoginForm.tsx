@@ -51,6 +51,7 @@ export const LoginForm: React.FC<Props> = ({
       await loginUser({ email, password });
       onSuccess();
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.message ?? 'Une erreur est survenue');
     } finally {
       setIsSubmitting(false);

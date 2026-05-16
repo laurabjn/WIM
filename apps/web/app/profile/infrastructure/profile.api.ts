@@ -1,6 +1,7 @@
 import type { UserProfile } from '@wim/shared';
+import { resolveImageUrl } from 'app/home/infrastructure/api';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3002/api';
 
 export async function getMyProfile(token: string): Promise<UserProfile> {
   const response = await fetch(`${API_URL}/users/me/profile`, {
@@ -15,6 +16,23 @@ export async function getMyProfile(token: string): Promise<UserProfile> {
   }
 
   return response.json();
+}
+
+export async function getPublicProfileById(userId: string) {
+  const response = await fetch(`${API_URL}/users/${userId}/profile`, {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error('Impossible de charger le profil');
+  }
+
+  const profile = await response.json();
+
+  return {
+    ...profile,
+    avatarUrl: resolveImageUrl(profile.avatarUrl),
+  };
 }
 
 export async function updateMyProfile(
