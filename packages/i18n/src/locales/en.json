@@ -14,12 +14,19 @@
     "notProvided": "Not provided",
     "notVerified": "Not verified",
     "verified": "Verified",
-    "save": "Save"
+    "save": "Save",
+    "exchanges": "Exchanges",
+    "account": "Account",
+    "seeMore": "See more",
+    "browse": "Browse the",
+    "world": "world",
+    "noUser": "User not found"
   },
   "auth": {    
     "welcomeTitle": "Welcome to Wim!",
     "guidedTour": "Guided tour",
     "goToWim": "Go to Wim",
+    "alreadyHaveAccount": "Already have an account ?",
     "register": {
       "signUpTitle": "Sign up for Wim",
       "usageConditions": "By registering, you agree to the Terms of Use and Privacy Policy, including the Use of Cookies.",
@@ -120,7 +127,9 @@
   },
   "profile": {
     "exchange": "Exchange",
+    "exchanges": "Exchanges",
     "reviews": "Reviews",
+    "rate": "rate",
     "noReviews": "No reviews yet",
     "homes": "Homes",
     "loading": "Loading profile...",
@@ -566,6 +575,28 @@
       "places": "Places",
       "numberOfPlaces": "Number of places not provided",
       "notProvided": "Car not provided"
+    },
+    "homeType": "Home type",
+    "capacity": "Capacity",
+    "beds": "Beds",
+    "bathrooms": "Bathrooms",
+    "rulesTitle": "Rules",
+    "carExchangeAccepted": "Car exchange accepted",
+    "carExchangeDescription": "Indicate whether you agree to have your vehicle exchanged for the accommodation.",
+    "availabilityTitle": "Availability",
+    "availabilityForExchange": "Availability for exchange",
+    "availabilityForExchangeDescription": "Displays this accommodation as available to other users.",
+    "pricePerNight": "Price per night",
+    "nbExchanges": "number of exchanges",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "from": "from",
+    "category": {
+      "all": "All",
+      "nature": "Nature",
+      "city": "City",
+      "beach": "Beach",
+      "culture": "Culture"
     }
   },
   "admin": {
@@ -578,5 +609,11 @@
     "adminFeatureBilling": "Billing & subscriptions",
     "adminComingSoon": "Coming soon",
     "adminNoAccess": "You do not have access to this page."
+  },
+  "search": {
+    "toExplore": "Explore",
+    "fastSearch": "Fast search",
+    "lastSearches": "Your last searches",
+    "categories": "Categories"
   }
 }

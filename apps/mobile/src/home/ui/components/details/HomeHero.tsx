@@ -7,9 +7,11 @@ import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 type Props = {
   home: Home;
   onBack: () => void;
+  isFavorite: boolean;
+  onToggleFavorite: (homeId: string) => void;
 };
 
-export function HomeHero({ home, onBack }: Props) {
+export function HomeHero({ home, onBack, isFavorite, onToggleFavorite }: Props) {
   const { t } = useTranslation('home');
   const coverUrl = resolveImageUrl(home.photos?.[0]?.url);
 
@@ -32,8 +34,10 @@ export function HomeHero({ home, onBack }: Props) {
           <Text style={styles.icon}>↗</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.circleButton}>
-          <Text style={styles.icon}>☆</Text>
+        <TouchableOpacity style={styles.circleButton} onPress={() => onToggleFavorite(home.id)}>
+          <Text style={[styles.icon, isFavorite && styles.favoriteIcon]}>
+            {isFavorite ? '★' : '☆'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -87,6 +91,9 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 20,
     color: '#111111',
+  },
+  favoriteIcon: {
+    color: '#F59E0B',
   },
   imageCounter: {
     position: 'absolute',

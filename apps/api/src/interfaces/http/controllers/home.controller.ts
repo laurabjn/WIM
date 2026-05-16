@@ -25,6 +25,9 @@ import { UpdateHomeUseCase } from 'src/application/home/use-cases/update-home.us
 import { CreateHomeDto } from '../dtos/create-home.dto';
 import { UpdateHomeDto } from '../dtos/home/update-home.dto';
 import { JwtAuthGuard } from '../jwt-auth.guard';
+import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
+import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
+import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
 
 function editFileName(
   _req: unknown,
@@ -52,9 +55,12 @@ export class HomeController {
     private readonly createHomeUseCase: CreateHomeUseCase,
     private readonly getHomeByIdUseCase: GetHomeByIdUseCase,
     private readonly listMyHomesUseCase: ListMyHomesUseCase,
+    private readonly listPublicHomesUseCase: ListPublicHomesUseCase,
     private readonly updateHomeUseCase: UpdateHomeUseCase,
     private readonly deleteHomeUseCase: DeleteHomeUseCase,
     private readonly addHomePhotoUseCase: AddHomePhotoUseCase,
+    private readonly addFavoriteUseCase: AddFavoriteUseCase,
+    private readonly removeFavoriteUseCase: RemoveFavoriteUseCase,
   ) {
     console.log('homecontroller created');
   }
@@ -134,6 +140,15 @@ export class HomeController {
     return this.listMyHomesUseCase.execute(ownerId);
   }
 
+  @Get()
+  listPublicHomes() {
+    return this.listPublicHomesUseCase.execute();
+  }
+
+  @Get('owner/:ownerId')
+  getByOwnerId(@Param('ownerId') ownerId: string) {
+    return this.listMyHomesUseCase.execute(ownerId);
+  }
 
   @Get(':id')
   getById(@Param('id') id: string) {
@@ -155,6 +170,18 @@ export class HomeController {
   async delete(@Param('id') id: string, @Req() req: any) {
     await this.deleteHomeUseCase.execute(id, req.user.sub);
     return { success: true };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/favorite')
+  addFavorite(@Req() req: any, @Param('id') homeId: string) {
+    return this.addFavoriteUseCase.execute(req.user.sub, homeId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id/favorite')
+  removeFavorite(@Req() req: any, @Param('id') homeId: string) {
+    return this.removeFavoriteUseCase.execute(req.user.sub, homeId);
   }
 
   @UseGuards(JwtAuthGuard)

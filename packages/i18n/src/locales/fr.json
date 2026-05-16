@@ -14,10 +14,18 @@
     "notProvided": "Non renseigné",
     "notVerified": "Non vérifié",
     "verified": "Vérifié",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "exchanges": "Échanges",
+    "account": "Compte",
+    "browse": "PARCOUREZ",
+    "world": "LE MONDE",
+    "seeMore": "Voir plus",
+    "noUser": "Utilisateur introuvable"
   },
   "profile": {
     "exchange": "Échange",
+    "exchanges": "Échanges",
+    "rate": "note",
     "reviews": "commentaires",
     "noReviews": "Aucun avis pour le moment",
     "homes": "Logements",
@@ -409,6 +417,7 @@
     "welcomeTitle": "Bienvenue sur Wim !",
     "guidedTour": "Visite guidée",
     "goToWim": "Accédez à Wim",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
     "register": {
       "signUpTitle": "Inscrivez-vous à Wim",
       "usageConditions": "En vous inscrivant, vous acceptez les Conditions d'utilisation et la Politique de confidentialité, notamment l'Utilisation des cookies.",
@@ -564,6 +573,28 @@
       "places": "Places",
       "numberOfPlaces": "Nombre de places non renseigné",
       "notProvided": "Véhicule non renseigné"
+    },
+    "homeType": "Type de logement",
+    "capacity": "Voyageurs",
+    "beds": "Lits",
+    "bathrooms": "Salles de bain",
+    "rulesTitle": "Règles",
+    "carExchangeAccepted": "Échange de voiture accepté",
+    "carExchangeDescription": "Indique si tu acceptes que ton véhicule soit échangé avec le logement.",
+    "availabilityTitle": "Disponibilité",
+    "availableForExchange": "Disponible pour échange",
+    "availableForExchangeDescription": "Affiche ce logement comme disponible pour les autres utilisateurs.",
+    "pricePerNight": "Prix indicatif par nuit",
+    "nbExchanges": "Nombre d'échanges",
+    "available": "Disponible",
+    "unavailable": "Indisponible",
+    "from": "à partir de",
+    "category": {
+      "all": "Tous",
+      "nature": "Nature",
+      "city": "Ville",
+      "beach": "Plage",
+      "culture": "Culture"
     }
   },
   "admin": {
@@ -576,5 +607,11 @@
     "adminFeatureBilling": "Facturation & abonnements",
     "adminComingSoon": "À venir",
     "adminNoAccess": "Vous n’avez pas accès à cette page."
+  },
+  "search": {
+    "toExplore": "Explorer",
+    "fastSearch": "Recherche rapide",
+    "lastSearches": "Vos dernières recherches",
+    "categories": "Catégories"
   }
 }

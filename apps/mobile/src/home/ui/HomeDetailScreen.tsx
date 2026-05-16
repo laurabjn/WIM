@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getHomeById } from '../infrastructure/home.api';
+import { addFavoriteHome, getHomeById, removeFavoriteHome } from '../infrastructure/home.api';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { VehicleCard } from './components/details/VehiculeCard';
 import { HomeHero } from './components/details/HomeHero';
@@ -73,6 +73,32 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
     loadHome();
   }, [homeId, token, isSessionLoading, t]);
+
+  async function toggleFavorite(homeId: string) {
+    if (!token || !home) return;
+
+    const nextValue = !home.isFavorite;
+
+    setHome({
+      ...home,
+      isFavorite: nextValue,
+    });
+
+    try {
+      if (nextValue) {
+        await addFavoriteHome(token, homeId);
+      } else {
+        await removeFavoriteHome(token, homeId);
+      }
+    } catch (error) {
+      setHome({
+        ...home,
+        isFavorite: !nextValue,
+      });
+
+      console.log('Toggle favorite error:', error);
+    }
+  }
     
   if (error || !home) {
     return (
@@ -87,7 +113,12 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <HomeHero home={home} onBack={() => navigation.goBack()} />
+        <HomeHero
+          home={home}
+          onBack={() => navigation.goBack()}
+          isFavorite={home.isFavorite ?? false}
+          onToggleFavorite={toggleFavorite}
+        />
         
         <HomeSummary home={home} />
 

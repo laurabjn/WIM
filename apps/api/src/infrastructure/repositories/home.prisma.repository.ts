@@ -152,6 +152,29 @@ export class HomeRepositoryPrisma implements HomeRepository {
     return this.mapHome(home);
   }
 
+  async findAll(): Promise<HomeEntity[]> {
+    const homes = await this.prisma.home.findMany({
+      include: {
+        photos: {
+          orderBy: { position: 'asc' },
+        },
+        vehicle: true,
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+            createdAt: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return homes.map((home) => this.mapHome(home));
+  }
+
   async findById(id: string): Promise<HomeEntity | null> {
     const home = await this.prisma.home.findUnique({
       where: { id },

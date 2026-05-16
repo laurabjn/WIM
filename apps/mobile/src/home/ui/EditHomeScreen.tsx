@@ -18,6 +18,10 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { getHomeById, resolveImageUrl, updateHome } from '../infrastructure/home.api';
 import { HomeTabs } from './components/HomeTabs';
 import { EditHomeGeneralTab } from './components/EditHomeGeneralTab';
+import { EditHomeDetailsTab } from './components/edit/EditHomeDetailsTab';
+import { EditHomeAmenitiesTab } from './components/edit/EditHomeAmenitiesTab';
+import { EditHomeRulesTab } from './components/edit/EditHomeRulesTab';
+import { EditHomeAvailabilityTab } from './components/edit/EditHomeAvailabilityTab';
 
 type Props = NativeStackScreenProps<HomesStackParamList, 'EditHome'>;
 
@@ -36,6 +40,11 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const [beds, setBeds] = useState(1);
   const [bathrooms, setBathrooms] = useState(1);
   const [amenities, setAmenities] = useState<string[]>([]);
+
+  const [homeType, setHomeType] = useState('HOUSE');
+  const [carExchangeAccepted, setCarExchangeAccepted] = useState(false);
+  const [isAvailableForExchange, setIsAvailableForExchange] = useState(true);
+  const [pricePerNight, setPricePerNight] = useState<number | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +76,10 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         setBeds(data.beds ?? 1);
         setBathrooms(data.bathrooms ?? 1);
         setAmenities(data.amenities ?? []);
+        setHomeType(data.homeType ?? 'HOUSE');
+        setCarExchangeAccepted(data.carExchangeAccepted ?? false);
+        setIsAvailableForExchange(data.isAvailableForExchange ?? true);
+        setPricePerNight(data.pricePerNight ?? null);
       } catch (err) {
         console.log('Load home error:', err);
         setError('Impossible de charger le logement.');
@@ -98,6 +111,10 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         beds,
         bathrooms,
         amenities,
+        homeType,
+        carExchangeAccepted,
+        isAvailableForExchange,
+        pricePerNight,
       });
 
       setHome(updatedHome);
@@ -107,6 +124,10 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
       setBeds(updatedHome.beds ?? 1);
       setBathrooms(updatedHome.bathrooms ?? 1);
       setAmenities(updatedHome.amenities ?? []);
+      setHomeType(updatedHome.homeType ?? 'HOUSE');
+      setCarExchangeAccepted(updatedHome.carExchangeAccepted ?? false);
+      setIsAvailableForExchange(updatedHome.isAvailableForExchange ?? true);
+      setPricePerNight(updatedHome.pricePerNight ?? null);
     } catch (err) {
       console.log('Update home error:', err);
       setError('Impossible de mettre à jour le logement.');
@@ -123,6 +144,10 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     beds,
     bathrooms,
     amenities,
+    homeType,
+    carExchangeAccepted,
+    isAvailableForExchange,
+    pricePerNight,
   ]);
 
   useEffect(() => {
@@ -188,27 +213,39 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         )}
 
         {activeTab === 'Détails' && (
-          <View style={styles.tabPlaceholder}>
-            <Text>Détails</Text>
-          </View>
+          <EditHomeDetailsTab
+            capacity={capacity}
+            beds={beds}
+            bathrooms={bathrooms}
+            homeType={homeType}
+            onChangeCapacity={setCapacity}
+            onChangeBeds={setBeds}
+            onChangeBathrooms={setBathrooms}
+            onChangeHomeType={setHomeType}
+          />
         )}
 
         {activeTab === 'Équipements' && (
-          <View style={styles.tabPlaceholder}>
-            <Text>Équipements</Text>
-          </View>
+          <EditHomeAmenitiesTab
+            amenities={amenities}
+            onChangeAmenities={setAmenities}
+          />
         )}
 
         {activeTab === 'Règles' && (
-          <View style={styles.tabPlaceholder}>
-            <Text>Règles</Text>
-          </View>
+          <EditHomeRulesTab
+            carExchangeAccepted={carExchangeAccepted}
+            onChangeCarExchangeAccepted={setCarExchangeAccepted}
+          />
         )}
 
         {activeTab === 'Disponibilité' && (
-          <View style={styles.tabPlaceholder}>
-            <Text>Disponibilité</Text>
-          </View>
+          <EditHomeAvailabilityTab
+            isAvailableForExchange={isAvailableForExchange}
+            pricePerNight={pricePerNight}
+            onChangeIsAvailableForExchange={setIsAvailableForExchange}
+            onChangePricePerNight={setPricePerNight}
+          />
         )}
       </ScrollView>
     </SafeAreaView>

@@ -10,6 +10,7 @@ export interface Home {
   latitude?: number | null;
   longitude?: number | null;
   capacity: number;
+  category: string;
   beds: number;
   bedrooms: number;
   bathrooms: number;

@@ -10,6 +10,9 @@ import { HomeRepositoryPrisma } from 'src/infrastructure/repositories/home.prism
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { HOME_REPOSITORY } from '../tokens/token';
 import { AuthModule } from './auth.module';
+import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
+import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
+import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
 
 @Module({
   imports: [AuthModule],
@@ -37,6 +40,11 @@ import { AuthModule } from './auth.module';
       inject: [HOME_REPOSITORY],
     },
     {
+      provide: ListPublicHomesUseCase,
+      useFactory: (homeRepo) => new ListPublicHomesUseCase(homeRepo),
+      inject: [HOME_REPOSITORY],
+    },
+    {
       provide: UpdateHomeUseCase,
       useFactory: (homeRepo) => new UpdateHomeUseCase(homeRepo),
       inject: [HOME_REPOSITORY],
@@ -51,6 +59,16 @@ import { AuthModule } from './auth.module';
       useFactory: (homeRepo) => new AddHomePhotoUseCase(homeRepo),
       inject: [HOME_REPOSITORY],
     },
+    {
+      provide: AddFavoriteUseCase,
+      useFactory: (homeRepo) => new AddFavoriteUseCase(homeRepo),
+      inject: [HOME_REPOSITORY],
+    },
+    {
+      provide: RemoveFavoriteUseCase,
+      useFactory: (homeRepo) => new RemoveFavoriteUseCase(homeRepo),
+      inject: [HOME_REPOSITORY],
+    }
   ],
 })
 export class HomeModule {}

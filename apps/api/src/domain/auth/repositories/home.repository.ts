@@ -65,6 +65,7 @@ export interface UpdateHomeRepositoryData {
 
 export interface HomeRepository {
   create(data: CreateHomeRepositoryData): Promise<HomeEntity>;
+  findAll(): Promise<HomeEntity[]>;
   findById(id: string): Promise<HomeEntity | null>;
   findByOwnerId(ownerId: string): Promise<HomeEntity[]>;
   update(id: string, data: UpdateHomeRepositoryData): Promise<HomeEntity>;
