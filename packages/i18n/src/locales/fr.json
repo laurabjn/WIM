@@ -597,6 +597,20 @@
       "culture": "Culture"
     }
   },
+  "availability": {
+    "when": "Quand êtes-vous disponible pour échanger ?",
+    "exchangerDates": "aux dates de l’échangeur",
+    "specificDates": "dates précises",
+    "free": "disponibilité libre"
+  },
+  "contact": {
+    "title": "Contacter l'hôte",
+    "message": "Message",
+    "messagePlaceholder": "Écrivez votre message ici...",
+    "send": "Envoyer le message",
+    "defaultMessage": "Message par defaut",
+    "defaultMessageContent": "Je suis intéressé par votre logement pour un échange prochain. Il semble correspondre à ce que je recherche et j’aimerais savoir s’il serait disponible aux dates que j’envisage.  Je suis ouvert à la discussion si vous souhaitez plus d’informations sur mon logement ou sur mes conditions de séjour. N’hésitez pas à me faire savoir vos disponibilités ou si vous avez des questions. Au plaisir d’échanger avec vous !"
+  },
   "admin": {
     "adminTitle": "Tableau de bord administrateur",
     "adminSubtitle": "Vue réservée aux administrateurs.",

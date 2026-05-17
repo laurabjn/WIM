@@ -66,6 +66,7 @@ model Home {
   owner   User        @relation(fields: [ownerId], references: [id])
   photos  HomePhoto[]
   favorites Favorite[]
+  availabilities HomeAvailability[]
 
   vehicle Vehicle? 
 
@@ -117,6 +118,26 @@ model Favorite {
 
   @@unique([userId, homeId])
   @@map("favorites")
+}
+
+enum AvailabilityType {
+  AVAILABLE
+  BLOCKED
+}
+
+model HomeAvailability {
+  id        String           @id @default(uuid())
+  homeId    String           @map("home_id")
+  home      Home             @relation(fields: [homeId], references: [id], onDelete: Cascade)
+
+  startDate DateTime         @map("start_date")
+  endDate   DateTime         @map("end_date")
+  type      AvailabilityType @default(AVAILABLE)
+
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  @@map("home_availabilities")
 }
 
 model SupportRequest {

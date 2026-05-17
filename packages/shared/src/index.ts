@@ -6,3 +6,5 @@ export * from './utils/passwordRules';
 export * from './profile/profile.type';
 export * from './utils/travelOption';
 export * from './utils/languagesOptions';
+export * from './home/home.type';
+export * from './home/homeAvailability.type';

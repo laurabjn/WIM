@@ -6,6 +6,7 @@ import { UploadsModule } from './interfaces/http/modules/uploads.module';
 import { ProfileModule } from './interfaces/http/modules/profile.module';
 import { SupportModule } from './interfaces/http/modules/support.module';
 import { HomeModule } from './interfaces/http/modules/home.module';
+import { HomeAvailabilityModule } from './interfaces/http/modules/home-availability.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { HomeModule } from './interfaces/http/modules/home.module';
     ProfileModule,
     SupportModule,
     HomeModule,
+    HomeAvailabilityModule
   ],
 })
 export class AppModule {}

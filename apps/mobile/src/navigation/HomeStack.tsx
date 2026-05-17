@@ -26,6 +26,8 @@ export function HomesStackNavigator() {
         <Stack.Screen name="CreateHomeLocation" component={TestScreen} />
         <Stack.Screen name="CreateHomeCapacity" component={TestScreen} />
         <Stack.Screen name="EditHome" component={EditHomeScreen} />
+        <Stack.Screen name="ExchangeAvailability" component={TestScreen} />
+        <Stack.Screen name="ExchangeMessage" component={TestScreen} />
       </Stack.Navigator>
     </HomeCreationProvider>
   );

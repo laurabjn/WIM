@@ -6,4 +6,11 @@ export type HomesStackParamList = {
   CreateHomeLocation: undefined;
   CreateHomeCapacity: undefined;
   EditHome: { homeId: string };
+  ExchangeAvailability: {
+    homeId: string;
+  };
+  ExchangeMessage: {
+    homeId: string;
+    availabilityType: 'FREE' | 'EXCHANGER_DATES' | 'SPECIFIC_DATES';
+  };
 };
