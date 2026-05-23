@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { registerUserApi } from '../../infrastructure/api';
 import { Stepper } from '../components/Stepper';
+import { FontAwesome } from '@expo/vector-icons';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep4'>;
 
@@ -22,6 +23,8 @@ export const RegisterStep4Screen: React.FC<Props> = ({ route, navigation }) => {
 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     function isPasswordValid(value: string) {
@@ -90,31 +93,61 @@ export const RegisterStep4Screen: React.FC<Props> = ({ route, navigation }) => {
                     </Text>
 
                     <View style={styles.form}>
-                    <TextInput
-                        style={[
-                        styles.input,
-                        password.length > 0 &&
-                            !isPasswordValid(password) && styles.inputError,
-                        ]}
-                        placeholder={t('auth:register.password')}
-                        placeholderTextColor="#C0C0C0"
-                        secureTextEntry
-                        value={password}
-                        onChangeText={setPassword}
-                    />
+                      <View style={styles.passwordWrapper}>
+                        <TextInput
+                          style={[
+                            styles.passwordInput,
+                            password.length > 0 &&
+                              !isPasswordValid(password) &&
+                              styles.inputError,
+                          ]}
+                          placeholder={t('auth:register.password')}
+                          placeholderTextColor="#C0C0C0"
+                          secureTextEntry={!showPassword}
+                          value={password}
+                          onChangeText={setPassword}
+                        />
 
-                    <TextInput
-                        style={[
-                        styles.input,
-                        confirmPassword.length > 0 &&
-                            password !== confirmPassword && styles.inputError,
-                        ]}
-                        placeholder={t('auth:register.confirmPassword')}
-                        placeholderTextColor="#C0C0C0"
-                        secureTextEntry
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                    />
+                        <TouchableOpacity
+                          style={styles.eyeButton}
+                          onPress={() => setShowPassword((prev) => !prev)}
+                        >
+                          <FontAwesome
+                            name={showPassword ? 'eye-slash' : 'eye'}
+                            size={18}
+                            color="#7B7B7B"
+                          />
+                        </TouchableOpacity>
+                      </View>
+
+                      <View style={styles.passwordWrapper}>
+                        <TextInput
+                          style={[
+                            styles.passwordInput,
+                            confirmPassword.length > 0 &&
+                              password !== confirmPassword &&
+                              styles.inputError,
+                          ]}
+                          placeholder={t('auth:register.confirmPassword')}
+                          placeholderTextColor="#C0C0C0"
+                          secureTextEntry={!showConfirmPassword}
+                          value={confirmPassword}
+                          onChangeText={setConfirmPassword}
+                        />
+
+                        <TouchableOpacity
+                          style={styles.eyeButton}
+                          onPress={() =>
+                            setShowConfirmPassword((prev) => !prev)
+                          }
+                        >
+                          <FontAwesome
+                            name={showConfirmPassword ? 'eye-slash' : 'eye'}
+                            size={18}
+                            color="#7B7B7B"
+                          />
+                        </TouchableOpacity>
+                      </View>
 
                     {password.length > 0 && !isPasswordValid(password) && (
                         <Text style={styles.helperText}>{t('auth:register.passwordRules')}</Text>
@@ -265,5 +298,31 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: '700',
     fontSize: 16,
+  },
+
+  passwordWrapper: {
+    position: 'relative',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+
+  passwordInput: {
+    height: 52,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 16,
+    paddingRight: 48,
+    fontSize: 14,
+    color: '#111111',
+    backgroundColor: '#FFFFFF',
+  },
+
+  eyeButton: {
+    position: 'absolute',
+    right: 16,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
