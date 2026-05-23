@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
     CreateHomeAvailabilityInput,
     HomeAvailabilityRepository
-} from 'src/application/home/ports/home-availability.repository';
+} from 'src/domain/auth/repositories/home-availability.repository';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { HomeAvailabilityEntity } from 'src/domain/auth/entities/home-availability.entity';
 

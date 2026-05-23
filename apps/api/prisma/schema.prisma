@@ -67,6 +67,7 @@ model Home {
   photos  HomePhoto[]
   favorites Favorite[]
   availabilities HomeAvailability[]
+  exchanges Exchange[]
 
   vehicle Vehicle? 
 
@@ -138,6 +139,33 @@ model HomeAvailability {
   updatedAt DateTime         @updatedAt @map("updated_at")
 
   @@map("home_availabilities")
+}
+
+enum ExchangeStatus {
+  CURRENT
+  FUTURE
+  PAST
+  CANCELLED
+}
+
+model Exchange {
+  id             String         @id @default(uuid())
+  homeId         String         @map("home_id")
+  home           Home           @relation(fields: [homeId], references: [id], onDelete: Cascade)
+
+  hostId         String         @map("host_id")
+  guestId        String         @map("guest_id")
+
+  startDate      DateTime       @map("start_date")
+  endDate        DateTime       @map("end_date")
+  travelersCount Int            @default(1) @map("travelers_count")
+
+  status         ExchangeStatus
+
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  @@map("exchanges")
 }
 
 model SupportRequest {

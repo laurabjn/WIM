@@ -1,3 +1,5 @@
+import { HomeAvailability } from "./homeAvailability.type";
+
 export interface Home {
   id: string;
   ownerId: string;
@@ -18,12 +20,14 @@ export interface Home {
   amenities: string[];
   carExchangeAccepted: boolean;
   photos: HomePhoto[];
-  vehicle?: Vehicle | null;
+  vehicle?: Vehicule | null;
+  availabilities?: HomeAvailability[];
   isAvailableForExchange: boolean;
   pricePerNight?: number | null;
   isFavorite?: boolean;
   averageRating?: number | null;
   reviewsCount?: number | null;
+  reviews: Review[];
   createdAt: string;
   updatedAt: string;
 }
@@ -37,7 +41,7 @@ export interface HomeOwner {
   createdAt: string;
 }
 
-export interface Vehicle {
+export interface Vehicule {
   id: string;
   homeId: string;
   brand?: string | null;
@@ -62,6 +66,18 @@ export type PickedPhoto = {
   type: string;
 };
 
+export type Review = {
+  id: string;
+  score: number;
+  comment: string;
+  createdAt: string;
+  author: {
+    firstName?: string | null;
+    avatarUrl?: string | null;
+    createdAt?: string | null;
+  };
+};
+
 export interface CreateHomeInput {
   title: string;
   description: string;
@@ -81,7 +97,7 @@ export interface CreateHomeInput {
   photos: HomePhoto[];
   averageRating?: number | null;
   reviewsCount?: number | null;
-  vehicle?: Vehicle | null;
+  vehicle?: Vehicule | null;
   pricePerNight?: number | null;
   isFavorite?: boolean;
 }

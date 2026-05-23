@@ -6,11 +6,14 @@ import { FavoriteRepositoryPrisma } from 'src/infrastructure/repositories/favori
 import { ListFavoritesUseCase } from 'src/application/favorite/use-case/list-favorite.usecase';
 import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
 import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 
 @Module({
   imports: [AuthModule],
   controllers: [FavoriteController],
-  providers: [
+    providers: [
+    PrismaService,
     FavoriteRepositoryPrisma,
     {
         provide: FAVORITE_REPOSITORY,
@@ -33,4 +36,4 @@ import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favori
     },
   ]
 })
-export class HomeModule {}
+export class FavoriteModule {}

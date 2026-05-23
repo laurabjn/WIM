@@ -7,17 +7,24 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ProfileStackParamList } from 'src/navigation/type/profileStack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export function ExchangeMessageScreen({ navigation }: any) {
-  const { t } = useTranslation(["contact", "common"]);
+type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeMessage'>;
+
+export function ExchangeMessageScreen({ navigation, route }: any) {
+  const { t } = useTranslation("contact");
+  const insets = useSafeAreaInsets();
+  const { homeId } = route.params;
     
-  const DEFAULT_MESSAGE = t("contact:defaultMessageContent");
+  const DEFAULT_MESSAGE = t("defaultMessageContent");
     
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
 
   function sendMessage() {
     console.log('message envoyé', message);
+    navigation.navigate('HomeDetails', { homeId });
   }
 
   return (
@@ -27,10 +34,10 @@ export function ExchangeMessageScreen({ navigation }: any) {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <Text style={styles.title}>{t("contact:messagePlaceholder")}</Text>
+        <Text style={styles.title}>{t("messagePlaceholder")}</Text>
 
         <View style={styles.messageBox}>
-          <Text style={styles.label}>{t("contact:defaultMessage")}</Text>
+          <Text style={styles.label}>{t("defaultMessage")}</Text>
 
           <TextInput
             value={message}
@@ -42,8 +49,16 @@ export function ExchangeMessageScreen({ navigation }: any) {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={sendMessage}>
-        <Text style={styles.buttonText}>{t("contact:send")}</Text>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          {
+            bottom: insets.bottom + 90,
+          }
+        ]}
+          onPress={sendMessage}
+      >
+        <Text style={styles.buttonText}>{t("send")}</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

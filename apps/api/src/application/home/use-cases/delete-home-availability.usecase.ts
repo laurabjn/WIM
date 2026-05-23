@@ -1,5 +1,5 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { HomeAvailabilityRepository } from '../ports/home-availability.repository';
+import { HomeAvailabilityRepository } from '../../../domain/auth/repositories/home-availability.repository';
 
 type HomeRepository = {
   findById(id: string): Promise<{ id: string; ownerId: string } | null>;

@@ -1,10 +1,10 @@
-import { Vehicle } from '@wim/shared/home/home.type';
+import { Vehicule } from '@wim/shared/home/home.type';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 type Props = {
-  vehicle?: Vehicle | null;
+  vehicle?: Vehicule | null;
 };
 
 export const VehicleCard: React.FC<Props> = ({ vehicle }) => {

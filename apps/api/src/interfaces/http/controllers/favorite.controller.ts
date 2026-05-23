@@ -13,14 +13,14 @@ export class FavoriteController {
   ) { }
     
   @UseGuards(JwtAuthGuard)
-  @Post(':id')
-  addFavorite(@Req() req: any, @Param('id') homeId: string) {
+  @Post(':homeId')
+  addFavorite(@Req() req: any, @Param('homeId') homeId: string) {
     return this.addFavoriteUseCase.execute(req.user.sub, homeId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  removeFavorite(@Req() req: any, @Param('id') homeId: string) {
+  @Delete(':homeId')
+  removeFavorite(@Req() req: any, @Param('homeId') homeId: string) {
     return this.removeFavoriteUseCase.execute(req.user.sub, homeId);
   }
 

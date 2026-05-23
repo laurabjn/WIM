@@ -1,113 +1,168 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-
-type Review = {
-  id: string;
-  score: number;
-  comment: string;
-  createdAt: string;
-  author: {
-    firstName?: string | null;
-    avatarUrl?: string | null;
-    createdAt?: string | null;
-  };
-};
+import { Review } from '@wim/shared';
 
 type Props = {
-  averageScore?: number | null;
-  reviewsCount?: number;
   reviews?: Review[];
+  averageRating?: number | null;
+  reviewsCount?: number;
 };
 
 export function HomeReviews({
-  averageScore = 4.2,
-  reviewsCount = 23,
   reviews = [],
+  averageRating,
+  reviewsCount = 0
 }: Props) {
   const { t } = useTranslation('home');
+  const [expandedReviewIds, setExpandedReviewIds] = useState<string[]>([]);
+  const [showAll, setShowAll] = useState(false);
 
-  const firstReview =
-    reviews[0] ??
-    {
-      id: 'mock-review',
-      score: 4,
-      comment:
-        'Mon partenaire et moi avons séjourné dans cet appartement et il était tout simplement parfait pour nos 3 jours à San Francisco. C’était propre et il y avait de belles vues. Nous reviendrons volontiers séjourner ici.',
-      createdAt: new Date().toISOString(),
-      author: {
-        firstName: 'Terry',
-        avatarUrl:
-          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
-        createdAt: new Date().toISOString(),
-      },
-    };
+  const displayedReviews = useMemo(() => {
+    return showAll ? reviews : reviews.slice(0, 1);
+  }, [reviews, showAll]);
+
+  if (reviews.length === 0) {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.title}>
+          ★ 0 · {t('reviews.reviewsCount', { count: 0 })}
+        </Text>
+
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyTitle}>
+            {t('reviews.noReviews')}
+          </Text>
+
+          <Text style={styles.emptyText}>
+            {t('reviews.noReviewsDescription')}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  function toggleExpanded(reviewId: string) {
+    setExpandedReviewIds((current) =>
+      current.includes(reviewId)
+        ? current.filter((id) => id !== reviewId)
+        : [...current, reviewId],
+    );
+  }
 
   return (
     <View style={styles.section}>
       <Text style={styles.title}>
-        ★ {averageScore?.toFixed(1)} ·{' '}
-        {t('reviewsCount', { count: reviewsCount })}
+        ★ {averageRating?.toFixed(1)} ·{' '}
+        {t('reviews.reviewsCount', { count: reviewsCount })}
       </Text>
 
-      <View style={styles.card}>
-        <View style={styles.reviewHeader}>
-          <Text style={styles.stars}>{renderStars(firstReview.score)}</Text>
-          <Text style={styles.dot}>·</Text>
-          <Text style={styles.date}>
-            {t('reviewDateFallback', 'il y a 2 mois')}
-          </Text>
-        </View>
+      {displayedReviews.map((review) => {
+        const isExpanded = expandedReviewIds.includes(review.id);
 
-        <Text style={styles.comment} numberOfLines={5}>
-          {firstReview.comment}
-        </Text>
+        return (
+          <View key={review.id} style={styles.card}>
+            <View style={styles.reviewHeader}>
+              <Text style={styles.stars}>{renderStars(review.score)}</Text>
+              <Text style={styles.dot}>·</Text>
+              <Text style={styles.date}>{formatReviewDate(review.createdAt)}</Text>
+            </View>
 
-        <TouchableOpacity>
-          <Text style={styles.readMore}>
-            {t('showMore', 'Afficher plus')}
+            <Text
+              style={styles.comment}
+              numberOfLines={isExpanded ? undefined : 5}
+            >
+              {review.comment}
+            </Text>
+
+            {review.comment.length > 120 ? (
+              <TouchableOpacity onPress={() => toggleExpanded(review.id)}>
+                <Text style={styles.readMore}>
+                  {isExpanded ? t('reviews.showLess') : t('reviews.showMore')}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+
+            <View style={styles.authorRow}>
+              <Image
+                source={{
+                  uri:
+                    review.author?.avatarUrl ??
+                    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
+                }}
+                style={styles.avatar}
+              />
+
+              <View>
+                <Text style={styles.authorName}>
+                  {review.author?.firstName}
+                </Text>
+                <Text style={styles.authorSince}>
+                  {t('reviews.hostSinceYears', {
+                    count: getHostYears(review.author?.createdAt),
+                    defaultValue: `Hôte depuis ${getHostYears(review.author?.createdAt)} ans`,
+                  })}
+                </Text>
+              </View>
+            </View>
+          </View>
+        );
+      })}
+
+      {reviews.length > 1 ? (
+        <TouchableOpacity
+          style={styles.outlineButton}
+          onPress={() => setShowAll((current) => !current)}
+        >
+          <Text style={styles.outlineText}>
+            {showAll
+              ? t('reviews.showLess')
+              : t('reviews.showAllReviews', {
+                  count: reviewsCount,
+                  defaultValue: `Afficher les ${reviewsCount} commentaires`,
+                })}
           </Text>
         </TouchableOpacity>
-
-        <View style={styles.authorRow}>
-          <Image
-            source={{
-              uri:
-                firstReview.author.avatarUrl ??
-                'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
-            }}
-            style={styles.avatar}
-          />
-
-          <View>
-            <Text style={styles.authorName}>
-              {firstReview.author.firstName ?? t('host', 'Hôte')}
-            </Text>
-            <Text style={styles.authorSince}>
-              {t('hostSinceYears', { count: 8, defaultValue: 'Hôte depuis 8 ans' })}
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      <TouchableOpacity style={styles.outlineButton}>
-        <Text style={styles.outlineText}>
-          {t('showAllReviews', {
-            count: reviewsCount,
-            defaultValue: `Afficher les ${reviewsCount} commentaires`,
-          })}
-        </Text>
-      </TouchableOpacity>
+      ) : null}
     </View>
   );
 }
 
 function renderStars(score: number) {
   const rounded = Math.round(score);
+
   return '★★★★★'
     .split('')
-    .map((star, index) => (index < rounded ? '★' : '☆'))
+    .map((_, index) => (index < rounded ? '★' : '☆'))
     .join('');
+}
+
+function formatReviewDate(date: string) {
+  const createdAt = new Date(date);
+  const now = new Date();
+
+  const diffMs = now.getTime() - createdAt.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 1) return 'aujourd’hui';
+  if (diffDays < 30) return `il y a ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) {
+    return `il y a ${diffMonths} mois`;
+  }
+
+  const diffYears = Math.floor(diffMonths / 12);
+  return `il y a ${diffYears} an${diffYears > 1 ? 's' : ''}`;
+}
+
+function getHostYears(createdAt?: string | null) {
+  if (!createdAt) return 0;
+
+  const created = new Date(createdAt);
+  const now = new Date();
+
+  return Math.max(0, now.getFullYear() - created.getFullYear());
 }
 
 const styles = StyleSheet.create({
@@ -121,6 +176,28 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#111111',
     marginBottom: 18,
+  },
+
+  emptyCard: {
+    backgroundColor: '#F8F8F8',
+    borderRadius: 22,
+    padding: 24,
+    alignItems: 'center',
+  },
+
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111111',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+
+  emptyText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#666666',
+    textAlign: 'center',
   },
 
   card: {

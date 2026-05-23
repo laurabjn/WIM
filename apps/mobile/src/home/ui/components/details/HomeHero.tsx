@@ -26,7 +26,7 @@ export function HomeHero({ home, onBack, isFavorite, onToggleFavorite }: Props) 
       )}
 
       <TouchableOpacity style={[styles.circleButton, styles.backButton]} onPress={onBack}>
-        <Text style={styles.icon}>←</Text>
+        <Text style={styles.icon}>‹</Text>
       </TouchableOpacity>
 
       <View style={styles.topActions}>

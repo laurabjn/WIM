@@ -15,7 +15,7 @@ export function HomeSummary({ home }: Props) {
       <Text style={styles.title}>{home.title}</Text>
 
       <Text style={styles.subtitle}>
-        {t('home:entireHome')} · {home.homeType} · {home.city}, {home.country}
+        {t('home:entireHome')} · {home.homeType.toLowerCase()} · {home.city}, {home.country}
       </Text>
 
       <Text style={styles.meta}>
@@ -24,6 +24,8 @@ export function HomeSummary({ home }: Props) {
         {home.bathrooms}{' '}
         {home.bathrooms > 1 ? t('profile:bathrooms') : t('profile:bathroom')}
       </Text>
+      
+      <Text style={styles.rating}>★ {home.averageRating} · {home.reviewsCount} {t('profile:reviews')}</Text>
     </View>
   );
 }
@@ -32,6 +34,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 18,
     paddingTop: 18,
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
@@ -47,5 +50,11 @@ const styles = StyleSheet.create({
   meta: {
     fontSize: 13,
     color: '#6B7280',
+  },
+  rating: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111111',
+    marginTop: 10,
   },
 });

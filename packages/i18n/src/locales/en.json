@@ -20,7 +20,11 @@
     "seeMore": "See more",
     "browse": "Browse the",
     "world": "world",
-    "noUser": "User not found"
+    "noUser": "User not found",
+    "contact": "Contact",
+    "noAvailability": "No availability for the moment",
+    "available": "Available",
+    "availableWithBlockDates": "Available with blocked dates"
   },
   "auth": {    
     "welcomeTitle": "Welcome to Wim!",
@@ -74,6 +78,7 @@
     "login": {
       "title": "Log in to Wim",
       "login": "Log in",
+      "loggingIn": "Logging in...",
       "loginWithGoogle": "Log in with Google",
       "loginWithApple": "Log in with Apple",
       "email": "Email",
@@ -597,21 +602,36 @@
       "city": "City",
       "beach": "Beach",
       "culture": "Culture"
+    },
+    "reviews": {
+      "reviewsCount": "reviews",
+      "showLess": "Show less",
+      "showMore": "Show more",
+      "showAllReviews": "Show all {{count}} reviews",
+      "noReviews": "No reviews for the moment.",
+      "noReviewsDescription": "The first travelers will soon be able to share their experience."
     }
   },
   "availability": {
     "when": "When are you available for exchange ?",
-    "exchangerDates": "on exchanger's dates",
-    "specificDates": "specific dates",
-    "free": "free availability"
+    "exchangerDates": "On exchanger's dates",
+    "specificDates": "Specific dates",
+    "free": "Free availability"
   },
   "contact": {
     "title": "Contact the host",
     "message": "Message",
-    "messagePlaceholder": "Write your message here...",
+    "messagePlaceholder": "Write a message",
     "send": "Send",
     "defaultMessage": "Default message",
     "defaultMessageContent": "I am interested in your accommodation for an upcoming exchange. It seems to fit what I'm looking for, and I would like to know if it would be available on the dates I'm considering. I am happy to discuss this further if you would like more information about my accommodation or my living arrangements. Please feel free to let me know your availability or if you have any questions. I look forward to hearing from you!"
+  },
+  "exchange": {
+    "currentExchanges": "Current exchanges",
+    "pastExchanges": "Past exchanges",
+    "upcomingExchanges": "Upcoming exchanges",
+    "noExchanges": "No exchanges for the moment.",
+    "noExchangesDescription": "Your exchanges will appear here once they are confirmed."
   },
   "admin": {
     "adminTitle": "Admin dashboard",

@@ -7,11 +7,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ProfileStackParamList } from 'src/navigation/type/profileStack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeAvailability'>;
 
 export function ExchangeAvailabilityScreen({ navigation, route }: any) {
   const { t } = useTranslation(["availability", "common"]);
   const { homeId } = route.params;
+  const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<
     'FREE' | 'EXCHANGER_DATES' | 'SPECIFIC_DATES' | null
   >(null);
@@ -33,14 +38,14 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
 
       <View style={styles.content}>
         <Text style={styles.title}>
-          {t("availability:when")}
+          {t("when")}
         </Text>
 
         <Pressable
           style={[styles.option, selected === 'FREE' && styles.optionSelected]}
           onPress={() => setSelected('FREE')}
         >
-          <Text style={styles.optionText}>{t("availability:free")}</Text>
+          <Text style={styles.optionText}>{t("free")}</Text>
         </Pressable>
 
         <Pressable
@@ -50,7 +55,7 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
           ]}
           onPress={() => setSelected('EXCHANGER_DATES')}
         >
-          <Text style={styles.optionText}> {t("availability:exchangerDates")} </Text>
+          <Text style={styles.optionText}> {t("exchangerDates")} </Text>
         </Pressable>
 
         <Pressable
@@ -60,12 +65,18 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
           ]}
           onPress={() => setSelected('SPECIFIC_DATES')}
         >
-          <Text style={styles.optionText}> {t("availability:specificDates")} </Text>
+          <Text style={styles.optionText}> {t("specificDates")} </Text>
         </Pressable>
       </View>
 
       <TouchableOpacity
-        style={[styles.button, !selected && styles.buttonDisabled]}
+        style={[
+          styles.button,
+          {
+            bottom: insets.bottom + 90,
+          },
+          !selected && styles.buttonDisabled,
+        ]}
         disabled={!selected}
         onPress={goNext}
       >

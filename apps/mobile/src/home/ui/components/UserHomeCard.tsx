@@ -64,7 +64,7 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
         </Text>
 
         <Text style={styles.details}>
-          {home.bedrooms ?? 0} {t('bedrooms')} • {home.beds ?? 0} {t('.beds')}
+          {home.bedrooms ?? 0} {t('bedrooms')} • {home.beds ?? 0} {t('beds')}
         </Text>
 
         <View style={styles.bottomRow}>

@@ -4,6 +4,8 @@ import { HomesStackParamList } from './type/homeStack';
 import { View, Text } from 'react-native';
 import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
 import { EditHomeScreen } from 'src/home/ui/EditHomeScreen';
+import { ExchangeAvailabilityScreen } from 'src/home/ui/ExchangeAvailabilityScreen';
+import { ExchangeMessageScreen } from 'src/home/ui/ExchangeMessageScreen';
 
 const Stack = createNativeStackNavigator<HomesStackParamList>();
 
@@ -26,8 +28,8 @@ export function HomesStackNavigator() {
         <Stack.Screen name="CreateHomeLocation" component={TestScreen} />
         <Stack.Screen name="CreateHomeCapacity" component={TestScreen} />
         <Stack.Screen name="EditHome" component={EditHomeScreen} />
-        <Stack.Screen name="ExchangeAvailability" component={TestScreen} />
-        <Stack.Screen name="ExchangeMessage" component={TestScreen} />
+        <Stack.Screen name="ExchangeAvailability" component={ExchangeAvailabilityScreen} />
+        <Stack.Screen name="ExchangeMessage" component={ExchangeMessageScreen} />
       </Stack.Navigator>
     </HomeCreationProvider>
   );

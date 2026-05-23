@@ -1,4 +1,4 @@
-import { HomeAvailabilityRepository } from "../ports/home-availability.repository";
+import { HomeAvailabilityRepository } from "../../../domain/auth/repositories/home-availability.repository";
 
 export class ListHomeAvailabilitiesUseCase {
   constructor(

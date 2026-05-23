@@ -20,7 +20,12 @@
     "browse": "PARCOUREZ",
     "world": "LE MONDE",
     "seeMore": "Voir plus",
-    "noUser": "Utilisateur introuvable"
+    "noUser": "Utilisateur introuvable",
+    "contact": "Contacter",
+    "noAvailability": "Aucune disponibilité pour le moment",
+    "available": "Disponiblité libre",
+    "availableWithBlockDates": "Disponiblité avec dates bloquées",
+    "specificDates": "Dates précises"
   },
   "profile": {
     "exchange": "Échange",
@@ -465,6 +470,7 @@
     "login": {
       "title": "Connectez-vous à Wim",
       "login": "Se connecter",
+      "loggingIn": "Connexion en cours...",
       "loginWithGoogle": "Se connecter avec Google",
       "loginWithApple": "Se connecter avec Apple",
       "email": "Email",
@@ -595,21 +601,36 @@
       "city": "Ville",
       "beach": "Plage",
       "culture": "Culture"
+    },
+    "reviews": {
+      "reviewsCount": "commentaires",
+      "showLess": "Voir moins",
+      "showMore": "Voir plus",
+      "showAllReviews": "Afficher les {{count}} commentaires",
+      "noReviews": "Aucun commentaire pour le moment.",
+      "noReviewsDescription": "Les premiers voyageurs pourront bientôt partager leur expérience."
     }
   },
   "availability": {
     "when": "Quand êtes-vous disponible pour échanger ?",
-    "exchangerDates": "aux dates de l’échangeur",
-    "specificDates": "dates précises",
-    "free": "disponibilité libre"
+    "exchangerDates": "Aux dates de l’échangeur",
+    "specificDates": "Dates précises",
+    "free": "Disponibilité libre"
   },
   "contact": {
     "title": "Contacter l'hôte",
     "message": "Message",
-    "messagePlaceholder": "Écrivez votre message ici...",
+    "messagePlaceholder": "Écrivez un message",
     "send": "Envoyer le message",
     "defaultMessage": "Message par defaut",
     "defaultMessageContent": "Je suis intéressé par votre logement pour un échange prochain. Il semble correspondre à ce que je recherche et j’aimerais savoir s’il serait disponible aux dates que j’envisage.  Je suis ouvert à la discussion si vous souhaitez plus d’informations sur mon logement ou sur mes conditions de séjour. N’hésitez pas à me faire savoir vos disponibilités ou si vous avez des questions. Au plaisir d’échanger avec vous !"
+  },
+  "exchange": {
+    "currentExchanges": "Échanges actuel",
+    "pastExchanges": "Échanges passés",
+    "upcomingExchanges": "Échanges à venir",
+    "noExchanges": "Aucun échange pour le moment.",
+    "noExchangesDescription": "Vos échanges apparaîtront ici lorsqu’ils seront confirmés."
   },
   "admin": {
     "adminTitle": "Tableau de bord administrateur",

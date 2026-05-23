@@ -18,9 +18,13 @@ import { HomeAmenities } from './components/details/HomeAmenities';
 import { HostSummary } from './components/details/HostSummary';
 import { HomeReviews } from './components/details/HomeReviews';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { HomesStackParamList } from 'src/navigation/type/homeStack';
+import { HomeAvailabilityBadge } from './components/details/HomeAvailabilityBadge';
+import { ProfileStackParamList } from 'src/navigation/type/profileStack';
+import { reviewMocks } from '../infrastructure/mocks/reviewMocks';
+import { amenitiesMocks } from '../infrastructure/mocks/amenitiesMocks';
+import { vehiculeMock } from '../infrastructure/mocks/vehiculeMocks';
 
-type Props = NativeStackScreenProps<HomesStackParamList, 'HomeDetails'>;
+type Props = NativeStackScreenProps<ProfileStackParamList, 'HomeDetails'>;
 
 export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { t } = useTranslation(["home", "profile", "common"]);
@@ -123,28 +127,33 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         <HomeSummary home={home} />
 
         <View style={styles.content}>
-
-          <Text style={styles.rating}>★ 4.2 · 23 commentaires</Text>
-
           <View style={styles.separator} />
 
-          <HostSummary owner={home.owner} />
+          <HostSummary
+            owner={home.owner}
+            onPress={() => navigation.navigate('PublicProfile', { userId: home.owner.id })}
+          />
 
           <View style={styles.separator} />
+          
+          <HomeAvailabilityBadge
+            home={home}
+            onPressContact={() =>
+              navigation.navigate('ExchangeAvailability', { homeId: home.id })
+            }
+          />
 
-        <HomeDescription description={home.description} />
+          <HomeDescription description={home.description} />
 
-          <View style={styles.carCard}>
-            <View style={{ flex: 1 }}>
-              {home.carExchangeAccepted ? (
-                <VehicleCard vehicle={home.vehicle} />
-              ) : null}
+          {home.isAvailableForExchange && home.vehicle ? (
+            <View style={{ flex: 1, paddingTop: 16 }}>
+              <VehicleCard vehicle={home.vehicle} />
             </View>
-          </View>
+          ) : null}
 
           <View style={styles.separator} />
 
-          <HomeAmenities amenities={home.amenities ?? []} />
+          <HomeAmenities amenities={home.amenities ?? []} /> 
 
           <View style={styles.separator} />
 
@@ -165,8 +174,13 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
           <View style={styles.separator} />
 
-          <HomeReviews />
+          <HomeReviews
+            reviews={home.reviews ?? []}
+            averageRating={home.averageRating}
+            reviewsCount={home.reviewsCount ?? 0}
+          />
         </View>
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -182,6 +196,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  bottomSpacer: {
+    height: 180,
+  },
+
+  scrollContent: {
+    paddingBottom: 160,
   },
 
   hero: {
@@ -230,6 +252,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+
   content: {
     padding: 18,
   },
@@ -263,7 +290,7 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: '#E5E7EB',
-    marginVertical: 18,
+    marginVertical: 28,
   },
 
   hostRow: {

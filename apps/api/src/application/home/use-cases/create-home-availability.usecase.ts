@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, NotFoundException } from '@nes
 import {
     CreateHomeAvailabilityInput,
     HomeAvailabilityRepository
-} from '../ports/home-availability.repository';
+} from '../../../domain/auth/repositories/home-availability.repository';
 
 
 type HomeRepository = {
