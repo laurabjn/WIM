@@ -13,6 +13,23 @@ export const VehicleCard: React.FC<Props> = ({ vehicle }) => {
 
   const vehicleName = [vehicle.brand, vehicle.model].filter(Boolean).join(' ');
 
+  function getFuelTypeLabel(fuelType?: string | null) {
+    switch (fuelType) {
+      case 'GASOLINE':
+        return 'Essence';
+      case 'HYBRID':
+        return 'Hybride';
+      case 'DIESEL':
+        return 'Diesel';
+      case 'ELECTRIC':
+        return 'Électrique';
+      default:
+        return null;
+    }
+  }
+
+  const fuelLabel = getFuelTypeLabel(vehicle.fuelType);
+
   return (
     <View style={styles.card}>
       <View style={styles.imageBox}>
@@ -35,6 +52,11 @@ export const VehicleCard: React.FC<Props> = ({ vehicle }) => {
         <Text style={styles.text}>
           {vehicle.seats ? `${vehicle.seats} ${t('vehicule.places')}` : t('vehicule.numberOfPlaces')}
           {vehicle.type ? ` · ${vehicle.type}` : ''}
+          {fuelLabel ? (
+            <Text style={styles.fuelType}>
+              {fuelLabel}
+            </Text>
+          ) : null}
         </Text>
 
         <Text style={styles.text}>
@@ -67,6 +89,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+  },
+
+  fuelType: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 4,
   },
 
   vehicleImage: {

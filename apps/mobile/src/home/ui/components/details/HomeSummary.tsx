@@ -15,7 +15,7 @@ export function HomeSummary({ home }: Props) {
       <Text style={styles.title}>{home.title}</Text>
 
       <Text style={styles.subtitle}>
-        {t('home:entireHome')} · {home.homeType.toLowerCase()} · {home.city}, {home.country}
+        {t('home:entireHome')} · {t(`home:homeTypes.${home.homeType.toLowerCase()}`)} · {home.city}, {home.country}
       </Text>
 
       <Text style={styles.meta}>

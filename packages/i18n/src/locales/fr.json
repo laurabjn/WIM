@@ -578,9 +578,25 @@
       "exchangeAccepted": "Cet hôte échange sa voiture",
       "places": "Places",
       "numberOfPlaces": "Nombre de places non renseigné",
-      "notProvided": "Véhicule non renseigné"
+      "notProvided": "Véhicule non renseigné",
+      "fuelType": {
+        "GASOLINE": "Essence",
+        "HYBRID": "Hybride",
+        "DIESEL": "Diesel",
+        "ELECTRIC": "Électrique",
+        "notProvided": "Type de carburant non renseigné"
+      }
     },
     "homeType": "Type de logement",
+    "homeTypes": {
+      "apartment": "Appartement",
+      "house": "Maison",
+      "villa": "Villa",
+      "studio": "Studio",
+      "cottage": "chalet",
+      "loft": "Loft",
+      "other": "Autre"
+    },
     "capacity": "Voyageurs",
     "beds": "Lits",
     "bathrooms": "Salles de bain",

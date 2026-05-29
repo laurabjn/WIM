@@ -579,9 +579,25 @@
       "exchangeAccepted": "This host accepts car exchange",
       "places": "Places",
       "numberOfPlaces": "Number of places not provided",
-      "notProvided": "Car not provided"
+      "notProvided": "Car not provided",
+      "fuelType": {
+        "GASOLINE": "Gasoline",
+        "HYBRID": "Hybrid",
+        "DIESEL": "Diesel",
+        "ELECTRIC": "Electric",
+        "notProvided": "Fuel type not provided"
+      }
     },
     "homeType": "Home type",
+    "homeTypes": {
+      "apartment": "Apartment",
+      "house": "House",
+      "villa": "Villa",
+      "studio": "Studio",
+      "cottage": "Cottage",
+      "loft": "Loft",
+      "other": "Other"
+    },
     "capacity": "Capacity",
     "beds": "Beds",
     "bathrooms": "Bathrooms",

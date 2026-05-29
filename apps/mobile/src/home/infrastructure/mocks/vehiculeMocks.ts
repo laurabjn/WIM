@@ -6,6 +6,7 @@ export const vehiculeMock: Vehicule = {
     brand: 'Tesla',
     model: 'Model Y',
     type: 'SUV',
+    fuelType: 'ELECTRIC',
     seats: 5,
     imageUrl: 'https://images.unsplash.com/photo-1617788138017-80ad40651399',
     createdAt: '2026-01-01T00:00:00Z',

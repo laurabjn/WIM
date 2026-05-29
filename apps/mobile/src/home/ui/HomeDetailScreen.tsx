@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   View,
@@ -103,6 +104,24 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       console.log('Toggle favorite error:', error);
     }
   }
+
+  async function handleShare() {
+    if (!home) return;
+
+    try {
+      await Share.share({
+        title: home.title,
+        message:
+          `🏡 ${home.title}\n\n` +
+          `${home.city}, ${home.country}\n\n` +
+          `${home.description}\n\n` +
+          `Découvre ce logement sur WIM ✨`,
+        url: home.photos?.[0]?.url,
+      });
+    } catch (error) {
+      console.log('Share error:', error);
+    }
+  }
     
   if (error || !home) {
     return (
@@ -122,6 +141,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           onBack={() => navigation.goBack()}
           isFavorite={home.isFavorite ?? false}
           onToggleFavorite={toggleFavorite}
+          onShare={handleShare}
         />
         
         <HomeSummary home={home} />

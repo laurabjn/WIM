@@ -41,6 +41,12 @@ export interface HomeOwner {
   createdAt: string;
 }
 
+export type VehicleFuelType =
+  | 'GASOLINE'
+  | 'HYBRID'
+  | 'DIESEL'
+  | 'ELECTRIC';
+
 export interface Vehicule {
   id: string;
   homeId: string;
@@ -48,6 +54,7 @@ export interface Vehicule {
   model?: string | null;
   seats?: number | null;
   type?: string | null;
+  fuelType?: VehicleFuelType | null;
   imageUrl?: string | null;
   createdAt: string;
   updatedAt: string;

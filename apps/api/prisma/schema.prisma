@@ -88,6 +88,13 @@ model HomePhoto {
   @@map("home_photos")
 }
 
+enum VehicleFuelType {
+  GASOLINE
+  HYBRID
+  DIESEL
+  ELECTRIC
+}
+
 model Vehicle {
   id        String   @id @default(uuid())
   homeId    String   @unique
@@ -97,6 +104,7 @@ model Vehicle {
   model     String?
   seats     Int?
   type      String?   // ex: "city", "suv", etc.
+  fuelType VehicleFuelType? @map("fuel_type")
 
   imageUrl  String?  @map("image_url") 
 
