@@ -3,15 +3,17 @@ import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
+import { Share } from 'react-native';
 
 type Props = {
   home: Home;
   onBack: () => void;
   isFavorite: boolean;
   onToggleFavorite: (homeId: string) => void;
+  onShare?: () => void;
 };
 
-export function HomeHero({ home, onBack, isFavorite, onToggleFavorite }: Props) {
+export function HomeHero({ home, onBack, isFavorite, onToggleFavorite, onShare }: Props) {
   const { t } = useTranslation('home');
   const coverUrl = resolveImageUrl(home.photos?.[0]?.url);
 
@@ -26,11 +28,11 @@ export function HomeHero({ home, onBack, isFavorite, onToggleFavorite }: Props) 
       )}
 
       <TouchableOpacity style={[styles.circleButton, styles.backButton]} onPress={onBack}>
-        <Text style={styles.icon}>←</Text>
+        <Text style={styles.icon}>‹</Text>
       </TouchableOpacity>
 
       <View style={styles.topActions}>
-        <TouchableOpacity style={styles.circleButton}>
+        <TouchableOpacity style={styles.circleButton} onPress={onShare}>
           <Text style={styles.icon}>↗</Text>
         </TouchableOpacity>
 

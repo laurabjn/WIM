@@ -36,6 +36,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -181,16 +182,30 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
                     onChangeText={setEmail}
                   />
 
-                  <TextInput
-                    testID="password-input"
-                    style={styles.input}
-                    placeholder={t('auth:login.password')}
-                    placeholderTextColor="#B4B4B4"
-                    secureTextEntry
-                    autoComplete="password"
-                    value={password}
-                    onChangeText={setPassword}
-                  />
+                  <View style={styles.passwordWrapper}>
+                    <TextInput
+                      testID="password-input"
+                      style={styles.passwordInput}
+                      placeholder={t('auth:login.password')}
+                      placeholderTextColor="#B4B4B4"
+                      secureTextEntry={!showPassword}
+                      autoComplete="password"
+                      value={password}
+                      onChangeText={setPassword}
+                    />
+
+                    <TouchableOpacity
+                      style={styles.eyeButton}
+                      onPress={() => setShowPassword((prev) => !prev)}
+                      activeOpacity={0.7}
+                    >
+                      <FontAwesome
+                        name={showPassword ? 'eye-slash' : 'eye'}
+                        size={18}
+                        color="#7B7B7B"
+                      />
+                    </TouchableOpacity>
+                  </View>
 
                   <TouchableOpacity
                     style={styles.forgotPasswordWrapper}
@@ -401,5 +416,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+
+  passwordWrapper: {
+    position: 'relative',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+
+  passwordInput: {
+    height: 46,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 16,
+    paddingRight: 46,
+    fontSize: 14,
+    color: '#111111',
+    backgroundColor: '#FFFFFF',
+  },
+
+  eyeButton: {
+    position: 'absolute',
+    right: 14,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

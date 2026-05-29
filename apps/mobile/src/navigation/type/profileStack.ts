@@ -20,4 +20,10 @@ export type ProfileStackParamList = {
   PublicProfile: { userId: string };
   Help: undefined;
   HomeDetails: { homeId: string };
+  EditHome: { homeId: string };
+  ExchangeAvailability: { homeId: string };
+  ExchangeMessage: {
+    homeId: string;
+    availabilityType: string
+  };
 };

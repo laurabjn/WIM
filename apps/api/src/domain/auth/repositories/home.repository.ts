@@ -1,3 +1,4 @@
+import { VehicleFuelType } from 'src/application/home/dto/vehicle-fuel-type';
 import { HomeEntity, HomePhotoEntity } from '../entities/home.entity';
 
 export interface VehicleRepositoryData {
@@ -5,6 +6,7 @@ export interface VehicleRepositoryData {
   model?: string | null;
   seats?: number | null;
   type?: string | null;
+  fuelType?: VehicleFuelType | null;
   imageUrl?: string | null;
 }
 

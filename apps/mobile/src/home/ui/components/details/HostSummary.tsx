@@ -1,14 +1,16 @@
 import { HomeOwner } from '@wim/shared/home/home.type';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
   owner: HomeOwner;
+  onPress?: () => void;
 };
 
 export function HostSummary({
-  owner
+  owner,
+  onPress
 }: Props) {
    const { t } = useTranslation('home');
     
@@ -19,7 +21,7 @@ export function HostSummary({
     }
     
    return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.8}>
       <Image
         source={
           owner.avatarUrl
@@ -38,7 +40,7 @@ export function HostSummary({
         <Text style={styles.star}>★</Text>
         <Text style={styles.rating}>{owner?.rating?.toFixed(1) || 'N/A'}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

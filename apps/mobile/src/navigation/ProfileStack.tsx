@@ -11,6 +11,9 @@ import { EditProfileScreen } from 'src/profile/ui/EditProfileScreen';
 import { HelpScreen } from 'src/profile/ui/HelpScreen';
 import { RegionDestinationsScreen } from 'src/profile/ui/RegionDestinationsScreen';
 import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
+import { EditHomeScreen } from 'src/home/ui/EditHomeScreen';
+import { ExchangeAvailabilityScreen } from 'src/home/ui/ExchangeAvailabilityScreen';
+import { ExchangeMessageScreen } from 'src/home/ui/ExchangeMessageScreen';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -70,6 +73,21 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       <Stack.Screen
         name="HomeDetails"
         component={HomeDetailsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditHome"
+        component={EditHomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ExchangeAvailability"
+        component={ExchangeAvailabilityScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ExchangeMessage"
+        component={ExchangeMessageScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

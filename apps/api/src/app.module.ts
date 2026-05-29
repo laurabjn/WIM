@@ -6,6 +6,9 @@ import { UploadsModule } from './interfaces/http/modules/uploads.module';
 import { ProfileModule } from './interfaces/http/modules/profile.module';
 import { SupportModule } from './interfaces/http/modules/support.module';
 import { HomeModule } from './interfaces/http/modules/home.module';
+import { HomeAvailabilityModule } from './interfaces/http/modules/home-availability.module';
+import { ExchangeModule } from './interfaces/http/modules/exchange.module';
+import { FavoriteModule } from './interfaces/http/modules/favorite.module';
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { HomeModule } from './interfaces/http/modules/home.module';
     ProfileModule,
     SupportModule,
     HomeModule,
+    HomeAvailabilityModule,
+    ExchangeModule,
+    FavoriteModule,
   ],
 })
 export class AppModule {}

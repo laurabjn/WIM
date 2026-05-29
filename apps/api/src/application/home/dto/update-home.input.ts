@@ -1,3 +1,5 @@
+import { VehicleFuelType } from "./vehicle-fuel-type";
+
 export interface UpdateHomeInput {
   homeId: string;
   requesterId: string;
@@ -22,6 +24,7 @@ export interface UpdateHomeInput {
     model?: string | null;
     seats?: number | null;
     type?: string | null;
+    fuelType?: VehicleFuelType | null;
     imageUrl?: string | null;
   } | null;
 }

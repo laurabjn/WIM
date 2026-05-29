@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 const ACCESS_TOKEN_KEY = 'wim.accessToken';
 const REFRESH_TOKEN_KEY = 'wim.refreshToken';
@@ -19,17 +19,18 @@ export interface AuthSession {
 }
 
 export async function saveSession(session: AuthSession): Promise<void> {
-  await AsyncStorage.setItem(ACCESS_TOKEN_KEY, session.accessToken);
-  await AsyncStorage.setItem(REFRESH_TOKEN_KEY, session.refreshToken);
-  await AsyncStorage.setItem(USER_KEY, JSON.stringify(session.user));
-  console.log('Session saved:', session);
+  await Promise.all([
+    SecureStore.setItemAsync(ACCESS_TOKEN_KEY, session.accessToken),
+    SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken),
+    SecureStore.setItemAsync(USER_KEY, JSON.stringify(session.user)),
+  ]);
 }
 
 export async function getSession(): Promise<AuthSession | null> {
   const [accessToken, refreshToken, userRaw] = await Promise.all([
-    AsyncStorage.getItem(ACCESS_TOKEN_KEY),
-    AsyncStorage.getItem(REFRESH_TOKEN_KEY),
-    AsyncStorage.getItem(USER_KEY),
+    SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
+    SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
+    SecureStore.getItemAsync(USER_KEY),
   ]);
 
   if (!accessToken || !refreshToken || !userRaw) return null;
@@ -38,15 +39,16 @@ export async function getSession(): Promise<AuthSession | null> {
     const user: StoredUser = JSON.parse(userRaw);
     return { accessToken, refreshToken, user };
   } catch {
+    await clearSession();
     return null;
   }
 }
 
 export async function clearSession(): Promise<void> {
   await Promise.all([
-    AsyncStorage.removeItem(ACCESS_TOKEN_KEY),
-    AsyncStorage.removeItem(REFRESH_TOKEN_KEY),
-    AsyncStorage.removeItem(USER_KEY),
+    SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
+    SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
+    SecureStore.deleteItemAsync(USER_KEY),
   ]);
 }
 

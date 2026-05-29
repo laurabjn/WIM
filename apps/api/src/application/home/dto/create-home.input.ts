@@ -1,3 +1,5 @@
+import { VehicleFuelType } from "./vehicle-fuel-type";
+
 export interface CreateHomeInput {
   ownerId: string;
   title: string;
@@ -23,6 +25,7 @@ export interface CreateHomeInput {
     model?: string | null;
     seats?: number | null;
     type?: string | null;
+    fuelType?: VehicleFuelType | null;
     images?: string[] | null;
   } | null;
 }

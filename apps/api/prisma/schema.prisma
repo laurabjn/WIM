@@ -66,6 +66,8 @@ model Home {
   owner   User        @relation(fields: [ownerId], references: [id])
   photos  HomePhoto[]
   favorites Favorite[]
+  availabilities HomeAvailability[]
+  exchanges Exchange[]
 
   vehicle Vehicle? 
 
@@ -86,6 +88,13 @@ model HomePhoto {
   @@map("home_photos")
 }
 
+enum VehicleFuelType {
+  GASOLINE
+  HYBRID
+  DIESEL
+  ELECTRIC
+}
+
 model Vehicle {
   id        String   @id @default(uuid())
   homeId    String   @unique
@@ -95,6 +104,7 @@ model Vehicle {
   model     String?
   seats     Int?
   type      String?   // ex: "city", "suv", etc.
+  fuelType VehicleFuelType? @map("fuel_type")
 
   imageUrl  String?  @map("image_url") 
 
@@ -117,6 +127,53 @@ model Favorite {
 
   @@unique([userId, homeId])
   @@map("favorites")
+}
+
+enum AvailabilityType {
+  AVAILABLE
+  BLOCKED
+}
+
+model HomeAvailability {
+  id        String           @id @default(uuid())
+  homeId    String           @map("home_id")
+  home      Home             @relation(fields: [homeId], references: [id], onDelete: Cascade)
+
+  startDate DateTime         @map("start_date")
+  endDate   DateTime         @map("end_date")
+  type      AvailabilityType @default(AVAILABLE)
+
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  @@map("home_availabilities")
+}
+
+enum ExchangeStatus {
+  CURRENT
+  FUTURE
+  PAST
+  CANCELLED
+}
+
+model Exchange {
+  id             String         @id @default(uuid())
+  homeId         String         @map("home_id")
+  home           Home           @relation(fields: [homeId], references: [id], onDelete: Cascade)
+
+  hostId         String         @map("host_id")
+  guestId        String         @map("guest_id")
+
+  startDate      DateTime       @map("start_date")
+  endDate        DateTime       @map("end_date")
+  travelersCount Int            @default(1) @map("travelers_count")
+
+  status         ExchangeStatus
+
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  @@map("exchanges")
 }
 
 model SupportRequest {

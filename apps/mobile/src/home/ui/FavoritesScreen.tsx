@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
+  Pressable,
   View,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -25,6 +27,8 @@ export function FavoritesScreen({ navigation }: Props) {
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [isLoadingHomes, setIsLoadingHomes] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<'ALL' | 'HOUSE' | 'APARTMENT' | 'CAR_EXCHANGE'>('ALL');
 
   useEffect(() => {
     async function loadFavorites() {
@@ -84,6 +88,22 @@ export function FavoritesScreen({ navigation }: Props) {
     }
   }
 
+  const filteredHomes = useMemo(() => {
+    switch (selectedFilter) {
+      case 'HOUSE':
+        return homes.filter((home) => home.homeType?.toLowerCase() === 'house');
+
+      case 'APARTMENT':
+        return homes.filter((home) => home.homeType?.toLowerCase() === 'apartment');
+
+      case 'CAR_EXCHANGE':
+        return homes.filter((home) => home.carExchangeAccepted);
+
+      default:
+        return homes;
+    }
+  }, [homes, selectedFilter]);
+
   if (isSessionLoading || isLoadingHomes) {
     return (
       <View style={styles.centered}>
@@ -100,7 +120,7 @@ export function FavoritesScreen({ navigation }: Props) {
           style={styles.headerIconButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.headerIcon}>←</Text>
+          <Text style={styles.headerIcon}>‹</Text>
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>
@@ -109,11 +129,55 @@ export function FavoritesScreen({ navigation }: Props) {
 
         <TouchableOpacity
           style={styles.headerIconButton}
-          onPress={() => console.log('Filtres')}
+          onPress={() => setIsFilterOpen((current) => !current)}
         >
           <Text style={styles.headerIcon}>☰</Text>
         </TouchableOpacity>
       </View>
+
+      {isFilterOpen && (
+        <View style={styles.dropdown}>
+          <TouchableOpacity
+            style={styles.dropdownItem}
+            onPress={() => {
+              setSelectedFilter('ALL');
+              setIsFilterOpen(false);
+            }}
+          >
+            <Text style={styles.dropdownText}>Tous</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.dropdownItem}
+            onPress={() => {
+              setSelectedFilter('HOUSE');
+              setIsFilterOpen(false);
+            }}
+          >
+            <Text style={styles.dropdownText}>Maison</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.dropdownItem}
+            onPress={() => {
+              setSelectedFilter('APARTMENT');
+              setIsFilterOpen(false);
+            }}
+          >
+            <Text style={styles.dropdownText}>Appartement</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.dropdownItem}
+            onPress={() => {
+              setSelectedFilter('CAR_EXCHANGE');
+              setIsFilterOpen(false);
+            }}
+          >
+            <Text style={styles.dropdownText}>Échange voiture</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <ScrollView
         style={styles.screen}
@@ -127,7 +191,7 @@ export function FavoritesScreen({ navigation }: Props) {
             </Text>
           </View>
         ) : (
-          homes.map((home) => (
+          filteredHomes.map((home) => (
             <FavoriteHomeCard
               key={home.id}
               home={home}
@@ -197,5 +261,27 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 14,
     color: '#6B6B6B',
+  },
+  dropdown: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingVertical: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  dropdownItem: {
+    paddingVertical: 13,
+    paddingHorizontal: 16,
+  },
+  dropdownText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111111',
   },
 });
