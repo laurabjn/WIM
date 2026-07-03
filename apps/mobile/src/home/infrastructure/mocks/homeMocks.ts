@@ -3,6 +3,29 @@ import { reviewMocks } from './reviewMocks';
 import { vehiculeMock } from './vehiculeMocks';
 import { amenitiesMocks } from './amenitiesMocks';
 
+export const heroByCategory = {
+  NATURE: {
+    title: 'SEDONA',
+    exchanges: 42,
+    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
+  },
+  BEACH: {
+    title: 'BIARRITZ',
+    exchanges: 28,
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e',
+  },
+  CITY: {
+    title: 'TOKYO',
+    exchanges: 64,
+    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf',
+  },
+  CULTURE: {
+    title: 'ROME',
+    exchanges: 35,
+    image: 'https://images.unsplash.com/photo-1525874684015-58379d421a52',
+  },
+};
+
 export const publicUserHomesMock: Home[] = [
   {
     id: 'home-1',

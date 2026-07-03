@@ -661,9 +661,19 @@
     "adminNoAccess": "You do not have access to this page."
   },
   "search": {
+    "search": "Search",
+    "toSearch": "Search",
     "toExplore": "Explore",
     "fastSearch": "Fast search",
     "lastSearches": "Your last searches",
-    "categories": "Categories"
+    "categories": "Categories",
+    "nbExchanges": "number of exchanges",
+    "destination": "Destination",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "travelers": "Number of travelers"
+  },
+  "swipe": {
+    "noMoreHome": "No more home available"
   }
 }

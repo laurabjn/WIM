@@ -13,6 +13,7 @@ import { AuthModule } from './auth.module';
 import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
 import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
 import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
+import { SearchHomesUseCase } from 'src/application/home/use-cases/search-homes.usecase';
 
 @Module({
   imports: [AuthModule],
@@ -67,6 +68,11 @@ import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-
     {
       provide: RemoveFavoriteUseCase,
       useFactory: (homeRepo) => new RemoveFavoriteUseCase(homeRepo),
+      inject: [HOME_REPOSITORY],
+    },
+    {
+      provide: SearchHomesUseCase,
+      useFactory: (homeRepo) => new SearchHomesUseCase(homeRepo),
       inject: [HOME_REPOSITORY],
     }
   ],

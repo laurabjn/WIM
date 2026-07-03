@@ -660,9 +660,19 @@
     "adminNoAccess": "Vous n’avez pas accès à cette page."
   },
   "search": {
+    "search": "Recherche",
+    "toSearch": "Rechercher",
     "toExplore": "Explorer",
     "fastSearch": "Recherche rapide",
     "lastSearches": "Vos dernières recherches",
-    "categories": "Catégories"
+    "categories": "Catégories",
+    "nbExchanges": "Nombre d'échanges",
+    "destination": "Destination",
+    "startDate": "Date de début",
+    "endDate": "Date maximale",
+    "travelers": "Nombre de voyageur"
+  },
+  "swipe": {
+    "noMoreHome": "Plus aucun logement à afficher"
   }
 }

@@ -12,6 +12,9 @@ import { ProfileStackNavigator } from './ProfileStack';
 import { useTranslation } from 'react-i18next';
 import { CustomTabBar } from './components/CustomTabBar';
 import { ExchangesScreen } from 'src/home/ui/ExchangesScreen';
+import { MenuScreen } from 'src/menu/ui/MenuScreen';
+import { SearchScreen } from 'src/search/ui/SearchScreen';
+import { SearchStackNavigator } from './SearchStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
@@ -40,7 +43,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
     >
       <Tab.Screen
         name="HomeTab"
-        component={TestScreen}
+        component={MenuScreen}
         options={{
           title: t('home'),
         }}
@@ -54,11 +57,12 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
       />
       <Tab.Screen
         name="SearchTab"
-        component={TestScreen}
         options={{
           title: t('search'),
         }}
-      />
+      >
+        {() => <SearchStackNavigator />}
+      </Tab.Screen>
       <Tab.Screen
         name="MessagesTab"
         component={TestScreen}

@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   UnauthorizedException,
   UploadedFile,
@@ -28,6 +29,8 @@ import { JwtAuthGuard } from '../jwt-auth.guard';
 import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
 import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
 import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
+import { SearchHomesDto } from '../dtos/home/search-homes.dto';
+import { SearchHomesUseCase } from 'src/application/home/use-cases/search-homes.usecase';
 
 function editFileName(
   _req: unknown,
@@ -61,6 +64,7 @@ export class HomeController {
     private readonly addHomePhotoUseCase: AddHomePhotoUseCase,
     private readonly addFavoriteUseCase: AddFavoriteUseCase,
     private readonly removeFavoriteUseCase: RemoveFavoriteUseCase,
+    private readonly searchHomesUseCase: SearchHomesUseCase,
   ) {
     console.log('homecontroller created');
   }
@@ -128,6 +132,15 @@ export class HomeController {
       });
   }
   
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  searchHomes(@Req() req, @Query() query: SearchHomesDto) {
+    return this.searchHomesUseCase.execute({
+      userId: req.user.sub,
+      ...query,
+    });
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('me/list')
   listMine(@Req() req: any) {

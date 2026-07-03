@@ -1,0 +1,60 @@
+import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
+
+export function RecentSearch({
+  image,
+  title,
+  dates,
+  travelers,
+}: {
+  image: string;
+  title: string;
+  dates: string;
+  travelers: string;
+}) {
+  return (
+    <TouchableOpacity style={styles.recentCard}>
+      <Image source={{ uri: image }} style={styles.recentImage} />
+
+      <View style={styles.recentContent}>
+        <Text style={styles.recentTitle}>{title}</Text>
+        <Text style={styles.recentText}>{dates}</Text>
+        <Text style={styles.recentText}>{travelers}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+const styles = StyleSheet.create({
+  recentCard: {
+    height: 95,
+    borderRadius: 16,
+    backgroundColor: '#fff',
+    marginBottom: 12,
+    flexDirection: 'row',
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  recentImage: {
+    width: 105,
+    height: '100%',
+  },
+  recentContent: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+  },
+  recentTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  recentText: {
+    fontSize: 12,
+    color: '#444',
+    marginBottom: 4,
+  },
+});
