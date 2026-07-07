@@ -27,19 +27,25 @@ model User {
   phone             String?
   preferredLocale   String         @default("fr")
   travelPreferences Json?
-  
-  homes Home[]
+
+  homes     Home[]
   favorites Favorite[]
-  
-  supportRequests   SupportRequest[]
+
+  supportRequests SupportRequest[]
+
+  swipesMade     Swipe[] @relation("SwipesMade")
+  swipesReceived Swipe[] @relation("SwipesReceived")
+
+  matchesAsUser1 Match[] @relation("MatchesAsUser1")
+  matchesAsUser2 Match[] @relation("MatchesAsUser2")
 
   @@map("users")
 }
 
 model Home {
-  id          String   @id @default(uuid())
-  ownerId     String
-  
+  id      String @id @default(uuid())
+  ownerId String
+
   title       String
   description String?
   address     String?
@@ -48,37 +54,37 @@ model Home {
   latitude    Float?
   longitude   Float?
   capacity    Int
-  beds        Int         @default(1)
-  bedrooms    Int         @default(1)
-  bathrooms   Int         @default(1)
-  homeType    String      @map("home_type")
+  beds        Int     @default(1)
+  bedrooms    Int     @default(1)
+  bathrooms   Int     @default(1)
+  homeType    String  @map("home_type")
   amenities   Json?
 
   isAvailableForExchange Boolean @default(true) @map("is_available_for_exchange")
-  pricePerNight           Int?    @map("price_per_night")
-  averageRating           Float?  @default(0) @map("average_rating")
-  reviewsCount            Int     @default(0) @map("reviews_count")
+  pricePerNight          Int?    @map("price_per_night")
+  averageRating          Float?  @default(0) @map("average_rating")
+  reviewsCount           Int     @default(0) @map("reviews_count")
 
-  carExchangeAccepted Boolean     @default(false) @map("car_exchange_accepted")
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
+  carExchangeAccepted Boolean  @default(false) @map("car_exchange_accepted")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
 
-  owner   User        @relation(fields: [ownerId], references: [id])
-  photos  HomePhoto[]
-  favorites Favorite[]
+  owner          User               @relation(fields: [ownerId], references: [id])
+  photos         HomePhoto[]
+  favorites      Favorite[]
   availabilities HomeAvailability[]
-  exchanges Exchange[]
+  exchanges      Exchange[]
 
-  vehicle Vehicle? 
+  vehicle Vehicle?
 
   @@index([city, country])
   @@index([latitude, longitude])
 }
 
 model HomePhoto {
-  id       String   @id @default(uuid())
-  homeId    String   @map("home_id")
-  home      Home     @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  homeId String @map("home_id")
+  home   Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
   url      String
   position Int
@@ -96,32 +102,32 @@ enum VehicleFuelType {
 }
 
 model Vehicle {
-  id        String   @id @default(uuid())
-  homeId    String   @unique
-  home      Home     @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  homeId String @unique
+  home   Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
-  brand     String?
-  model     String?
-  seats     Int?
-  type      String?   // ex: "city", "suv", etc.
+  brand    String?
+  model    String?
+  seats    Int?
+  type     String? // ex: "city", "suv", etc.
   fuelType VehicleFuelType? @map("fuel_type")
 
-  imageUrl  String?  @map("image_url") 
+  imageUrl String? @map("image_url")
 
-  createdAt DateTime @default(now())  
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("vehicles")
 }
 
 model Favorite {
-  id      String @id @default(uuid())
+  id String @id @default(uuid())
 
-  userId  String @map("user_id")
-  homeId  String @map("home_id")
+  userId String @map("user_id")
+  homeId String @map("home_id")
 
-  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  home    Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -135,16 +141,16 @@ enum AvailabilityType {
 }
 
 model HomeAvailability {
-  id        String           @id @default(uuid())
-  homeId    String           @map("home_id")
-  home      Home             @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  homeId String @map("home_id")
+  home   Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
   startDate DateTime         @map("start_date")
   endDate   DateTime         @map("end_date")
   type      AvailabilityType @default(AVAILABLE)
 
-  createdAt DateTime         @default(now()) @map("created_at")
-  updatedAt DateTime         @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("home_availabilities")
 }
@@ -157,36 +163,75 @@ enum ExchangeStatus {
 }
 
 model Exchange {
-  id             String         @id @default(uuid())
-  homeId         String         @map("home_id")
-  home           Home           @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  id     String @id @default(uuid())
+  homeId String @map("home_id")
+  home   Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
-  hostId         String         @map("host_id")
-  guestId        String         @map("guest_id")
+  hostId  String @map("host_id")
+  guestId String @map("guest_id")
 
-  startDate      DateTime       @map("start_date")
-  endDate        DateTime       @map("end_date")
-  travelersCount Int            @default(1) @map("travelers_count")
+  startDate      DateTime @map("start_date")
+  endDate        DateTime @map("end_date")
+  travelersCount Int      @default(1) @map("travelers_count")
 
-  status         ExchangeStatus
+  status ExchangeStatus
 
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("exchanges")
 }
 
+enum SwipeDirection {
+  LIKE
+  DISLIKE
+}
+
+enum MatchStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  BLOCKED
+}
+
+model Swipe {
+  id           String         @id @default(uuid())
+  swiperId     String
+  targetUserId String
+  direction    SwipeDirection
+  createdAt    DateTime       @default(now())
+
+  swiper     User @relation("SwipesMade", fields: [swiperId], references: [id])
+  targetUser User @relation("SwipesReceived", fields: [targetUserId], references: [id])
+
+  @@unique([swiperId, targetUserId])
+}
+
+model Match {
+  id        String      @id @default(uuid())
+  user1Id   String
+  user2Id   String
+  status    MatchStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  user1     User @relation("MatchesAsUser1", fields: [user1Id], references: [id])
+  user2     User @relation("MatchesAsUser2", fields: [user2Id], references: [id])
+
+  @@unique([user1Id, user2Id])
+}
+
 model SupportRequest {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
   userEmail    String   @map("user_email")
   userFullName String?  @map("user_full_name")
-  topic     String
-  subject   String
-  message   String
-  status    String   @default("open")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  topic        String
+  subject      String
+  message      String
+  status       String   @default("open")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

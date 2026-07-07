@@ -9,6 +9,7 @@ import { HomeModule } from './interfaces/http/modules/home.module';
 import { HomeAvailabilityModule } from './interfaces/http/modules/home-availability.module';
 import { ExchangeModule } from './interfaces/http/modules/exchange.module';
 import { FavoriteModule } from './interfaces/http/modules/favorite.module';
+import { SwipeModule } from './interfaces/http/modules/swipe.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FavoriteModule } from './interfaces/http/modules/favorite.module';
     HomeAvailabilityModule,
     ExchangeModule,
     FavoriteModule,
+    SwipeModule
   ],
 })
 export class AppModule {}

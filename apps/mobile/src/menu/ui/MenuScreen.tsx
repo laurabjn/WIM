@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -22,8 +23,13 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { Home } from '@wim/shared/home/home.type';
 import { searchHomesApi } from 'src/home/infrastructure/searchHome.api';
 import { publicUserHomesMock } from 'src/home/infrastructure/mocks/homeMocks';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { SearchStackParamList } from 'src/navigation/type/searchTabs';
+import { SearchToggle } from './components/SearchToggle';
 
-export function MenuScreen() {
+type Props = NativeStackScreenProps<SearchStackParamList,'Menu'>;
+
+export function MenuScreen({ navigation }: Props) {
   const { t } = useTranslation(['search', 'common']);
     
   type CategoryFilter = 'ALL' | 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
@@ -36,6 +42,12 @@ export function MenuScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [useMocks, setUseMocks] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      setQuickSearch(false);
+    }, []),
+  );
 
   useEffect(() => {
     async function loadSession() {
@@ -105,45 +117,19 @@ export function MenuScreen() {
     : t('search:toExplore');
   
   const toggleSearch = () => {
-    const nextValue = !quickSearch;
-
-    setQuickSearch(nextValue);
+    navigation.navigate('Swipe');
   };
-  
+    
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <Text
-            style={[
-              styles.headerText,
-              !quickSearch && styles.headerTextActive,
-            ]}
-          >
-            {t('search:toExplore')}
-          </Text>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.toggle}
-            onPress={toggleSearch}
-          >
-            <View
-              style={[
-                styles.toggleCircle,
-                quickSearch && styles.toggleCircleActive,
-              ]}
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={[
-              styles.headerText,
-              quickSearch && styles.headerTextActive,
-            ]}
-          >
-            {t('search:fastSearch')}
-          </Text>
+          <SearchToggle
+            quickSearch={quickSearch}
+            onToggle={toggleSearch}
+            exploreLabel={t('search:toExplore')}
+            quickSearchLabel={t('search:fastSearch')}
+          />
         </View>
 
         <View style={styles.heroCard}>

@@ -1,4 +1,5 @@
 export type SearchStackParamList = {
+  Menu: undefined;
   Search: undefined;
   DestinationSearch: {
     currentDestination: string;
@@ -10,4 +11,5 @@ export type SearchStackParamList = {
     endDate: Date | null;
     capacity: number | undefined;
   };
+  Swipe: undefined;
 };
