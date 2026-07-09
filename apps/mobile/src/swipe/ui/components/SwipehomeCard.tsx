@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Star, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -135,11 +136,24 @@ export function SwipeHomeCard({ home, onLike, onDislike }: Props) {
           <Text style={styles.price}>✈ {t('profile:price')} {home.pricePerNight}€</Text>
         </View>
 
-        <View style={styles.tags}>
-          {home.amenities.map((tag: string) => (
-            <Text key={tag} style={styles.tag}>{tag}</Text>
-          ))}
-        </View>
+      <View style={styles.tags}>
+        {home.amenities.map((tag: string, index: number) => (
+          <LinearGradient
+            key={tag}
+            colors={['#FFF176', '#FFD84D']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[
+              styles.tag,
+              index === 5 && {
+                marginLeft: 35,
+              },
+            ]}
+          >
+            <Text style={styles.tagText}>{tag}</Text>
+          </LinearGradient>
+        ))}
+      </View>
       </Animated.View>
 
       <Modal visible={carouselVisible} animationType="slide" transparent={false}>
@@ -249,19 +263,26 @@ const styles = StyleSheet.create({
     color: '#111',
   },
   tags: {
-    marginTop: 14,
+    marginTop: 18,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    columnGap: 6,
+    rowGap: 5,
+    paddingHorizontal: 20,
   },
   tag: {
-    backgroundColor: '#FFE27A',
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    borderRadius: 14,
-    fontSize: 13,
-    fontWeight: '900',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  tagText: {
+    fontSize: 11,
+    fontWeight: '800',
     color: '#3D2A00',
+    textAlign: 'center',
   },
   modal: {
     flex: 1,

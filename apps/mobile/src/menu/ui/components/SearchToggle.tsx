@@ -6,6 +6,7 @@ import {
   View,
   Animated
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = {
   quickSearch: boolean;
@@ -14,8 +15,9 @@ type Props = {
   quickSearchLabel: string;
 };
 
-const CIRCLE_SIZE = 24;
-const TOGGLE_PADDING = 5;
+const CIRCLE_SIZE = 22;
+const TOGGLE_WIDTH = 145;
+const TOGGLE_PADDING = 4;
 
 export function SearchToggle({
   quickSearch,
@@ -28,19 +30,17 @@ export function SearchToggle({
   useEffect(() => {
     Animated.timing(progress, {
       toValue: quickSearch ? 1 : 0,
-      duration: 220,
+      duration: 250,
       useNativeDriver: false,
     }).start();
   }, [quickSearch, progress]);
 
-  const backgroundColor = progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['#9BEBCB', '#25AEEB'],
-  });
-
   const translateX = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 130],
+    outputRange: [
+      0,
+      TOGGLE_WIDTH - CIRCLE_SIZE - TOGGLE_PADDING * 2,
+    ],
   });
 
   return (
@@ -49,8 +49,17 @@ export function SearchToggle({
         {exploreLabel}
       </Text>
 
-      <TouchableOpacity activeOpacity={0.8} onPress={onToggle}>
-        <Animated.View style={[styles.toggle, { backgroundColor }]}>
+      <TouchableOpacity activeOpacity={0.9} onPress={onToggle}>
+        <LinearGradient
+          colors={
+            quickSearch
+              ? ['#ffffff', '#4FC3FF']
+              : ['#40D890', '#ffffff']
+          }
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.toggle}
+        >
           <Animated.View
             style={[
               styles.toggleCircle,
@@ -59,7 +68,7 @@ export function SearchToggle({
               },
             ]}
           />
-        </Animated.View>
+        </LinearGradient>
       </TouchableOpacity>
 
       <Text style={[styles.headerText, quickSearch && styles.headerTextActive]}>
@@ -86,9 +95,10 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   toggle: {
-    width: 164,
-    height: 34,
+    width: TOGGLE_WIDTH,
+    height: 28,
     borderRadius: 20,
+    marginLeft: 30,
     justifyContent: 'center',
     paddingHorizontal: TOGGLE_PADDING,
   },
@@ -97,5 +107,13 @@ const styles = StyleSheet.create({
     height: CIRCLE_SIZE,
     borderRadius: CIRCLE_SIZE / 2,
     backgroundColor: '#fff',
+        shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    elevation: 3,
   },
 });

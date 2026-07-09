@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { CustomTabBar } from './components/CustomTabBar';
 import { ExchangesScreen } from 'src/home/ui/ExchangesScreen';
 import { SearchStackNavigator } from './SearchStack';
+import { SearchOnlyStackNavigator } from './SearchOnlyStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
@@ -71,7 +72,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
           title: t('search'),
         }}
       >
-        {() => <SearchStackNavigator />}
+        {() => <SearchOnlyStackNavigator />}
       </Tab.Screen>
       <Tab.Screen
         name="MessagesTab"

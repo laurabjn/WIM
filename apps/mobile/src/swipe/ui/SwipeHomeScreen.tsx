@@ -1,5 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useRef, useState } from 'react';
 import {
   Animated,
   StyleSheet,
@@ -18,6 +17,8 @@ import { SwipeDirection, createSwipeApi } from '../infrastructure/swipe.api';
 import { SearchToggle } from 'src/menu/ui/components/SearchToggle';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { currentUserMock, reciprocalLikesMock } from '../infrastructure/mocks/matchesMocks';
+import { SwipeTopPreview } from './components/SwipeTopPreview';
 
 type Props = NativeStackScreenProps<SearchStackParamList,'Swipe'>;
 
@@ -32,27 +33,39 @@ export function SwipeHomeScreen({ navigation }: Props) {
   const [matchId, setMatchId] = useState<string | null>(null);
   const [showMatch, setShowMatch] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      setQuickSearch(false);
-    }, []),
-  );
-
   async function handleSwipe(direction: SwipeDirection) {
     if (!home || swipeLoading) return;
 
-    console.log('MOCK SWIPE:', {
-      homeId: home.id,
-      ownerId: home.ownerId,
-      direction,
-    });
+    setSwipeLoading(true);
 
-    if (direction === 'LIKE' && home.id === '2') {
-      setMatchId('mock-match-1');
-      setShowMatch(true);
+    const swipe = {
+      swiperId: currentUserMock.id,
+      targetUserId: home.ownerId,
+      homeId: home.id,
+      direction,
+      createdAt: new Date().toISOString(),
+    };
+
+    console.log('MOCK SWIPE:', swipe);
+
+    if (direction === 'DISLIKE') {
+      setSwipeLoading(false);
+      next();
       return;
     }
 
+    const isMatch = reciprocalLikesMock.includes(home.ownerId);
+
+    if (isMatch) {
+      const mockMatchId = `match-${currentUserMock.id}-${home.ownerId}`;
+
+      setMatchId(mockMatchId);
+      setShowMatch(true);
+      setSwipeLoading(false);
+      return;
+    }
+
+    setSwipeLoading(false);
     next();
   }
 
@@ -121,6 +134,11 @@ export function SwipeHomeScreen({ navigation }: Props) {
           quickSearchLabel={t('search:fastSearch')}
         />
       </View>
+
+      <SwipeTopPreview
+        home={home}
+        onInfoPress={() => console.log('info')}
+      />
 
       <SwipeHomeCard
         key={home.id}
