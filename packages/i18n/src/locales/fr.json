@@ -626,7 +626,12 @@
       "showAllReviews": "Afficher les {{count}} commentaires",
       "noReviews": "Aucun commentaire pour le moment.",
       "noReviewsDescription": "Les premiers voyageurs pourront bientôt partager leur expérience."
-    }
+    },
+    "coordinatesUnavailable": "Localisation indisponible",
+    "unknownLocation": "Localisation non renseignée",
+    "reduce": "Réduire",
+    "readMore": "Lire la suite >",
+    "source": "Source : Wikipédia"
   },
   "availability": {
     "when": "Quand êtes-vous disponible pour échanger ?",
@@ -671,7 +676,10 @@
     "destination": "Destination",
     "startDate": "Date de début",
     "endDate": "Date maximale",
-    "travelers": "Nombre de voyageur"
+    "travelers": "Nombre de voyageur",
+    "noDestination": "Aucune destination trouvée",
+    "noRecentDestination": "Aucune destination récente",
+    "results": "Résultats"
   },
   "swipe": {
     "noMoreHome": "Plus aucun logement à afficher"

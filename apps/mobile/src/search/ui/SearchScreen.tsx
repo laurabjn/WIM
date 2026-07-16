@@ -35,11 +35,21 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
     'Sanita',
   ];
 
+  function toLocalApiDate(date: Date | null): string | undefined {
+    if (!date) return undefined;
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
   function handleSearch() {
     navigation.navigate('SearchResults', {
       city: destination,
-      startDate,
-      endDate,
+      startDate: toLocalApiDate(startDate),
+      endDate: toLocalApiDate(endDate),
       capacity: travelers ? Number(travelers) : undefined,
     });
   }

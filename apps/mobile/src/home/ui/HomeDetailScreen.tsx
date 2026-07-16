@@ -1,5 +1,5 @@
 import { Home } from '@wim/shared/home/home.type';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ScrollView,
@@ -24,6 +24,8 @@ import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { reviewMocks } from '../infrastructure/mocks/reviewMocks';
 import { amenitiesMocks } from '../infrastructure/mocks/amenitiesMocks';
 import { vehiculeMock } from '../infrastructure/mocks/vehiculeMocks';
+import { homeLocationSanFranciscoMock } from '../infrastructure/mocks/homeLocationMapMocks';
+import { HomeLocationMap } from './components/details/HomeLocationMap';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'HomeDetails'>;
 
@@ -132,6 +134,20 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
       </SafeAreaView>
     );
   }
+
+  const hasCoordinates =
+    typeof home.latitude === 'number' &&
+    Number.isFinite(home.latitude) &&
+    typeof home.longitude === 'number' &&
+    Number.isFinite(home.longitude);
+
+  const homeCoordinate: [number, number] | null = hasCoordinates
+    ? [home.longitude!, home.latitude!]
+    : null;
+
+  const locationLabel = [home.city, home.country]
+    .filter(Boolean)
+    .join(', ');
     
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -177,20 +193,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
           <View style={styles.separator} />
 
-          <Text style={styles.sectionTitle}>Où se situe le logement</Text>
-
-          <View style={styles.mapMock}>
-            <Text style={styles.mapPin}>📍</Text>
-          </View>
-
-          <Text style={styles.locationTitle}>San Francisco, Etats-Unis</Text>
-
-          <Text style={styles.description}>
-            San Francisco est une ville emblématique de la côte ouest des
-            États-Unis, connue pour son Golden Gate Bridge, ses rues en pente...
-          </Text>
-
-          <Text style={styles.readMore}>Lire la suite ›</Text>
+          <HomeLocationMap home={/*homeLocationSanFranciscoMock*/home} />
 
           <View style={styles.separator} />
 
@@ -211,31 +214,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
   center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   bottomSpacer: {
     height: 180,
   },
-
   scrollContent: {
     paddingBottom: 160,
   },
-
   hero: {
     height: 300,
     position: 'relative',
   },
-
   heroImage: {
     width: '100%',
     height: '100%',
   },
-
   circleButton: {
     width: 44,
     height: 44,
@@ -244,13 +241,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   backButton: {
     position: 'absolute',
     top: 16,
     left: 16,
   },
-
   topActions: {
     position: 'absolute',
     top: 16,
@@ -258,12 +253,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
-
   icon: {
     fontSize: 20,
     color: '#111111',
   },
-
   imageCounter: {
     position: 'absolute',
     right: 14,
@@ -271,109 +264,90 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
   },
-
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-
   content: {
     padding: 18,
   },
-
   title: {
     fontSize: 24,
     fontWeight: '800',
     color: '#111111',
     marginBottom: 8,
   },
-
   subtitle: {
     fontSize: 13,
     color: '#6B7280',
     marginBottom: 4,
   },
-
   meta: {
     fontSize: 13,
     color: '#6B7280',
     marginBottom: 10,
   },
-
   rating: {
     fontSize: 14,
     fontWeight: '600',
     color: '#111111',
     marginBottom: 12,
   },
-
   separator: {
     height: 1,
     backgroundColor: '#E5E7EB',
     marginVertical: 28,
   },
-
   hostRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
     marginRight: 12,
   },
-
   hostText: {
     flex: 1,
   },
-
   hostName: {
     fontSize: 15,
     fontWeight: '700',
     color: '#111111',
   },
-
   hostSince: {
     fontSize: 12,
     color: '#6B7280',
   },
-
   hostRating: {
     alignItems: 'center',
   },
-
   star: {
     fontSize: 18,
     color: '#111111',
   },
-
   hostScore: {
     fontSize: 22,
     color: '#111111',
   },
-
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
     color: '#111111',
     marginBottom: 12,
   },
-
   description: {
     fontSize: 13,
     lineHeight: 20,
     color: '#333333',
   },
-
   price: {
     fontSize: 15,
     fontWeight: '700',
     color: '#111111',
     marginTop: 14,
   },
-
   contactButton: {
     marginTop: 12,
     alignSelf: 'flex-end',
@@ -384,12 +358,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   contactText: {
     color: '#FFFFFF',
     fontWeight: '700',
   },
-
   carCard: {
     marginTop: 16,
     flexDirection: 'row',
@@ -403,27 +375,22 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
-
   featuresGrid: {
     gap: 14,
   },
-
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-
   featureIcon: {
     width: 28,
     fontSize: 20,
   },
-
   featureText: {
     fontSize: 15,
     color: '#111111',
   },
-
   outlineButton: {
     marginTop: 16,
     height: 34,
@@ -433,42 +400,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   outlineText: {
     fontSize: 12,
     fontWeight: '600',
     color: '#111111',
   },
-
-  mapMock: {
-    height: 240,
-    borderRadius: 16,
-    backgroundColor: '#DDEEFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-
-  mapPin: {
-    fontSize: 36,
-  },
-
-  locationTitle: {
-    marginTop: 14,
-    marginBottom: 10,
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#111111',
-  },
-
-  readMore: {
-    marginTop: 6,
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#111111',
-    textDecorationLine: 'underline',
-  },
-
   reviewCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
@@ -479,27 +415,23 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
-
   reviewStars: {
     fontSize: 13,
     fontWeight: '700',
     color: '#111111',
     marginBottom: 8,
   },
-
   reviewUser: {
     marginTop: 12,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-
   reviewAvatar: {
     width: 36,
     height: 36,
     borderRadius: 18,
   },
-
   errorText: {
     fontSize: 16,
     color: '#111111',

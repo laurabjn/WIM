@@ -10,6 +10,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootNavigator } from 'src/navigation/rootNavigator';
 import { ThemeProvider } from 'src/theme/ThemeContext';
 
+import 'src/search/infrastructure/map/mapbox.config';
+
 enableScreens();
 
 const Stack = createNativeStackNavigator();

@@ -627,7 +627,12 @@
       "showAllReviews": "Show all {{count}} reviews",
       "noReviews": "No reviews for the moment.",
       "noReviewsDescription": "The first travelers will soon be able to share their experience."
-    }
+    },
+    "coordinatesUnavailable": "Location unavailable",
+    "unknownLocation": "Location not specified",
+    "reduce": "Reduce",
+    "readMore": "Read more",
+    "source": "Source : Wikipedia"
   },
   "availability": {
     "when": "When are you available for exchange ?",
@@ -672,7 +677,10 @@
     "destination": "Destination",
     "startDate": "Start date",
     "endDate": "End date",
-    "travelers": "Number of travelers"
+    "travelers": "Number of travelers",
+    "noDestination": "No destination found",
+    "noRecentDestination": "No recent searches",
+    "results": "Results"
   },
   "swipe": {
     "noMoreHome": "No more home available"

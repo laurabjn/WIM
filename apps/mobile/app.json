@@ -10,10 +10,12 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "package": "com.wim.mobile"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wim.mobile"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +23,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.wim.mobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,6 +33,11 @@
       "expo-secure-store",
       "@react-native-community/datetimepicker",
       "@rnmapbox/maps"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b59c258a-7edd-41c4-a766-8b8ea9dabc9e"
+      }
+    }
   }
 }

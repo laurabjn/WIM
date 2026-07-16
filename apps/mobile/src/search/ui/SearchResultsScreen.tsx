@@ -1,292 +1,237 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
-  ActivityIndicator,
   Animated,
-  Image,
-  ScrollView,
   Dimensions,
-  PanResponder,
+  FlatList,
   StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import { ArrowLeft, SlidersHorizontal, Star } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getSession } from 'src/auth/infrastructure/authStorage';
-import { searchHomesApi } from 'src/home/infrastructure/searchHome.api';
+import Mapbox from '@rnmapbox/maps';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
 import { Home } from '@wim/shared/home/home.type';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { SearchResultCard } from './components/SearchResultCard';
 import { searchHomesMock } from '../infrastructure/mocks/searchHomeMocks';
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 
-type Props = NativeStackScreenProps<SearchStackParamList, 'SearchResults'>;
+import { SearchResultsHeader } from './components/SearchResultsHeader';
+import { SearchResultsSheet } from './components/SearchResultsSheet';
+import { SearchResultsMap } from './components/SearchResultsMap';
 
-export const SearchResultsScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { city, startDate, endDate, capacity } = route.params ?? {};
+type Props = NativeStackScreenProps<
+  SearchStackParamList,
+  'SearchResults'
+>;
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SHEET_COLLAPSED = SCREEN_HEIGHT * 0.48;
+const SHEET_EXPANDED = 90;
+
+export const SearchResultsScreen: React.FC<Props> = ({
+  navigation,
+  route,
+}) => {
+  const { city, capacity, startDate, endDate } = route.params ?? {};
 
   const [homes, setHomes] = useState<Home[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedHomeId, setSelectedHomeId] =
+    useState<string | null>(null);
 
-  const SCREEN_HEIGHT = Dimensions.get('window').height;
+  const cameraRef = useRef<Mapbox.Camera>(null);
+  const listRef = useRef<FlatList<Home>>(null);
 
-  const SHEET_COLLAPSED = 300;
-  const SHEET_EXPANDED = 90;
-
-  const sheetY = useRef(new Animated.Value(SHEET_COLLAPSED)).current;
-  const lastSheetY = useRef(SHEET_COLLAPSED);
-
-  const moveSheet = (toValue: number) => {
-    lastSheetY.current = toValue;
-
-    Animated.spring(sheetY, {
-      toValue,
-      useNativeDriver: true,
-      tension: 50,
-      friction: 10,
-    }).start();
-  };
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        return Math.abs(gestureState.dy) > 5;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        const nextY = lastSheetY.current + gestureState.dy;
-
-        if (nextY >= SHEET_EXPANDED && nextY <= SHEET_COLLAPSED) {
-          sheetY.setValue(nextY);
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        const shouldExpand =
-          gestureState.dy < -40 || gestureState.vy < -0.5;
-
-        const shouldCollapse =
-          gestureState.dy > 40 || gestureState.vy > 0.5;
-
-        if (shouldExpand) {
-          moveSheet(SHEET_EXPANDED);
-          return;
-        }
-
-        if (shouldCollapse) {
-          moveSheet(SHEET_COLLAPSED);
-          return;
-        }
-
-        const middle = (SHEET_COLLAPSED + SHEET_EXPANDED) / 2;
-        const currentY = lastSheetY.current + gestureState.dy;
-
-        moveSheet(currentY < middle ? SHEET_EXPANDED : SHEET_COLLAPSED);
-      },
-    }),
+  const sheetY = useRef(
+    new Animated.Value(SHEET_COLLAPSED),
   ).current;
-    
-  function toApiDate(date?: string | Date | null) {
-    if (!date) return undefined;
 
-    if (typeof date === 'string') {
-        return date;
-  }
-
-  return date.toISOString().split('T')[0];
-}
-
-  useEffect(() => {
-    async function loadResults() {
-      const session = await getSession();
-
-      if (!session?.accessToken) return;
-
-      // const data = await searchHomesApi(session.accessToken, {
-      //   city,
-      //   startDate: toApiDate(startDate),
-      //   endDate: toApiDate(endDate),
-      //   capacity,
-      // });
-      const data = searchHomesMock
-
-      setHomes(data);
-      setLoading(false);
+  function isHomeAvailable(
+    home: Home,
+    requestedStartDate?: string,
+    requestedEndDate?: string,
+  ) {
+    if (!requestedStartDate || !requestedEndDate) {
+      return true;
     }
 
-    loadResults();
-  }, [city, startDate, endDate, capacity]);
+    return (
+      home.availabilities?.some((availability) => {
+        if (availability.type !== 'AVAILABLE') {
+          return false;
+        }
 
-  const firstHome = homes.find((home) => home.latitude && home.longitude);
+        return (
+          availability.startDate <= requestedStartDate &&
+          availability.endDate >= requestedEndDate
+        );
+      }) ?? false
+    );
+  }
 
-  const region = {
-    latitude: firstHome?.latitude ?? 37.7749,
-    longitude: firstHome?.longitude ?? -122.4194,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  };
+  useEffect(() => {
+    async function loadHomes() {
+      setLoading(true);
+
+      try {
+        /*
+        ===== VERSION API =====
+
+        const session = await getSession();
+
+        if (!session?.accessToken) {
+          return;
+        }
+
+        const data = await searchHomesApi(session.accessToken, {
+          city,
+          startDate,
+          endDate,
+          capacity,
+        });
+
+        setHomes(data);
+
+        */
+
+        // ===== VERSION MOCK =====
+
+        const searchedCity = city
+          ?.split(',')[0]
+          ?.trim()
+          .toLowerCase();
+
+        const filteredHomes = (searchHomesMock as Home[]).filter((home) => {
+          const matchesCity =
+            !searchedCity ||
+            home.city.trim().toLowerCase() === searchedCity;
+
+          const matchesCapacity =
+            !capacity ||
+            home.capacity >= capacity;
+
+          const matchesAvailability = isHomeAvailable(
+            home,
+            startDate,
+            endDate,
+          );
+
+          return (
+            matchesCity &&
+            matchesCapacity &&
+            matchesAvailability
+          );
+        });
+
+        setHomes(filteredHomes);
+      } catch (error) {
+        console.log('Search homes error:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadHomes();
+  }, [city, capacity, startDate, endDate]);
+
+  const moveSheet = useCallback(
+    (position: number) => {
+      Animated.spring(sheetY, {
+        toValue: position,
+        useNativeDriver: true,
+        tension: 55,
+        friction: 10,
+      }).start();
+    },
+    [sheetY],
+  );
+
+  const centerCamera = useCallback(
+    (home: Home, zoomLevel = 14) => {
+      if (
+        typeof home.longitude !== 'number' ||
+        typeof home.latitude !== 'number'
+      ) {
+        return;
+      }
+
+      cameraRef.current?.setCamera({
+        centerCoordinate: [
+          home.longitude,
+          home.latitude,
+        ],
+        zoomLevel,
+        animationMode: 'flyTo',
+        animationDuration: 550,
+      });
+    },
+    [],
+  );
+
+  function handleSelectMarker(
+    home: Home,
+    index: number,
+  ) {
+    setSelectedHomeId(home.id);
+    centerCamera(home);
+    moveSheet(SHEET_COLLAPSED);
+
+    listRef.current?.scrollToIndex({
+      index,
+      animated: true,
+      viewPosition: 0,
+    });
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.iconButton} onPress={() => navigation.goBack()}>
-          <ArrowLeft size={20} color="#111" />
-        </TouchableOpacity>
+      <SearchResultsHeader
+        title={city || 'Résultats'}
+        onBack={() => navigation.goBack()}
+        onOpenFilters={() => {
+          console.log('Ouvrir les filtres');
+        }}
+      />
 
-        <Text style={styles.title}>{city}</Text>
+      <SearchResultsMap
+        homes={homes}
+        selectedHomeId={selectedHomeId}
+        cameraRef={cameraRef}
+        onSelectHome={handleSelectMarker}
+        onClearSelection={() =>
+          setSelectedHomeId(null)
+        }
+      />
 
-        <TouchableOpacity style={styles.iconButton}>
-          <SlidersHorizontal size={18} color="#111" />
-        </TouchableOpacity>
-      </View>
-
-      <MapView style={styles.map} initialRegion={region}>
-        {homes
-          .filter((home) => home.latitude && home.longitude)
-          .map((home) => (
-            <Marker
-              key={home.id}
-              coordinate={{
-                latitude: home.latitude!,
-                longitude: home.longitude!,
-              }}
-              onPress={() => console.log(`Marker pressed: ${home.title}`)}
-            />
-          ))}
-      </MapView>
-      
-      <Animated.View
-        style={[
-          styles.sheet,
-          {
-            transform: [{ translateY: sheetY }],
-          },
-        ]}
-      >
-        <View style={styles.handleContainer} {...panResponder.panHandlers}>
-          <View style={styles.dragBar} />
-          <Text style={styles.resultsCount}>{homes.length} Résultats</Text>
-        </View>
-
-        {loading ? (
-          <ActivityIndicator style={{ marginTop: 20 }} />
-        ) : (
-            <Animated.ScrollView
-              contentContainerStyle={styles.results}
-              showsVerticalScrollIndicator={false}
-            >
-            {homes.map((home) => (
-              <SearchResultCard
-                key={home.id}
-                home={home}
-                onPress={() => console.log("home detail")}
-              />
-            ))}
-          </Animated.ScrollView>
-        )}
-      </Animated.View>
+      <SearchResultsSheet
+        homes={homes}
+        loading={loading}
+        selectedHomeId={selectedHomeId}
+        sheetY={sheetY}
+        listRef={listRef}
+        collapsedPosition={SHEET_COLLAPSED}
+        expandedPosition={SHEET_EXPANDED}
+        onMoveSheet={moveSheet}
+        onVisibleHomeChange={(home) => {
+          setSelectedHomeId(home.id);
+          centerCamera(home, 13.5);
+        }}
+        onPressHome={(home) => {
+          navigation.navigate('HomeDetails', {
+            homeId: home.id,
+          });
+        }}
+      />
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  header: {
-    height: 64,
-    paddingHorizontal: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 2,
-  },
-  title: {
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  map: {
-    flex: 1,
-    width: '100%',
-  },
-  sheet: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    overflow: 'hidden',
-  },
-  handleContainer: {
-    paddingTop: 8,
-    paddingBottom: 8,
-  },
-  dragBar: {
-    alignSelf: 'center',
-    marginTop: 8,
-    width: 48,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#111',
-  },
-  resultsCount: {
-    textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 10,
-    fontSize: 12,
-    color: '#555',
-  },
-  results: {
-    paddingHorizontal: 10,
-    paddingBottom: 100,
-  },
-  card: {
-    marginBottom: 18,
-  },
-  image: {
-    width: '100%',
-    height: 300,
-    borderRadius: 14,
-  },
-  cardTitle: {
-    marginTop: 8,
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  location: {
-    marginTop: 2,
-    fontSize: 12,
-    color: '#555',
-  },
-  metaRow: {
-    marginTop: 2,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  meta: {
-    fontSize: 12,
-    color: '#444',
-  },
-  rating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: 12,
-    fontWeight: '700',
   },
 });

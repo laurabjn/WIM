@@ -51,9 +51,6 @@ export function SearchResultCard({ home, onPress }: Props) {
 
         <View style={styles.bottomRow}>
           <Text style={styles.available}>{t('available')}</Text>
-          <Text style={styles.price}>
-            ✈ {t('price')} {home.pricePerNight ?? 560}€
-          </Text>
         </View>
       </View>
     </TouchableOpacity>

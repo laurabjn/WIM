@@ -7,9 +7,12 @@ export type SearchStackParamList = {
     };
   SearchResults: {
     city: string;
-    startDate: Date | null;
-    endDate: Date | null;
+    startDate?: string;
+    endDate?: string;
     capacity: number | undefined;
   };
   Swipe: undefined;
+  HomeDetails: {
+    homeId: string;
+  };
 };
