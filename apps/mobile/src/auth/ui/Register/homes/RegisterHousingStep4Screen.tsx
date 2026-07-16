@@ -14,8 +14,9 @@ import { Stepper } from '../../components/Stepper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NumberChip } from 'src/profile/ui/components/NumberChip';
 import { createHome } from 'src/home/infrastructure/home.api';
-import { uploadHomePhotos } from 'src/auth/infrastructure/upload/uploadHomeImage';
+import { uploadHomeImage, UploadPhoto } from 'src/auth/infrastructure/upload/uploadHomeImage';
 import { getSession } from 'src/auth/infrastructure/authStorage';
+import { HomePhoto } from '@wim/shared/home/home.type';
 
 type Props = NativeStackScreenProps<AuthStackParamList,'RegisterHousingStep4'>;
 
@@ -51,6 +52,26 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
       travelersCount !== undefined && travelersCount > 0
     );
   }, [travelersCount]);
+
+  async function uploadHomePhotos(
+    token: string,
+    homeId: string,
+    photos: UploadPhoto[],
+  ): Promise<HomePhoto[]> {
+    const uploadedPhotos: HomePhoto[] = [];
+
+    for (const photo of photos) {
+      const uploadedPhoto = await uploadHomeImage(
+        token,
+        homeId,
+        photo,
+      );
+
+      uploadedPhotos.push(uploadedPhoto);
+    }
+
+    return uploadedPhotos;
+  }
 
   async function handleContinue() {
     setError(null);
@@ -90,8 +111,13 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
       console.log('Home created successfully:', createdHome);
       console.log('photos to upload:', photos);
 
-      const uploadedPhotos = await uploadHomePhotos(token!, createdHome.id, photos);
-      console.log('Uploaded photos:', uploadedPhotos);
+      if (photos.length > 0) {
+        await uploadHomePhotos(
+          token,
+          createdHome.id,
+          photos,
+        );
+      }
 
       navigation.navigate('RegisterWelcome');
     } catch (err) {

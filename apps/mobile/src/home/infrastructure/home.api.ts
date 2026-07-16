@@ -58,7 +58,7 @@ console.log('AUTH HEADER:', `Bearer ${token}`);
     },
     body: JSON.stringify(homeData),
   });
-    
+    console.log(response)
   if (!response.ok) {
     const text = await response.text();
     console.log('Create home API error:', response.status, text);

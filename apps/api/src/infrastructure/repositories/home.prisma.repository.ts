@@ -88,7 +88,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
       isAvailableForExchange: home.isAvailableForExchange ?? false,
       pricePerNight: home.pricePerNight ?? null,
       averageRating: home.averageRating ?? null,
-      reviewCount: home.reviewsCount ?? 0,
+      reviewsCount: home.reviewsCount ?? 0,
       carExchangeAccepted: home.carExchangeAccepted ?? false,
       photos: home.photos.map((photo) => this.mapPhoto(photo)),
       createdAt: home.createdAt,
@@ -119,7 +119,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
         isAvailableForExchange: data.isAvailableForExchange,
         pricePerNight: data.pricePerNight,
         averageRating: data.averageRating,
-        reviewCount: data.reviewCount,
+        reviewsCount: data.reviewCount,
         carExchangeAccepted: data.carExchangeAccepted,
 
         vehicle:

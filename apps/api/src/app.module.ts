@@ -10,6 +10,7 @@ import { HomeAvailabilityModule } from './interfaces/http/modules/home-availabil
 import { ExchangeModule } from './interfaces/http/modules/exchange.module';
 import { FavoriteModule } from './interfaces/http/modules/favorite.module';
 import { SwipeModule } from './interfaces/http/modules/swipe.module';
+import { LocationModule } from './interfaces/http/modules/location.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { SwipeModule } from './interfaces/http/modules/swipe.module';
     HomeAvailabilityModule,
     ExchangeModule,
     FavoriteModule,
-    SwipeModule
+    SwipeModule,
+    LocationModule
   ],
 })
 export class AppModule {}

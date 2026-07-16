@@ -1,3 +1,5 @@
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
+
 export type LocationDescription = {
   title: string;
   description: string;
@@ -5,60 +7,33 @@ export type LocationDescription = {
   pageUrl?: string;
 };
 
-type WikipediaSummaryResponse = {
-  title?: string;
-  description?: string;
-  extract?: string;
-  content_urls?: {
-    mobile?: {
-      page?: string;
-    };
-    desktop?: {
-      page?: string;
-    };
-  };
-};
-
 export async function getLocationDescription(
   city: string,
+  latitude?: number | null,
+  longitude?: number | null,
   language = 'fr',
 ): Promise<LocationDescription | null> {
-  const normalizedCity = city.trim();
+  const params = new URLSearchParams({
+    language,
+  });
 
-  if (!normalizedCity) {
-    return null;
+  if (typeof latitude === 'number') {
+    params.append('latitude', String(latitude));
   }
 
-  const encodedCity = encodeURIComponent(normalizedCity);
+  if (typeof longitude === 'number') {
+    params.append('longitude', String(longitude));
+  }
 
   const response = await fetch(
-    `https://${language}.wikipedia.org/api/rest_v1/page/summary/${encodedCity}`,
-    {
-      headers: {
-        Accept: 'application/json',
-      },
-    },
+    `${API_URL}/locations/${encodeURIComponent(
+      city,
+    )}/description?${params.toString()}`,
   );
 
-  if (response.status === 404) {
+  if (!response.ok) {
     return null;
   }
 
-  const data =
-    (await response.json().catch(() => null)) as
-      | WikipediaSummaryResponse
-      | null;
-
-  if (!response.ok || !data?.extract) {
-    return null;
-  }
-
-  return {
-    title: data.title ?? normalizedCity,
-    description: data.description ?? '',
-    extract: data.extract,
-    pageUrl:
-      data.content_urls?.mobile?.page ??
-      data.content_urls?.desktop?.page,
-  };
+  return response.json();
 }

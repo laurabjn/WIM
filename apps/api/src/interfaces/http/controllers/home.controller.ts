@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -99,7 +100,7 @@ export class HomeController {
       isAvailableForExchange: dto.isAvailableForExchange ?? false,
       pricePerNight: dto.pricePerNight,
       averageRating: null,
-      reviewCount: 0,
+      reviewsCount: 0,
       carExchangeAccepted: dto.carExchangeAccepted ?? false,
       vehicle: dto.carExchangeAccepted ? dto.vehicle ?? null : null,
     });
@@ -124,7 +125,7 @@ export class HomeController {
         isAvailableForExchange: dto.isAvailableForExchange ?? false,
         pricePerNight: dto.pricePerNight,
         averageRating: null,
-        reviewCount: 0,
+        reviewsCount: 0,
         
         carExchangeAccepted: dto.carExchangeAccepted ?? false,
 
@@ -212,8 +213,14 @@ export class HomeController {
   uploadPhoto(
     @Param('id') id: string,
     @Req() req: any,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
+    if (!file) {
+      throw new BadRequestException(
+        'Aucun fichier image reçu',
+      );
+    }
+
     return this.addHomePhotoUseCase.execute({
       homeId: id,
       requesterId: req.user.sub,

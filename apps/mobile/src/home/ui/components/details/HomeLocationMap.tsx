@@ -46,7 +46,7 @@ export function HomeLocationMap({ home }: Props) {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadLocationDescription() {
+    async function loadDescription() {
       if (!home.city) {
         setLocationDescription(null);
         return;
@@ -57,8 +57,12 @@ export function HomeLocationMap({ home }: Props) {
 
         const data = await getLocationDescription(
           home.city,
+          home.latitude,
+          home.longitude,
           'fr',
         );
+
+        console.log('LOCATION DESCRIPTION', data);
 
         if (!cancelled) {
           setLocationDescription(data);
@@ -79,7 +83,7 @@ export function HomeLocationMap({ home }: Props) {
       }
     }
 
-    loadLocationDescription();
+    loadDescription();
 
     return () => {
       cancelled = true;
