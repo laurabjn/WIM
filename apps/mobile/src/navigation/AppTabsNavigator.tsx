@@ -7,11 +7,14 @@ import {
 import {
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { AppTabsParamList } from './type/appTabs';
 import { ProfileStackNavigator } from './ProfileStack';
 import { useTranslation } from 'react-i18next';
 import { CustomTabBar } from './components/CustomTabBar';
 import { ExchangesScreen } from 'src/home/ui/ExchangesScreen';
+import { SearchStackNavigator } from './SearchStack';
+import { SearchOnlyStackNavigator } from './SearchOnlyStack';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
@@ -36,11 +39,22 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
         headerShown: false,
         tabBarHideOnKeyboard: true,
       }}
-      tabBar={(props) => <CustomTabBar {...props} />}
+      tabBar={(props) => {
+        const route = props.state.routes[props.state.index];
+
+        const routeName =
+          getFocusedRouteNameFromRoute(route) ?? route.name;
+
+        if (routeName === 'Swipe') {
+          return null;
+        }
+
+        return <CustomTabBar {...props} />;
+      }}
     >
       <Tab.Screen
         name="HomeTab"
-        component={TestScreen}
+        component={SearchStackNavigator}
         options={{
           title: t('home'),
         }}
@@ -54,11 +68,12 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
       />
       <Tab.Screen
         name="SearchTab"
-        component={TestScreen}
         options={{
           title: t('search'),
         }}
-      />
+      >
+        {() => <SearchOnlyStackNavigator />}
+      </Tab.Screen>
       <Tab.Screen
         name="MessagesTab"
         component={TestScreen}

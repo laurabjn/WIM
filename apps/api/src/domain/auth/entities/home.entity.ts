@@ -54,7 +54,7 @@ export interface HomeEntity {
   isAvailableForExchange: boolean;
   pricePerNight?: number | null;
   averageRating?: number | null;
-  reviewCount: number;
+  reviewsCount: number;
   carExchangeAccepted: boolean;
   photos: HomePhotoEntity[];
   vehicle?: VehicleEntity | null;

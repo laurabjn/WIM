@@ -1,4 +1,8 @@
-export type AvailabilityType = 'AVAILABLE' | 'BLOCKED';
+type AvailabilityType =
+  | 'AVAILABLE'
+  | 'BLOCKED'
+  | 'PENDING_EXCHANGE'
+  | 'CONFIRMED_EXCHANGE';
 
 export type HomeAvailability = {
   id: string;

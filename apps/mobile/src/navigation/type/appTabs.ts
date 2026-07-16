@@ -4,4 +4,5 @@ export type AppTabsParamList = {
   SearchTab: undefined;
   MessagesTab: undefined;
   ProfileTab: undefined;
+  SwipeTab: undefined;
 };
