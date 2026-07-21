@@ -35,6 +35,7 @@ model User {
 
   swipesMade     Swipe[] @relation("SwipesMade")
   swipesReceived Swipe[] @relation("SwipesReceived")
+  searchHistory  SearchHistory[]
 
   matchesAsUser1 Match[] @relation("MatchesAsUser1")
   matchesAsUser2 Match[] @relation("MatchesAsUser2")
@@ -76,6 +77,7 @@ model Home {
   exchanges      Exchange[]
 
   vehicle Vehicle?
+  swipes Swipe[]
 
   @@index([city, country])
   @@index([latitude, longitude])
@@ -198,13 +200,31 @@ model Swipe {
   id           String         @id @default(uuid())
   swiperId     String
   targetUserId String
+  homeId       String
   direction    SwipeDirection
   createdAt    DateTime       @default(now())
 
   swiper     User @relation("SwipesMade", fields: [swiperId], references: [id])
   targetUser User @relation("SwipesReceived", fields: [targetUserId], references: [id])
 
+  home       Home @relation(fields: [homeId],references: [id],onDelete: Cascade)
+
   @@unique([swiperId, targetUserId])
+}
+
+model SearchHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  city      String?
+  country   String?
+  latitude  Float?
+  longitude Float?
+  capacity  Int?
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime @default(now())
+
+  user      User @relation(fields: [userId],references: [id],onDelete: Cascade)
 }
 
 model Match {

@@ -4,7 +4,7 @@ import { SearchScreen } from "src/search/ui/SearchScreen";
 import { SearchStackParamList } from "./type/searchTabs";
 import { View, Text } from 'react-native';
 import { SearchResultsScreen } from "src/search/ui/SearchResultsScreen";
-import { SwipeHomeScreen } from "src/swipe/ui/SwipeHomeScreen";
+import { SwipeHomeScreen } from "src/swipe/infrastructure/SwipeHomeScreen";
 import { MenuScreen } from "src/menu/ui/MenuScreen";
 import { HomeDetailsScreen } from "src/home/ui/HomeDetailScreen";
 

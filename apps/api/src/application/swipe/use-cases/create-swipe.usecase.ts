@@ -1,46 +1,79 @@
 import {
   CreateSwipeInput,
-  SwipeRepository
-} from "src/domain/auth/repositories/swipe.repository";
+  SwipeRepository,
+} from 'src/domain/auth/repositories/swipe.repository';
 
 export class CreateSwipeUseCase {
-  constructor(private readonly swipeRepository: SwipeRepository) {}
+  constructor(
+    private readonly swipeRepository:
+      SwipeRepository,
+  ) {}
 
-  async execute(input: CreateSwipeInput) {
-    if (input.swiperId === input.targetUserId) {
-      throw new Error('Vous ne pouvez pas vous swiper vous-même');
+  async execute(
+    input: CreateSwipeInput,
+  ) {
+    if (
+      input.swiperId ===
+      input.targetUserId
+    ) {
+      throw new Error(
+        'Vous ne pouvez pas vous swiper vous-même',
+      );
     }
 
-    await this.swipeRepository.create(input);
+    const homeBelongsToTarget =
+      await this.swipeRepository.homeBelongsToUser(
+        input.homeId,
+        input.targetUserId,
+      );
 
-    if (input.direction === 'DISLIKE') {
+    if (!homeBelongsToTarget) {
+      throw new Error(
+        'Le logement ne correspond pas à cet utilisateur',
+      );
+    }
+
+    const swipe =
+      await this.swipeRepository.create(
+        input,
+      );
+
+    if (
+      input.direction ===
+      'DISLIKE'
+    ) {
       return {
         success: true,
+        swipeId: swipe.id,
         match: false,
         matchId: null,
       };
     }
 
-    const reciprocalLike = await this.swipeRepository.hasLike(
-      input.targetUserId,
-      input.swiperId,
-    );
+    const reciprocalLike =
+      await this.swipeRepository.hasLike(
+        input.targetUserId,
+        input.swiperId,
+      );
 
     if (!reciprocalLike) {
       return {
         success: true,
+        swipeId: swipe.id,
         match: false,
         matchId: null,
       };
     }
 
-    const match = await this.swipeRepository.createMatch(
-      input.swiperId,
-      input.targetUserId,
-    );
+    const match =
+      await this.swipeRepository.createMatch(
+        input.swiperId,
+        input.targetUserId,
+      );
 
     return {
       success: true,
+      swipeId: swipe.id,
       match: true,
       matchId: match.id,
     };

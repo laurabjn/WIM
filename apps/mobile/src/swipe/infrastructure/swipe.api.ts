@@ -8,28 +8,102 @@ export type SwipeResponse = {
   matchId: string | null;
 };
 
-export async function createSwipeApi(
-  token: string,
-  targetUserId: string,
-  direction: SwipeDirection,
-): Promise<SwipeResponse> {
-  const response = await fetch(`${API_URL}/swipes`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      targetUserId,
-      direction,
-    }),
-  });
+export type SwipeApiResult = {
+  swipe: {
+    id: string;
+    swiperId: string;
+    targetUserId: string;
+    homeId: string;
+    direction: SwipeDirection;
+    createdAt: string;
+  };
 
-  const data = await response.json().catch(() => null);
+  match: boolean;
+  matchId: string | null;
+};
+
+export type SwipeRecommendation = {
+  id: string;
+  ownerId: string;
+  title: string;
+  description: string;
+  city: string;
+  country: string;
+  latitude: number | null;
+  longitude: number | null;
+  capacity: number;
+  homeType: string;
+  amenities: string[];
+  carExchangeAccepted: boolean;
+
+  photos: Array<{
+    id: string;
+    url: string;
+    position: number;
+  }>;
+
+  recommendationScore?: number;
+};
+
+export async function getSwipeRecommendationsApi(
+  accessToken: string,
+  limit = 20,
+): Promise<SwipeRecommendation[]> {
+  const response = await fetch(
+    `${API_URL}/swipes/recommendations?limit=${limit}`,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${accessToken}`,
+        Accept: 'application/json',
+      },
+    },
+  );
 
   if (!response.ok) {
-    throw new Error(data?.message ?? 'Erreur lors du swipe');
+    const body = await response.text();
+
+    throw new Error(
+      `Recommendation error ${response.status}: ${body}`,
+    );
   }
 
-  return data;
+  const data = await response.json();
+
+  return data.results;
+}
+
+export async function createSwipeApi(
+  token: string,
+  homeId: string,
+  direction: SwipeDirection,
+): Promise<SwipeApiResult> {
+  const response = await fetch(
+    `${API_URL}/swipes`,
+    {
+      method: 'POST',
+
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+        'Content-Type':
+          'application/json',
+      },
+
+      body: JSON.stringify({
+        homeId,
+        direction,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const body = await response.text();
+
+    throw new Error(
+      `Swipe error ${response.status}: ${body}`,
+    );
+  }
+
+  return response.json();
 }

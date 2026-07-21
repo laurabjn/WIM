@@ -1,21 +1,25 @@
 import React, { useRef, useState } from 'react';
 import {
   Animated,
+  Dimensions,
   Image,
-  Modal,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   PanResponder,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Dimensions,
 } from 'react-native';
-import { Star, X } from 'lucide-react-native';
+import { Star } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+const CARD_HORIZONTAL_PADDING = 18;
+const CAROUSEL_WIDTH =
+  SCREEN_WIDTH - CARD_HORIZONTAL_PADDING * 2;
 
 type Props = {
   home: any;
@@ -23,11 +27,20 @@ type Props = {
   onDislike: () => void;
 };
 
-export function SwipeHomeCard({ home, onLike, onDislike }: Props) {
-  const { t } = useTranslation(["profile", "swipe"])
-  const [carouselVisible, setCarouselVisible] = useState(false);
+export function SwipeHomeCard({
+  home,
+  onLike,
+  onDislike,
+}: Props) {
+  const { t } = useTranslation(['profile', 'swipe']);
 
-  const translateX = useRef(new Animated.Value(0)).current;
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [isCarouselDragging, setIsCarouselDragging] =
+    useState(false);
+
+  const translateX = useRef(
+    new Animated.Value(0),
+  ).current;
 
   const rotate = translateX.interpolate({
     inputRange: [-200, 0, 200],
@@ -48,7 +61,17 @@ export function SwipeHomeCard({ home, onLike, onDislike }: Props) {
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 12,
+      onMoveShouldSetPanResponder: (_, gesture) => {
+        if (isCarouselDragging) {
+          return false;
+        }
+
+        return (
+          Math.abs(gesture.dx) > 12 &&
+          Math.abs(gesture.dx) >
+            Math.abs(gesture.dy)
+        );
+      },
 
       onPanResponderMove: (_, gesture) => {
         translateX.setValue(gesture.dx);
@@ -64,6 +87,7 @@ export function SwipeHomeCard({ home, onLike, onDislike }: Props) {
             translateX.setValue(0);
             onLike();
           });
+
           return;
         }
 
@@ -76,9 +100,19 @@ export function SwipeHomeCard({ home, onLike, onDislike }: Props) {
             translateX.setValue(0);
             onDislike();
           });
+
           return;
         }
 
+        Animated.spring(translateX, {
+          toValue: 0,
+          useNativeDriver: true,
+          tension: 60,
+          friction: 8,
+        }).start();
+      },
+
+      onPanResponderTerminate: () => {
         Animated.spring(translateX, {
           toValue: 0,
           useNativeDriver: true,
@@ -86,110 +120,264 @@ export function SwipeHomeCard({ home, onLike, onDislike }: Props) {
       },
     }),
   ).current;
-  
-  return (
-    <>
-      <Animated.View
-        {...panResponder.panHandlers}
-        style={[
-          styles.card,
+
+  function handleCarouselScrollEnd(
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) {
+    const nextIndex = Math.round(
+      event.nativeEvent.contentOffset.x /
+        CAROUSEL_WIDTH,
+    );
+
+    setPhotoIndex(nextIndex);
+    setIsCarouselDragging(false);
+  }
+
+  const photos =
+    home.photos?.length > 0
+      ? home.photos
+      : [
           {
-            transform: [{ translateX }, { rotate }],
+            id: 'fallback',
+            url: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233',
           },
-        ]}
-      >
-        <TouchableOpacity activeOpacity={0.95} onPress={() => setCarouselVisible(true)}>
-          <Image source={{ uri: home.photos[0].url }} style={styles.image} />
-        </TouchableOpacity>
+        ];
 
-        <View style={styles.avatar}>
-          <Image source={{ uri: home.photos[1]?.url ?? home.photos[0].url }} style={styles.avatarImage} />
-        </View>
-
-        <Animated.View style={[styles.swipeBadge, styles.likeBadge, { opacity: likeOpacity }]}>
-          <Text style={styles.likeText}>✓</Text>
-        </Animated.View>
-
-        <Animated.View style={[styles.swipeBadge, styles.dislikeBadge, { opacity: dislikeOpacity }]}>
-          <Text style={styles.dislikeText}>×</Text>
-        </Animated.View>
-
-        <View style={styles.infoRow}>
-          <View style={styles.left}>
-            <Text style={styles.title}>{home.title} 🔵</Text>
-            <Text style={styles.location}>{home.city}, {home.country}</Text>
-            <Text style={styles.meta}>
-              {home.bedrooms} {t('profile:bedrooms')} • {home.beds} {t('profile:beds')}
-            </Text>
-          </View>
-
-          <View style={styles.rating}>
-            <Star size={15} color="#111" fill="#111" />
-            <Text style={styles.ratingText}>
-              {home.averageRating} ({home.reviewsCount})
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.statusRow}>
-          <Text style={styles.available}>{t('profile:available')}</Text>
-          <Text style={styles.price}>✈ {t('profile:price')} {home.pricePerNight}€</Text>
-        </View>
-
-      <View style={styles.tags}>
-        {home.amenities.map((tag: string, index: number) => (
-          <LinearGradient
-            key={tag}
-            colors={['#FFF176', '#FFD84D']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[
-              styles.tag,
-              index === 5 && {
-                marginLeft: 35,
+  return (
+    <Animated.View
+      {...panResponder.panHandlers}
+      style={[
+        styles.card,
+        {
+          transform: [
+            { translateX },
+            { rotate },
+          ],
+        },
+      ]}
+    >
+      <View style={styles.carouselContainer}>
+        <ScrollView
+          horizontal
+          pagingEnabled
+          nestedScrollEnabled
+          showsHorizontalScrollIndicator={false}
+          scrollEventThrottle={16}
+          onTouchStart={() =>
+            setIsCarouselDragging(true)
+          }
+          onMomentumScrollEnd={
+            handleCarouselScrollEnd
+          }
+          onScrollEndDrag={() => {
+            setTimeout(() => {
+              setIsCarouselDragging(false);
+            }, 80);
+          }}
+        >
+          {photos.map(
+            (
+              photo: {
+                id?: string;
+                url: string;
               },
-            ]}
-          >
-            <Text style={styles.tagText}>{tag}</Text>
-          </LinearGradient>
-        ))}
-      </View>
-      </Animated.View>
-
-      <Modal visible={carouselVisible} animationType="slide" transparent={false}>
-        <View style={styles.modal}>
-          <TouchableOpacity style={styles.closeButton} onPress={() => setCarouselVisible(false)}>
-            <X size={26} color="#111" />
-          </TouchableOpacity>
-
-          <ScrollView
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-          >
-            {home.photos.map((photo: { url: string }, index: number) => (
+              index: number,
+            ) => (
               <Image
-                key={`${photo.url}-${index}`}
+                key={
+                  photo.id ??
+                  `${photo.url}-${index}`
+                }
                 source={{ uri: photo.url }}
                 style={styles.carouselImage}
               />
-            ))}
-          </ScrollView>
+            ),
+          )}
+        </ScrollView>
+
+        {photos.length > 1 && (
+          <View style={styles.pagination}>
+            {photos.map(
+              (
+                _: unknown,
+                index: number,
+              ) => (
+                <View
+                  key={`dot-${index}`}
+                  style={[
+                    styles.paginationDot,
+                    index === photoIndex &&
+                      styles.paginationDotActive,
+                  ]}
+                />
+              ),
+            )}
+          </View>
+        )}
+
+        <View style={styles.photoCounter}>
+          <Text style={styles.photoCounterText}>
+            {photoIndex + 1}/{photos.length}
+          </Text>
         </View>
-      </Modal>
-    </>
+      </View>
+
+      <View style={styles.avatar}>
+        <Image
+          source={{
+            uri:
+              home.owner?.avatarUrl ??
+              photos[1]?.url ??
+              photos[0].url,
+          }}
+          style={styles.avatarImage}
+        />
+      </View>
+
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.swipeBadge,
+          styles.likeBadge,
+          {
+            opacity: likeOpacity,
+          },
+        ]}
+      >
+        <Text style={styles.likeText}>✓</Text>
+      </Animated.View>
+
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.swipeBadge,
+          styles.dislikeBadge,
+          {
+            opacity: dislikeOpacity,
+          },
+        ]}
+      >
+        <Text style={styles.dislikeText}>
+          ×
+        </Text>
+      </Animated.View>
+
+      <View style={styles.infoRow}>
+        <View style={styles.left}>
+          <Text style={styles.title}>
+            {home.title} 🔵
+          </Text>
+
+          <Text style={styles.location}>
+            {home.city}, {home.country}
+          </Text>
+
+          <Text style={styles.meta}>
+            {home.bedrooms}{' '}
+            {t('profile:bedrooms')} •{' '}
+            {home.beds} {t('profile:beds')}
+          </Text>
+        </View>
+
+        <View style={styles.rating}>
+          <Star
+            size={15}
+            color="#111"
+            fill="#111"
+          />
+
+          <Text style={styles.ratingText}>
+            {home.averageRating} (
+            {home.reviewsCount})
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.statusRow}>
+        <Text style={styles.available}>
+          {t('profile:available')}
+        </Text>
+      </View>
+
+      <View style={styles.tags}>
+        {home.amenities.map(
+          (tag: string) => (
+            <LinearGradient
+              key={tag}
+              colors={['#FFF176', '#FFD84D']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.tag}
+            >
+              <Text style={styles.tagText}>
+                {tag}
+              </Text>
+            </LinearGradient>
+          ),
+        )}
+      </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    paddingHorizontal: 18,
+    paddingHorizontal:
+      CARD_HORIZONTAL_PADDING,
     paddingBottom: 240,
   },
-  image: {
-    width: '100%',
+  carouselContainer: {
+    width: CAROUSEL_WIDTH,
     height: 370,
     borderRadius: 22,
+    overflow: 'hidden',
+    backgroundColor: '#EEEEEE',
+  },
+  carouselImage: {
+    width: CAROUSEL_WIDTH,
+    height: 370,
+    resizeMode: 'cover',
+  },
+  pagination: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 5,
+  },
+  paginationDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor:
+      'rgba(255,255,255,0.55)',
+  },
+  paginationDotActive: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+  },
+  photoCounter: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    minWidth: 42,
+    height: 26,
+    borderRadius: 13,
+    paddingHorizontal: 9,
+    backgroundColor:
+      'rgba(0,0,0,0.48)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoCounterText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
   },
   avatar: {
     position: 'absolute',
@@ -199,9 +387,9 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 29,
     borderWidth: 4,
-    borderColor: '#fff',
+    borderColor: '#FFFFFF',
     overflow: 'hidden',
-    backgroundColor: '#eee',
+    backgroundColor: '#EEEEEE',
   },
   avatarImage: {
     width: '100%',
@@ -219,17 +407,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: '900',
-    color: '#111',
+    color: '#111111',
   },
   location: {
     marginTop: 3,
     fontSize: 14,
-    color: '#555',
+    color: '#555555',
   },
   meta: {
     marginTop: 3,
     fontSize: 14,
-    color: '#333',
+    color: '#333333',
   },
   rating: {
     flexDirection: 'row',
@@ -240,7 +428,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 15,
     fontWeight: '800',
-    color: '#111',
+    color: '#111111',
   },
   statusRow: {
     marginTop: 18,
@@ -250,7 +438,7 @@ const styles = StyleSheet.create({
   },
   available: {
     backgroundColor: '#41D086',
-    color: '#fff',
+    color: '#FFFFFF',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 10,
@@ -260,7 +448,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#111',
+    color: '#111111',
   },
   tags: {
     marginTop: 18,
@@ -268,11 +456,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     columnGap: 6,
     rowGap: 5,
-    paddingHorizontal: 20,
   },
   tag: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -284,37 +471,19 @@ const styles = StyleSheet.create({
     color: '#3D2A00',
     textAlign: 'center',
   },
-  modal: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  closeButton: {
-    position: 'absolute',
-    zIndex: 10,
-    top: 50,
-    right: 20,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  carouselImage: {
-    width: SCREEN_WIDTH,
-    height: '100%',
-    resizeMode: 'contain',
-  },
   swipeBadge: {
     position: 'absolute',
-    top: 150,
-    alignSelf: 'center',
+    top: 135,
+    left: '50%',
+    marginLeft: -55,
     width: 110,
     height: 110,
     borderRadius: 55,
-    backgroundColor: 'rgba(255,255,255,0.75)',
+    backgroundColor:
+      'rgba(255,255,255,0.78)',
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 20,
   },
   likeText: {
     fontSize: 72,

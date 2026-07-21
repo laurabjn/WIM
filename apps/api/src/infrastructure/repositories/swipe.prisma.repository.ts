@@ -1,13 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
-import { SwipeRepository, CreateSwipeInput } from 'src/domain/auth/repositories/swipe.repository';
+import {
+  SwipeRepository,
+  CreateSwipeInput,
+  SwipeRecord,
+  MatchRecord
+} from 'src/domain/auth/repositories/swipe.repository';
 
 @Injectable()
 export class SwipePrismaRepository implements SwipeRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(input: CreateSwipeInput): Promise<void> {
-    await this.prisma.swipe.upsert({
+  async create(input: CreateSwipeInput): Promise<SwipeRecord> {
+    return this.prisma.swipe.upsert({
       where: {
         swiperId_targetUserId: {
           swiperId: input.swiperId,
@@ -21,12 +26,12 @@ export class SwipePrismaRepository implements SwipeRepository {
     });
   }
 
-  async hasLike(fromUserId: string, toUserId: string): Promise<boolean> {
+  async hasLike(swiperId: string, targetUserId: string): Promise<boolean> {
     const swipe = await this.prisma.swipe.findUnique({
       where: {
         swiperId_targetUserId: {
-          swiperId: fromUserId,
-          targetUserId: toUserId,
+          swiperId: swiperId,
+          targetUserId: targetUserId,
         },
       },
     });
@@ -34,8 +39,8 @@ export class SwipePrismaRepository implements SwipeRepository {
     return swipe?.direction === 'LIKE';
   }
 
-  async createMatch(userAId: string, userBId: string): Promise<{ id: string }> {
-    const [user1Id, user2Id] = [userAId, userBId].sort();
+  async createMatch(firstUserId: string, secondUserId: string): Promise<MatchRecord> {
+    const [user1Id, user2Id] = [firstUserId, secondUserId].sort();
 
     return this.prisma.match.upsert({
       where: {
@@ -49,10 +54,26 @@ export class SwipePrismaRepository implements SwipeRepository {
         user1Id,
         user2Id,
         status: 'PENDING',
-      },
-      select: {
-        id: true,
-      },
+      }
     });
+  }
+
+  async homeBelongsToUser(
+    homeId: string,
+    userId: string,
+  ): Promise<boolean> {
+    const home =
+      await this.prisma.home.findFirst({
+        where: {
+          id: homeId,
+          ownerId: userId,
+        },
+
+        select: {
+          id: true,
+        },
+      });
+
+    return Boolean(home);
   }
 }

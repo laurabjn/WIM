@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import {
   Animated,
   StyleSheet,
@@ -7,31 +7,122 @@ import {
   View,
   PanResponder
 } from 'react-native';
-import { Info, X, Check } from 'lucide-react-native';
+import {
+  Info,
+  X,
+  Check
+} from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { swipeHomesMock } from '../infrastructure/mocks/swipeHomeMocks';
-import { SwipeHomeCard } from './components/SwipehomeCard';
+import { swipeHomesMock } from './mocks/swipeHomeMocks';
+import { SwipeHomeCard } from '../ui/components/SwipehomeCard';
 import { useTranslation } from 'react-i18next';
 import { getSession } from 'src/auth/infrastructure/authStorage';
-import { SwipeDirection, createSwipeApi } from '../infrastructure/swipe.api';
+import {
+  SwipeDirection,
+  SwipeRecommendation,
+  createSwipeApi,
+  getSwipeRecommendationsApi
+} from './swipe.api';
 import { SearchToggle } from 'src/menu/ui/components/SearchToggle';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { currentUserMock, reciprocalLikesMock } from '../infrastructure/mocks/matchesMocks';
-import { SwipeTopPreview } from './components/SwipeTopPreview';
+import {
+  currentUserMock,
+  reciprocalLikesMock
+} from './mocks/matchesMocks';
+import { SwipeTopPreview } from '../ui/components/SwipeTopPreview';
+import { SwipeMockRecommendationEngine } from './swipeRecommendationEngine';
+import {
+  RecommendationScenarioName,
+  recommendationScenarios
+} from './mocks/swipeRecommendationScenarioMock';
 
-type Props = NativeStackScreenProps<SearchStackParamList,'Swipe'>;
+type Props = NativeStackScreenProps<SearchStackParamList, 'Swipe'>;
 
 export function SwipeHomeScreen({ navigation }: Props) {
   const { t } = useTranslation(['common', "swipe"]);
-  const [index, setIndex] = useState(0);
-  const home = swipeHomesMock[index];
   const position = useRef(new Animated.ValueXY()).current;
+
+  const [index, setIndex] = useState(0);
+  const [homes, setHomes] = useState<SwipeRecommendation[]>([]);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [swipeLoading, setSwipeLoading] = useState(false);
   const [quickSearch, setQuickSearch] = useState(true);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [showMatch, setShowMatch] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const engine = useMemo(
+    () => new SwipeMockRecommendationEngine(),
+    [],
+  );
+
+  const [scenario, setScenario] =
+    useState<RecommendationScenarioName>(
+      'SOUTH_WEST_FAMILY',
+    );
+
+  const recommendedHomes = useMemo(
+    () =>
+      engine.recommend(
+        recommendationScenarios[scenario],
+        swipeHomesMock,
+        {
+          limit: 30,
+          excludeAlreadySwiped: true,
+          includeDiscovery: true,
+        },
+      ),
+    [engine, scenario],
+  );
+
+  const home = recommendedHomes[index];
+
+  useEffect(() => {
+    setIndex(0);
+  }, [scenario]);
+
+  // useEffect(() => {
+  //   loadRecommendations();
+  // }, []);
+
+  async function loadRecommendations() {
+    try {
+      setSwipeLoading(true);
+      setError(null);
+
+      const session =
+        await getSession();
+
+      if (!session?.accessToken) {
+        setError(
+          'Utilisateur non connecté',
+        );
+
+        return;
+      }
+
+      const recommendations =
+        await getSwipeRecommendationsApi(
+          session.accessToken,
+          20,
+        );
+
+      setHomes(recommendations);
+      setIndex(0);
+    } catch (loadError) {
+      console.error(
+        'Load recommendations error:',
+        loadError,
+      );
+
+      setError(
+        'Impossible de charger les logements',
+      );
+    } finally {
+      setSwipeLoading(false);
+    }
+  }
 
   async function handleSwipe(direction: SwipeDirection) {
     if (!home || swipeLoading) return;
@@ -135,10 +226,75 @@ export function SwipeHomeScreen({ navigation }: Props) {
         />
       </View>
 
+      <View style={styles.debugButtons}>
+        <TouchableOpacity
+          style={styles.debugButton}
+          onPress={() =>
+            setScenario('SOUTH_WEST_FAMILY')
+          }
+        >
+          <Text>Famille</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.debugButton}
+          onPress={() =>
+            setScenario('CITY_COUPLE')
+          }
+        >
+          <Text>Ville</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.debugButton}
+          onPress={() =>
+            setScenario('NATURE_MOUNTAIN')
+          }
+        >
+          <Text>Nature</Text>
+        </TouchableOpacity>
+      </View>
+
       <SwipeTopPreview
         home={home}
         onInfoPress={() => console.log('info')}
       />
+
+    <View style={styles.debugScore}>
+      <Text style={styles.debugTitle}>
+        Score : {home.recommendationScore}
+      </Text>
+
+      <Text>
+        Ville :
+        {' '}
+        {home.recommendationDetails.cityScore}
+      </Text>
+
+      <Text>
+        Type :
+        {' '}
+        {home.recommendationDetails.homeTypeScore}
+      </Text>
+
+      <Text>
+        Equipements :
+        {' '}
+        {home.recommendationDetails.amenitiesScore}
+      </Text>
+
+      <Text>
+        Recherche :
+        {' '}
+        {home.recommendationDetails.searchScore}
+      </Text>
+
+      <Text>
+        Pénalité :
+        {' '}
+        {home.recommendationDetails.dislikePenalty}
+      </Text>
+    </View>
 
       <SwipeHomeCard
         key={home.id}
@@ -288,4 +444,47 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '800',
   },
+  debugScore: {
+    position: 'absolute',
+    top: 150,
+    right: 12,
+    zIndex: 100,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  debugScoreText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  debugDetail: {
+    color: '#fff',
+    fontSize: 10,
+    marginTop: 2,
+  },
+  debugButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+  },
+  debugButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 16,
+  },
+  debugTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 6,
+  }
 });
