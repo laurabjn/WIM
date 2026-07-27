@@ -3,12 +3,28 @@ import { CreateSwipeUseCase } from 'src/application/swipe/use-cases/create-swipe
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { SwipePrismaRepository } from 'src/infrastructure/repositories/swipe.prisma.repository';
 import { SwipeController } from '../controllers/swipe.controller';
-import { SWIPE_REPOSITORY } from '../tokens/token';
+import { MATCH_REPOSITORY, SWIPE_REPOSITORY } from '../tokens/token';
+import { GetSwipeRecommendationsUseCase } from 'src/application/swipe/use-cases/get-swipe-recommendation.usecase';
+import { HomeRecommendationScorer } from 'src/application/swipe/services/home-recommendation-scorer';
+import { UserRecommendationProfileBuilder } from 'src/application/swipe/services/user-recommendation-profile.builder';
+import { SwipeRecommendationPrismaRepository } from 'src/infrastructure/repositories/swipe-recommendation.prisma.repository';
+import { MatchController } from '../controllers/match.controller';
+import { GetMyMatchesUseCase } from 'src/application/swipe/use-cases/get-my-matches.usecase';
+import { MatchPrismaRepository } from 'src/infrastructure/repositories/match.prisma.repository';
 
 @Module({
-  controllers: [SwipeController],
+  controllers: [SwipeController, MatchController],
   providers: [
     PrismaService,
+    SwipeRecommendationPrismaRepository,
+    UserRecommendationProfileBuilder,
+    HomeRecommendationScorer,
+    GetSwipeRecommendationsUseCase,
+    GetMyMatchesUseCase,
+    {
+      provide: MATCH_REPOSITORY,
+      useClass: MatchPrismaRepository,
+    },
     {
       provide: SWIPE_REPOSITORY,
       useClass: SwipePrismaRepository,
@@ -21,6 +37,6 @@ import { SWIPE_REPOSITORY } from '../tokens/token';
       inject: [SWIPE_REPOSITORY],
     },
   ],
-  exports: [CreateSwipeUseCase],
+  exports: [CreateSwipeUseCase, GetSwipeRecommendationsUseCase],
 })
 export class SwipeModule {}

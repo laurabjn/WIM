@@ -1,13 +1,14 @@
 import { Home } from '@wim/shared/home/home.type';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
   home: Home;
+  onPressReviews?: () => void;
 };
 
-export function HomeSummary({ home }: Props) {
+export function HomeSummary({ home, onPressReviews }: Props) {
   const { t } = useTranslation(['home', "profile"]);
 
   return (
@@ -25,7 +26,15 @@ export function HomeSummary({ home }: Props) {
         {home.bathrooms > 1 ? t('profile:bathrooms') : t('profile:bathroom')}
       </Text>
       
-      <Text style={styles.rating}>★ {home.averageRating} · {home.reviewsCount} {t('profile:reviews')}</Text>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={onPressReviews}
+      >
+        <Text style={styles.rating}>
+          ★ {home.averageRating} · {home.reviewsCount}{' '}
+          {t('profile:reviews')}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }

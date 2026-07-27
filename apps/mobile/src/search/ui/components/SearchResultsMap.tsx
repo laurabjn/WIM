@@ -75,19 +75,46 @@ export function SearchResultsMap({
   }, [homesWithCoordinates]);
 
   useEffect(() => {
-    if (!mapBounds) return;
+    if (homesWithCoordinates.length === 0) {
+      return;
+    }
 
     const timeout = setTimeout(() => {
-      cameraRef.current?.fitBounds(
-        mapBounds.ne,
-        mapBounds.sw,
-        70,
-        700,
-      );
+      if (
+        homesWithCoordinates.length === 1
+      ) {
+        const onlyHome =
+          homesWithCoordinates[0];
+
+        cameraRef.current?.setCamera({
+          centerCoordinate: [
+            onlyHome.longitude as number,
+            onlyHome.latitude as number,
+          ],
+          zoomLevel: 13.5,
+          animationMode: 'flyTo',
+          animationDuration: 700,
+        });
+
+        return;
+      }
+
+      if (mapBounds) {
+        cameraRef.current?.fitBounds(
+          mapBounds.ne,
+          mapBounds.sw,
+          70,
+          700,
+        );
+      }
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [cameraRef, mapBounds]);
+  }, [
+    cameraRef,
+    homesWithCoordinates,
+    mapBounds,
+  ]);
 
   return (
     <View style={styles.mapContainer}>
@@ -118,63 +145,61 @@ export function SearchResultsMap({
           const selected = home.id === selectedHomeId;
 
           return (
-            <Mapbox.MarkerView
-              key={home.id}
-              coordinate={[
-                home.longitude as number,
-                home.latitude as number,
+          <Mapbox.PointAnnotation
+            key={home.id}
+            id={`home-${home.id}`}
+            coordinate={[
+              home.longitude as number,
+              home.latitude as number,
+            ]}
+            anchor={{ x: 0.5, y: 1 }}
+            onSelected={() => {
+              const originalIndex = homes.findIndex(
+                item => item.id === home.id,
+              );
+
+              onSelectHome(
+                home,
+                originalIndex >= 0
+                  ? originalIndex
+                  : index,
+              );
+            }}
+          >
+            <View
+              collapsable={false}
+              style={[
+                styles.markerWrapper,
+                selected &&
+                  styles.markerWrapperSelected,
               ]}
-              anchor={{ x: 0.5, y: 1 }}
-              allowOverlap
             >
-              <Pressable
-                hitSlop={12}
-                onPress={(event) => {
-                  event.stopPropagation();
-
-                  const originalIndex = homes.findIndex(
-                    (item) => item.id === home.id,
-                  );
-
-                  onSelectHome(
-                    home,
-                    originalIndex >= 0
-                      ? originalIndex
-                      : index,
-                  );
-                }}
+              <View
                 style={[
-                  styles.markerWrapper,
-                  selected &&
-                    styles.markerWrapperSelected,
+                  styles.marker,
+                  selected && styles.markerSelected,
                 ]}
               >
-                <View
+                <Text
                   style={[
-                    styles.marker,
-                    selected && styles.markerSelected,
+                    styles.markerNumber,
+                    selected &&
+                      styles.markerNumberSelected,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.markerNumber,
-                      selected &&
-                        styles.markerNumberSelected,
-                    ]}
-                  >
-                    {index + 1}
-                  </Text>
-                </View>
+                  {index + 1}
+                </Text>
+              </View>
 
-                <View
-                  style={[
-                    styles.markerArrow,
-                    selected &&
-                      styles.markerArrowSelected,
-                  ]}
-                />
-              </Pressable>
-            </Mapbox.MarkerView>
+              <View
+                style={[
+                  styles.markerArrow,
+                  selected &&
+                    styles.markerArrowSelected,
+                ]}
+              />
+            </View>
+          </Mapbox.PointAnnotation>
           );
         })}
       </Mapbox.MapView>

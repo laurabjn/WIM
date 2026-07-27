@@ -84,8 +84,6 @@ export function FavoriteHomeCard({
               <Text style={styles.badgeAvailableText}>{t('available')}</Text>
             </View>
           ) : null}
-
-          <Text style={styles.price}>{t('price')} {home.pricePerNight ?? 0}€</Text>
         </View>
       </View>
     </TouchableOpacity>

@@ -7,3 +7,5 @@ export const EMAIL_SENDER = Symbol('EMAIL_SENDER');
 export const IDENTITY_PROVIDER = Symbol('IDENTITY_PROVIDER');
 export const SWIPE_REPOSITORY = Symbol('SWIPE_REPOSITORY');
 export const HOME_SEARCH_REPOSITORY = Symbol('HOME_SEARCH_REPOSITORY');
+export const MATCH_REPOSITORY = Symbol('MATCH_REPOSITORY');
+export const CHAT_REPOSITORY = Symbol('CHAT_REPOSITORY');

@@ -9,6 +9,9 @@ export class CreateSwipeDto {
   @IsString()
   targetUserId: string;
 
+  @IsString()
+  homeId!: string;
+
   @IsEnum(SwipeDirectionDto)
   direction: SwipeDirectionDto;
 }

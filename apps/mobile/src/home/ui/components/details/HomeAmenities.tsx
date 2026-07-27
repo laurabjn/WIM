@@ -1,12 +1,16 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
-  Car,
-  ChefHat,
   Dog,
+  Palmtree,
   Trees,
-  Waves,
+  Umbrella,
   Wifi,
 } from 'lucide-react-native';
 
@@ -14,19 +18,46 @@ type Props = {
   amenities: string[];
 };
 
-const AMENITY_ICONS: Record<string, React.ReactNode> = {
-  kitchen: <ChefHat size={26} color="#111111" />,
-  garage: <Car size={26} color="#111111" />,
-  garden: <Trees size={26} color="#111111" />,
-  pets: <Dog size={26} color="#111111" />,
-  wifi: <Wifi size={26} color="#111111" />,
-  pool: <Waves size={26} color="#111111" />,
+type AmenityIconProps = {
+  size?: number;
+  color?: string;
 };
 
-export function HomeAmenities({ amenities }: Props) {
+const VISIBLE_AMENITIES_LIMIT = 6;
+
+const AMENITY_ICONS: Record<
+  string,
+  React.ComponentType<AmenityIconProps>
+> = {
+  wifi: Wifi,
+  plage: Umbrella,
+  terrasse: Palmtree,
+  jardin: Trees,
+  animaux: Dog,
+};
+
+export function HomeAmenities({
+  amenities,
+}: Props) {
   const { t } = useTranslation('home');
 
-  const visibleAmenities = amenities.slice(0, 6);
+  const [showAll, setShowAll] =
+    useState(false);
+
+  const displayedAmenities = showAll
+    ? amenities
+    : amenities.slice(
+        0,
+        VISIBLE_AMENITIES_LIMIT,
+      );
+
+  const hasHiddenAmenities =
+    amenities.length >
+    VISIBLE_AMENITIES_LIMIT;
+
+  function handleToggleAmenities() {
+    setShowAll(current => !current);
+  }
 
   return (
     <View style={styles.section}>
@@ -34,50 +65,106 @@ export function HomeAmenities({ amenities }: Props) {
         {t('amenitiesTitle')}
       </Text>
 
-      {visibleAmenities.length > 0 ? (
+      {displayedAmenities.length > 0 ? (
         <>
           <View style={styles.featuresGrid}>
-            {visibleAmenities.map((item) => {
-              const key = item.toLowerCase();
-              const icon = AMENITY_ICONS[key] ?? (
-                <Text style={styles.fallbackIcon}>•</Text>
-              );
+            {displayedAmenities.map(
+              item => {
+                const key = item
+                  .trim()
+                  .toLowerCase();
 
-              return (
-                <View key={item} style={styles.featureRow}>
-                  <View style={styles.iconWrapper}>{icon}</View>
+                const Icon =
+                  AMENITY_ICONS[key];
 
-                  <Text style={styles.featureText}>
-                    {t(`amenities.${key}`, item)}
-                  </Text>
-                </View>
-              );
-            })}
+                return (
+                  <View
+                    key={item}
+                    style={
+                      styles.featureRow
+                    }
+                  >
+                    <View
+                      style={
+                        styles.iconWrapper
+                      }
+                    >
+                      {Icon ? (
+                        <Icon
+                          size={26}
+                          color="#111111"
+                        />
+                      ) : (
+                        <Text
+                          style={
+                            styles.fallbackIcon
+                          }
+                        >
+                          •
+                        </Text>
+                      )}
+                    </View>
+
+                    <Text
+                      style={
+                        styles.featureText
+                      }
+                    >
+                      {t(
+                        `amenities.${key}`,
+                        {
+                          defaultValue:
+                            item,
+                        },
+                      )}
+                    </Text>
+                  </View>
+                );
+              },
+            )}
           </View>
 
-          {amenities.length > 6 ? (
-            <TouchableOpacity style={styles.outlineButton}>
-              <Text style={styles.outlineText}>
-                {t('showAllAmenities', {
-                  count: amenities.length,
-                  defaultValue: `Afficher les ${amenities.length} caractéristiques`,
-                })}
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.outlineButton}>
-              <Text style={styles.outlineText}>
-                {t('showAllAmenities', {
-                  count: amenities.length,
-                  defaultValue: `Afficher les ${amenities.length} caractéristiques`,
-                })}
+          {hasHiddenAmenities && (
+            <TouchableOpacity
+              style={
+                styles.outlineButton
+              }
+              activeOpacity={0.8}
+              onPress={
+                handleToggleAmenities
+              }
+            >
+              <Text
+                style={
+                  styles.outlineText
+                }
+              >
+                {showAll
+                  ? t(
+                      'hideAmenities',
+                      {
+                        defaultValue:
+                          'Réduire',
+                      },
+                    )
+                  : t(
+                      'showAllAmenities',
+                      {
+                        count:
+                          amenities.length,
+                        defaultValue: `Afficher les ${amenities.length} caractéristiques`,
+                      },
+                    )}
               </Text>
             </TouchableOpacity>
           )}
         </>
       ) : (
         <Text style={styles.description}>
-          {t('noAmenities', 'Aucun équipement renseigné.')}
+          {t('noAmenities', {
+            defaultValue:
+              'Aucun équipement renseigné.',
+          })}
         </Text>
       )}
     </View>
@@ -90,10 +177,10 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
+    marginBottom: 22,
     fontSize: 17,
     fontWeight: '700',
     color: '#111111',
-    marginBottom: 22,
   },
 
   featuresGrid: {
@@ -117,17 +204,19 @@ const styles = StyleSheet.create({
   },
 
   featureText: {
+    flex: 1,
     fontSize: 16,
-    color: '#111111',
     fontWeight: '400',
+    color: '#111111',
   },
 
   outlineButton: {
     marginTop: 24,
-    height: 34,
+    minHeight: 40,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#D6D6D6',
+    paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },

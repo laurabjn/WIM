@@ -683,6 +683,10 @@
     "results": "Results"
   },
   "swipe": {
-    "noMoreHome": "No more home available"
+    "noMoreHome": "No more home available",
+    "homeNotFound": "Home not found",
+    "homenotAvailable": "This home is no longer available",
+    "match": "It's a match 🎉",
+    "matchText": "You and {{firstName}} liked each other."
   }
 }

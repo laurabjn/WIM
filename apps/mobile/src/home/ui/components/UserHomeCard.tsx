@@ -77,10 +77,6 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
               <Text style={styles.badgeText}>{t('unavailable')}</Text>
             </View>
           )}
-
-          <Text style={styles.price}>
-            {t('price')} {home.pricePerNight ?? 0}€
-          </Text>
         </View>
       </View>
     </TouchableOpacity>
