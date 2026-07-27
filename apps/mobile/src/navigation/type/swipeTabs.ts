@@ -3,12 +3,13 @@ import { Home } from '@wim/shared/home/home.type';
 export type SwipeStackParamList = {
   Swipe: 
     | {
-        processedHomeId?: string;
-        action?: 'like' | 'dislike';
+        restoreHomeId?: string;
+        restoreIndex?: number;
       }
     | undefined;
 
   SwipeHomeDetails: {
-    home: Home;
+    homeId: string;
+    swipeIndex: number;
   };
 };

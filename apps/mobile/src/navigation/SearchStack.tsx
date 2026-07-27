@@ -7,6 +7,7 @@ import { SearchResultsScreen } from "src/search/ui/SearchResultsScreen";
 import { SwipeHomeScreen } from "src/swipe/infrastructure/SwipeHomeScreen";
 import { MenuScreen } from "src/menu/ui/MenuScreen";
 import { HomeDetailsScreen } from "src/home/ui/HomeDetailScreen";
+import { SwipeDetailHomeScreen } from "src/swipe/ui/components/SwipeDetailsHomeScreen";
 
 const Stack = createStackNavigator<SearchStackParamList>();
 
@@ -27,6 +28,7 @@ export function SearchStackNavigator() {
           <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
           <Stack.Screen name="Swipe" component={SwipeHomeScreen} />
           <Stack.Screen name="HomeDetails" component={HomeDetailsScreen} />
+          <Stack.Screen name="SwipeHomeDetails" component={SwipeDetailHomeScreen} />
         </Stack.Navigator>
     );
 }

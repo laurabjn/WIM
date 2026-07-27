@@ -9,12 +9,24 @@ export type SwipeHomeType =
 export type SwipeHomeMock = {
   id: string;
   ownerId: string;
+    owner: {
+    id: string;
+    firstName: string;
+    lastName: String;
+    avatarUrl: string;
+  };
   title: string;
   city: string;
   country: string;
+  latitude: number;
+  longitude: number;
+  capacity: number;
   homeType: SwipeHomeType;
   bedrooms: number;
   beds: number;
+  bathrooms: number;
+  carExchangeAccepted: boolean;
+  description: string;
   pricePerNight: number;
   averageRating: number;
   reviewsCount: number;

@@ -23,6 +23,7 @@ const CAROUSEL_WIDTH =
 
 type Props = {
   home: any;
+  onPress: () => void;
   onLike: () => void;
   onDislike: () => void;
 };

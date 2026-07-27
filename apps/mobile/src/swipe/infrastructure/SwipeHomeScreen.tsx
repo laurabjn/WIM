@@ -39,7 +39,7 @@ import {
 
 type Props = NativeStackScreenProps<SearchStackParamList, 'Swipe'>;
 
-export function SwipeHomeScreen({ navigation }: Props) {
+export function SwipeHomeScreen({ navigation, route }: Props) {
   const { t } = useTranslation(['common', "swipe"]);
   const position = useRef(new Animated.ValueXY()).current;
 
@@ -81,6 +81,38 @@ export function SwipeHomeScreen({ navigation }: Props) {
   useEffect(() => {
     setIndex(0);
   }, [scenario]);
+
+  useEffect(() => {
+    const restoreHomeId =
+      route.params?.restoreHomeId;
+
+    const restoreIndex =
+      route.params?.restoreIndex;
+
+    if (
+      typeof restoreIndex === 'number' &&
+      recommendedHomes[restoreIndex]?.id ===
+        restoreHomeId
+    ) {
+      setIndex(restoreIndex);
+      return;
+    }
+
+    if (restoreHomeId) {
+      const foundIndex =
+        recommendedHomes.findIndex(
+          item => item.id === restoreHomeId,
+        );
+
+      if (foundIndex >= 0) {
+        setIndex(foundIndex);
+      }
+    }
+  }, [
+    route.params?.restoreHomeId,
+    route.params?.restoreIndex,
+    recommendedHomes,
+  ]);
 
   // useEffect(() => {
   //   loadRecommendations();
@@ -215,6 +247,14 @@ export function SwipeHomeScreen({ navigation }: Props) {
     }
   };
 
+  function openHomeDetails() {
+    console.log('open')
+    navigation.navigate('SwipeHomeDetails', {
+      homeId: home.id,
+      swipeIndex: index,
+    });
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.toggleWrapper}>
@@ -226,7 +266,7 @@ export function SwipeHomeScreen({ navigation }: Props) {
         />
       </View>
 
-      <View style={styles.debugButtons}>
+      {/* <View style={styles.debugButtons}>
         <TouchableOpacity
           style={styles.debugButton}
           onPress={() =>
@@ -253,52 +293,53 @@ export function SwipeHomeScreen({ navigation }: Props) {
         >
           <Text>Nature</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <SwipeTopPreview
         home={home}
-        onInfoPress={() => console.log('info')}
+        onInfoPress={openHomeDetails}
       />
 
-    <View style={styles.debugScore}>
-      <Text style={styles.debugTitle}>
-        Score : {home.recommendationScore}
-      </Text>
+      {/* <View style={styles.debugScore}>
+        <Text style={styles.debugTitle}>
+          Score : {home.recommendationScore}
+        </Text>
 
-      <Text>
-        Ville :
-        {' '}
-        {home.recommendationDetails.cityScore}
-      </Text>
+        <Text>
+          Ville :
+          {' '}
+          {home.recommendationDetails.cityScore}
+        </Text>
 
-      <Text>
-        Type :
-        {' '}
-        {home.recommendationDetails.homeTypeScore}
-      </Text>
+        <Text>
+          Type :
+          {' '}
+          {home.recommendationDetails.homeTypeScore}
+        </Text>
 
-      <Text>
-        Equipements :
-        {' '}
-        {home.recommendationDetails.amenitiesScore}
-      </Text>
+        <Text>
+          Equipements :
+          {' '}
+          {home.recommendationDetails.amenitiesScore}
+        </Text>
 
-      <Text>
-        Recherche :
-        {' '}
-        {home.recommendationDetails.searchScore}
-      </Text>
+        <Text>
+          Recherche :
+          {' '}
+          {home.recommendationDetails.searchScore}
+        </Text>
 
-      <Text>
-        Pénalité :
-        {' '}
-        {home.recommendationDetails.dislikePenalty}
-      </Text>
-    </View>
+        <Text>
+          Pénalité :
+          {' '}
+          {home.recommendationDetails.dislikePenalty}
+        </Text>
+      </View> */}
 
       <SwipeHomeCard
         key={home.id}
         home={home}
+        onPress={openHomeDetails}
         onLike={() => handleSwipe('LIKE')}
         onDislike={() => handleSwipe('DISLIKE')}
       />
@@ -312,7 +353,7 @@ export function SwipeHomeScreen({ navigation }: Props) {
           <X size={28} color="#E74C3C" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.moreButton}>
+        <TouchableOpacity style={styles.moreButton} onPress={openHomeDetails}>
           <Info size={16} color="#111" />
           <Text style={styles.moreText}>{t('common:seeMore')}</Text>
         </TouchableOpacity>

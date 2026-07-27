@@ -682,6 +682,8 @@
     "results": "Résultats"
   },
   "swipe": {
-    "noMoreHome": "Plus aucun logement à afficher"
+    "noMoreHome": "Plus aucun logement à afficher",
+    "homeNotFound": "Logement introuvable",
+    "homenotAvailable": "Ce logement n'est plus disponible"
   }
 }

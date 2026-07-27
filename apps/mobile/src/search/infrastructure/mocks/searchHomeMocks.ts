@@ -15,8 +15,8 @@ export const searchHomesMock = [
       {
         id: 'availability-home-1-1',
         homeId: '1',
-        startDate: '2026-07-01',
-        endDate: '2026-07-22',
+        startDate: '2026-07-27',
+        endDate: '2026-07-30',
         type: 'AVAILABLE',
         createdAt: '2026-06-01T10:00:00.000Z',
         updatedAt: '2026-06-01T10:00:00.000Z',

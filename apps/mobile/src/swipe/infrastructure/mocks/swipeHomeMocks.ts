@@ -4,61 +4,85 @@ const cities = [
   {
     city: 'Bordeaux',
     country: 'France',
+    latitude: 44.8378,
+    longitude: -0.5792,
     defaultAmenities: ['Wifi', 'Jardin', 'Parking'],
   },
   {
     city: 'Biarritz',
     country: 'France',
+    latitude: 43.4832,
+    longitude: -1.5586,
     defaultAmenities: ['Wifi', 'Plage', 'Terrasse'],
   },
   {
     city: 'Arcachon',
     country: 'France',
+    latitude: 44.6525,
+    longitude: -1.1688,
     defaultAmenities: ['Plage', 'Terrasse', 'Parking'],
   },
   {
     city: 'Paris',
     country: 'France',
+    latitude: 48.8566,
+    longitude: 2.3522,
     defaultAmenities: ['Wifi', 'Métro', 'Climatisation'],
   },
   {
     city: 'Lyon',
     country: 'France',
+    latitude: 45.7640,
+    longitude: 4.8357,
     defaultAmenities: ['Wifi', 'Centre-ville', 'Balcon'],
   },
   {
     city: 'Annecy',
     country: 'France',
+    latitude: 45.8992,
+    longitude: 6.1294,
     defaultAmenities: ['Nature', 'Lac', 'Parking'],
   },
   {
     city: 'Chamonix',
     country: 'France',
+    latitude: 45.9237,
+    longitude: 6.8694,
     defaultAmenities: ['Montagne', 'Cheminée', 'Nature'],
   },
   {
     city: 'Nice',
     country: 'France',
+    latitude: 43.7102,
+    longitude: 7.2620,
     defaultAmenities: ['Plage', 'Climatisation', 'Terrasse'],
   },
   {
     city: 'Austin',
     country: 'États-Unis',
+    latitude: 30.2672,
+    longitude: -97.7431,
     defaultAmenities: ['Jardin', 'Barbecue', 'Parking'],
   },
   {
     city: 'San Francisco',
     country: 'États-Unis',
+    latitude: 37.7749,
+    longitude: -122.4194,
     defaultAmenities: ['Wifi', 'Vue', 'Centre-ville'],
   },
   {
     city: 'Lisbonne',
     country: 'Portugal',
+    latitude: 38.7223,
+    longitude: -9.1393,
     defaultAmenities: ['Terrasse', 'Climatisation', 'Wifi'],
   },
   {
     city: 'Barcelone',
     country: 'Espagne',
+    latitude: 41.3874,
+    longitude: 2.1686,
     defaultAmenities: ['Plage', 'Balcon', 'Climatisation'],
   },
 ];
@@ -196,6 +220,16 @@ function createPhotos(
   );
 }
 
+function randomCoordinate(
+  coordinate: number,
+  offset = 0.003,
+) {
+  return (
+    coordinate +
+    (Math.random() * 2 - 1) * offset
+  );
+}
+
 function createSwipeHome(
   index: number,
 ): SwipeHomeMock {
@@ -231,15 +265,44 @@ function createSwipeHome(
     index + 60,
   );
 
+  const bathrooms =
+    1 +
+    Math.floor(seededRandom(index + 16) * 3);
+
+  const capacity =
+    beds +
+    Math.floor(seededRandom(index + 15) * 3);
+  
+  const carExchangeAccepted = seededRandom(index + 17) > 0.45;
+
+  const description =
+    `Profitez d'un séjour dans cette ${
+      homeType.toLowerCase()
+    } située à ${location.city}. 
+    Le logement est entièrement équipé et idéal pour découvrir la région. 
+    Vous profiterez d'un environnement calme ainsi que de nombreux équipements pour toute la famille.`;
+
   return {
     id: `home-${index + 1}`,
     ownerId: `user-${index + 2}`,
+    owner: {
+      id: `user-${index + 2}`,
+      firstName: `Laura ${index + 1}`,
+      lastName: `Laura ${index + 1}`,
+      avatarUrl: photoUrls[(index + 5) % photoUrls.length],
+    },
     title: `${titlePrefix} à ${location.city}`,
     city: location.city,
     country: location.country,
+    latitude: randomCoordinate(location.latitude),
+    longitude: randomCoordinate(location.longitude),
+    capacity,
     homeType,
     bedrooms,
     beds,
+    bathrooms,
+    carExchangeAccepted,
+    description,
     pricePerNight,
     averageRating,
     reviewsCount,
@@ -255,7 +318,7 @@ export const swipeHomesMock: SwipeHomeMock[] =
   Array.from(
     { length: 60 },
     (_, index) => createSwipeHome(index),
-  );
+);
 
 // export const swipeHomesMock = [
 //   {

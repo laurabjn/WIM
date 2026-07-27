@@ -11,8 +11,17 @@ export type SearchStackParamList = {
     endDate?: string;
     capacity: number | undefined;
   };
-  Swipe: undefined;
+  Swipe:
+    | {
+        restoreHomeId?: string;
+        restoreIndex?: number;
+      }
+    | undefined;
   HomeDetails: {
     homeId: string;
+  };
+  SwipeHomeDetails: {
+    homeId: string;
+    swipeIndex: number;
   };
 };
