@@ -20,13 +20,8 @@ import {
 } from 'react-native';
 import {
   ArrowLeft,
-  Check,
   Heart,
   Home as HomeIcon,
-  MapPin,
-  Star,
-  Users,
-  Wifi,
 } from 'lucide-react-native';
 import Mapbox from '@rnmapbox/maps';
 import {
@@ -48,6 +43,8 @@ import { HostSummary } from 'src/home/ui/components/details/HostSummary';
 import { VehicleCard } from 'src/home/ui/components/details/VehiculeCard';
 import { HomeAmenities } from 'src/home/ui/components/details/HomeAmenities';
 import { HomeReviews } from 'src/home/ui/components/details/HomeReviews';
+import { getSession } from 'src/auth/infrastructure/authStorage';
+import { addFavoriteHome, listFavoriteHomes, removeFavoriteHome } from 'src/home/infrastructure/home.api';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -80,6 +77,9 @@ export function SwipeDetailHomeScreen({
   ).current;
   const sheetPositionRef = useRef(SHEET_COLLAPSED);
 
+  const [token, setToken] = useState<string | null>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -152,6 +152,62 @@ export function SwipeDetailHomeScreen({
 
     return () => clearTimeout(timer);
   }, [centerCamera, home]);
+
+  useEffect(() => {
+    async function loadSession() {
+        try {
+            const session = await getSession();
+            setToken(session?.accessToken ?? null);
+            console.log('Loaded session:', session);
+        } catch (error) {
+            console.log('Error loading session:', error);
+            setToken(null);
+        } finally {
+            setIsSessionLoading(false);
+        }
+    }
+
+    loadSession();
+  }, []);
+
+  useEffect(() => {
+    if (!token || !home) {
+      return;
+    }
+
+    const accessToken = token;
+
+    let cancelled = false;
+
+    async function loadFavoriteStatus() {
+      try {
+        const favoriteHomes = await listFavoriteHomes(accessToken);
+
+        const isAlreadyFavorite =
+          favoriteHomes.some(
+            favoriteHome =>
+              favoriteHome.id === home!.id,
+          );
+
+        if (!cancelled) {
+          setIsFavorite(
+            isAlreadyFavorite,
+          );
+        }
+      } catch (error) {
+        console.log(
+          'Load favorite status error:',
+          error,
+        );
+      }
+    }
+
+    loadFavoriteStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token, home]);
 
   const panResponder = useMemo(
     () =>
@@ -260,6 +316,45 @@ export function SwipeDetailHomeScreen({
     });
   }
 
+  async function toggleFavorite() {
+    if (
+      !token ||
+      !home ||
+      isFavoriteLoading
+    ) {
+      return;
+    }
+
+    const previousValue = isFavorite;
+    const nextValue = !previousValue;
+
+    setIsFavorite(nextValue);
+    setIsFavoriteLoading(true);
+
+    try {
+      if (nextValue) {
+        await addFavoriteHome(
+          token,
+          home.id,
+        );
+      } else {
+        await removeFavoriteHome(
+          token,
+          home.id,
+        );
+      }
+    } catch (error) {
+      setIsFavorite(previousValue);
+
+      console.log(
+        'Toggle favorite error:',
+        error,
+      );
+    } finally {
+      setIsFavoriteLoading(false);
+    }
+  }
+
   if (!home) {
     return (
       <SafeAreaView
@@ -313,12 +408,7 @@ export function SwipeDetailHomeScreen({
             SHEET_COLLAPSED,
           );
         }}
-        onClearSelection={() => {
-          /**
-           * Sur la fiche détail, le seul
-           * logement reste sélectionné.
-           */
-        }}
+        onClearSelection={() => {}}
       />
 
       <Animated.View
@@ -358,14 +448,18 @@ export function SwipeDetailHomeScreen({
             </View>
 
             <TouchableOpacity
-              style={
-                styles.favoriteButton
+              style={[
+                styles.favoriteButton,
+                isFavoriteLoading &&
+                styles.favoriteButtonDisabled,
+              ]}
+              onPress={toggleFavorite}
+              disabled={
+                isFavoriteLoading ||
+                isSessionLoading ||
+                !token
               }
-              onPress={() =>
-                setIsFavorite(
-                  current => !current,
-                )
-              }
+              activeOpacity={0.7}
             >
               <Heart
                 size={21}
@@ -537,40 +631,6 @@ export function SwipeDetailHomeScreen({
   );
 }
 
-type SummaryItemProps = {
-  icon: React.ReactNode;
-  value: number | string;
-  label: string;
-};
-
-function SummaryItem({
-  icon,
-  value,
-  label,
-}: SummaryItemProps) {
-  return (
-    <View style={styles.summaryItem}>
-      <View
-        style={styles.summaryIcon}
-      >
-        {icon}
-      </View>
-
-      <Text
-        style={styles.summaryValue}
-      >
-        {value}
-      </Text>
-
-      <Text
-        style={styles.summaryLabel}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-}
-
 function SectionTitle({
   title,
 }: {
@@ -580,68 +640,6 @@ function SectionTitle({
     <Text style={styles.sectionTitle}>
       {title}
     </Text>
-  );
-}
-
-function AmenityItem({
-  amenity,
-}: {
-  amenity: string;
-}) {
-  const normalizedAmenity =
-    amenity.toLowerCase();
-
-  const Icon =
-    normalizedAmenity.includes(
-      'wifi',
-    )
-      ? Wifi
-      : Check;
-
-  return (
-    <View style={styles.amenityItem}>
-      <View
-        style={styles.amenityIcon}
-      >
-        <Icon
-          size={19}
-          color="#111111"
-        />
-      </View>
-
-      <Text
-        style={styles.amenityText}
-      >
-        {amenity}
-      </Text>
-    </View>
-  );
-}
-
-function formatHomeType(
-  homeType?: string,
-) {
-  if (!homeType) {
-    return 'Logement entier';
-  }
-
-  const labels: Record<
-    string,
-    string
-  > = {
-    HOUSE: 'Maison entière',
-    APARTMENT:
-      'Appartement entier',
-    VILLA: 'Villa entière',
-    STUDIO: 'Studio entier',
-    CABIN: 'Chalet entier',
-    LOFT: 'Loft entier',
-  };
-
-  return (
-    labels[
-      homeType.toUpperCase()
-    ] ?? homeType
   );
 }
 
@@ -676,6 +674,10 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
+  },
+
+  favoriteButtonDisabled: {
+    opacity: 0.5,
   },
 
   sheet: {
