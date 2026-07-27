@@ -17,3 +17,9 @@ export interface MatchEntity {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type MatchWithUsers =
+  MatchEntity & {
+    user1: MatchUserEntity;
+    user2: MatchUserEntity;
+  };

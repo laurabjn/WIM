@@ -684,6 +684,8 @@
   "swipe": {
     "noMoreHome": "Plus aucun logement à afficher",
     "homeNotFound": "Logement introuvable",
-    "homenotAvailable": "Ce logement n'est plus disponible"
+    "homenotAvailable": "Ce logement n'est plus disponible",
+    "match": "C’est un match 🎉",
+    "matchText": "Vous et {{firstName}} vous êtes likés mutuellement."
   }
 }

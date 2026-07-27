@@ -76,6 +76,7 @@ export class CreateSwipeUseCase {
       swipeId: swipe.id,
       match: true,
       matchId: match.id,
+      chatId: match.chat.id,
     };
   }
 }

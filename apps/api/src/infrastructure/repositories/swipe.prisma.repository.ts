@@ -21,6 +21,7 @@ export class SwipePrismaRepository implements SwipeRepository {
       },
       update: {
         direction: input.direction,
+        homeId: input.homeId,
       },
       create: input,
     });
@@ -39,22 +40,61 @@ export class SwipePrismaRepository implements SwipeRepository {
     return swipe?.direction === 'LIKE';
   }
 
-  async createMatch(firstUserId: string, secondUserId: string): Promise<MatchRecord> {
-    const [user1Id, user2Id] = [firstUserId, secondUserId].sort();
+  async createMatch(
+    firstUserId: string,
+    secondUserId: string,
+  ) {
+    const [user1Id, user2Id] = [
+      firstUserId,
+      secondUserId,
+    ].sort();
 
-    return this.prisma.match.upsert({
-      where: {
-        user1Id_user2Id: {
+    return this.prisma.$transaction(async prisma => {
+      const match = await prisma.match.upsert({
+        where: {
+          user1Id_user2Id: {
+            user1Id,
+            user2Id,
+          },
+        },
+        update: {
+          status: 'ACCEPTED',
+        },
+        create: {
           user1Id,
           user2Id,
+          status: 'ACCEPTED',
         },
-      },
-      update: {},
-      create: {
-        user1Id,
-        user2Id,
-        status: 'PENDING',
-      }
+      });
+
+      const chat = await prisma.chat.upsert({
+        where: {
+          matchId: match.id,
+        },
+        update: {},
+        create: {
+          matchId: match.id,
+
+          participants: {
+            create: [
+              {
+                userId: user1Id,
+              },
+              {
+                userId: user2Id,
+              },
+            ],
+          },
+        },
+        include: {
+          participants: true,
+        },
+      });
+
+      return {
+        ...match,
+        chat,
+      };
     });
   }
 

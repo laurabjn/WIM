@@ -21,6 +21,19 @@ export type MatchRecord = {
   user1Id: string;
   user2Id: string;
   createdAt: Date;
+  chat: {
+    id: string;
+    matchId: string;
+    createdAt: Date;
+    updatedAt: Date;
+
+    participants: Array<{
+      id: string;
+      chatId: string;
+      userId: string;
+      joinedAt: Date;
+    }>;
+  };
 };
 
 export interface SwipeRepository {

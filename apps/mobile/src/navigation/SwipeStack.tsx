@@ -1,9 +1,9 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { SearchStackParamList } from "./type/searchTabs";
 import { View, Text } from 'react-native';
-import { SwipeHomeScreen } from "src/swipe/infrastructure/SwipeHomeScreen";
 import { MenuScreen } from "src/menu/ui/MenuScreen";
 import { SwipeDetailHomeScreen } from "src/swipe/ui/components/SwipeDetailsHomeScreen";
+import { SwipeHomeScreen } from "src/swipe/ui/SwipeHomeScreen";
 
 const Stack = createStackNavigator<SearchStackParamList>();
 
