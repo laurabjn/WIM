@@ -5,7 +5,7 @@ const cities = [
     city: 'Bordeaux',
     country: 'France',
     latitude: 44.8378,
-    longitude: -0.5792,
+    longitude: -1.5562,
     defaultAmenities: ['Wifi', 'Jardin', 'Parking'],
   },
   {

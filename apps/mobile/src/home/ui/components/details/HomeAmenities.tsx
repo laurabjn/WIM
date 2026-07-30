@@ -12,7 +12,15 @@ import {
   Trees,
   Umbrella,
   Wifi,
+  CircleParking,
+  Dumbbell,
+  Binoculars,
+  AirVent 
 } from 'lucide-react-native';
+import {
+  getAmenityIcon,
+  normalizeAmenity,
+} from '../../../../utils/amenityIcons';
 
 type Props = {
   amenities: string[];
@@ -34,13 +42,17 @@ const AMENITY_ICONS: Record<
   terrasse: Palmtree,
   jardin: Trees,
   animaux: Dog,
+  parking: CircleParking,
+  vue: Binoculars,
+  sport: Dumbbell,
+  climatisation: AirVent 
 };
 
 export function HomeAmenities({
   amenities,
 }: Props) {
   const { t } = useTranslation('home');
-
+console.log(amenities)
   const [showAll, setShowAll] =
     useState(false);
 
@@ -69,17 +81,14 @@ export function HomeAmenities({
         <>
           <View style={styles.featuresGrid}>
             {displayedAmenities.map(
-              item => {
-                const key = item
-                  .trim()
-                  .toLowerCase();
+              (item, index) => {
+                const key = normalizeAmenity(item)
 
-                const Icon =
-                  AMENITY_ICONS[key];
+                const Icon = getAmenityIcon(item);
 
                 return (
                   <View
-                    key={item}
+                    key={`${key}-${index}`}
                     style={
                       styles.featureRow
                     }
