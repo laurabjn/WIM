@@ -1,6 +1,6 @@
+import { API_URL } from '../../config/api';
 import type { Exchange } from '@wim/shared';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3002/api';
 
 export async function getMyExchanges(token: string): Promise<Exchange[]> {
   const response = await fetch(`${API_URL}/exchanges/me`, {

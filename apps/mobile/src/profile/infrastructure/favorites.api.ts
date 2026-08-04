@@ -1,8 +1,7 @@
+import { API_URL } from '../../config/api';
 import { FavoriteHome } from "@wim/shared";
 
 
-const API_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
 
 export async function getFavoriteHomes(token: string): Promise<FavoriteHome[]> {
   const response = await fetch(`${API_URL}/favorites`, {
