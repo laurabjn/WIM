@@ -4,12 +4,14 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 import { SendMessageDto } from 'src/application/message/dto/send-message.dto';
+import { GetChatMessagesDto } from 'src/application/message/dto/get-chat-messages.dto';
 import { GetChatMessagesUseCase } from 'src/application/message/use-cases/get-chat-messages.usecase';
 import { GetMyChatsUseCase } from 'src/application/message/use-cases/get-my-chat.usecase';
 import { SendMessageUseCase } from 'src/application/message/use-cases/send-message.usecase';
@@ -60,11 +62,14 @@ export class ChatController {
     @Req() request: AuthenticatedRequest,
     @Param('chatId')
     chatId: string,
+    @Query() query: GetChatMessagesDto,
   ) {
-    return this.getMessages.execute(
+    return this.getMessages.execute({
       chatId,
-      this.getUserId(request),
-    );
+      userId: this.getUserId(request),
+      cursor: query.cursor,
+      limit: query.limit,
+    });
   }
 
   @Post(':chatId/messages')

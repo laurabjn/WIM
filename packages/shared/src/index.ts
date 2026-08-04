@@ -9,3 +9,5 @@ export * from './utils/languagesOptions';
 export * from './home/home.type';
 export * from './home/homeAvailability.type';
 export * from './home/exchange.type';
+export * from './chat/chat.type';
+export * from './chat/message.type';

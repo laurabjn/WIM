@@ -7,18 +7,16 @@ import {
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
 import { MessageRepository } from 'src/domain/auth/repositories/message.repository';
 import { CHAT_REPOSITORY, MESSAGE_REPOSITORY } from 'src/interfaces/http/tokens/token';
-import { mapMessage } from '../message.mapper';
-import { ChatMessagesPage } from '@wim/shared';
 
-type Input = {
+export type MarkChatAsReadResult = {
   chatId: string;
   userId: string;
-  cursor?: string;
-  limit?: number;
+  lastReadMessageId: string | null;
+  readAt: string;
 };
 
 @Injectable()
-export class GetChatMessagesUseCase {
+export class MarkChatAsReadUseCase {
   constructor(
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: ChatRepository,
@@ -26,13 +24,14 @@ export class GetChatMessagesUseCase {
     private readonly messageRepository: MessageRepository,
   ) {}
 
-  async execute({
-    chatId,
-    userId,
-    cursor,
-    limit = 30,
-  }: Input): Promise<ChatMessagesPage> {
-    const chat = await this.chatRepository.findById(chatId);
+  async execute(
+    chatId: string,
+    userId: string,
+  ): Promise<MarkChatAsReadResult> {
+    const chat =
+      await this.chatRepository.findById(
+        chatId,
+      );
 
     if (!chat) {
       throw new NotFoundException(
@@ -52,18 +51,23 @@ export class GetChatMessagesUseCase {
       );
     }
 
-    const result = await this.messageRepository.findChatMessages(
-        {
-          chatId,
-          cursor,
-          limit,
-        },
+    const lastMessage =
+      await this.messageRepository.findLastMessage(
+        chatId,
       );
 
+    await this.chatRepository.updateLastReadMessage(
+      chatId,
+      userId,
+      lastMessage?.id ?? null,
+    );
+
     return {
-      messages: result.messages.map(mapMessage),
-      hasMore: result.hasMore,
-      nextCursor: result.nextCursor,
+      chatId,
+      userId,
+      lastReadMessageId:
+        lastMessage?.id ?? null,
+      readAt: new Date().toISOString(),
     };
   }
 }

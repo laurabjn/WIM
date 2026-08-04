@@ -3,8 +3,9 @@ import { GetChatMessagesUseCase } from 'src/application/message/use-cases/get-ch
 import { GetMyChatsUseCase } from 'src/application/message/use-cases/get-my-chat.usecase';
 import { SendMessageUseCase } from 'src/application/message/use-cases/send-message.usecase';
 import { ChatPrismaRepository } from 'src/infrastructure/repositories/chat.prisma.repository';
+import { PrismaMessageRepository } from 'src/infrastructure/repositories/message.prisma.repository';
 import { ChatController } from '../controllers/chat.controller';
-import { CHAT_REPOSITORY } from '../tokens/token';
+import { CHAT_REPOSITORY, MESSAGE_REPOSITORY } from '../tokens/token';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 
 @Module({
@@ -20,9 +21,14 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
         provide: CHAT_REPOSITORY,
         useClass: ChatPrismaRepository,
       },
+      {
+        provide: MESSAGE_REPOSITORY,
+        useClass: PrismaMessageRepository,
+      },
   ],
   exports: [
     CHAT_REPOSITORY,
+    MESSAGE_REPOSITORY,
   ],
 })
 export class ChatModule {}

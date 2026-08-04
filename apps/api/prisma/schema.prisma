@@ -286,11 +286,15 @@ model Chat {
 model ChatParticipant {
   id String @id @default(uuid())
 
+  lastReadMessageId String?
+  lastReadAt        DateTime?
+
   chatId String
   userId String
 
-  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id])
+  lastReadMessage Message? @relation("LastReadMessage", fields: [lastReadMessageId], references: [id], onDelete: SetNull)
+  chat            Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id])
 
   joinedAt DateTime @default(now())
 
@@ -304,8 +308,9 @@ model Message {
   senderId String
   content  String
 
-  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  chat               Chat              @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender             User              @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  readByParticipants ChatParticipant[] @relation("LastReadMessage")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

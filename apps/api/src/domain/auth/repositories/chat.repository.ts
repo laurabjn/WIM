@@ -1,56 +1,57 @@
 export type ChatUser = {
-  id: string;
-  firstName: string | null;
-  lastName: string | null;
-  avatarUrl: string | null;
-};
+  id: string
+  firstName: string
+  lastName: string
+  avatarUrl: string | null
+}
 
-export type ChatListItem = {
-  id: string;
-  matchId: string;
-  createdAt: Date;
-  updatedAt: Date;
-
-  participants: {
-    user: ChatUser;
-  }[];
-
-  messages: {
-    id: string;
-    content: string;
-    senderId: string;
-    createdAt: Date;
-  }[];
-};
+export type ChatParticipant = {
+  id: string
+  chatId: string
+  userId: string
+  lastReadMessageId: string | null
+  joinedAt: Date
+  user: ChatUser
+}
 
 export type ChatMessage = {
-  id: string;
-  chatId: string;
-  senderId: string;
-  content: string;
-  createdAt: Date;
+  id: string
+  chatId: string
+  senderId: string
+  content: string
+  createdAt: Date
+  updatedAt: Date
+  sender: ChatUser
+}
 
-  sender: ChatUser;
-};
+export type Chat = {
+  id: string
+  matchId: string
+  createdAt: Date
+  updatedAt: Date
+  participants: ChatParticipant[]
+  messages: ChatMessage[]
+}
+
+export type ChatListItem = {
+  id: string
+  matchId: string
+  createdAt: Date
+  updatedAt: Date
+  participants: ChatParticipant[]
+  messages: ChatMessage[]
+}
 
 export interface ChatRepository {
-  findByUserId(
-    userId: string,
-  ): Promise<ChatListItem[]>;
-
-  findMessages(
-    chatId: string,
-    userId: string,
-  ): Promise<ChatMessage[]>;
-
-  createMessage(input: {
-    chatId: string;
-    senderId: string;
-    content: string;
-  }): Promise<ChatMessage>;
-
-  isParticipant(
-    chatId: string,
-    userId: string,
-  ): Promise<boolean>;
+  findByUserId(userId: string,): Promise<ChatListItem[]>
+  findById(chatId: string,): Promise<Chat>
+  findMessages(chatId: string, userId: string,): Promise<ChatMessage[]>
+  findParticipant(chatId: string,userId: string): Promise<ChatParticipant | null>;
+  findMyChats(userId: string): Promise<ChatListItem[]>
+  updateLastReadMessage(chatId: string, userId: string, lastReadMessageId: string | null): Promise<void>
+  countUnreadMessages(chatId: string, userId: string): Promise<number>
+  countAllUnreadMessages(userId: string): Promise<number>
+  touchChat(chatId: string): Promise<void>
+  createMessage(input: {chatId: string, senderId: string, content: string}): Promise<ChatMessage>;
+  isParticipant(chatId: string, userId: string): Promise<boolean>
 }
