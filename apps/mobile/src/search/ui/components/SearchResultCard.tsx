@@ -16,7 +16,12 @@ import { useTranslation } from 'react-i18next';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_HORIZONTAL_MARGIN = 20;
-const IMAGE_WIDTH = SCREEN_WIDTH - CARD_HORIZONTAL_MARGIN;
+// Le conteneur de la liste porte le cadre de selection : 2px de bordure et 3px
+// de padding de chaque cote. Sans les deduire, la carte depassait de 10px et le
+// cadre bleu paraissait plus etroit qu'elle.
+const SELECTION_FRAME_INSET = 10;
+const IMAGE_WIDTH =
+  SCREEN_WIDTH - CARD_HORIZONTAL_MARGIN - SELECTION_FRAME_INSET;
 
 type Props = {
   home: Home;
@@ -160,7 +165,9 @@ export function SearchResultCard({
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 18,
+    // L'espacement entre resultats est gere par le conteneur de la liste :
+    // une marge ici s'ajoutait a l'interieur du cadre de selection, qui
+    // se refermait alors sur du vide sous la carte.
     backgroundColor: '#fff',
   },
 
@@ -180,25 +187,32 @@ const styles = StyleSheet.create({
 
   favoriteButton: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    // Aligne sur le badge numerote, qui est pose a 9px du bord de la photo.
+    top: 9,
+    right: 9,
     zIndex: 10,
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    // Pastille opaque plutot qu'une etoile blanche posee a meme la photo :
+    // sur un cliche clair, elle etait illisible malgre son ombre portee.
+    backgroundColor: 'rgba(255,255,255,0.92)',
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
 
   favorite: {
-    fontSize: 34,
-    color: '#fff',
-    fontWeight: '300',
-    textShadowColor: 'rgba(0,0,0,0.35)',
-    textShadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    textShadowRadius: 3,
+    // Etoile sombre sur la pastille claire : l'ombre portee ne sert plus a la
+    // detacher du fond, c'est la pastille qui s'en charge.
+    fontSize: 22,
+    lineHeight: 24,
+    color: '#087EBE',
+    fontWeight: '400',
   },
 
   pagination: {
