@@ -94,6 +94,15 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
       latitude: home.latitude,
       longitude: home.longitude,
       coverPhotoUrl: home.photos[0]?.url ?? null,
+      beds: home.beds,
+      bedrooms: home.bedrooms,
+      averageRating: home.averageRating,
+      reviewsCount: home.reviewsCount,
+      photos: home.photos.map((photo) => ({
+        id: photo.id,
+        url: photo.url,
+        position: photo.position,
+      })),
       owner: {
         id: home.owner.id,
         firstName: home.owner.firstName,

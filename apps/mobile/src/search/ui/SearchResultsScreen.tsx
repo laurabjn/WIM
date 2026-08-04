@@ -16,7 +16,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Home } from '@wim/shared/home/home.type';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
-import { searchHomesMock } from '../infrastructure/mocks/searchHomeMocks';
+import { searchHomesApi } from '../../home/infrastructure/searchHome.api';
+import { getSession } from 'src/auth/infrastructure/authStorage';
 
 import { SearchResultsHeader } from './components/SearchResultsHeader';
 import { SearchResultsSheet } from './components/SearchResultsSheet';
@@ -77,9 +78,6 @@ export const SearchResultsScreen: React.FC<Props> = ({
       setLoading(true);
 
       try {
-        /*
-        ===== VERSION API =====
-
         const session = await getSession();
 
         if (!session?.accessToken) {
@@ -94,39 +92,6 @@ export const SearchResultsScreen: React.FC<Props> = ({
         });
 
         setHomes(data);
-
-        */
-
-        // ===== VERSION MOCK =====
-
-        const searchedCity = city
-          ?.split(',')[0]
-          ?.trim()
-          .toLowerCase();
-
-        const filteredHomes = (searchHomesMock as Home[]).filter((home) => {
-          const matchesCity =
-            !searchedCity ||
-            home.city.trim().toLowerCase() === searchedCity;
-
-          const matchesCapacity =
-            !capacity ||
-            home.capacity >= capacity;
-
-          const matchesAvailability = isHomeAvailable(
-            home,
-            startDate,
-            endDate,
-          );
-
-          return (
-            matchesCity &&
-            matchesCapacity &&
-            matchesAvailability
-          );
-        });
-
-        setHomes(filteredHomes);
       } catch (error) {
         console.log('Search homes error:', error);
       } finally {

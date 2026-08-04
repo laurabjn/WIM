@@ -19,6 +19,20 @@ export type HomeSearchResult = {
   latitude: number | null;
   longitude: number | null;
   coverPhotoUrl: string | null;
+
+  // Champs attendus par les cartes de résultats. Sans eux, la carte affichait
+  // « undefined Chambres » et une note vide : c'est pour cette raison que
+  // l'écran de résultats s'appuyait encore sur des données fictives.
+  beds: number;
+  bedrooms: number;
+  averageRating: number | null;
+  reviewsCount: number;
+  photos: Array<{
+    id: string;
+    url: string;
+    position: number;
+  }>;
+
   owner: {
     id: string;
     firstName: string | null;
