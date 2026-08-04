@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsEmail,
@@ -55,9 +56,16 @@ export class RegisterDto {
   @IsString()
   phone?: string;
 
-  // Doit etre une date ISO-8601 complete : Prisma rejette "1990-01-01" et
-  // l'erreur remonte en 500. Le mobile envoie deja Date.toISOString().
+  // Prisma exige un horodatage complet : "1990-01-01" le fait echouer en 500,
+  // alors que c'est une date ISO-8601 parfaitement valide. On normalise donc
+  // vers un ISO complet avant validation. Une valeur non reconnue est laissee
+  // telle quelle pour que @IsISO8601 la rejette proprement en 400.
   @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value !== 'string' || value === '') return value;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? value : parsed.toISOString();
+  })
   @IsISO8601()
   birthDate?: string;
 }
