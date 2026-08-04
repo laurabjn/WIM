@@ -68,6 +68,7 @@ const daysFromNow = (days) => {
 const OWNERS = [
   {
     key: 'sophie',
+    birthDate: new Date('1985-03-14T00:00:00.000Z'),
     email: `sophie${DEMO_DOMAIN}`,
     firstName: 'Sophie',
     lastName: 'Martin',
@@ -80,6 +81,7 @@ const OWNERS = [
   },
   {
     key: 'thomas',
+    birthDate: new Date('1990-07-22T00:00:00.000Z'),
     email: `thomas${DEMO_DOMAIN}`,
     firstName: 'Thomas',
     lastName: 'Leroy',
@@ -92,6 +94,7 @@ const OWNERS = [
   },
   {
     key: 'elena',
+    birthDate: new Date('1982-11-03T00:00:00.000Z'),
     email: `elena${DEMO_DOMAIN}`,
     firstName: 'Elena',
     lastName: 'Rossi',
@@ -104,6 +107,7 @@ const OWNERS = [
   },
   {
     key: 'marc',
+    birthDate: new Date('1958-01-19T00:00:00.000Z'),
     email: `marc${DEMO_DOMAIN}`,
     firstName: 'Marc',
     lastName: 'Dubois',
@@ -116,6 +120,7 @@ const OWNERS = [
   },
   {
     key: 'lucia',
+    birthDate: new Date('1993-05-30T00:00:00.000Z'),
     email: `lucia${DEMO_DOMAIN}`,
     firstName: 'Lucia',
     lastName: 'Fernandez',
@@ -370,6 +375,7 @@ async function main() {
       lastName: owner.lastName,
       avatarUrl: owner.avatar,
       bio: owner.bio,
+      birthDate: owner.birthDate,
       country: owner.country,
       nationality: owner.nationality,
       languages: owner.languages,
