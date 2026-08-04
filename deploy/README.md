@@ -120,13 +120,24 @@ cp deploy/.env.prod.example deploy/.env.prod
 chmod 600 deploy/.env.prod
 
 # Générer les secrets
-openssl rand -base64 32   # POSTGRES_PASSWORD
+openssl rand -hex 24      # POSTGRES_PASSWORD (hex : il va dans une URL)
 openssl rand -base64 48   # JWT_ACCESS_SECRET
 openssl rand -base64 48   # JWT_REFRESH_SECRET
 openssl rand -base64 48   # JWT_RESET_SECRET
 
 nano deploy/.env.prod
 ```
+
+Ou, pour les injecter directement sans édition manuelle :
+
+```bash
+sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(openssl rand -hex 24)|" deploy/.env.prod
+sed -i "s|^JWT_ACCESS_SECRET=.*|JWT_ACCESS_SECRET=$(openssl rand -base64 48 | tr -d '\n')|" deploy/.env.prod
+sed -i "s|^JWT_REFRESH_SECRET=.*|JWT_REFRESH_SECRET=$(openssl rand -base64 48 | tr -d '\n')|" deploy/.env.prod
+sed -i "s|^JWT_RESET_SECRET=.*|JWT_RESET_SECRET=$(openssl rand -base64 48 | tr -d '\n')|" deploy/.env.prod
+```
+
+Il ne restera plus qu'à renseigner `SMTP_PASS` à la main.
 
 Les valeurs propres à `worldismine.fr` sont déjà préremplies. Il reste à
 renseigner les trois secrets JWT, `POSTGRES_PASSWORD` et `SMTP_PASS`.
