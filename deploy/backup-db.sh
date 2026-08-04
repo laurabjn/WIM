@@ -48,3 +48,26 @@ docker run --rm -v wim_wim_uploads:/data:ro -v "$BACKUP_DIR":/backup alpine \
 find "$BACKUP_DIR" -name 'wim-*' -type f -mtime +"$RETENTION_DAYS" -delete
 
 echo "[backup] OK — $DUMP_FILE ($(du -h "$DUMP_FILE" | cut -f1))"
+
+# --- Copie hors du VPS ------------------------------------------------------
+# S'active dès que RCLONE_REMOTE est renseigné dans .env.prod (ex. ovh:wim-backups).
+# Sans cette variable, le script se comporte exactement comme avant.
+if [ -n "${RCLONE_REMOTE:-}" ]; then
+  if ! command -v rclone >/dev/null 2>&1; then
+    echo "[backup] ERREUR : RCLONE_REMOTE est défini mais rclone n'est pas installé" >&2
+    exit 1
+  fi
+
+  echo "[backup] Copie vers $RCLONE_REMOTE"
+
+  # `copy` et non `sync` : `sync` répliquerait à distance toute suppression
+  # locale. Un serveur compromis effacerait alors aussi les sauvegardes
+  # distantes — précisément ce contre quoi elles protègent.
+  rclone copy "$BACKUP_DIR" "$RCLONE_REMOTE" --stats-one-line
+
+  # La rétention distante est plus longue que la locale : le stockage objet
+  # coûte peu, et une corruption peut n'être découverte que des semaines après.
+  rclone delete "$RCLONE_REMOTE" --min-age "${REMOTE_RETENTION_DAYS:-90}d"
+
+  echo "[backup] Copie distante OK ($(rclone size "$RCLONE_REMOTE" --json 2>/dev/null | head -c 120))"
+fi
