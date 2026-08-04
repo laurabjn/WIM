@@ -19,8 +19,16 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
       firstName: true,
       lastName: true,
       avatarUrl: true,
-      rating: true,
       createdAt: true,
+      // Les notes de tous les avis reçus par cet hôte, sur l'ensemble de ses
+      // logements. La colonne `rating` de l'utilisateur existe toujours mais
+      // n'est plus lue : c'était une valeur figée, qu'aucun avis ne mettait à
+      // jour, d'où un hôte à 5 étoiles dont les logements affichaient 4,3.
+      homes: {
+        select: {
+          reviews: { select: { score: true } },
+        },
+      },
     },
   },
   reviews: {
@@ -66,13 +74,25 @@ export function mapVehicle(vehicle: PrismaHomeWithRelations['vehicle']) {
 export function mapOwner(owner: PrismaHomeWithRelations['owner']) {
   if (!owner) return null;
 
+  const scores = owner.homes.flatMap((home) =>
+    home.reviews.map((review) => review.score),
+  );
+
   return {
     id: owner.id,
     firstName: owner.firstName,
     lastName: owner.lastName,
     avatarUrl: owner.avatarUrl,
-    // Note de l'hote : sans elle, les cartes affichaient 0.0 et le detail N/A.
-    rating: owner.rating,
+    // Moyenne des avis reçus, arrondie au dixième comme l'affichage.
+    // `null` tant qu'aucun avis n'existe : l'application montre alors « N/A »
+    // plutôt qu'un 0 qui se lirait comme une mauvaise note.
+    rating:
+      scores.length > 0
+        ? Math.round(
+            (scores.reduce((sum, score) => sum + score, 0) / scores.length) *
+              10,
+          ) / 10
+        : null,
     createdAt: owner.createdAt,
   };
 }
