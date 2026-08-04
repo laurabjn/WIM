@@ -19,12 +19,14 @@
       "ios": {
         "simulator": false
       },
+      "environment": "preview",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api"
       }
     },
     "production": {
       "autoIncrement": true,
+      "environment": "production",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api"
       }
