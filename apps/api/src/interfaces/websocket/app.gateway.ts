@@ -9,10 +9,14 @@ import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
 
+const wsCorsOrigin = process.env.WS_CORS_ORIGIN
+  ? process.env.WS_CORS_ORIGIN.split(',').map((origin) => origin.trim())
+  : 'http://localhost:3001';
+
 @WebSocketGateway({
-  namespace: '/ws',
+  namespace: process.env.WS_NAMESPACE || '/ws',
   cors: {
-    origin: 'http://localhost:3001',
+    origin: wsCorsOrigin,
     credentials: true,
   },
 })

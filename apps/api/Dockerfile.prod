@@ -1,0 +1,100 @@
+# Image de production de l'API NestJS.
+# À construire depuis la RACINE du monorepo :
+#   docker build -f apps/api/Dockerfile.prod -t wim-api .
+#
+# node:20-slim (Debian) plutôt qu'Alpine : les moteurs Prisma sont bien mieux
+# supportés sur glibc que sur musl.
+
+# ---------------------------------------------------------------------------
+# Stage 1 — build : dépendances complètes, génération Prisma, compilation Nest
+# ---------------------------------------------------------------------------
+FROM node:20-slim AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Les manifests d'abord : cette couche n'est invalidée que si les deps changent.
+COPY package.json package-lock.json turbo.json ./
+COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
+COPY apps/docs/package.json apps/docs/package.json
+COPY apps/mobile/package.json apps/mobile/package.json
+COPY packages/shared/package.json packages/shared/package.json
+COPY packages/i18n/package.json packages/i18n/package.json
+COPY packages/ui/package.json packages/ui/package.json
+COPY packages/eslint-config/package.json packages/eslint-config/package.json
+COPY packages/typescript-config/package.json packages/typescript-config/package.json
+
+RUN npm ci
+
+# Sources nécessaires au build de l'API (le reste est exclu par .dockerignore).
+COPY apps/api apps/api
+COPY packages packages
+
+RUN npx prisma generate --schema=apps/api/prisma/schema.prisma
+
+WORKDIR /app/apps/api
+# `nest build` émet dist/apps/api/src/** et dist/packages/shared/src/**
+# (racine commune imposée par les imports vers packages/shared).
+RUN npx nest build
+
+# ---------------------------------------------------------------------------
+# Stage 2 — runtime : dépendances de production uniquement + build compilé
+# ---------------------------------------------------------------------------
+FROM node:20-slim AS runner
+
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+COPY package.json package-lock.json turbo.json ./
+COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
+COPY apps/docs/package.json apps/docs/package.json
+COPY apps/mobile/package.json apps/mobile/package.json
+COPY packages/shared/package.json packages/shared/package.json
+COPY packages/i18n/package.json packages/i18n/package.json
+COPY packages/ui/package.json packages/ui/package.json
+COPY packages/eslint-config/package.json packages/eslint-config/package.json
+COPY packages/typescript-config/package.json packages/typescript-config/package.json
+
+# --include-workspace-root : l'API utilise aussi les deps déclarées à la racine.
+RUN npm ci --omit=dev --workspace=api --include-workspace-root \
+    && npm cache clean --force
+
+# Schéma + migrations : requis par `prisma migrate deploy` au démarrage.
+COPY apps/api/prisma apps/api/prisma
+
+# Le client Prisma doit être régénéré ici : le node_modules de ce stage est
+# neuf, celui du builder (qui contenait le client généré) n'a pas été copié.
+RUN npx prisma generate --schema=apps/api/prisma/schema.prisma
+
+COPY --from=builder /app/apps/api/dist apps/api/dist
+
+# Aucun `require('@wim/shared')` n'existe aujourd'hui dans le JS émis (tous les
+# imports sont type-only, donc élidés). Ce lien vers le shared compilé évite un
+# crash au démarrage si un import de valeur est ajouté plus tard.
+RUN mkdir -p node_modules/@wim/shared \
+    && cp -r apps/api/dist/packages/shared/src/. node_modules/@wim/shared/ \
+    && printf '{"name":"@wim/shared","version":"0.0.1","main":"index.js","types":"index.d.ts"}' \
+       > node_modules/@wim/shared/package.json
+
+COPY apps/api/docker-entrypoint.prod.sh /app/docker-entrypoint.prod.sh
+RUN chmod +x /app/docker-entrypoint.prod.sh
+
+# Les fichiers uploadés vivent dans un volume monté ici (voir compose).
+RUN mkdir -p /app/apps/api/uploads/avatars /app/apps/api/uploads/homes \
+    && chown -R node:node /app/apps/api/uploads
+
+WORKDIR /app/apps/api
+USER node
+
+ENV PORT=3000
+EXPOSE 3000
+
+CMD ["sh", "/app/docker-entrypoint.prod.sh"]

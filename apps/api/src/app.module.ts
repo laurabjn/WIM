@@ -12,6 +12,7 @@ import { FavoriteModule } from './interfaces/http/modules/favorite.module';
 import { SwipeModule } from './interfaces/http/modules/swipe.module';
 import { LocationModule } from './interfaces/http/modules/location.module';
 import { ChatModule } from './interfaces/http/modules/chat.module';
+import { HealthModule } from './interfaces/http/modules/health.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { ChatModule } from './interfaces/http/modules/chat.module';
     FavoriteModule,
     SwipeModule,
     LocationModule,
-    ChatModule
+    ChatModule,
+    HealthModule
   ],
 })
 export class AppModule {}
