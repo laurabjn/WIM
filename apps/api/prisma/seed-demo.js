@@ -26,8 +26,37 @@ const DEMO_PASSWORD = 'DemoWim2026';
 
 // Les images doivent être des URL absolues : l'application les passe
 // directement à <Image source={{ uri }} />, sans préfixer par l'URL de l'API.
-const photo = (seed) => `https://picsum.photos/seed/${seed}/1200/800`;
+const photo = (id) => `https://images.unsplash.com/${id}?w=1200&q=80`;
 const avatar = (n) => `https://i.pravatar.cc/300?img=${n}`;
+
+// Identifiants Unsplash, tous vérifiés accessibles. Nommés par pièce pour que
+// les galeries de chaque logement restent cohérentes (extérieur, séjour,
+// chambre, cuisine) plutôt que d'aligner des visuels sans rapport.
+const IMG = {
+  salonLumineux: 'photo-1502672260266-1c1ef2d93688',
+  salon: 'photo-1560448204-e02f11c3d0e2',
+  canape: 'photo-1522708323590-d24dbb6b0267',
+  salonCosy: 'photo-1586023492125-27b2c045efd7',
+  interieur: 'photo-1600607687939-ce8a6c25118c',
+  chambre: 'photo-1600566753086-00f18fb6b3ea',
+  chambre2: 'photo-1571003123894-1f0594d2b5d9',
+  chambre3: 'photo-1505873242700-f289a29e1e0f',
+  sallePain: 'photo-1600210492486-724fe5c67fb0',
+  cuisine: 'photo-1484154218962-a197022b5858',
+  cuisine2: 'photo-1556909212-d5b604d0c90d',
+  maison: 'photo-1512917774080-9991f1c4c750',
+  maisonModerne: 'photo-1600585154340-be6161a56a0c',
+  maison2: 'photo-1600596542815-ffad4c1539a9',
+  maison3: 'photo-1502005229762-cf1b2da7c5d6',
+  chaletBois: 'photo-1493809842364-78817add7ffb',
+  chalet: 'photo-1416331108676-a22ccb276e35',
+  chaletMontagne: 'photo-1449158743715-0a90ebb6d2d8',
+  villaPiscine: 'photo-1613490493576-7fde63acd811',
+  villa: 'photo-1512918728675-ed5a9ecdebfd',
+  voitureCitadine: 'photo-1549317661-bd32c8ce0db2',
+  voitureSuv: 'photo-1533473359331-0135ef1b58bf',
+  voitureBreak: 'photo-1552519507-da3b142c6e3d',
+};
 
 const daysFromNow = (days) => {
   const d = new Date();
@@ -120,14 +149,14 @@ const HOMES = [
     averageRating: 4.8,
     reviewsCount: 24,
     carExchangeAccepted: true,
-    photos: ['lyon-1', 'lyon-2', 'lyon-3', 'lyon-4'],
+    photos: [IMG.salonLumineux, IMG.interieur, IMG.chambre, IMG.cuisine],
     vehicle: {
       brand: 'Renault',
       model: 'Zoe',
       seats: 5,
       type: 'city',
       fuelType: 'ELECTRIC',
-      imageUrl: photo('car-zoe'),
+      imageUrl: photo(IMG.voitureCitadine),
     },
     availabilities: [
       [10, 40],
@@ -154,14 +183,14 @@ const HOMES = [
     averageRating: 4.6,
     reviewsCount: 17,
     carExchangeAccepted: true,
-    photos: ['bordeaux-1', 'bordeaux-2', 'bordeaux-3', 'bordeaux-4'],
+    photos: [IMG.maison, IMG.salon, IMG.chambre2, IMG.cuisine2],
     vehicle: {
       brand: 'Peugeot',
       model: '3008',
       seats: 5,
       type: 'suv',
       fuelType: 'HYBRID',
-      imageUrl: photo('car-3008'),
+      imageUrl: photo(IMG.voitureSuv),
     },
     availabilities: [
       [5, 30],
@@ -188,7 +217,7 @@ const HOMES = [
     averageRating: 4.9,
     reviewsCount: 41,
     carExchangeAccepted: false,
-    photos: ['florence-1', 'florence-2', 'florence-3', 'florence-4'],
+    photos: [IMG.salonCosy, IMG.chambre3, IMG.sallePain, IMG.canape],
     availabilities: [
       [15, 50],
       [80, 120],
@@ -214,14 +243,14 @@ const HOMES = [
     averageRating: 4.7,
     reviewsCount: 33,
     carExchangeAccepted: true,
-    photos: ['chamonix-1', 'chamonix-2', 'chamonix-3', 'chamonix-4'],
+    photos: [IMG.chaletBois, IMG.chalet, IMG.chaletMontagne, IMG.chambre],
     vehicle: {
       brand: 'Volkswagen',
       model: 'Tiguan',
       seats: 5,
       type: 'suv',
       fuelType: 'DIESEL',
-      imageUrl: photo('car-tiguan'),
+      imageUrl: photo(IMG.voitureBreak),
     },
     availabilities: [
       [20, 60],
@@ -248,7 +277,7 @@ const HOMES = [
     averageRating: 4.5,
     reviewsCount: 12,
     carExchangeAccepted: false,
-    photos: ['valence-1', 'valence-2', 'valence-3', 'valence-4'],
+    photos: [IMG.maison2, IMG.maison3, IMG.salon, IMG.cuisine],
     availabilities: [
       [1, 35],
       [50, 90],
@@ -274,7 +303,7 @@ const HOMES = [
     averageRating: 4.4,
     reviewsCount: 9,
     carExchangeAccepted: false,
-    photos: ['lyon-studio-1', 'lyon-studio-2', 'lyon-studio-3'],
+    photos: [IMG.canape, IMG.interieur, IMG.cuisine2],
     availabilities: [[8, 45]],
   },
   {
@@ -297,7 +326,7 @@ const HOMES = [
     averageRating: 5.0,
     reviewsCount: 28,
     carExchangeAccepted: true,
-    photos: ['capferret-1', 'capferret-2', 'capferret-3', 'capferret-4'],
+    photos: [IMG.villaPiscine, IMG.villa, IMG.maisonModerne, IMG.salonCosy],
     availabilities: [
       [30, 70],
       [110, 150],
@@ -323,7 +352,7 @@ const HOMES = [
     averageRating: 4.3,
     reviewsCount: 6,
     carExchangeAccepted: false,
-    photos: ['florence-loft-1', 'florence-loft-2', 'florence-loft-3'],
+    photos: [IMG.salonLumineux, IMG.chambre2, IMG.sallePain],
     availabilities: [[25, 65]],
   },
 ];
