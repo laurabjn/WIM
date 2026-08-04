@@ -104,6 +104,7 @@ const daysFromNow = (days) => {
 const OWNERS = [
   {
     key: 'sophie',
+    memberSince: new Date('2019-04-08T00:00:00.000Z'),
     birthDate: new Date('1985-03-14T00:00:00.000Z'),
     email: `sophie${DEMO_DOMAIN}`,
     firstName: 'Sophie',
@@ -117,6 +118,7 @@ const OWNERS = [
   },
   {
     key: 'thomas',
+    memberSince: new Date('2021-09-16T00:00:00.000Z'),
     birthDate: new Date('1990-07-22T00:00:00.000Z'),
     email: `thomas${DEMO_DOMAIN}`,
     firstName: 'Thomas',
@@ -130,6 +132,7 @@ const OWNERS = [
   },
   {
     key: 'elena',
+    memberSince: new Date('2018-06-02T00:00:00.000Z'),
     birthDate: new Date('1982-11-03T00:00:00.000Z'),
     email: `elena${DEMO_DOMAIN}`,
     firstName: 'Elena',
@@ -143,6 +146,7 @@ const OWNERS = [
   },
   {
     key: 'marc',
+    memberSince: new Date('2020-11-23T00:00:00.000Z'),
     birthDate: new Date('1958-01-19T00:00:00.000Z'),
     email: `marc${DEMO_DOMAIN}`,
     firstName: 'Marc',
@@ -156,6 +160,7 @@ const OWNERS = [
   },
   {
     key: 'lucia',
+    memberSince: new Date('2022-02-11T00:00:00.000Z'),
     birthDate: new Date('1993-05-30T00:00:00.000Z'),
     email: `lucia${DEMO_DOMAIN}`,
     firstName: 'Lucia',
@@ -423,8 +428,11 @@ async function main() {
 
     ownersByKey[owner.key] = await prisma.user.upsert({
       where: { email: owner.email },
-      update: data,
-      create: { email: owner.email, ...data },
+      // createdAt est forcé : l'application affiche « Hôte depuis N ans » à
+      // partir de cette date, et des comptes créés le jour même donnaient
+      // « Hôte depuis 0 ans » partout.
+      update: { ...data, createdAt: owner.memberSince },
+      create: { email: owner.email, ...data, createdAt: owner.memberSince },
     });
   }
   console.log(`[seed] ${OWNERS.length} comptes de démonstration prêts.`);

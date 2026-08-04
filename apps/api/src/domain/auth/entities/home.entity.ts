@@ -48,6 +48,16 @@ export interface ReviewEntity {
   author: ReviewAuthorEntity;
 }
 
+export interface HomeAvailabilityEntity {
+  id: string;
+  homeId: string;
+  startDate: Date;
+  endDate: Date;
+  type: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface HomeEntity {
   id: string;
   ownerId: string;
@@ -72,6 +82,7 @@ export interface HomeEntity {
   carExchangeAccepted: boolean;
   photos: HomePhotoEntity[];
   reviews: ReviewEntity[];
+  availabilities: HomeAvailabilityEntity[];
   vehicle?: VehicleEntity | null;
   createdAt: Date;
   updatedAt: Date;

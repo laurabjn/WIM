@@ -35,6 +35,11 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
       },
     },
   },
+  // Le bandeau du détail lit home.availabilities : sans cet include, il
+  // affichait « Aucune disponibilité » même pour un logement qui en a.
+  availabilities: {
+    orderBy: { startDate: 'asc' },
+  },
 } satisfies Prisma.HomeInclude;
 
 export type PrismaHomeWithRelations = Prisma.HomeGetPayload<{
@@ -127,6 +132,15 @@ export function mapHome(home: PrismaHomeWithRelations): HomeEntity {
     carExchangeAccepted: home.carExchangeAccepted ?? false,
     photos: home.photos.map(mapPhoto),
     reviews: home.reviews.map(mapReview),
+    availabilities: home.availabilities.map((availability) => ({
+      id: availability.id,
+      homeId: availability.homeId,
+      startDate: availability.startDate,
+      endDate: availability.endDate,
+      type: availability.type,
+      createdAt: availability.createdAt,
+      updatedAt: availability.updatedAt,
+    })),
     createdAt: home.createdAt,
     updatedAt: home.updatedAt,
     vehicle: mapVehicle(home.vehicle),
