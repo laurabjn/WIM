@@ -24,6 +24,16 @@
         "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api"
       }
     },
+    "preview-simulator": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api"
+      }
+    },
     "production": {
       "autoIncrement": true,
       "environment": "production",
