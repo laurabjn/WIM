@@ -42,6 +42,7 @@ model User {
 
   chatParticipants ChatParticipant[]
   messages         Message[]
+  reviews          Review[]
 
   @@map("users")
 }
@@ -81,6 +82,7 @@ model Home {
 
   vehicle Vehicle?
   swipes  Swipe[]
+  reviews Review[]
 
   @@index([city, country])
   @@index([latitude, longitude])
@@ -316,4 +318,25 @@ model Message {
   updatedAt DateTime @updatedAt
 
   @@index([chatId, createdAt])
+}
+
+model Review {
+  id String @id @default(uuid())
+
+  homeId String @map("home_id")
+  home   Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
+
+  authorId String @map("author_id")
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  score   Int
+  comment String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Un seul avis par logement et par auteur.
+  @@unique([homeId, authorId])
+  @@index([homeId])
+  @@map("reviews")
 }

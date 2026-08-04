@@ -7,6 +7,7 @@ import {
 } from 'src/domain/auth/repositories/home.repository';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import {
+  HOME_WITH_RELATIONS_INCLUDE,
   PrismaHomeWithRelations,
   mapHome,
   mapPhoto,
@@ -65,19 +66,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
               }
             : undefined,
       },
-      include: {
-        photos: true,
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
     });
 
     return this.mapHome(home);
@@ -85,21 +74,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
 
   async findAll(): Promise<HomeEntity[]> {
     const homes = await this.prisma.home.findMany({
-      include: {
-        photos: {
-          orderBy: { position: 'asc' },
-        },
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
       orderBy: { createdAt: 'desc' },
     });
 
@@ -109,21 +84,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
   async findById(id: string): Promise<HomeEntity | null> {
     const home = await this.prisma.home.findUnique({
       where: { id },
-      include: {
-        photos: {
-          orderBy: { position: 'asc' },
-        },
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
     });
 
     if (!home) return null;
@@ -133,21 +94,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
   async findByOwnerId(ownerId: string): Promise<HomeEntity[]> {
     const homes = await this.prisma.home.findMany({
       where: { ownerId },
-      include: {
-        photos: {
-          orderBy: { position: 'asc' },
-        },
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
       orderBy: { createdAt: 'desc' },
     });
 
@@ -188,21 +135,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
                 }
             : undefined,
       },
-      include: {
-        photos: {
-          orderBy: { position: 'asc' },
-        },
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
     });
 
     return this.mapHome(home);

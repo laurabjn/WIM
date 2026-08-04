@@ -18,7 +18,37 @@ export class PrismaProfileRepository implements ProfileRepository {
 
     if (!user) return null;
 
-    return this.mapUserToProfile(user);
+    // Ces compteurs figuraient dans le contrat partagé et étaient affichés par
+    // l'application, mais n'étaient jamais calculés : la fiche profil montrait
+    // donc toujours 0.
+    const [homesCount, exchangesCount, reviewStats] = await Promise.all([
+      this.prisma.home.count({ where: { ownerId: userId } }),
+
+      // L'utilisateur peut être hôte ou voyageur. Les échanges annulés ne
+      // comptent pas : ils ne représentent aucun séjour réalisé ou à venir.
+      this.prisma.exchange.count({
+        where: {
+          status: { not: 'CANCELLED' },
+          OR: [{ hostId: userId }, { guestId: userId }],
+        },
+      }),
+
+      // Les avis reçus portent sur les logements de l'utilisateur, pas sur
+      // ceux qu'il a lui-même écrits.
+      this.prisma.review.aggregate({
+        where: { home: { ownerId: userId } },
+        _count: { _all: true },
+        _avg: { score: true },
+      }),
+    ]);
+
+    return {
+      ...this.mapUserToProfile(user),
+      homesCount,
+      exchangesCount,
+      reviewsCount: reviewStats._count._all,
+      averageRating: reviewStats._avg.score ?? null,
+    };
   }
 
   async getPublicProfile(userId: string): Promise<Partial<UserProfile> | null> {

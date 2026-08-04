@@ -12,10 +12,17 @@ export async function getLocationDescription(
   latitude?: number | null,
   longitude?: number | null,
   language = 'fr',
+  country?: string | null,
 ): Promise<LocationDescription | null> {
   const params = new URLSearchParams({
     language,
   });
+
+  // Départage les villes homonymes : « Valence » existe en France comme en
+  // Espagne, et l'article Wikipédia générique est une page d'homonymie.
+  if (country) {
+    params.append('country', country);
+  }
 
   if (typeof latitude === 'number') {
     params.append('latitude', String(latitude));

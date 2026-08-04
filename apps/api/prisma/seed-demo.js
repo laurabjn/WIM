@@ -58,6 +58,42 @@ const IMG = {
   voitureBreak: 'photo-1552519507-da3b142c6e3d',
 };
 
+// Piochés à tour de rôle pour chaque logement. L'auteur est choisi parmi les
+// autres propriétaires : la contrainte d'unicité (home_id, author_id) interdit
+// deux avis du même auteur sur un même logement, et personne ne s'auto-évalue.
+const REVIEW_TEMPLATES = [
+  {
+    score: 5,
+    comment:
+      "Séjour parfait du début à la fin. Le logement correspond exactement aux photos, tout était impeccable et l'accueil très chaleureux. Nous reviendrons sans hésiter.",
+  },
+  {
+    score: 4,
+    comment:
+      "Très bel endroit, spacieux et bien situé. Quelques bruits de rue le matin, mais rien de gênant. Les échanges avec les propriétaires ont été fluides.",
+  },
+  {
+    score: 5,
+    comment:
+      'Un vrai coup de cœur. Le quartier est agréable, les commerces sont à deux pas et le logement est encore plus lumineux que sur les photos.',
+  },
+  {
+    score: 4,
+    comment:
+      "L'échange s'est très bien passé. Logement propre, équipement complet, et des recommandations de restaurants qui valaient le détour.",
+  },
+  {
+    score: 5,
+    comment:
+      'Nous avons passé deux semaines formidables. Tout était pensé pour se sentir chez soi, jusqu\'aux petits détails. Merci encore !',
+  },
+  {
+    score: 3,
+    comment:
+      "Bon séjour dans l'ensemble. Le logement est conforme à la description, mais la connexion internet était capricieuse pendant notre séjour.",
+  },
+];
+
 const daysFromNow = (days) => {
   const d = new Date();
   d.setUTCHours(0, 0, 0, 0);
@@ -403,8 +439,33 @@ async function main() {
     console.log(`[seed] ${removed.count} logements de démo précédents supprimés.`);
   }
 
-  for (const home of HOMES) {
+  let totalReviews = 0;
+
+  for (const [index, home] of HOMES.entries()) {
     const owner = ownersByKey[home.owner];
+
+    // Tout le monde sauf le propriétaire : on ne s'évalue pas soi-même.
+    const authors = OWNERS.filter((o) => o.key !== home.owner).map(
+      (o) => ownersByKey[o.key],
+    );
+
+    // 2 à 4 avis selon le logement, pour que les fiches ne se ressemblent pas.
+    const reviews = Array.from({ length: 2 + (index % 3) }, (_, i) => {
+      const template = REVIEW_TEMPLATES[(index + i) % REVIEW_TEMPLATES.length];
+      return {
+        authorId: authors[i % authors.length].id,
+        score: template.score,
+        comment: template.comment,
+        createdAt: daysFromNow(-(10 + i * 25)),
+      };
+    });
+
+    // averageRating et reviewsCount sont stockés sur le logement : les déduire
+    // des avis réellement créés évite d'afficher « 4,8 » sous une liste vide.
+    const averageScore =
+      reviews.reduce((sum, review) => sum + review.score, 0) / reviews.length;
+
+    totalReviews += reviews.length;
 
     await prisma.home.create({
       data: {
@@ -424,8 +485,8 @@ async function main() {
         amenities: home.amenities,
         isAvailableForExchange: true,
         pricePerNight: home.pricePerNight,
-        averageRating: home.averageRating,
-        reviewsCount: home.reviewsCount,
+        averageRating: Math.round(averageScore * 10) / 10,
+        reviewsCount: reviews.length,
         carExchangeAccepted: home.carExchangeAccepted,
 
         photos: {
@@ -445,13 +506,19 @@ async function main() {
           })),
         },
 
+        reviews: {
+          create: reviews,
+        },
+
         ...(home.vehicle ? { vehicle: { create: home.vehicle } } : {}),
       },
     });
   }
 
   const totalPhotos = HOMES.reduce((sum, h) => sum + h.photos.length, 0);
-  console.log(`[seed] ${HOMES.length} logements créés, ${totalPhotos} photos.`);
+  console.log(
+    `[seed] ${HOMES.length} logements créés, ${totalPhotos} photos, ${totalReviews} avis.`,
+  );
   console.log('');
   console.log('Comptes de démonstration (mot de passe commun) :');
   for (const owner of OWNERS) {

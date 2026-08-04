@@ -2,12 +2,16 @@ import { Prisma } from '@prisma/client';
 import {
   HomeEntity,
   HomePhotoEntity,
+  ReviewEntity,
 } from 'src/domain/auth/entities/home.entity';
 
 // Forme Prisma attendue par les mappers : tout repository qui veut produire un
 // HomeEntity complet doit charger ces relations.
 export const HOME_WITH_RELATIONS_INCLUDE = {
-  photos: true,
+  // Triées : la première photo sert de visuel de couverture.
+  photos: {
+    orderBy: { position: 'asc' },
+  },
   vehicle: true,
   owner: {
     select: {
@@ -16,6 +20,18 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
       lastName: true,
       avatarUrl: true,
       createdAt: true,
+    },
+  },
+  reviews: {
+    orderBy: { createdAt: 'desc' },
+    include: {
+      author: {
+        select: {
+          firstName: true,
+          avatarUrl: true,
+          createdAt: true,
+        },
+      },
     },
   },
 } satisfies Prisma.HomeInclude;
@@ -65,6 +81,22 @@ export function mapPhoto(
   };
 }
 
+export function mapReview(
+  review: PrismaHomeWithRelations['reviews'][number],
+): ReviewEntity {
+  return {
+    id: review.id,
+    score: review.score,
+    comment: review.comment,
+    createdAt: review.createdAt,
+    author: {
+      firstName: review.author.firstName,
+      avatarUrl: review.author.avatarUrl,
+      createdAt: review.author.createdAt,
+    },
+  };
+}
+
 export function mapHome(home: PrismaHomeWithRelations): HomeEntity {
   return {
     id: home.id,
@@ -91,6 +123,7 @@ export function mapHome(home: PrismaHomeWithRelations): HomeEntity {
     reviewsCount: home.reviewsCount ?? 0,
     carExchangeAccepted: home.carExchangeAccepted ?? false,
     photos: home.photos.map(mapPhoto),
+    reviews: home.reviews.map(mapReview),
     createdAt: home.createdAt,
     updatedAt: home.updatedAt,
     vehicle: mapVehicle(home.vehicle),

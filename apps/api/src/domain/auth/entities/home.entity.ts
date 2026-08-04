@@ -34,6 +34,20 @@ export interface HomeOwnerEntity {
   createdAt: Date;
 }
 
+export interface ReviewAuthorEntity {
+  firstName?: string | null;
+  avatarUrl?: string | null;
+  createdAt: Date;
+}
+
+export interface ReviewEntity {
+  id: string;
+  score: number;
+  comment: string;
+  createdAt: Date;
+  author: ReviewAuthorEntity;
+}
+
 export interface HomeEntity {
   id: string;
   ownerId: string;
@@ -57,6 +71,7 @@ export interface HomeEntity {
   reviewsCount: number;
   carExchangeAccepted: boolean;
   photos: HomePhotoEntity[];
+  reviews: ReviewEntity[];
   vehicle?: VehicleEntity | null;
   createdAt: Date;
   updatedAt: Date;

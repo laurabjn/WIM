@@ -60,6 +60,7 @@ export function HomeLocationMap({ home }: Props) {
           home.latitude,
           home.longitude,
           'fr',
+          home.country,
         );
 
         console.log('LOCATION DESCRIPTION', data);
