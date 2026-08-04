@@ -112,7 +112,7 @@ const OWNERS = [
     country: 'France',
     nationality: 'française',
     bio: "Architecte à Lyon, je voyage dès que possible et j'adore accueillir.",
-    languages: ['fr', 'en'],
+    languages: ['french', 'english'],
     rating: 5,
   },
   {
@@ -125,7 +125,7 @@ const OWNERS = [
     country: 'France',
     nationality: 'française',
     bio: 'Photographe basé à Bordeaux. Toujours partant pour un échange.',
-    languages: ['fr', 'es'],
+    languages: ['french', 'english'],
     rating: 4,
   },
   {
@@ -138,7 +138,7 @@ const OWNERS = [
     country: 'Italie',
     nationality: 'italienne',
     bio: 'Je vis à Florence avec mes deux chats. Échange de maison depuis 2019.',
-    languages: ['it', 'en', 'fr'],
+    languages: ['english', 'french'],
     rating: 5,
   },
   {
@@ -151,7 +151,7 @@ const OWNERS = [
     country: 'France',
     nationality: 'française',
     bio: 'Retraité, passionné de montagne et de randonnée.',
-    languages: ['fr'],
+    languages: ['french'],
     rating: 4,
   },
   {
@@ -164,7 +164,7 @@ const OWNERS = [
     country: 'Espagne',
     nationality: 'espagnole',
     bio: 'Prof de yoga à Valence, ma maison est ouverte toute l\'année.',
-    languages: ['es', 'en'],
+    languages: ['english'],
     rating: 5,
   },
 ];

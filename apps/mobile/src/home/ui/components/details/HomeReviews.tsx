@@ -204,6 +204,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
     padding: 16,
+    // Les cartes se suivaient sans respiration : l'ombre portée ne suffit pas à
+    // les séparer visuellement quand elles se touchent.
+    marginBottom: 14,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 14,

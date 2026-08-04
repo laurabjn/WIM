@@ -19,6 +19,7 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
       firstName: true,
       lastName: true,
       avatarUrl: true,
+      rating: true,
       createdAt: true,
     },
   },
@@ -65,6 +66,8 @@ export function mapOwner(owner: PrismaHomeWithRelations['owner']) {
     firstName: owner.firstName,
     lastName: owner.lastName,
     avatarUrl: owner.avatarUrl,
+    // Note de l'hote : sans elle, les cartes affichaient 0.0 et le detail N/A.
+    rating: owner.rating,
     createdAt: owner.createdAt,
   };
 }
