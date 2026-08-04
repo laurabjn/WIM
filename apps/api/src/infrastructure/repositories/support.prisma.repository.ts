@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
-import { CreateSupportRequestDto } from 'src/application/support/dto/create-support-request.dto';
+import { CreateSupportRequestData } from 'src/application/support/dto/create-support-request.dto';
 import {
   SupportRequestEntity,
   SupportRequestRepository,
@@ -13,7 +13,7 @@ export class PrismaSupportRequestRepository
   constructor(private readonly prisma: PrismaService) {}
 
   async create(
-    input: CreateSupportRequestDto,
+    input: CreateSupportRequestData,
   ): Promise<SupportRequestEntity> {
     const created = await this.prisma.supportRequest.create({
       data: {

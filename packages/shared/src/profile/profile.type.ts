@@ -1,13 +1,11 @@
+import { STAY_DURATIONS } from '../utils/travelOption';
+
 export type SupportedLocale = 'fr' | 'en';
 
-export const STAY_DURATIONS = [
-  '1w',
-  '2w',
-  '3w',
-  '1m',
-  '2m',
-  '3m'
-];
+// Source unique : la constante vit dans utils/travelOption. La redéclarer ici
+// créait deux symboles homonymes que `index.ts` réexportait tous les deux,
+// rendant `STAY_DURATIONS` ambigu à l'import depuis '@wim/shared'.
+export { STAY_DURATIONS };
 
 export enum IdentityStatus {
   NOT_VERIFIED = 'NOT_VERIFIED',
@@ -26,7 +24,10 @@ export interface TravelPreferences {
   preferredCities?: string[];
   preferredContinents?: string[];
   preferredDestinationsByRegion?: Record<string, string[]>;
-  stayDuration?: typeof STAY_DURATIONS[number] | null;
+  // Volontairement `string` et non l'union littérale de STAY_DURATIONS : le
+  // doublon supprimé ici n'avait pas `as const`, ce champ était donc déjà large.
+  // Le resserrer casserait les écrans qui gèrent la valeur en `useState<string>`.
+  stayDuration?: string | null;
   preferredSeasons?: string[];
   essentialAmenities?: string[];
   preferredEnvironments?: string[];

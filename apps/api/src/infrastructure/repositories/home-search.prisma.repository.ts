@@ -46,7 +46,10 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
           ? {
               availabilities: {
                 some: {
-                  isAvailable: true,
+                  // HomeAvailability n'a pas de booléen `isAvailable` : la
+                  // disponibilité est portée par l'enum `type`
+                  // (AVAILABLE | BLOCKED).
+                  type: 'AVAILABLE',
                   startDate: {
                     lte: new Date(startDate),
                   },

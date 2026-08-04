@@ -125,8 +125,8 @@ export class HomeController {
         isAvailableForExchange: dto.isAvailableForExchange ?? false,
         pricePerNight: dto.pricePerNight,
         averageRating: null,
-        reviewsCount: 0,
-        
+        reviewCount: 0,
+
         carExchangeAccepted: dto.carExchangeAccepted ?? false,
 
         vehicle: dto.carExchangeAccepted ? dto.vehicle ?? null : null,

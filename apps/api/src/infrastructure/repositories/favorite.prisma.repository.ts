@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { FavoriteRepository } from "src/domain/auth/repositories/favorite.repository";
+import { HomeEntity } from "src/domain/auth/entities/home.entity";
 import { PrismaService } from "../database/prisma/prisma.service";
+import { HOME_WITH_RELATIONS_INCLUDE, mapHome } from "./home.mapper";
 
 @Injectable()
 export class FavoriteRepositoryPrisma implements FavoriteRepository {
@@ -20,19 +22,19 @@ export class FavoriteRepositoryPrisma implements FavoriteRepository {
     });
   }
 
-  async listByUser(userId: string) {
+  async listByUser(userId: string): Promise<HomeEntity[]> {
     const favorites = await this.prisma.favorite.findMany({
       where: { userId },
       include: {
+        // Même include que le repository des logements : renvoyer l'objet
+        // Prisma brut ne satisfait pas HomeEntity (`amenities` est un Json,
+        // le véhicule manquait, l'owner exposait tout l'utilisateur).
         home: {
-          include: {
-            photos: true,
-            owner: true,
-          },
+          include: HOME_WITH_RELATIONS_INCLUDE,
         },
       },
     });
 
-    return favorites.map((f) => f.home);
+    return favorites.map((favorite) => mapHome(favorite.home));
   }
 }

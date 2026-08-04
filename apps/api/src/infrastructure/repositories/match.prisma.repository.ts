@@ -62,6 +62,24 @@ export class MatchPrismaRepository
             country: true,
           },
         },
+
+        chat: {
+          select: {
+            id: true,
+            matchId: true,
+            createdAt: true,
+            updatedAt: true,
+
+            participants: {
+              select: {
+                id: true,
+                chatId: true,
+                userId: true,
+                joinedAt: true,
+              },
+            },
+          },
+        },
       },
 
       orderBy: {
