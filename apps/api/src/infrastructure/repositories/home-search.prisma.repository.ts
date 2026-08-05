@@ -76,6 +76,13 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
             avatarUrl: true,
           },
         },
+
+        // Restreint au seul utilisateur courant : la presence d'une ligne
+        // suffit a savoir si le logement est dans ses favoris.
+        favorites: {
+          where: { userId },
+          select: { id: true },
+        },
       },
 
       orderBy: {
@@ -98,6 +105,7 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
       bedrooms: home.bedrooms,
       averageRating: home.averageRating,
       reviewsCount: home.reviewsCount,
+      isFavorite: home.favorites.length > 0,
       photos: home.photos.map((photo) => ({
         id: photo.id,
         url: photo.url,

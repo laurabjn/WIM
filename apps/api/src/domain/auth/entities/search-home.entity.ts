@@ -27,6 +27,9 @@ export type HomeSearchResult = {
   bedrooms: number;
   averageRating: number | null;
   reviewsCount: number;
+  // Etat du favori pour l'utilisateur qui effectue la recherche : sans lui,
+  // l'etoile des resultats repartait systematiquement a vide.
+  isFavorite: boolean;
   photos: Array<{
     id: string;
     url: string;

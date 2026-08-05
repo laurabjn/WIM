@@ -3,6 +3,9 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Review } from '@wim/shared';
 
+// Nombre de lignes affichees tant que l'avis n'est pas deplie.
+const COLLAPSED_LINES = 5;
+
 type Props = {
   reviews?: Review[];
   averageRating?: number | null;
@@ -17,6 +20,18 @@ export function HomeReviews({
   const { t } = useTranslation('home');
   const [expandedReviewIds, setExpandedReviewIds] = useState<string[]>([]);
   const [showAll, setShowAll] = useState(false);
+  // Identifiants des avis dont le texte depasse reellement la hauteur
+  // repliee. Le seuil de 120 caracteres utilise auparavant proposait
+  // « Voir plus » sur des commentaires qui tenaient entierement a l'ecran.
+  const [truncatedReviewIds, setTruncatedReviewIds] = useState<string[]>([]);
+
+  function handleTextLayout(reviewId: string, lineCount: number) {
+    if (lineCount <= COLLAPSED_LINES) return;
+
+    setTruncatedReviewIds((current) =>
+      current.includes(reviewId) ? current : [...current, reviewId],
+    );
+  }
 
   const displayedReviews = useMemo(() => {
     return showAll ? reviews : reviews.slice(0, 1);
@@ -70,12 +85,15 @@ export function HomeReviews({
 
             <Text
               style={styles.comment}
-              numberOfLines={isExpanded ? undefined : 5}
+              numberOfLines={isExpanded ? undefined : COLLAPSED_LINES}
+              onTextLayout={(event) =>
+                handleTextLayout(review.id, event.nativeEvent.lines.length)
+              }
             >
               {review.comment}
             </Text>
 
-            {review.comment.length > 120 ? (
+            {truncatedReviewIds.includes(review.id) ? (
               <TouchableOpacity onPress={() => toggleExpanded(review.id)}>
                 <Text style={styles.readMore}>
                   {isExpanded ? t('reviews.showLess') : t('reviews.showMore')}

@@ -6,6 +6,7 @@ import { View, Text } from 'react-native';
 import { SearchResultsScreen } from "src/search/ui/SearchResultsScreen";
 import { MenuScreen } from "src/menu/ui/MenuScreen";
 import { HomeDetailsScreen } from "src/home/ui/HomeDetailScreen";
+import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
 import { SwipeDetailHomeScreen } from "src/swipe/ui/components/SwipeDetailsHomeScreen";
 import { SwipeHomeScreen } from "src/swipe/ui/SwipeHomeScreen";
 
@@ -28,6 +29,7 @@ export function SearchStackNavigator() {
           <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
           <Stack.Screen name="Swipe" component={SwipeHomeScreen} />
           <Stack.Screen name="HomeDetails" component={HomeDetailsScreen} />
+        <Stack.Screen name="PublicProfile" component={ProfilePublicScreen} />
           <Stack.Screen name="SwipeHomeDetails" component={SwipeDetailHomeScreen} />
         </Stack.Navigator>
     );

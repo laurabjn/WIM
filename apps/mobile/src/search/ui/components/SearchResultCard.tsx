@@ -13,6 +13,11 @@ import {
 import { Star } from 'lucide-react-native';
 import { Home } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
+import { getSession } from 'src/auth/infrastructure/authStorage';
+import {
+  addFavoriteHome,
+  removeFavoriteHome,
+} from 'src/home/infrastructure/home.api';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_HORIZONTAL_MARGIN = 20;
@@ -34,6 +39,34 @@ export function SearchResultCard({
 }: Props) {
   const { t } = useTranslation('profile');
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(
+    home.isFavorite ?? false,
+  );
+
+  async function handleToggleFavorite() {
+    // Bascule immediate puis appel reseau : l'etoile ne doit pas attendre le
+    // serveur pour reagir. En cas d'echec, on revient a l'etat precedent.
+    const nextValue = !isFavorite;
+    setIsFavorite(nextValue);
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) {
+        setIsFavorite(!nextValue);
+        return;
+      }
+
+      if (nextValue) {
+        await addFavoriteHome(session.accessToken, home.id);
+      } else {
+        await removeFavoriteHome(session.accessToken, home.id);
+      }
+    } catch (error) {
+      setIsFavorite(!nextValue);
+      console.log('Toggle favorite error:', error);
+    }
+  }
 
   const photos =
     home.photos && home.photos.length > 0
@@ -59,11 +92,7 @@ export function SearchResultCard({
   }
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.95}
-      onPress={onPress}
-    >
+    <View style={styles.card}>
       <View style={styles.carouselContainer}>
         <ScrollView
           horizontal
@@ -74,29 +103,30 @@ export function SearchResultCard({
           scrollEventThrottle={16}
         >
           {photos.map((photo, index) => (
-            <Image
+            <TouchableOpacity
               key={
                 photo.id ??
                 `${photo.url}-${index}`
               }
-              source={{ uri: photo.url }}
-              style={styles.image}
-            />
+              activeOpacity={0.95}
+              onPress={onPress}
+            >
+              <Image
+                source={{ uri: photo.url }}
+                style={styles.image}
+              />
+            </TouchableOpacity>
           ))}
         </ScrollView>
 
         <TouchableOpacity
           style={styles.favoriteButton}
           activeOpacity={0.8}
-          onPress={(event) => {
-            event.stopPropagation();
-            console.log(
-              'Favorite pressed:',
-              home.id,
-            );
-          }}
+          onPress={handleToggleFavorite}
         >
-          <Text style={styles.favorite}>☆</Text>
+          <Text style={styles.favorite}>
+            {isFavorite ? '★' : '☆'}
+          </Text>
         </TouchableOpacity>
 
         {photos.length > 1 ? (
@@ -121,7 +151,11 @@ export function SearchResultCard({
         </View>
       </View>
 
-      <View style={styles.content}>
+      <TouchableOpacity
+        style={styles.content}
+        activeOpacity={0.95}
+        onPress={onPress}
+      >
         <View style={styles.topRow}>
           <View style={styles.left}>
             <Text style={styles.title}>
@@ -158,8 +192,8 @@ export function SearchResultCard({
             {t('available')}
           </Text>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 }
 
