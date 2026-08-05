@@ -34,8 +34,6 @@ async function bootstrap() {
     prefix: '/uploads',
   });
 
-  // Derrière le reverse proxy (Caddy), fait confiance aux en-têtes X-Forwarded-*
-  // pour que req.ip et req.protocol reflètent le client réel et non le proxy.
   app.set('trust proxy', 1);
 
   const port = Number(process.env.PORT) || 3002;

@@ -26,8 +26,6 @@ export class SendMessageUseCase {
     private readonly messageRepository: MessageRepository,
   ) {}
 
-  // Renvoie le contrat partagé avec les clients (dates ISO), pas le type du
-  // domaine (dates `Date`) : c'est `mapMessage` qui fait la conversion.
   async execute({
     chatId,
     senderId,

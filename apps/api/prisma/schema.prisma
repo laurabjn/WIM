@@ -335,7 +335,6 @@ model Review {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  // Un seul avis par logement et par auteur.
   @@unique([homeId, authorId])
   @@index([homeId])
   @@map("reviews")

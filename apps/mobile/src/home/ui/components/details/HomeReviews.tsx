@@ -3,7 +3,6 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Review } from '@wim/shared';
 
-// Nombre de lignes affichees tant que l'avis n'est pas deplie.
 const COLLAPSED_LINES = 5;
 
 type Props = {
@@ -20,9 +19,6 @@ export function HomeReviews({
   const { t } = useTranslation('home');
   const [expandedReviewIds, setExpandedReviewIds] = useState<string[]>([]);
   const [showAll, setShowAll] = useState(false);
-  // Identifiants des avis dont le texte depasse reellement la hauteur
-  // repliee. Le seuil de 120 caracteres utilise auparavant proposait
-  // « Voir plus » sur des commentaires qui tenaient entierement a l'ecran.
   const [truncatedReviewIds, setTruncatedReviewIds] = useState<string[]>([]);
 
   function handleTextLayout(reviewId: string, lineCount: number) {
@@ -222,8 +218,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
     padding: 16,
-    // Les cartes se suivaient sans respiration : l'ombre portée ne suffit pas à
-    // les séparer visuellement quand elles se touchent.
     marginBottom: 14,
     shadowColor: '#000',
     shadowOpacity: 0.1,

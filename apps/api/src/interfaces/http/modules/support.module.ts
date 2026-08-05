@@ -18,8 +18,6 @@ import { USER_REPOSITORY } from '../tokens/token';
     },
     {
       provide: CreateSupportRequestUseCase,
-      // Le use case résout l'auteur (email, nom complet) via le UserRepository
-      // avant d'enregistrer la demande.
       useFactory: (repo: PrismaSupportRequestRepository, userRepo) =>
         new CreateSupportRequestUseCase(repo, userRepo),
       inject: [PrismaSupportRequestRepository, USER_REPOSITORY],

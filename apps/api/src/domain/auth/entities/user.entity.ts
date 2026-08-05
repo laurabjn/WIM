@@ -63,7 +63,6 @@ export class User {
   }
 
   /**
-   * Mapping depuis la couche infra (Prisma → domaine)
    */
   static fromPersistence(prismaUser: PrismaUser): User {
     return new User(
@@ -77,8 +76,6 @@ export class User {
       prismaUser.country,
       prismaUser.nationality ?? '',
       prismaUser.phone,
-      // birth_date est nullable en base : sans le `?.`, tout utilisateur sans
-      // date de naissance faisait echouer sa propre connexion avec un 500.
       prismaUser.birthDate?.toISOString() ?? '',
       prismaUser.languages ? JSON.stringify(prismaUser.languages) : '',
       prismaUser.isAdmin,

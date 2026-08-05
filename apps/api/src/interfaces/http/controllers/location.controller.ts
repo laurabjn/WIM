@@ -15,7 +15,6 @@ type WikipediaPage = {
     lat: number;
     lon: number;
   }>;
-  // Présent uniquement sur les pages d'homonymie.
   pageprops?: {
     disambiguation?: string;
   };
@@ -43,10 +42,6 @@ export class LocationController {
       return null;
     }
 
-    // L'article portant exactement le nom de la ville est presque toujours le
-    // bon. On le tente en premier : la recherche par coordonnées renvoyait le
-    // lieu le plus proche du point donné, donc un bâtiment ("Mairie de Lyon",
-    // "Église Saint-Michel de Chamonix") plutôt que la ville elle-même.
     const resultFromTitle = await this.findDescriptionByTitle(
       normalizedCity,
       language,
@@ -56,8 +51,6 @@ export class LocationController {
       return resultFromTitle;
     }
 
-    // Titre ambigu (« Valence » renvoie une page d'homonymie) : le pays permet
-    // de trancher.
     const resultFromSearch = await this.findDescriptionBySearch(
       normalizedCity,
       language,
@@ -68,7 +61,6 @@ export class LocationController {
       return resultFromSearch;
     }
 
-    // Dernier recours seulement, pour les lieux sans article dédié.
     const parsedLatitude = Number(latitude);
     const parsedLongitude = Number(longitude);
 
@@ -95,7 +87,6 @@ export class LocationController {
       action: 'query',
       format: 'json',
       titles: city,
-      // Suit les redirections : « Chamonix » mène à « Chamonix-Mont-Blanc ».
       redirects: '1',
       prop: 'extracts|description|info|coordinates|pageprops',
       inprop: 'url',
@@ -106,8 +97,6 @@ export class LocationController {
     const data = await this.fetchWikipedia(language, params);
     const page = Object.values(data?.query?.pages ?? {})[0];
 
-    // Une page d'homonymie n'a aucune valeur informative : on laisse la
-    // recherche par pays trancher.
     if (page?.pageprops?.disambiguation !== undefined) {
       return null;
     }
@@ -170,9 +159,6 @@ export class LocationController {
       action: 'query',
       format: 'json',
       generator: 'search',
-      // Le pays du logement, et non « Gironde France » comme auparavant : cette
-      // valeur codée en dur faisait remonter « Sainte-Florence (Gironde) » pour
-      // Florence, ou un département français pour Lyon.
       gsrsearch: country ? `${city} ${country}` : city,
       gsrlimit: '10',
       gsrnamespace: '0',
@@ -229,8 +215,6 @@ export class LocationController {
         score += 60;
       }
 
-      // Privilégie les articles décrivant une localité plutôt qu'un monument
-      // ou une administration situés dans la ville.
       if (
         normalizedDescription.includes('commune') ||
         normalizedDescription.includes('ville') ||

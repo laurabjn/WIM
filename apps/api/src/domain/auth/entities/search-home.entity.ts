@@ -20,15 +20,10 @@ export type HomeSearchResult = {
   longitude: number | null;
   coverPhotoUrl: string | null;
 
-  // Champs attendus par les cartes de résultats. Sans eux, la carte affichait
-  // « undefined Chambres » et une note vide : c'est pour cette raison que
-  // l'écran de résultats s'appuyait encore sur des données fictives.
   beds: number;
   bedrooms: number;
   averageRating: number | null;
   reviewsCount: number;
-  // Etat du favori pour l'utilisateur qui effectue la recherche : sans lui,
-  // l'etoile des resultats repartait systematiquement a vide.
   isFavorite: boolean;
   photos: Array<{
     id: string;

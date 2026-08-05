@@ -1,37 +1,14 @@
-/**
- * Jeu de données de démonstration.
- *
- * Écrit en JavaScript et non en TypeScript à dessein : l'image de production
- * n'embarque pas `ts-node` (dépendances de dev exclues), alors que `node`,
- * `@prisma/client` et `bcrypt` y sont présents. Le dossier prisma/ étant copié
- * dans l'image, ce script s'exécute directement dans le conteneur :
- *
- *   sudo docker exec wim_api node prisma/seed-demo.js
- *
- * Rejouable : les comptes de démo sont mis à jour plutôt que dupliqués, et
- * leurs logements sont recréés à chaque exécution.
- *
- * Pour tout supprimer :
- *   sudo docker exec wim_db psql -U wim -d wim \
- *     -c "DELETE FROM users WHERE email LIKE '%@demo.worldismine.fr';"
- */
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
 
-// Suffixe qui identifie les comptes de démo et permet de les retrouver.
 const DEMO_DOMAIN = '@demo.worldismine.fr';
 const DEMO_PASSWORD = 'DemoWim2026';
 
-// Les images doivent être des URL absolues : l'application les passe
-// directement à <Image source={{ uri }} />, sans préfixer par l'URL de l'API.
 const photo = (id) => `https://images.unsplash.com/${id}?w=1200&q=80`;
 const avatar = (n) => `https://i.pravatar.cc/300?img=${n}`;
 
-// Identifiants Unsplash, tous vérifiés accessibles. Nommés par pièce pour que
-// les galeries de chaque logement restent cohérentes (extérieur, séjour,
-// chambre, cuisine) plutôt que d'aligner des visuels sans rapport.
 const IMG = {
   salonLumineux: 'photo-1502672260266-1c1ef2d93688',
   salon: 'photo-1560448204-e02f11c3d0e2',
@@ -58,9 +35,6 @@ const IMG = {
   voitureBreak: 'photo-1552519507-da3b142c6e3d',
 };
 
-// Piochés à tour de rôle pour chaque logement. L'auteur est choisi parmi les
-// autres propriétaires : la contrainte d'unicité (home_id, author_id) interdit
-// deux avis du même auteur sur un même logement, et personne ne s'auto-évalue.
 const REVIEW_TEMPLATES = [
   {
     score: 5,
@@ -407,8 +381,6 @@ async function main() {
   console.log('[seed] Mots de passe : hachage en cours…');
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
 
-  // upsert plutôt que create : le script doit pouvoir être relancé sans
-  // dupliquer les comptes ni invalider les sessions existantes.
   const ownersByKey = {};
   for (const owner of OWNERS) {
     const data = {
@@ -428,17 +400,12 @@ async function main() {
 
     ownersByKey[owner.key] = await prisma.user.upsert({
       where: { email: owner.email },
-      // createdAt est forcé : l'application affiche « Hôte depuis N ans » à
-      // partir de cette date, et des comptes créés le jour même donnaient
-      // « Hôte depuis 0 ans » partout.
       update: { ...data, createdAt: owner.memberSince },
       create: { email: owner.email, ...data, createdAt: owner.memberSince },
     });
   }
   console.log(`[seed] ${OWNERS.length} comptes de démonstration prêts.`);
 
-  // Les logements sont recréés à chaque exécution. Les photos, disponibilités,
-  // véhicules, favoris et swipes associés partent en cascade (onDelete: Cascade).
   const ownerIds = Object.values(ownersByKey).map((u) => u.id);
   const removed = await prisma.home.deleteMany({
     where: { ownerId: { in: ownerIds } },
@@ -452,12 +419,10 @@ async function main() {
   for (const [index, home] of HOMES.entries()) {
     const owner = ownersByKey[home.owner];
 
-    // Tout le monde sauf le propriétaire : on ne s'évalue pas soi-même.
     const authors = OWNERS.filter((o) => o.key !== home.owner).map(
       (o) => ownersByKey[o.key],
     );
 
-    // 2 à 4 avis selon le logement, pour que les fiches ne se ressemblent pas.
     const reviews = Array.from({ length: 2 + (index % 3) }, (_, i) => {
       const template = REVIEW_TEMPLATES[(index + i) % REVIEW_TEMPLATES.length];
       return {
@@ -468,8 +433,6 @@ async function main() {
       };
     });
 
-    // averageRating et reviewsCount sont stockés sur le logement : les déduire
-    // des avis réellement créés évite d'afficher « 4,8 » sous une liste vide.
     const averageScore =
       reviews.reduce((sum, review) => sum + review.score, 0) / reviews.length;
 
@@ -504,8 +467,6 @@ async function main() {
           })),
         },
 
-        // Des périodes futures : la recherche par dates filtre sur
-        // startDate <= début demandé et endDate >= fin demandée.
         availabilities: {
           create: home.availabilities.map(([from, to]) => ({
             startDate: daysFromNow(from),

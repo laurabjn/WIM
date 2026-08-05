@@ -17,8 +17,6 @@ import {
 export class HomeRepositoryPrisma implements HomeRepository {
   constructor(private readonly prisma: PrismaService) { }
 
-  // Les mappers vivent dans ./home.mapper afin que les autres repositories qui
-  // renvoient des HomeEntity (favoris, notamment) partagent la même conversion.
   private mapPhoto(photo: PrismaHomeWithRelations['photos'][number]): HomePhotoEntity {
     return mapPhoto(photo);
   }

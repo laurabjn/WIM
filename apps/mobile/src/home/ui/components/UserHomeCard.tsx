@@ -55,8 +55,6 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
             {home.title}
           </Text>
           <Text style={styles.rating}>
-            {/* La note du logement, et non celle de l'hote : la carte affichait
-                5 alors que la fiche de ce meme logement indiquait 4,3. */}
             ★ {home.averageRating?.toFixed(1) ?? '0.0'}
           </Text>
         </View>

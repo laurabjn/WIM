@@ -84,9 +84,6 @@ export const SearchResultsScreen: React.FC<Props> = ({
           return;
         }
 
-        // L'autocompletion renvoie l'intitule complet du lieu
-        // (« Lyon, Auvergne-Rhone-Alpes, France ») alors que la base ne stocke
-        // que la ville : sans cette extraction, aucun resultat ne remonte.
         const data = await searchHomesApi(session.accessToken, {
           city: city?.split(',')[0]?.trim(),
           startDate,

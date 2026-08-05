@@ -27,10 +27,6 @@ type AmenityIconProps = {
 export type AmenityIconComponent =
   React.ComponentType<AmenityIconProps>;
 
-// Les mots-clés couvrent les deux vocabulaires en circulation : les libellés
-// saisis en français, et les clés anglaises de ESSENTIAL_AMENITIES (@wim/shared)
-// que l'écran de création de logement enregistre. Sans les secondes, seuls
-// « wifi » et « parking » obtenaient une icône.
 const AMENITY_ICON_RULES: Array<{
   keywords: string[];
   icon: AmenityIconComponent;

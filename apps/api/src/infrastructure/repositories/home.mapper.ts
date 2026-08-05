@@ -5,10 +5,7 @@ import {
   ReviewEntity,
 } from 'src/domain/auth/entities/home.entity';
 
-// Forme Prisma attendue par les mappers : tout repository qui veut produire un
-// HomeEntity complet doit charger ces relations.
 export const HOME_WITH_RELATIONS_INCLUDE = {
-  // Triées : la première photo sert de visuel de couverture.
   photos: {
     orderBy: { position: 'asc' },
   },
@@ -20,10 +17,6 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
       lastName: true,
       avatarUrl: true,
       createdAt: true,
-      // Les notes de tous les avis reçus par cet hôte, sur l'ensemble de ses
-      // logements. La colonne `rating` de l'utilisateur existe toujours mais
-      // n'est plus lue : c'était une valeur figée, qu'aucun avis ne mettait à
-      // jour, d'où un hôte à 5 étoiles dont les logements affichaient 4,3.
       homes: {
         select: {
           reviews: { select: { score: true } },
@@ -43,8 +36,6 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
       },
     },
   },
-  // Le bandeau du détail lit home.availabilities : sans cet include, il
-  // affichait « Aucune disponibilité » même pour un logement qui en a.
   availabilities: {
     orderBy: { startDate: 'asc' },
   },
@@ -83,9 +74,6 @@ export function mapOwner(owner: PrismaHomeWithRelations['owner']) {
     firstName: owner.firstName,
     lastName: owner.lastName,
     avatarUrl: owner.avatarUrl,
-    // Moyenne des avis reçus, arrondie au dixième comme l'affichage.
-    // `null` tant qu'aucun avis n'existe : l'application montre alors « N/A »
-    // plutôt qu'un 0 qui se lirait comme une mauvaise note.
     rating:
       scores.length > 0
         ? Math.round(
@@ -142,8 +130,6 @@ export function mapHome(home: PrismaHomeWithRelations): HomeEntity {
     bedrooms: home.bedrooms ?? 0,
     bathrooms: home.bathrooms ?? 0,
     homeType: home.homeType,
-    // `amenities` est une colonne Json : Prisma la type en JsonValue, il faut
-    // donc vérifier que c'est bien un tableau avant de la présenter en string[].
     amenities: Array.isArray(home.amenities) ? (home.amenities as string[]) : [],
     isAvailableForExchange: home.isAvailableForExchange ?? false,
     pricePerNight: home.pricePerNight ?? null,

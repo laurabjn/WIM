@@ -37,9 +37,6 @@ export type MatchWithUsersRecord = {
   user1: MatchUserRecord;
   user2: MatchUserRecord;
 
-  // Le chat est une relation de Match, pas de User : un match n'a qu'une seule
-  // conversation, partagée par les deux participants. Nullable tant qu'aucune
-  // conversation n'a été ouverte pour ce match.
   chat: MatchChatRecord | null;
 };
 

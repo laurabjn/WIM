@@ -26,9 +26,6 @@ export class FavoriteRepositoryPrisma implements FavoriteRepository {
     const favorites = await this.prisma.favorite.findMany({
       where: { userId },
       include: {
-        // Même include que le repository des logements : renvoyer l'objet
-        // Prisma brut ne satisfait pas HomeEntity (`amenities` est un Json,
-        // le véhicule manquait, l'owner exposait tout l'utilisateur).
         home: {
           include: HOME_WITH_RELATIONS_INCLUDE,
         },

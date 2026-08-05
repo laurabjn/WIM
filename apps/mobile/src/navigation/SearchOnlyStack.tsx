@@ -29,9 +29,6 @@ export function SearchOnlyStackNavigator() {
         component={SearchResultsScreen}
       />
 
-      {/* Sans ces deux ecrans, React Navigation les cherchait dans l'onglet
-          Accueil : ouvrir un resultat basculait d'onglet, et le retour
-          ramenait au menu au lieu des resultats. */}
       <Stack.Screen
         name="HomeDetails"
         component={HomeDetailsScreen}

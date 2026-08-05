@@ -25,9 +25,6 @@ export class RegisterDto {
   })
   password!: string;
 
-  // Ces champs sont facultatifs a l'inscription. Sans @IsOptional(), un client
-  // qui n'envoie pas la cle (JSON.stringify omet les valeurs undefined, par
-  // exemple quand aucune photo de profil n'est choisie) recevait un 400.
   @IsOptional()
   @IsString()
   firstName?: string;
@@ -56,10 +53,6 @@ export class RegisterDto {
   @IsString()
   phone?: string;
 
-  // Prisma exige un horodatage complet : "1990-01-01" le fait echouer en 500,
-  // alors que c'est une date ISO-8601 parfaitement valide. On normalise donc
-  // vers un ISO complet avant validation. Une valeur non reconnue est laissee
-  // telle quelle pour que @IsISO8601 la rejette proprement en 400.
   @IsOptional()
   @Transform(({ value }) => {
     if (typeof value !== 'string' || value === '') return value;

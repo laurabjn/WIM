@@ -18,8 +18,6 @@ export async function getLocationDescription(
     language,
   });
 
-  // Départage les villes homonymes : « Valence » existe en France comme en
-  // Espagne, et l'article Wikipédia générique est une page d'homonymie.
   if (country) {
     params.append('country', country);
   }
