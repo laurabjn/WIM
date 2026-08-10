@@ -1,64 +1,35 @@
 import { API_URL } from '../../config/api';
+import type {
+  ChatMessages,
+  ChatMessagesPage,
+  MyChatListItem,
+  UnreadMessagesCount,
+} from '@wim/shared';
 
-export type ChatUser = {
-  id: string;
-  firstName: string | null;
-  lastName: string | null;
-  avatarUrl: string | null;
-};
-
-export type ChatItem = {
-  id: string;
-  matchId: string;
-  user: ChatUser | null;
-  lastMessage: {
-    id: string;
-    content: string;
-    senderId: string;
-    createdAt: string;
-  } | null;
-  updatedAt: string;
-};
-
-export type ChatMessage = {
-  id: string;
-  chatId: string;
-  senderId: string;
-  content: string;
-  createdAt: string;
-  sender: ChatUser;
-};
-
-async function parseResponse(
-  response: Response,
-) {
+async function parseResponse(response: Response) {
   const data = await response.json();
 
   if (!response.ok) {
-    const message =
-      Array.isArray(data?.message)
-        ? data.message.join(', ')
-        : data?.message;
+    const message = Array.isArray(data?.message)
+      ? data.message.join(', ')
+      : data?.message;
 
-    throw new Error(
-      message ?? 'Une erreur est survenue',
-    );
+    throw new Error(message ?? 'Une erreur est survenue');
   }
 
   return data;
 }
 
+function authHeaders(token: string) {
+  return { Authorization: `Bearer ${token}` };
+}
+
 export async function getChatsApi(
   token: string,
-): Promise<ChatItem[]> {
-  const response = await fetch(
-    `${API_URL}/chats`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+): Promise<MyChatListItem[]> {
+  const response = await fetch(`${API_URL}/chats`, {
+    headers: authHeaders(token),
+  });
 
   return parseResponse(response);
 }
@@ -66,14 +37,18 @@ export async function getChatsApi(
 export async function getMessagesApi(
   token: string,
   chatId: string,
-): Promise<ChatMessage[]> {
+  options: { cursor?: string; limit?: number } = {},
+): Promise<ChatMessagesPage> {
+  const params = new URLSearchParams();
+
+  if (options.cursor) params.append('cursor', options.cursor);
+  if (options.limit) params.append('limit', String(options.limit));
+
+  const query = params.toString();
+
   const response = await fetch(
-    `${API_URL}/chats/${chatId}/messages`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
+    `${API_URL}/chats/${chatId}/messages${query ? `?${query}` : ''}`,
+    { headers: authHeaders(token) },
   );
 
   return parseResponse(response);
@@ -83,22 +58,37 @@ export async function sendMessageApi(
   token: string,
   chatId: string,
   content: string,
-): Promise<ChatMessage> {
-  const response = await fetch(
-    `${API_URL}/chats/${chatId}/messages`,
-    {
-      method: 'POST',
-
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-
-      body: JSON.stringify({
-        content,
-      }),
+): Promise<ChatMessages> {
+  const response = await fetch(`${API_URL}/chats/${chatId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders(token),
     },
-  );
+    body: JSON.stringify({ content }),
+  });
+
+  return parseResponse(response);
+}
+
+export async function markChatAsReadApi(
+  token: string,
+  chatId: string,
+): Promise<void> {
+  const response = await fetch(`${API_URL}/chats/${chatId}/read`, {
+    method: 'PATCH',
+    headers: authHeaders(token),
+  });
+
+  await parseResponse(response);
+}
+
+export async function getUnreadCountApi(
+  token: string,
+): Promise<UnreadMessagesCount> {
+  const response = await fetch(`${API_URL}/chats/unread-count`, {
+    headers: authHeaders(token),
+  });
 
   return parseResponse(response);
 }

@@ -687,5 +687,20 @@
     "homenotAvailable": "Ce logement n'est plus disponible",
     "match": "C’est un match 🎉",
     "matchText": "Vous et {{firstName}} vous êtes likés mutuellement."
+  },
+  "chat": {
+    "title": "Messages",
+    "empty": "Aucune conversation",
+    "emptyDescription": "Vos conversations apparaîtront ici dès que vous aurez un match.",
+    "loadError": "Impossible de charger les conversations.",
+    "messagePlaceholder": "Votre message...",
+    "send": "Envoyer",
+    "sendError": "Le message n'a pas pu être envoyé.",
+    "noMessages": "Aucun message pour le moment",
+    "startConversation": "Écrivez le premier message pour lancer la discussion.",
+    "loadingMore": "Chargement des messages précédents...",
+    "seen": "Vu",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier"
   }
 }

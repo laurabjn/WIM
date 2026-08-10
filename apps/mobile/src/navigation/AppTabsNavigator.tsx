@@ -15,6 +15,8 @@ import { CustomTabBar } from './components/CustomTabBar';
 import { ExchangesScreen } from 'src/home/ui/ExchangesScreen';
 import { SearchStackNavigator } from './SearchStack';
 import { SearchOnlyStackNavigator } from './SearchOnlyStack';
+import { MessagesStackNavigator } from './MessagesStack';
+import { useUnreadMessages } from 'src/chat/hooks/useUnreadMessages';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
@@ -32,6 +34,7 @@ type Props = {
 
 export function AppTabsNavigator({ setIsAuthenticated }: Props) {
   const { t } = useTranslation('common');
+  const unreadCount = useUnreadMessages();
 
   return (
     <Tab.Navigator
@@ -76,9 +79,10 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
       </Tab.Screen>
       <Tab.Screen
         name="MessagesTab"
-        component={TestScreen}
+        component={MessagesStackNavigator}
         options={{
           title: t('messages'),
+          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
         }}
       />
       <Tab.Screen

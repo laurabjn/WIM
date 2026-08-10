@@ -27,7 +27,7 @@
     "available": "Available",
     "availableWithBlockDates": "Available with blocked dates"
   },
-  "auth": {    
+  "auth": {
     "welcomeTitle": "Welcome to Wim!",
     "guidedTour": "Guided tour",
     "goToWim": "Go to Wim",
@@ -688,5 +688,20 @@
     "homenotAvailable": "This home is no longer available",
     "match": "It's a match 🎉",
     "matchText": "You and {{firstName}} liked each other."
+  },
+  "chat": {
+    "title": "Messages",
+    "empty": "No conversations",
+    "emptyDescription": "Your conversations will appear here as soon as you have a match.",
+    "loadError": "Could not load conversations.",
+    "messagePlaceholder": "Your message...",
+    "send": "Send",
+    "sendError": "The message could not be sent.",
+    "noMessages": "No messages yet",
+    "startConversation": "Write the first message to start the conversation.",
+    "loadingMore": "Loading earlier messages...",
+    "seen": "Seen",
+    "today": "Today",
+    "yesterday": "Yesterday"
   }
 }

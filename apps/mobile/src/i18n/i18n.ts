@@ -27,6 +27,7 @@ export async function initI18n() {
           exchange: fr.exchange,
           search: fr.search,
           swipe: fr.swipe,
+          chat: fr.chat,
         },
         en: {
           common: en.common,
@@ -37,12 +38,13 @@ export async function initI18n() {
           contact: en.contact,
           exchange: en.exchange,
           search: en.search,
-          swipe: en.swipe
+          swipe: en.swipe,
+          chat: en.chat
         },
       },
       lng: locale,
       fallbackLng: "fr",
-      ns: ["common", "auth", "profile", "home", "availability", "contact", "exchange", "search", "swipe"],
+      ns: ["common", "auth", "profile", "home", "availability", "contact", "exchange", "search", "swipe", "chat"],
       defaultNS: "common",
       interpolation: {escapeValue: false}
     });
