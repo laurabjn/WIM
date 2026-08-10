@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -15,6 +16,8 @@ import { GetChatMessagesDto } from 'src/application/message/dto/get-chat-message
 import { GetChatMessagesUseCase } from 'src/application/message/use-cases/get-chat-messages.usecase';
 import { GetMyChatsUseCase } from 'src/application/message/use-cases/get-my-chat.usecase';
 import { SendMessageUseCase } from 'src/application/message/use-cases/send-message.usecase';
+import { MarkChatAsReadUseCase } from 'src/application/message/use-cases/mark-chat-as-read.usecase';
+import { GetUnreadCountUseCase } from 'src/application/message/use-cases/get-unread-count.usecase';
 
 type AuthenticatedRequest = {
   user?: {
@@ -31,6 +34,8 @@ export class ChatController {
     private readonly getMyChats: GetMyChatsUseCase,
     private readonly getMessages: GetChatMessagesUseCase,
     private readonly sendMessage: SendMessageUseCase,
+    private readonly markChatAsRead: MarkChatAsReadUseCase,
+    private readonly getUnreadCount: GetUnreadCountUseCase,
   ) {}
 
   private getUserId(
@@ -55,6 +60,20 @@ export class ChatController {
     return this.getMyChats.execute(
       this.getUserId(request),
     );
+  }
+
+  @Get('unread-count')
+  countUnread(@Req() request: AuthenticatedRequest) {
+    return this.getUnreadCount.execute(this.getUserId(request));
+  }
+
+  @Patch(':chatId/read')
+  markAsRead(
+    @Req() request: AuthenticatedRequest,
+    @Param('chatId')
+    chatId: string,
+  ) {
+    return this.markChatAsRead.execute(chatId, this.getUserId(request));
   }
 
   @Get(':chatId/messages')

@@ -68,6 +68,33 @@ const REVIEW_TEMPLATES = [
   },
 ];
 
+const CONVERSATIONS = [
+  {
+    between: ['sophie', 'thomas'],
+    messages: [
+      { from: 'thomas', content: 'Bonjour Sophie ! Votre appartement a Lyon me plait beaucoup. Seriez-vous interessee par un echange fin aout ?', daysAgo: 6 },
+      { from: 'sophie', content: 'Bonjour Thomas, avec plaisir ! Bordeaux nous tente depuis longtemps. Vous seriez la sur quelles dates exactement ?', daysAgo: 6 },
+      { from: 'thomas', content: 'Du 15 au 25 aout de preference. La maison est libre et le jardin est parfait si vous venez en famille.', daysAgo: 5 },
+      { from: 'sophie', content: 'Ces dates nous conviennent. Je regarde les trains et je reviens vers vous rapidement.', daysAgo: 2 },
+    ],
+  },
+  {
+    between: ['sophie', 'elena'],
+    messages: [
+      { from: 'elena', content: 'Ciao Sophie ! Votre studio pres du Parc de la Tete d Or a l air parfait pour un sejour de travail.', daysAgo: 3 },
+      { from: 'sophie', content: 'Merci Elena ! Il y a un vrai bureau et la fibre, c est ideal pour teletravailler. Florence me fait beaucoup envie de mon cote.', daysAgo: 3 },
+      { from: 'elena', content: 'Alors on devrait pouvoir s entendre. Je vous envoie mes disponibilites de septembre ce week-end.', daysAgo: 1 },
+    ],
+  },
+  {
+    between: ['marc', 'lucia'],
+    messages: [
+      { from: 'lucia', content: 'Bonjour Marc, votre chalet a Chamonix est magnifique. Est-il accessible en hiver sans equipement particulier ?', daysAgo: 9 },
+      { from: 'marc', content: 'Bonjour Lucia ! La route est deneigee tous les matins, des pneus hiver suffisent largement.', daysAgo: 8 },
+    ],
+  },
+];
+
 const daysFromNow = (days) => {
   const d = new Date();
   d.setUTCHours(0, 0, 0, 0);
@@ -483,6 +510,58 @@ async function main() {
       },
     });
   }
+
+  await prisma.match.deleteMany({
+    where: {
+      OR: [
+        { user1Id: { in: ownerIds } },
+        { user2Id: { in: ownerIds } },
+      ],
+    },
+  });
+
+  let totalMessages = 0;
+
+  for (const conversation of CONVERSATIONS) {
+    const [firstKey, secondKey] = conversation.between;
+    const first = ownersByKey[firstKey];
+    const second = ownersByKey[secondKey];
+
+    const match = await prisma.match.create({
+      data: {
+        user1Id: first.id,
+        user2Id: second.id,
+        status: 'ACCEPTED',
+        chat: {
+          create: {
+            participants: {
+              create: [
+                { userId: first.id },
+                { userId: second.id },
+              ],
+            },
+          },
+        },
+      },
+      include: { chat: true },
+    });
+
+    for (const message of conversation.messages) {
+      await prisma.message.create({
+        data: {
+          chatId: match.chat.id,
+          senderId: ownersByKey[message.from].id,
+          content: message.content,
+          createdAt: daysFromNow(-message.daysAgo),
+        },
+      });
+      totalMessages += 1;
+    }
+  }
+
+  console.log(
+    `[seed] ${CONVERSATIONS.length} conversations creees, ${totalMessages} messages.`,
+  );
 
   const totalPhotos = HOMES.reduce((sum, h) => sum + h.photos.length, 0);
   console.log(
