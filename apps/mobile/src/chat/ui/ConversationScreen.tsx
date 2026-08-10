@@ -13,7 +13,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, Send } from 'lucide-react-native';
+import {
+  Camera,
+  ChevronLeft,
+  ImageIcon,
+  Info,
+  Mic,
+  Send,
+} from 'lucide-react-native';
 import type { ChatMessages } from '@wim/shared';
 
 import { getSession } from 'src/auth/infrastructure/authStorage';
@@ -22,6 +29,11 @@ import {
   markChatAsReadApi,
   sendMessageApi,
 } from '../infrastructure/chat.api';
+import {
+  formatMessageDay,
+  formatMessageTime,
+  isSameDay,
+} from '../utils/formatMessageDay';
 
 const PAGE_SIZE = 30;
 
@@ -60,8 +72,7 @@ export function ConversationScreen({ route, navigation }: Props) {
       try {
         const session = await getSession();
 
-        if (!session?.accessToken) return;
-        if (cancelled) return;
+        if (!session?.accessToken || cancelled) return;
 
         setCurrentUserId(session.user?.id ?? null);
 
@@ -136,6 +147,7 @@ export function ConversationScreen({ route, navigation }: Props) {
       );
 
       setMessages((current) => [message, ...current]);
+      setError(null);
     } catch (sendError) {
       console.log('Send message error:', sendError);
       setDraft(content);
@@ -145,53 +157,115 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
-  function renderMessage(message: ChatMessages) {
+  const lastOwnMessageId = messages.find(
+    (message) => message.senderId === currentUserId,
+  )?.id;
+
+  function renderMessage(message: ChatMessages, index: number) {
     const isMine = message.senderId === currentUserId;
 
+    const older = messages[index + 1];
+    const startsNewDay =
+      !older || !isSameDay(message.createdAt, older.createdAt);
+
+    const newer = messages[index - 1];
+    const isLastOfGroup =
+      !newer || newer.senderId !== message.senderId;
+
     return (
-      <View
-        style={[
-          styles.bubbleRow,
-          isMine ? styles.bubbleRowMine : styles.bubbleRowTheirs,
-        ]}
-      >
+      <View>
+        {newer && !isSameDay(newer.createdAt, message.createdAt) ? (
+          <View style={styles.daySeparator}>
+            <Text style={styles.dayText}>
+              {formatMessageDay(newer.createdAt, t)}
+            </Text>
+          </View>
+        ) : null}
+
         <View
           style={[
-            styles.bubble,
-            isMine ? styles.bubbleMine : styles.bubbleTheirs,
+            styles.bubbleRow,
+            isMine ? styles.bubbleRowMine : styles.bubbleRowTheirs,
+            isLastOfGroup ? styles.bubbleRowSpaced : null,
           ]}
         >
-          <Text
+          <View
             style={[
-              styles.bubbleText,
-              isMine ? styles.bubbleTextMine : styles.bubbleTextTheirs,
+              styles.bubble,
+              isMine ? styles.bubbleMine : styles.bubbleTheirs,
+              isLastOfGroup
+                ? isMine
+                  ? styles.bubbleMineTail
+                  : styles.bubbleTheirsTail
+                : null,
             ]}
           >
-            {message.content}
-          </Text>
+            <Text
+              style={[
+                styles.bubbleText,
+                isMine ? styles.bubbleTextMine : styles.bubbleTextTheirs,
+              ]}
+            >
+              {message.content}
+            </Text>
+
+            <Text
+              style={[
+                styles.bubbleTime,
+                isMine ? styles.bubbleTimeMine : styles.bubbleTimeTheirs,
+              ]}
+            >
+              {formatMessageTime(message.createdAt)}
+            </Text>
+          </View>
         </View>
+
+        {isMine && message.id === lastOwnMessageId ? (
+          <Text style={styles.seen}>{t('seenLabel')}</Text>
+        ) : null}
+
+        {startsNewDay ? (
+          <View style={styles.daySeparator}>
+            <Text style={styles.dayText}>
+              {formatMessageDay(message.createdAt, t)}
+            </Text>
+          </View>
+        ) : null}
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <TouchableOpacity
-          style={styles.backButton}
+          style={styles.headerButton}
           onPress={navigation.goBack}
           activeOpacity={0.7}
         >
-          <ChevronLeft size={24} color="#111111" />
+          <ChevronLeft size={26} color="#111111" />
         </TouchableOpacity>
 
         {participantAvatar ? (
-          <Image source={{ uri: participantAvatar }} style={styles.headerAvatar} />
-        ) : null}
+          <Image
+            source={{ uri: participantAvatar }}
+            style={styles.headerAvatar}
+          />
+        ) : (
+          <View style={[styles.headerAvatar, styles.headerAvatarFallback]}>
+            <Text style={styles.headerInitial}>
+              {(participantName ?? '?').charAt(0).toUpperCase()}
+            </Text>
+          </View>
+        )}
 
         <Text style={styles.headerName} numberOfLines={1}>
           {participantName}
         </Text>
+
+        <TouchableOpacity style={styles.headerButton} activeOpacity={0.7}>
+          <Info size={22} color="#111111" />
+        </TouchableOpacity>
       </View>
 
       {loading ? (
@@ -200,12 +274,12 @@ export function ConversationScreen({ route, navigation }: Props) {
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
         >
           <FlatList
             data={messages}
             keyExtractor={(message) => message.id}
-            renderItem={({ item }) => renderMessage(item)}
+            renderItem={({ item, index }) => renderMessage(item, index)}
             inverted
             contentContainerStyle={styles.list}
             onEndReached={loadEarlier}
@@ -226,6 +300,10 @@ export function ConversationScreen({ route, navigation }: Props) {
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <View style={styles.composer}>
+            <View style={styles.cameraButton}>
+              <Camera size={18} color="#FFFFFF" />
+            </View>
+
             <TextInput
               style={styles.input}
               value={draft}
@@ -235,17 +313,21 @@ export function ConversationScreen({ route, navigation }: Props) {
               multiline
             />
 
-            <TouchableOpacity
-              style={[
-                styles.sendButton,
-                !draft.trim() && styles.sendButtonDisabled,
-              ]}
-              onPress={handleSend}
-              disabled={!draft.trim() || sending}
-              activeOpacity={0.8}
-            >
-              <Send size={18} color="#FFFFFF" />
-            </TouchableOpacity>
+            {draft.trim() ? (
+              <TouchableOpacity
+                style={styles.sendButton}
+                onPress={handleSend}
+                disabled={sending}
+                activeOpacity={0.8}
+              >
+                <Send size={18} color="#FFFFFF" />
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.composerIcons}>
+                <Mic size={20} color="#9CA3AF" />
+                <ImageIcon size={20} color="#9CA3AF" />
+              </View>
+            )}
           </View>
         </KeyboardAvoidingView>
       )}
@@ -266,30 +348,41 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingBottom: 12,
-    gap: 10,
+    paddingHorizontal: 8,
+    paddingBottom: 10,
+    gap: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E7EB',
   },
 
-  backButton: {
-    width: 32,
-    height: 32,
+  headerButton: {
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     backgroundColor: '#F1F1F1',
+  },
+
+  headerAvatarFallback: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  headerInitial: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#087EBE',
   },
 
   headerName: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '700',
     color: '#111111',
   },
@@ -300,7 +393,7 @@ const styles = StyleSheet.create({
 
   list: {
     paddingHorizontal: 14,
-    paddingVertical: 16,
+    paddingVertical: 12,
     flexGrow: 1,
   },
 
@@ -308,9 +401,24 @@ const styles = StyleSheet.create({
     marginVertical: 12,
   },
 
+  daySeparator: {
+    alignItems: 'center',
+    marginVertical: 14,
+  },
+
+  dayText: {
+    fontSize: 12,
+    color: '#8A8A8A',
+    textTransform: 'capitalize',
+  },
+
   bubbleRow: {
-    marginBottom: 8,
+    marginBottom: 2,
     flexDirection: 'row',
+  },
+
+  bubbleRowSpaced: {
+    marginBottom: 10,
   },
 
   bubbleRowMine: {
@@ -322,19 +430,26 @@ const styles = StyleSheet.create({
   },
 
   bubble: {
-    maxWidth: '78%',
+    maxWidth: '76%',
     paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingTop: 9,
+    paddingBottom: 7,
+    borderRadius: 22,
   },
 
   bubbleMine: {
     backgroundColor: '#111111',
-    borderBottomRightRadius: 6,
   },
 
   bubbleTheirs: {
     backgroundColor: '#F1F1F1',
+  },
+
+  bubbleMineTail: {
+    borderBottomRightRadius: 6,
+  },
+
+  bubbleTheirsTail: {
     borderBottomLeftRadius: 6,
   },
 
@@ -349,6 +464,29 @@ const styles = StyleSheet.create({
 
   bubbleTextTheirs: {
     color: '#111111',
+  },
+
+  bubbleTime: {
+    marginTop: 3,
+    fontSize: 10,
+    alignSelf: 'flex-end',
+  },
+
+  bubbleTimeMine: {
+    color: 'rgba(255,255,255,0.6)',
+  },
+
+  bubbleTimeTheirs: {
+    color: '#9CA3AF',
+  },
+
+  seen: {
+    alignSelf: 'flex-end',
+    marginTop: 2,
+    marginBottom: 10,
+    marginRight: 4,
+    fontSize: 11,
+    color: '#9CA3AF',
   },
 
   empty: {
@@ -383,36 +521,49 @@ const styles = StyleSheet.create({
 
   composer: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     gap: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#E5E7EB',
+  },
+
+  cameraButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#111111',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   input: {
     flex: 1,
     maxHeight: 120,
     paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: 9,
+    paddingBottom: 9,
     borderRadius: 22,
-    backgroundColor: '#F4F4F5',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#D1D5DB',
     fontSize: 14,
     color: '#111111',
   },
 
+  composerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingRight: 4,
+  },
+
   sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#087EBE',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  sendButtonDisabled: {
-    backgroundColor: '#C7D2DA',
   },
 });

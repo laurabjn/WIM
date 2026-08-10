@@ -702,6 +702,11 @@
     "loadingMore": "Loading earlier messages...",
     "seen": "Seen",
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "seenLabel": "Seen",
+    "delivered": "Sent",
+    "dateToday": "Today",
+    "dateYesterday": "Yesterday",
+    "attachmentsSoon": "Photo sharing is coming soon."
   }
 }

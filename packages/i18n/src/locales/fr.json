@@ -701,6 +701,11 @@
     "loadingMore": "Chargement des messages précédents...",
     "seen": "Vu",
     "today": "Aujourd'hui",
-    "yesterday": "Hier"
+    "yesterday": "Hier",
+    "seenLabel": "Vu",
+    "delivered": "Envoyé",
+    "dateToday": "Aujourd'hui",
+    "dateYesterday": "Hier",
+    "attachmentsSoon": "L'envoi de photos arrivera prochainement."
   }
 }
