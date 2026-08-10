@@ -48,7 +48,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
         const routeName =
           getFocusedRouteNameFromRoute(route) ?? route.name;
 
-        if (routeName === 'Swipe') {
+        if (routeName === 'Swipe' || routeName === 'Conversation') {
           return null;
         }
 

@@ -546,13 +546,16 @@ async function main() {
       include: { chat: true },
     });
 
-    for (const message of conversation.messages) {
+    for (const [index, message] of conversation.messages.entries()) {
+      const sentAt = daysFromNow(-message.daysAgo);
+      sentAt.setUTCHours(9, index * 7, 0, 0);
+
       await prisma.message.create({
         data: {
           chatId: match.chat.id,
           senderId: ownersByKey[message.from].id,
           content: message.content,
-          createdAt: daysFromNow(-message.daysAgo),
+          createdAt: sentAt,
         },
       });
       totalMessages += 1;
