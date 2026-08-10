@@ -511,13 +511,24 @@ async function main() {
     });
   }
 
-  await prisma.match.deleteMany({
+  const previousMatches = await prisma.match.findMany({
     where: {
       OR: [
         { user1Id: { in: ownerIds } },
         { user2Id: { in: ownerIds } },
       ],
     },
+    select: { id: true },
+  });
+
+  const previousMatchIds = previousMatches.map((match) => match.id);
+
+  await prisma.chat.deleteMany({
+    where: { matchId: { in: previousMatchIds } },
+  });
+
+  await prisma.match.deleteMany({
+    where: { id: { in: previousMatchIds } },
   });
 
   let totalMessages = 0;
