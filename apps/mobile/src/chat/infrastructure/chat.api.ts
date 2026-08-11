@@ -35,6 +35,30 @@ export async function getChatsApi(
   return parseResponse(response);
 }
 
+export async function sendPhotoMessageApi(
+  token: string,
+  chatId: string,
+  uri: string,
+): Promise<ChatMessages> {
+  const extension = uri.split('.').pop()?.toLowerCase() ?? 'jpg';
+
+  const form = new FormData();
+
+  form.append('file', {
+    uri,
+    name: `message.${extension}`,
+    type: extension === 'png' ? 'image/png' : 'image/jpeg',
+  } as unknown as Blob);
+
+  const response = await fetch(`${API_URL}/chats/${chatId}/photos`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: form,
+  });
+
+  return parseResponse(response);
+}
+
 export async function getRequestsApi(
   token: string,
 ): Promise<MyRequestListItem[]> {

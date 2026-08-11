@@ -733,6 +733,13 @@
     "shareStatus": "Share your status",
     "statusExample": "Looking for an exchange in Lyon",
     "relevantRequests": "Relevant requests",
-    "allRequests": "All requests"
+    "allRequests": "All requests",
+    "autoTranslated": "This conversation is translated automatically,",
+    "removeTranslation": "remove translation",
+    "photoError": "The photo could not be sent.",
+    "cameraDenied": "Camera access is denied.",
+    "galleryDenied": "Photo access is denied.",
+    "voiceSoon": "Voice messages are coming soon.",
+    "photoPreview": "Photo"
   }
 }

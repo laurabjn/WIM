@@ -309,12 +309,20 @@ model ChatParticipant {
   @@unique([chatId, userId])
 }
 
+enum MessageType {
+  TEXT
+  IMAGE
+}
+
 model Message {
   id String @id @default(uuid())
 
   chatId   String
   senderId String
   content  String
+
+  type          MessageType @default(TEXT)
+  attachmentUrl String?     @map("attachment_url")
 
   chat               Chat              @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender             User              @relation(fields: [senderId], references: [id], onDelete: Cascade)

@@ -183,7 +183,11 @@ export function ConversationsScreen({ navigation }: Props) {
               style={[styles.preview, hasUnread && styles.previewUnread]}
               numberOfLines={1}
             >
-              {chat.lastMessage?.content ?? t('startConversation')}
+              {chat.lastMessage
+                ? chat.lastMessage.type === 'IMAGE'
+                  ? t('photoPreview')
+                  : chat.lastMessage.content
+                : t('startConversation')}
             </Text>
 
             {hasUnread ? (

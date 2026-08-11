@@ -16,6 +16,8 @@ type Input = {
   chatId: string;
   senderId: string;
   content: string;
+  type?: 'TEXT' | 'IMAGE';
+  attachmentUrl?: string | null;
 };
 
 @Injectable()
@@ -32,11 +34,13 @@ export class SendMessageUseCase {
     chatId,
     senderId,
     content,
+    type = 'TEXT',
+    attachmentUrl = null,
   }: Input): Promise<ChatMessages> {
     const cleanedContent =
       content.trim();
 
-    if (!cleanedContent) {
+    if (!cleanedContent && !attachmentUrl) {
       throw new BadRequestException(
         'Le message ne peut pas être vide.',
       );
@@ -75,6 +79,8 @@ export class SendMessageUseCase {
         chatId,
         senderId,
         content: cleanedContent,
+        type,
+        attachmentUrl,
       });
 
     await this.chatRepository.touchChat(chatId);

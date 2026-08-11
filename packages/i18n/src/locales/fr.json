@@ -732,6 +732,13 @@
     "shareStatus": "Partagez votre statut",
     "statusExample": "Recherche échange à Lyon",
     "relevantRequests": "Demandes pertinentes",
-    "allRequests": "Toutes les demandes"
+    "allRequests": "Toutes les demandes",
+    "autoTranslated": "Cette discussion est traduite automatiquement,",
+    "removeTranslation": "retirer la traduction",
+    "photoError": "La photo n'a pas pu etre envoyee.",
+    "cameraDenied": "L'acces a l'appareil photo est refuse.",
+    "galleryDenied": "L'acces aux photos est refuse.",
+    "voiceSoon": "Les messages vocaux arrivent bientot.",
+    "photoPreview": "Photo"
   }
 }

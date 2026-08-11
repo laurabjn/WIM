@@ -68,6 +68,8 @@ export class ChatPrismaRepository implements ChatRepository {
             chatId: true,
             senderId: true,
             content: true,
+            type: true,
+            attachmentUrl: true,
             createdAt: true,
             updatedAt: true,
 
@@ -390,12 +392,16 @@ export class ChatPrismaRepository implements ChatRepository {
     chatId: string;
     senderId: string;
     content: string;
+    type?: 'TEXT' | 'IMAGE';
+    attachmentUrl?: string | null;
   }): Promise<ChatMessage> {
     return this.prisma.message.create({
       data: {
         chatId: input.chatId,
         senderId: input.senderId,
         content: input.content,
+        type: input.type ?? 'TEXT',
+        attachmentUrl: input.attachmentUrl ?? null,
       },
 
       include: {

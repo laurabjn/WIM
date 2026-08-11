@@ -1,5 +1,6 @@
 import { Inject } from '@nestjs/common';
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,8 +10,13 @@ import {
   Query,
   Req,
   UnauthorizedException,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { extname } from 'path';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 import { SendMessageDto } from 'src/application/message/dto/send-message.dto';
 import { GetChatMessagesDto } from 'src/application/message/dto/get-chat-messages.dto';
@@ -23,6 +29,29 @@ import { GetUnreadCountUseCase } from 'src/application/message/use-cases/get-unr
 import { AppGateway } from 'src/interfaces/websocket/app.gateway';
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
 import { CHAT_REPOSITORY } from '../tokens/token';
+
+function editFileName(
+  _req: unknown,
+  file: Express.Multer.File,
+  callback: (error: Error | null, filename: string) => void,
+) {
+  const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+  callback(null, `${unique}${extname(file.originalname)}`);
+}
+
+function imageFileFilter(
+  _req: unknown,
+  file: Express.Multer.File,
+  callback: (error: Error | null, acceptFile: boolean) => void,
+) {
+  if (!file.mimetype.match(/\/(jpg|jpeg|png|webp|heic)$/)) {
+    return callback(
+      new BadRequestException('Seules les images sont acceptees.'),
+      false,
+    );
+  }
+  callback(null, true);
+}
 
 type AuthenticatedRequest = {
   user?: {
@@ -133,6 +162,41 @@ export class ChatController {
       chatId,
       senderId: this.getUserId(request),
       content: dto.content,
+    });
+
+    this.gateway.emitMessageCreated(chatId, message);
+    await this.notifyChatUpdated(chatId, message);
+
+    return message;
+  }
+
+  @Post(':chatId/photos')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/messages',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+      limits: { fileSize: 8 * 1024 * 1024 },
+    }),
+  )
+  async createPhotoMessage(
+    @Req() request: AuthenticatedRequest,
+    @Param('chatId')
+    chatId: string,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('Aucun fichier image recu');
+    }
+
+    const message = await this.sendMessage.execute({
+      chatId,
+      senderId: this.getUserId(request),
+      content: '',
+      type: 'IMAGE',
+      attachmentUrl: `/uploads/messages/${file.filename}`,
     });
 
     this.gateway.emitMessageCreated(chatId, message);

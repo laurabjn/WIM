@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import {
   Camera,
@@ -33,7 +35,9 @@ import {
   getMessagesApi,
   markChatAsReadApi,
   sendMessageApi,
+  sendPhotoMessageApi,
 } from '../infrastructure/chat.api';
+import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { useChatSocket } from '../hooks/useChatSocket';
 import {
   getChatExchangeApi,
@@ -86,6 +90,8 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [translated, setTranslated] = useState(false);
 
   const cursorRef = useRef<string | null>(null);
   const hasMoreRef = useRef(false);
@@ -205,6 +211,71 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
+  async function sendPhoto(uri: string) {
+    setUploading(true);
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      const message = await sendPhotoMessageApi(
+        session.accessToken,
+        chatId,
+        uri,
+      );
+
+      setMessages((current) =>
+        current.some((item) => item.id === message.id)
+          ? current
+          : [message, ...current],
+      );
+
+      setError(null);
+    } catch (photoError) {
+      console.log('Send photo error:', photoError);
+      setError(t('photoError'));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function takePhoto() {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert('', t('cameraDenied'));
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      await sendPhoto(result.assets[0].uri);
+    }
+  }
+
+  async function pickPhoto() {
+    const permission =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert('', t('galleryDenied'));
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      await sendPhoto(result.assets[0].uri);
+    }
+  }
+
   async function blockParticipant() {
     setMenuOpen(false);
 
@@ -283,21 +354,31 @@ export function ConversationScreen({ route, navigation }: Props) {
                   ? styles.bubbleMineTail
                   : styles.bubbleTheirsTail
                 : null,
+              message.type === 'IMAGE' ? styles.bubbleImage : null,
             ]}
           >
-            <Text
-              style={[
-                styles.bubbleText,
-                isMine ? styles.bubbleTextMine : styles.bubbleTextTheirs,
-              ]}
-            >
-              {message.content}
-            </Text>
+            {message.type === 'IMAGE' && message.attachmentUrl ? (
+              <Image
+                source={{ uri: resolveImageUrl(message.attachmentUrl) ?? '' }}
+                style={styles.attachment}
+                resizeMode="cover"
+              />
+            ) : (
+              <Text
+                style={[
+                  styles.bubbleText,
+                  isMine ? styles.bubbleTextMine : styles.bubbleTextTheirs,
+                ]}
+              >
+                {message.content}
+              </Text>
+            )}
 
             <Text
               style={[
                 styles.bubbleTime,
                 isMine ? styles.bubbleTimeMine : styles.bubbleTimeTheirs,
+                message.type === 'IMAGE' ? styles.bubbleTimeOnImage : null,
               ]}
             >
               {formatMessageTime(message.createdAt)}
@@ -430,35 +511,79 @@ export function ConversationScreen({ route, navigation }: Props) {
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
-          <View style={styles.composer}>
-            <View style={styles.cameraButton}>
-              <Camera size={18} color="#FFFFFF" />
-            </View>
+          <View style={styles.composerArea}>
+            <View style={styles.composerCard}>
+              {translated ? (
+                <Text style={styles.translationNotice}>
+                  {t('autoTranslated')}{' '}
+                  <Text
+                    style={styles.translationLink}
+                    onPress={() => setTranslated(false)}
+                  >
+                    {t('removeTranslation')}
+                  </Text>
+                </Text>
+              ) : null}
 
-            <TextInput
-              style={styles.input}
-              value={draft}
-              onChangeText={setDraft}
-              placeholder={t('messagePlaceholder')}
-              placeholderTextColor="#9CA3AF"
-              multiline
-            />
+              <View style={styles.composerRow}>
+                <TouchableOpacity
+                  style={styles.cameraButton}
+                  onPress={takePhoto}
+                  disabled={uploading}
+                  activeOpacity={0.8}
+                >
+                  {uploading ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Camera size={19} color="#FFFFFF" />
+                  )}
+                </TouchableOpacity>
 
-            {draft.trim() ? (
-              <TouchableOpacity
-                style={styles.sendButton}
-                onPress={handleSend}
-                disabled={sending}
-                activeOpacity={0.8}
-              >
-                <Send size={18} color="#FFFFFF" />
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.composerIcons}>
-                <Mic size={20} color="#9CA3AF" />
-                <ImageIcon size={20} color="#9CA3AF" />
+                <TextInput
+                  style={styles.input}
+                  value={draft}
+                  onChangeText={setDraft}
+                  placeholder={t('messagePlaceholder')}
+                  placeholderTextColor="#B4B4B8"
+                  multiline
+                />
+
+                <TouchableOpacity
+                  style={styles.iconButton}
+                  onPress={() => Alert.alert('', t('voiceSoon'))}
+                  activeOpacity={0.7}
+                >
+                  <Mic size={21} color="#111111" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.iconButton}
+                  onPress={pickPhoto}
+                  disabled={uploading}
+                  activeOpacity={0.7}
+                >
+                  <ImageIcon size={21} color="#111111" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleSend}
+                  disabled={sending || !draft.trim()}
+                  activeOpacity={0.85}
+                >
+                  <LinearGradient
+                    colors={['#2DA7F3', '#52D1A6']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={[
+                      styles.sendButton,
+                      !draft.trim() ? styles.sendButtonIdle : null,
+                    ]}
+                  >
+                    <Send size={19} color="#FFFFFF" />
+                  </LinearGradient>
+                </TouchableOpacity>
               </View>
-            )}
+            </View>
           </View>
         </KeyboardAvoidingView>
       )}
@@ -725,20 +850,45 @@ menuBackdrop: {
     color: '#DC2626',
   },
 
-  composer: {
+  composerArea: {
+    paddingHorizontal: 10,
+    paddingBottom: 6,
+  },
+
+  composerCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    shadowColor: '#000000',
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+
+  translationNotice: {
+    paddingTop: 4,
+    paddingBottom: 10,
+    fontSize: 11,
+    color: '#8A8A8E',
+    textAlign: 'center',
+  },
+
+  translationLink: {
+    color: '#8A8A8E',
+    textDecorationLine: 'underline',
+  },
+
+  composerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#E5E7EB',
   },
 
   cameraButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: '#111111',
     alignItems: 'center',
     justifyContent: 'center',
@@ -746,30 +896,50 @@ menuBackdrop: {
 
   input: {
     flex: 1,
-    maxHeight: 120,
-    paddingHorizontal: 16,
-    paddingTop: 9,
-    paddingBottom: 9,
-    borderRadius: 22,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#D1D5DB',
-    fontSize: 14,
+    maxHeight: 110,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 10,
+    fontSize: 15,
+    fontWeight: '600',
     color: '#111111',
   },
 
-  composerIcons: {
-    flexDirection: 'row',
+  iconButton: {
+    width: 34,
+    height: 42,
     alignItems: 'center',
-    gap: 14,
-    paddingRight: 4,
+    justifyContent: 'center',
   },
 
   sendButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#087EBE',
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    marginLeft: 6,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  sendButtonIdle: {
+    opacity: 0.45,
+  },
+
+  bubbleImage: {
+    paddingHorizontal: 4,
+    paddingTop: 4,
+    paddingBottom: 4,
+    overflow: 'hidden',
+  },
+
+  attachment: {
+    width: 210,
+    height: 210,
+    borderRadius: 18,
+    backgroundColor: '#E5E7EB',
+  },
+
+  bubbleTimeOnImage: {
+    marginRight: 6,
   },
 });

@@ -16,6 +16,8 @@ export class PrismaMessageRepository implements MessageRepository {
         chatId: data.chatId,
         senderId: data.senderId,
         content: data.content,
+        type: data.type ?? 'TEXT',
+        attachmentUrl: data.attachmentUrl ?? null,
       },
       include: {
         sender: {

@@ -88,7 +88,7 @@ COPY apps/api/docker-entrypoint.prod.sh /app/docker-entrypoint.prod.sh
 RUN chmod +x /app/docker-entrypoint.prod.sh
 
 # Les fichiers uploadés vivent dans un volume monté ici (voir compose).
-RUN mkdir -p /app/apps/api/uploads/avatars /app/apps/api/uploads/homes \
+RUN mkdir -p /app/apps/api/uploads/avatars /app/apps/api/uploads/homes /app/apps/api/uploads/messages \
     && chown -R node:node /app/apps/api/uploads
 
 WORKDIR /app/apps/api

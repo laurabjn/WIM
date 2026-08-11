@@ -5,11 +5,15 @@ export type MessageSender = {
   avatarUrl: string | null;
 };
 
+export type MessageKind = 'TEXT' | 'IMAGE';
+
 export type ChatMessages = {
   id: string;
   chatId: string;
   senderId: string;
   content: string;
+  type: MessageKind;
+  attachmentUrl: string | null;
   sender: MessageSender;
   createdAt: string;
   updatedAt: string;
