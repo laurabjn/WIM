@@ -14,6 +14,7 @@ export type ChatMessages = {
   content: string;
   type: MessageKind;
   attachmentUrl: string | null;
+  translatedContent?: string | null;
   sender: MessageSender;
   createdAt: string;
   updatedAt: string;

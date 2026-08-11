@@ -1,11 +1,12 @@
 import {
+  IsBoolean,
   IsInt,
   IsOptional,
   IsUUID,
   Max,
   Min,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class GetChatMessagesDto {
   @IsOptional()
@@ -18,4 +19,9 @@ export class GetChatMessagesDto {
   @Min(1)
   @Max(100)
   limit = 30;
+
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  translate?: boolean;
 }

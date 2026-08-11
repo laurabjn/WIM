@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
@@ -57,6 +58,8 @@ import {
 
 const PAGE_SIZE = 30;
 
+const translationKey = (chatId: string) => `chat:translate:${chatId}`;
+
 type Props = {
   route: {
     params: {
@@ -91,7 +94,9 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [translated, setTranslated] = useState(false);
+  const [translated, setTranslated] = useState(true);
+
+  const translatedRef = useRef(true);
 
   const cursorRef = useRef<string | null>(null);
   const hasMoreRef = useRef(false);
@@ -107,8 +112,16 @@ export function ConversationScreen({ route, navigation }: Props) {
 
         setCurrentUserId(session.user?.id ?? null);
 
+        const stored = await AsyncStorage.getItem(translationKey(chatId));
+        const wantsTranslation = stored !== 'off';
+
+        translatedRef.current = wantsTranslation;
+
+        if (!cancelled) setTranslated(wantsTranslation);
+
         const page = await getMessagesApi(session.accessToken, chatId, {
           limit: PAGE_SIZE,
+          translate: wantsTranslation,
         });
 
         if (cancelled) return;
@@ -169,6 +182,7 @@ export function ConversationScreen({ route, navigation }: Props) {
       const page = await getMessagesApi(session.accessToken, chatId, {
         cursor: cursorRef.current,
         limit: PAGE_SIZE,
+        translate: translatedRef.current,
       });
 
       setMessages((current) => [...current, ...page.messages]);
@@ -209,6 +223,14 @@ export function ConversationScreen({ route, navigation }: Props) {
     } finally {
       setSending(false);
     }
+  }
+
+  async function disableTranslation() {
+    translatedRef.current = false;
+
+    setTranslated(false);
+
+    await AsyncStorage.setItem(translationKey(chatId), 'off');
   }
 
   async function sendPhoto(uri: string) {
@@ -321,6 +343,9 @@ export function ConversationScreen({ route, navigation }: Props) {
     Alert.alert('', t('reported'));
   }
 
+  const showTranslationNotice =
+    translated && messages.some((message) => message.translatedContent);
+
   const lastOwnMessageId = messages.find(
     (message) => message.senderId === currentUserId,
   )?.id;
@@ -370,7 +395,9 @@ export function ConversationScreen({ route, navigation }: Props) {
                   isMine ? styles.bubbleTextMine : styles.bubbleTextTheirs,
                 ]}
               >
-                {message.content}
+                {translated && message.translatedContent
+                  ? message.translatedContent
+                  : message.content}
               </Text>
             )}
 
@@ -513,12 +540,12 @@ export function ConversationScreen({ route, navigation }: Props) {
 
           <View style={styles.composerArea}>
             <View style={styles.composerCard}>
-              {translated ? (
+              {showTranslationNotice ? (
                 <Text style={styles.translationNotice}>
                   {t('autoTranslated')}{' '}
                   <Text
                     style={styles.translationLink}
-                    onPress={() => setTranslated(false)}
+                    onPress={disableTranslation}
                   >
                     {t('removeTranslation')}
                   </Text>

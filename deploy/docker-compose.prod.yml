@@ -60,6 +60,7 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
+      DEEPL_API_KEY: ${DEEPL_API_KEY:-}
       MAIL_FROM: ${MAIL_FROM}
     volumes:
       # Les fichiers uploadés survivent aux redéploiements et rebuilds d'image.

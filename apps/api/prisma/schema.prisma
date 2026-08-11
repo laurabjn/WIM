@@ -324,14 +324,30 @@ model Message {
   type          MessageType @default(TEXT)
   attachmentUrl String?     @map("attachment_url")
 
-  chat               Chat              @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender             User              @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  readByParticipants ChatParticipant[] @relation("LastReadMessage")
+  chat               Chat                 @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender             User                 @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  readByParticipants ChatParticipant[]    @relation("LastReadMessage")
+  translations       MessageTranslation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([chatId, createdAt])
+}
+
+// La traduction est facturee au caractere : on la conserve pour ne jamais
+// repayer la traduction d'un message deja vu.
+model MessageTranslation {
+  id        String @id @default(uuid())
+  messageId String
+  locale    String
+  content   String
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, locale])
 }
 
 model Review {

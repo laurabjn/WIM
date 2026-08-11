@@ -9,12 +9,14 @@ import { MessageRepository } from 'src/domain/auth/repositories/message.reposito
 import { CHAT_REPOSITORY, MESSAGE_REPOSITORY } from 'src/interfaces/http/tokens/token';
 import { mapMessage } from '../message.mapper';
 import { ChatMessagesPage } from '@wim/shared';
+import { MessageTranslationService } from '../services/message-translation.service';
 
 type Input = {
   chatId: string;
   userId: string;
   cursor?: string;
   limit?: number;
+  translate?: boolean;
 };
 
 @Injectable()
@@ -24,6 +26,7 @@ export class GetChatMessagesUseCase {
     private readonly chatRepository: ChatRepository,
     @Inject(MESSAGE_REPOSITORY)
     private readonly messageRepository: MessageRepository,
+    private readonly translation: MessageTranslationService,
   ) {}
 
   async execute({
@@ -31,6 +34,7 @@ export class GetChatMessagesUseCase {
     userId,
     cursor,
     limit = 30,
+    translate = false,
   }: Input): Promise<ChatMessagesPage> {
     const chat = await this.chatRepository.findById(chatId);
 
@@ -60,8 +64,12 @@ export class GetChatMessagesUseCase {
         },
       );
 
+    const messages = result.messages.map(mapMessage);
+
     return {
-      messages: result.messages.map(mapMessage),
+      messages: translate
+        ? await this.translation.translate(messages, userId)
+        : messages,
       hasMore: result.hasMore,
       nextCursor: result.nextCursor,
     };

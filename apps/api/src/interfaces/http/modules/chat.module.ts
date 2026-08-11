@@ -17,8 +17,11 @@ import {
   CHAT_REPOSITORY,
   EXCHANGE_REPOSITORY,
   MESSAGE_REPOSITORY,
+  TRANSLATOR,
 } from '../tokens/token';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { MessageTranslationService } from 'src/application/message/services/message-translation.service';
+import { DeeplTranslator } from 'src/infrastructure/translation/deepl.translator';
 
 @Module({
   imports: [WebsocketModule, ModerationModule],
@@ -35,6 +38,11 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
       SendMessageUseCase,
       MarkChatAsReadUseCase,
       GetUnreadCountUseCase,
+      MessageTranslationService,
+      {
+        provide: TRANSLATOR,
+        useClass: DeeplTranslator,
+      },
       {
         provide: CHAT_REPOSITORY,
         useClass: ChatPrismaRepository,

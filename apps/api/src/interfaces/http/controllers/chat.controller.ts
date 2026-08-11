@@ -148,6 +148,7 @@ export class ChatController {
       userId: this.getUserId(request),
       cursor: query.cursor,
       limit: query.limit,
+      translate: query.translate,
     });
   }
 

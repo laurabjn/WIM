@@ -12,3 +12,5 @@ export const CHAT_REPOSITORY = Symbol('CHAT_REPOSITORY');
 export const MESSAGE_REPOSITORY = Symbol('MESSAGE_REPOSITORY');
 export const EXCHANGE_REPOSITORY = Symbol('EXCHANGE_REPOSITORY');
 
+
+export const TRANSLATOR = Symbol('TRANSLATOR');

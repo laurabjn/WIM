@@ -72,12 +72,13 @@ export async function getRequestsApi(
 export async function getMessagesApi(
   token: string,
   chatId: string,
-  options: { cursor?: string; limit?: number } = {},
+  options: { cursor?: string; limit?: number; translate?: boolean } = {},
 ): Promise<ChatMessagesPage> {
   const params = new URLSearchParams();
 
   if (options.cursor) params.append('cursor', options.cursor);
   if (options.limit) params.append('limit', String(options.limit));
+  if (options.translate) params.append('translate', 'true');
 
   const query = params.toString();
 
