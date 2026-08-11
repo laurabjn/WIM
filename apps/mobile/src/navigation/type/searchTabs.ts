@@ -20,6 +20,9 @@ export type SearchStackParamList = {
   HomeDetails: {
     homeId: string;
   };
+  PublicProfile: {
+    userId: string;
+  };
   SwipeHomeDetails: {
     homeId: string;
     swipeIndex: number;

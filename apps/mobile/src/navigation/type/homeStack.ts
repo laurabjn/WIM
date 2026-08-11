@@ -1,6 +1,7 @@
 export type HomesStackParamList = {
   MyHomes: undefined;
   HomeDetails: { homeId: string };
+  PublicProfile: { userId: string };
   CreateHomePhotos: undefined;
   CreateHomeDescription: undefined;
   CreateHomeLocation: undefined;
