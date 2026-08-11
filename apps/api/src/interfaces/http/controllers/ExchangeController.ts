@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Patch,
+  Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,10 @@ import {
   RespondToExchangeUseCase,
 } from 'src/application/exchange/use-cases/respond-to-exchange.usecase';
 import { GetChatExchangeUseCase } from 'src/application/exchange/use-cases/get-chat-exchange.usecase';
+import {
+  RequestExchangeInput,
+  RequestExchangeUseCase,
+} from 'src/application/exchange/use-cases/request-exchange.usecase';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 
 @Controller('exchanges')
@@ -22,7 +27,19 @@ export class ExchangeController {
     private readonly listMyExchangesUseCase: ListMyExchangesUseCase,
     private readonly respondToExchangeUseCase: RespondToExchangeUseCase,
     private readonly getChatExchangeUseCase: GetChatExchangeUseCase,
+    private readonly requestExchangeUseCase: RequestExchangeUseCase,
   ) {}
+
+  @Post()
+  async request(
+    @Req() req: any,
+    @Body() body: Omit<RequestExchangeInput, 'requesterId'>,
+  ) {
+    return this.requestExchangeUseCase.execute({
+      ...body,
+      requesterId: req.user.sub,
+    });
+  }
 
   @Get('me')
   async findMine(@Req() req: any) {

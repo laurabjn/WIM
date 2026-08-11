@@ -10,6 +10,8 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { getSession } from 'src/auth/infrastructure/authStorage';
+import { requestExchangeApi } from 'src/chat/infrastructure/exchange.api';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeMessage'>;
 
@@ -22,9 +24,30 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
     
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
 
-  function sendMessage() {
-    console.log('message envoyé', message);
-    navigation.navigate('HomeDetails', { homeId });
+  const [sending, setSending] = useState(false);
+
+  async function sendMessage() {
+    if (sending || !message.trim()) return;
+
+    setSending(true);
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      const result = await requestExchangeApi(session.accessToken, {
+        homeId,
+        message: message.trim(),
+      });
+
+      navigation.navigate('Conversation', { chatId: result.chatId });
+    } catch (error) {
+      console.log('Request exchange error:', error);
+      navigation.navigate('HomeDetails', { homeId });
+    } finally {
+      setSending(false);
+    }
   }
 
   return (

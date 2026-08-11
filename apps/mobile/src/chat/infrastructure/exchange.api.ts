@@ -40,3 +40,25 @@ export async function respondToExchangeApi(
 
   return parseOptional(result);
 }
+
+export async function requestExchangeApi(
+  token: string,
+  input: {
+    homeId: string;
+    message: string;
+    startDate?: string;
+    endDate?: string;
+    travelersCount?: number;
+  },
+): Promise<{ exchangeId: string; chatId: string }> {
+  const response = await fetch(`${API_URL}/exchanges`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(input),
+  });
+
+  return parseOptional(response);
+}
