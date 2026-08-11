@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
@@ -51,18 +52,25 @@ type Props = {
   route: {
     params: {
       chatId: string;
+      participantId?: string;
       participantName?: string;
       participantAvatar?: string | null;
     };
   };
   navigation: {
     goBack: () => void;
+    navigate: (screen: string, params?: Record<string, unknown>) => void;
   };
 };
 
 export function ConversationScreen({ route, navigation }: Props) {
   const { t } = useTranslation('chat');
-  const { chatId, participantName, participantAvatar } = route.params;
+  const {
+    chatId,
+    participantId,
+    participantName,
+    participantAvatar,
+  } = route.params;
 
   const [messages, setMessages] = useState<ChatMessages[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -185,6 +193,42 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
+  function openMenu() {
+    Alert.alert(participantName ?? '', undefined, [
+      {
+        text: t('blockUser'),
+        onPress: () => Alert.alert('', t('actionUnavailable')),
+      },
+      {
+        text: t('deleteExchange'),
+        style: 'destructive',
+        onPress: async () => {
+          if (!exchange) {
+            Alert.alert('', t('actionUnavailable'));
+            return;
+          }
+
+          const session = await getSession();
+
+          if (!session?.accessToken) return;
+
+          await respondToExchangeApi(
+            session.accessToken,
+            exchange.id,
+            'DECLINE',
+          );
+
+          setExchange(null);
+        },
+      },
+      {
+        text: t('report'),
+        onPress: () => Alert.alert('', t('actionUnavailable')),
+      },
+      { text: t('cancel'), style: 'cancel' },
+    ]);
+  }
+
   const lastOwnMessageId = messages.find(
     (message) => message.senderId === currentUserId,
   )?.id;
@@ -202,14 +246,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
     return (
       <View>
-        {newer && !isSameDay(newer.createdAt, message.createdAt) ? (
-          <View style={styles.daySeparator}>
-            <Text style={styles.dayText}>
-              {formatMessageDay(newer.createdAt, t)}
-            </Text>
-          </View>
-        ) : null}
-
         <View
           style={[
             styles.bubbleRow,
@@ -274,29 +310,42 @@ export function ConversationScreen({ route, navigation }: Props) {
           <ChevronLeft size={26} color="#111111" />
         </TouchableOpacity>
 
-        {participantAvatar ? (
-          <Image
-            source={{ uri: participantAvatar }}
-            style={styles.headerAvatar}
-          />
-        ) : (
-          <View style={[styles.headerAvatar, styles.headerAvatarFallback]}>
-            <Text style={styles.headerInitial}>
-              {(participantName ?? '?').charAt(0).toUpperCase()}
-            </Text>
-          </View>
-        )}
+        <TouchableOpacity
+          style={styles.headerIdentity}
+          activeOpacity={0.7}
+          disabled={!participantId}
+          onPress={() =>
+            navigation.navigate('PublicProfile', { userId: participantId })
+          }
+        >
+          {participantAvatar ? (
+            <Image
+              source={{ uri: participantAvatar }}
+              style={styles.headerAvatar}
+            />
+          ) : (
+            <View style={[styles.headerAvatar, styles.headerAvatarFallback]}>
+              <Text style={styles.headerInitial}>
+                {(participantName ?? '?').charAt(0).toUpperCase()}
+              </Text>
+            </View>
+          )}
 
-        <Text style={styles.headerName} numberOfLines={1}>
-          {participantName}
-        </Text>
+          <Text style={styles.headerName} numberOfLines={1}>
+            {participantName}
+          </Text>
+        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.headerButton} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.headerButton}
+          activeOpacity={0.7}
+          onPress={openMenu}
+        >
           <Info size={22} color="#111111" />
         </TouchableOpacity>
       </View>
 
-      {exchange ? (
+      {exchange?.isHost ? (
         <ExchangeBanner
           exchange={exchange}
           onRespond={async (response) => {
@@ -400,6 +449,13 @@ const styles = StyleSheet.create({
     gap: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E7EB',
+  },
+
+  headerIdentity: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 
   headerButton: {

@@ -138,6 +138,7 @@ export function ConversationsScreen({ navigation }: Props) {
         onPress={() =>
           navigation.navigate('Conversation', {
             chatId: chat.id,
+            participantId: participant?.id,
             participantName: participant?.firstName ?? '',
             participantAvatar: participant?.avatarUrl ?? null,
           })
@@ -230,6 +231,18 @@ export function ConversationsScreen({ navigation }: Props) {
         <ActivityIndicator style={styles.loader} color="#087EBE" />
       ) : (
         <FlatList
+          ListHeaderComponent={
+            tab === 'requests' ? (
+              <TouchableOpacity
+                style={styles.matchesRow}
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('Matches')}
+              >
+                <Text style={styles.matchesLabel}>⚡ {t('matches')}</Text>
+                <Text style={styles.matchesCount}>›</Text>
+              </TouchableOpacity>
+            ) : null
+          }
           data={visible}
           keyExtractor={(chat) => chat.id}
           renderItem={({ item }) => renderChat(item)}
@@ -272,6 +285,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingTop: 8,
     paddingBottom: 12,
+  },
+
+  matchesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E7EB',
+  },
+
+  matchesLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111111',
+  },
+
+  matchesCount: {
+    fontSize: 18,
+    color: '#9CA3AF',
   },
 
   tabs: {

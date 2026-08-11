@@ -16,6 +16,7 @@ export type MyMatchResult = {
   createdAt: Date;
 
   user: MatchUserRecord;
+  chatId: string | null;
 };
 
 @Injectable()
@@ -45,6 +46,7 @@ export class GetMyMatchesUseCase {
         status: match.status,
         createdAt: match.createdAt,
         user: otherUser,
+        chatId: match.chat?.id ?? null,
       };
     });
   }

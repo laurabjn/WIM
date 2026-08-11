@@ -715,6 +715,12 @@
     "tabMessages": "Messages",
     "tabRequests": "Requests",
     "emptyRequests": "No requests",
-    "emptyRequestsDescription": "Exchange requests you receive will appear here."
+    "emptyRequestsDescription": "Exchange requests you receive will appear here.",
+    "blockUser": "Block user",
+    "deleteExchange": "Delete exchange",
+    "report": "Report",
+    "cancel": "Cancel",
+    "actionUnavailable": "This action is not available yet.",
+    "matches": "Matches"
   }
 }

@@ -430,4 +430,13 @@ export class ChatPrismaRepository implements ChatRepository {
 
     return Boolean(participant);
   }
+
+  async hasUserReplied(chatId: string, userId: string): Promise<boolean> {
+    const message = await this.prisma.message.findFirst({
+      where: { chatId, senderId: userId },
+      select: { id: true },
+    });
+
+    return message !== null;
+  }
 }

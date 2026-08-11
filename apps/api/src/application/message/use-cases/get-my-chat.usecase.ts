@@ -3,11 +3,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
-import {
-  CHAT_REPOSITORY,
-  EXCHANGE_REPOSITORY,
-} from 'src/interfaces/http/tokens/token';
-import { ExchangeRepository } from 'src/domain/auth/repositories/exchange.repository';
+import { CHAT_REPOSITORY } from 'src/interfaces/http/tokens/token';
 import { mapMessage } from '../message.mapper';
 import { MyChatListItem } from '@wim/shared';
 
@@ -16,8 +12,6 @@ export class GetMyChatsUseCase {
   constructor(
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: ChatRepository,
-    @Inject(EXCHANGE_REPOSITORY)
-    private readonly exchangeRepository: ExchangeRepository,
   ) {}
 
   async execute(userId: string): Promise<MyChatListItem[]> {
@@ -36,12 +30,10 @@ export class GetMyChatsUseCase {
             userId,
           );
 
-        const pendingExchange = otherParticipant
-          ? await this.exchangeRepository.findPendingBetween(
-              userId,
-              otherParticipant.userId,
-            )
-          : null;
+        const hasReplied = await this.chatRepository.hasUserReplied(
+          chat.id,
+          userId,
+        );
 
         return {
           id: chat.id,
@@ -67,7 +59,7 @@ export class GetMyChatsUseCase {
             : null,
 
           unreadCount,
-          isRequest: pendingExchange?.hostId === userId,
+          isRequest: !hasReplied,
           createdAt: chat.createdAt.toISOString(),
           updatedAt: chat.updatedAt.toISOString(),
         };

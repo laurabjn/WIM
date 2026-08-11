@@ -714,6 +714,12 @@
     "tabMessages": "Messages",
     "tabRequests": "Demandes",
     "emptyRequests": "Aucune demande",
-    "emptyRequestsDescription": "Les demandes d'échange que vous recevez apparaîtront ici."
+    "emptyRequestsDescription": "Les demandes d'échange que vous recevez apparaîtront ici.",
+    "blockUser": "Bloquer l'utilisateur",
+    "deleteExchange": "Supprimer l'échange",
+    "report": "Signaler",
+    "cancel": "Annuler",
+    "actionUnavailable": "Cette action n'est pas encore disponible.",
+    "matches": "Matchs"
   }
 }

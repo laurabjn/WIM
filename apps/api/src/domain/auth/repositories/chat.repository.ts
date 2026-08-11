@@ -54,4 +54,5 @@ export interface ChatRepository {
   touchChat(chatId: string): Promise<void>
   createMessage(input: {chatId: string, senderId: string, content: string}): Promise<ChatMessage>;
   isParticipant(chatId: string, userId: string): Promise<boolean>
+  hasUserReplied(chatId: string, userId: string): Promise<boolean>
 }
