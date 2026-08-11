@@ -17,6 +17,7 @@ export type MyMatchResult = {
 
   user: MatchUserRecord;
   chatId: string | null;
+  hasMessages: boolean;
 };
 
 @Injectable()
@@ -47,6 +48,7 @@ export class GetMyMatchesUseCase {
         createdAt: match.createdAt,
         user: otherUser,
         chatId: match.chat?.id ?? null,
+        hasMessages: (match.chat?.messagesCount ?? 0) > 0,
       };
     });
   }

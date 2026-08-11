@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Alert } from 'react-native';
+import { Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
@@ -85,6 +85,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [draft, setDraft] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const cursorRef = useRef<string | null>(null);
   const hasMoreRef = useRef(false);
@@ -198,66 +199,49 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
-  function openMenu() {
-    Alert.alert(participantName ?? '', undefined, [
-      {
-        text: t('blockUser'),
-        style: 'destructive',
-        onPress: async () => {
-          if (!participantId) return;
+  async function blockParticipant() {
+    setMenuOpen(false);
 
-          const session = await getSession();
+    if (!participantId) return;
 
-          if (!session?.accessToken) return;
+    const session = await getSession();
 
-          await blockUserApi(session.accessToken, participantId);
+    if (!session?.accessToken) return;
 
-          Alert.alert('', t('blocked'));
-          navigation.goBack();
-        },
-      },
-      {
-        text: t('deleteExchange'),
-        style: 'destructive',
-        onPress: async () => {
-          if (!exchange) {
-            Alert.alert('', t('actionUnavailable'));
-            return;
-          }
+    await blockUserApi(session.accessToken, participantId);
 
-          const session = await getSession();
+    Alert.alert('', t('blocked'));
+    navigation.goBack();
+  }
 
-          if (!session?.accessToken) return;
+  async function deleteExchange() {
+    setMenuOpen(false);
 
-          await respondToExchangeApi(
-            session.accessToken,
-            exchange.id,
-            'DECLINE',
-          );
+    if (!exchange) {
+      Alert.alert('', t('actionUnavailable'));
+      return;
+    }
 
-          setExchange(null);
-        },
-      },
-      {
-        text: t('report'),
-        onPress: async () => {
-          if (!participantId) return;
+    const session = await getSession();
 
-          const session = await getSession();
+    if (!session?.accessToken) return;
 
-          if (!session?.accessToken) return;
+    await respondToExchangeApi(session.accessToken, exchange.id, 'DECLINE');
+    setExchange(null);
+  }
 
-          await reportUserApi(
-            session.accessToken,
-            participantId,
-            t('reportReason'),
-          );
+  async function reportParticipant() {
+    setMenuOpen(false);
 
-          Alert.alert('', t('reported'));
-        },
-      },
-      { text: t('cancel'), style: 'cancel' },
-    ]);
+    if (!participantId) return;
+
+    const session = await getSession();
+
+    if (!session?.accessToken) return;
+
+    await reportUserApi(session.accessToken, participantId, t('reportReason'));
+
+    Alert.alert('', t('reported'));
   }
 
   const lastOwnMessageId = messages.find(
@@ -370,7 +354,7 @@ export function ConversationScreen({ route, navigation }: Props) {
         <TouchableOpacity
           style={styles.headerButton}
           activeOpacity={0.7}
-          onPress={openMenu}
+          onPress={() => setMenuOpen(true)}
         >
           <Info size={22} color="#111111" />
         </TouchableOpacity>
@@ -472,6 +456,39 @@ export function ConversationScreen({ route, navigation }: Props) {
           </View>
         </KeyboardAvoidingView>
       )}
+      <Modal
+        visible={menuOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMenuOpen(false)}
+      >
+        <TouchableOpacity
+          style={styles.menuBackdrop}
+          activeOpacity={1}
+          onPress={() => setMenuOpen(false)}
+        >
+          <View style={styles.menuSheet}>
+            <TouchableOpacity style={styles.menuItem} onPress={blockParticipant}>
+              <Text style={styles.menuDanger}>{t('blockUser')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={deleteExchange}>
+              <Text style={styles.menuText}>{t('deleteExchange')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={reportParticipant}>
+              <Text style={styles.menuText}>{t('report')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setMenuOpen(false)}
+            >
+              <Text style={styles.menuCancel}>{t('cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -494,6 +511,41 @@ const styles = StyleSheet.create({
     gap: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E7EB',
+  },
+
+menuBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'flex-end',
+  },
+
+  menuSheet: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    paddingVertical: 8,
+    paddingBottom: 26,
+  },
+
+  menuItem: {
+    paddingVertical: 15,
+    paddingHorizontal: 22,
+  },
+
+  menuText: {
+    fontSize: 15,
+    color: '#111111',
+  },
+
+  menuDanger: {
+    fontSize: 15,
+    color: '#DC2626',
+  },
+
+  menuCancel: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#6B7280',
   },
 
   headerIdentity: {

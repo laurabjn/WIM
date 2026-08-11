@@ -55,14 +55,19 @@ export function ExchangeBanner({
 
     if (step === 'start') {
       setStartDate(picked);
-      setEditing('end');
+
+      setTimeout(() => setEditing('end'), 250);
       return;
     }
+
+    if (picked <= startDate) return;
 
     setPending(true);
 
     try {
       await onChangeDates(startDate, picked);
+    } catch (error) {
+      console.log('Update exchange dates error:', error);
     } finally {
       setPending(false);
     }
@@ -101,7 +106,11 @@ export function ExchangeBanner({
 
       {editing ? (
         <DateTimePicker
-          value={editing === 'start' ? startDate : new Date(exchange.endDate)}
+          value={
+            editing === 'start'
+              ? startDate
+              : new Date(startDate.getTime() + 86400000)
+          }
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           minimumDate={editing === 'end' ? startDate : new Date()}

@@ -14,7 +14,7 @@ export type MatchUserRecord = {
 
 export type MatchChatRecord = {
   id: string;
-  matchId: string;
+  matchId: string | null;
   createdAt: Date;
   updatedAt: Date;
 
@@ -24,6 +24,8 @@ export type MatchChatRecord = {
     userId: string;
     joinedAt: Date;
   }>;
+
+  messagesCount?: number;
 };
 
 export type MatchWithUsersRecord = {

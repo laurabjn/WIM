@@ -725,6 +725,9 @@
     "exchangeTo": "au",
     "blocked": "Utilisateur bloqué",
     "reported": "Signalement envoyé",
-    "reportReason": "Comportement inapproprié"
+    "reportReason": "Comportement inapproprié",
+    "requestsTitle": "Invitations par message",
+    "emptyRequestsTitle": "Aucune invitation par message récente",
+    "emptyRequestsHint": "Les demandes datant de plus de 90 jours ne sont pas affichées."
   }
 }

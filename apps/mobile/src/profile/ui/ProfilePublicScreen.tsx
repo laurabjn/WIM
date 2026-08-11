@@ -110,8 +110,8 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
     },
     averageRating: profile.averageRating ?? null,
     reviewsCount: profile.reviewsCount ?? 0,
-    exchangesCount: profile.exchangesCount ?? 0,
     homesCount: profile.homesCount ?? 0,
+    exchangesCount: profile.exchangesCount ?? 0,
   };
 
   return (
@@ -140,9 +140,9 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
                 onPressEdit={(homeId) => {
                   console.log('Modifier logement', homeId);
                 }}
-                onPressCard={(homeId) => {
-                  console.log('Voir logement', homeId);
-                }}
+                onPressCard={(homeId) =>
+                  navigation.navigate('HomeDetails', { homeId })
+                }
                 hideEditButton
               />
             ))}

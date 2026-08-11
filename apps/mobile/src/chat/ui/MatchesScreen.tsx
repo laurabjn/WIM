@@ -35,7 +35,9 @@ export function MatchesScreen({ navigation }: Props) {
 
       if (!session?.accessToken) return;
 
-      setMatches(await getMyMatchesApi(session.accessToken));
+      const all = await getMyMatchesApi(session.accessToken);
+
+      setMatches(all.filter((match) => !match.hasMessages));
     } catch (error) {
       console.log('Load matches error:', error);
     } finally {

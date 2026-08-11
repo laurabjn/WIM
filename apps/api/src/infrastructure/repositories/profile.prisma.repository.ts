@@ -40,7 +40,10 @@ export class PrismaProfileRepository implements ProfileRepository {
       homesCount,
       exchangesCount,
       reviewsCount: reviewStats._count._all,
-      averageRating: reviewStats._avg.score ?? null,
+      averageRating:
+        reviewStats._avg.score !== null
+          ? Math.round(reviewStats._avg.score * 10) / 10
+          : null,
     };
   }
 
@@ -51,11 +54,33 @@ export class PrismaProfileRepository implements ProfileRepository {
 
     if (!user) return null;
 
+    const [homesCount, exchangesCount, reviewStats] = await Promise.all([
+      this.prisma.home.count({ where: { ownerId: userId } }),
+      this.prisma.exchange.count({
+        where: {
+          status: { not: 'CANCELLED' },
+          OR: [{ hostId: userId }, { guestId: userId }],
+        },
+      }),
+      this.prisma.review.aggregate({
+        where: { home: { ownerId: userId } },
+        _count: { _all: true },
+        _avg: { score: true },
+      }),
+    ]);
+
     return {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       age: calculateAge(user.birthDate),
+      homesCount,
+      exchangesCount,
+      reviewsCount: reviewStats._count._all,
+      averageRating:
+        reviewStats._avg.score !== null
+          ? Math.round(reviewStats._avg.score * 10) / 10
+          : null,
       avatarUrl: user.avatarUrl,
       bio: user.bio,
       country: user.country,

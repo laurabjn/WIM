@@ -5,6 +5,7 @@ export type MatchItem = {
   status: string;
   createdAt: string;
   chatId: string | null;
+  hasMessages: boolean;
   user: {
     id: string;
     firstName: string | null;

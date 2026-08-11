@@ -200,27 +200,14 @@ export function ConversationsScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <Text style={styles.title}>{t('title')}</Text>
 
-      <View style={styles.tabs}>
-        <TouchableOpacity
-          style={[styles.tab, tab === 'messages' && styles.tabActive]}
-          onPress={() => setTab('messages')}
-          activeOpacity={0.7}
-        >
-          <Text
-            style={[styles.tabText, tab === 'messages' && styles.tabTextActive]}
-          >
-            {t('tabMessages')}
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.listHeader}>
+        <Text style={styles.sectionTitle}>{t('tabMessages')}</Text>
 
         <TouchableOpacity
-          style={[styles.tab, tab === 'requests' && styles.tabActive]}
-          onPress={() => setTab('requests')}
           activeOpacity={0.7}
+          onPress={() => navigation.navigate('Requests')}
         >
-          <Text
-            style={[styles.tabText, tab === 'requests' && styles.tabTextActive]}
-          >
+          <Text style={styles.requestsLink}>
             {t('tabRequests')}
             {requests.length > 0 ? ` (${requests.length})` : ''}
           </Text>
@@ -231,19 +218,8 @@ export function ConversationsScreen({ navigation }: Props) {
         <ActivityIndicator style={styles.loader} color="#087EBE" />
       ) : (
         <FlatList
-          ListHeaderComponent={
-            tab === 'requests' ? (
-              <TouchableOpacity
-                style={styles.matchesRow}
-                activeOpacity={0.7}
-                onPress={() => navigation.navigate('Matches')}
-              >
-                <Text style={styles.matchesLabel}>⚡ {t('matches')}</Text>
-                <Text style={styles.matchesCount}>›</Text>
-              </TouchableOpacity>
-            ) : null
-          }
-          data={visible}
+
+          data={conversations}
           keyExtractor={(chat) => chat.id}
           renderItem={({ item }) => renderChat(item)}
           contentContainerStyle={styles.list}

@@ -726,6 +726,9 @@
     "exchangeTo": "to",
     "blocked": "User blocked",
     "reported": "Report sent",
-    "reportReason": "Inappropriate behaviour"
+    "reportReason": "Inappropriate behaviour",
+    "requestsTitle": "Message requests",
+    "emptyRequestsTitle": "No recent message requests",
+    "emptyRequestsHint": "Requests older than 90 days are not shown."
   }
 }
