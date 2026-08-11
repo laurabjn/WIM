@@ -1,40 +1,68 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
+import { CalendarDays } from 'lucide-react-native';
 import type { PendingExchange } from '@wim/shared';
 
 type Props = {
   exchange: PendingExchange;
-  onRespond: (response: 'ACCEPT' | 'DECLINE') => Promise<void>;
+  onAccept: () => Promise<void>;
+  onChangeDates: (startDate: Date, endDate: Date) => Promise<void>;
 };
 
-function formatRange(startDate: string, endDate: string): string {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  const options: Intl.DateTimeFormatOptions = {
+function formatDay(value: string): string {
+  return new Date(value).toLocaleDateString(undefined, {
     day: 'numeric',
     month: 'long',
-  };
-
-  return `${start.toLocaleDateString(undefined, options)} — ${end.toLocaleDateString(undefined, options)}`;
+  });
 }
 
-export function ExchangeBanner({ exchange, onRespond }: Props) {
+export function ExchangeBanner({
+  exchange,
+  onAccept,
+  onChangeDates,
+}: Props) {
   const { t } = useTranslation('chat');
-  const [pending, setPending] = useState(false);
 
-  async function respond(response: 'ACCEPT' | 'DECLINE') {
+  const [pending, setPending] = useState(false);
+  const [editing, setEditing] = useState<'start' | 'end' | null>(null);
+  const [startDate, setStartDate] = useState(new Date(exchange.startDate));
+
+  async function accept() {
     setPending(true);
 
     try {
-      await onRespond(response);
+      await onAccept();
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function handlePicked(picked?: Date) {
+    const step = editing;
+
+    setEditing(null);
+
+    if (!picked || !step) return;
+
+    if (step === 'start') {
+      setStartDate(picked);
+      setEditing('end');
+      return;
+    }
+
+    setPending(true);
+
+    try {
+      await onChangeDates(startDate, picked);
     } finally {
       setPending(false);
     }
@@ -42,39 +70,46 @@ export function ExchangeBanner({ exchange, onRespond }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.texts}>
-        <Text style={styles.title}>{t('exchangePending')}</Text>
+      <Text style={styles.title}>{t('exchangePending')}</Text>
 
-        <Text style={styles.dates}>
-          {formatRange(exchange.startDate, exchange.endDate)}
-        </Text>
-
-        <Text style={styles.home} numberOfLines={1}>
-          {exchange.homeTitle}
-        </Text>
-      </View>
+      <Text style={styles.dates}>
+        {t('exchangeFrom')} {formatDay(exchange.startDate)}{' '}
+        {t('exchangeTo')} {formatDay(exchange.endDate)}
+      </Text>
 
       {pending ? (
-        <ActivityIndicator color="#087EBE" />
+        <ActivityIndicator style={styles.loader} color="#111111" />
       ) : (
         <View style={styles.actions}>
           <TouchableOpacity
-            style={styles.declineButton}
-            onPress={() => respond('DECLINE')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.declineText}>{t('exchangeDecline')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
             style={styles.acceptButton}
-            onPress={() => respond('ACCEPT')}
-            activeOpacity={0.8}
+            onPress={accept}
+            activeOpacity={0.85}
           >
             <Text style={styles.acceptText}>{t('exchangeAccept')}</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.datesButton}
+            onPress={() => setEditing('start')}
+            activeOpacity={0.85}
+          >
+            <CalendarDays size={18} color="#111111" />
+          </TouchableOpacity>
         </View>
       )}
+
+      {editing ? (
+        <DateTimePicker
+          value={editing === 'start' ? startDate : new Date(exchange.endDate)}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'inline' : 'default'}
+          minimumDate={editing === 'end' ? startDate : new Date()}
+          onChange={(event, picked) =>
+            handlePicked(event.type === 'dismissed' ? undefined : picked)
+          }
+        />
+      ) : null}
     </View>
   );
 }
@@ -83,61 +118,59 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: 14,
     marginTop: 10,
-    padding: 14,
-    borderRadius: 18,
-    backgroundColor: '#F4F4F5',
-    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 20,
+    backgroundColor: '#F1F1F1',
     alignItems: 'center',
-    gap: 12,
-  },
-
-  texts: {
-    flex: 1,
   },
 
   title: {
-    fontSize: 13,
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111111',
+    textAlign: 'center',
+  },
+
+  dates: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#087EBE',
+    textAlign: 'center',
+  },
+
+  loader: {
+    marginTop: 12,
+  },
+
+  actions: {
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'stretch',
+  },
+
+  acceptButton: {
+    flex: 1,
+    paddingVertical: 11,
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+  },
+
+  acceptText: {
+    fontSize: 14,
     fontWeight: '700',
     color: '#111111',
   },
 
-  dates: {
-    marginTop: 3,
-    fontSize: 12,
-    color: '#6B7280',
-  },
-
-  home: {
-    marginTop: 2,
-    fontSize: 11,
-    color: '#9CA3AF',
-  },
-
-  actions: {
-    alignItems: 'flex-end',
-    gap: 6,
-  },
-
-  acceptButton: {
-    paddingHorizontal: 18,
-    paddingVertical: 9,
-    borderRadius: 20,
-    backgroundColor: '#087EBE',
-  },
-
-  acceptText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-
-  declineButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-
-  declineText: {
-    color: '#6B7280',
-    fontSize: 12,
+  datesButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

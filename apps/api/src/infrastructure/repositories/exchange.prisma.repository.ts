@@ -121,4 +121,18 @@ export class ExchangeRepositoryPrisma {
 
     return this.mapPending(exchange);
   }
+
+  async updateDates(
+    exchangeId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<PendingExchange> {
+    const exchange = await this.prisma.exchange.update({
+      where: { id: exchangeId },
+      data: { startDate, endDate },
+      include: this.pendingInclude,
+    });
+
+    return this.mapPending(exchange);
+  }
 }

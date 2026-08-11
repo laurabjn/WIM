@@ -38,7 +38,12 @@ import { useChatSocket } from '../hooks/useChatSocket';
 import {
   getChatExchangeApi,
   respondToExchangeApi,
+  updateExchangeDatesApi,
 } from '../infrastructure/exchange.api';
+import {
+  blockUserApi,
+  reportUserApi,
+} from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
 import {
   formatMessageDay,
@@ -197,7 +202,19 @@ export function ConversationScreen({ route, navigation }: Props) {
     Alert.alert(participantName ?? '', undefined, [
       {
         text: t('blockUser'),
-        onPress: () => Alert.alert('', t('actionUnavailable')),
+        style: 'destructive',
+        onPress: async () => {
+          if (!participantId) return;
+
+          const session = await getSession();
+
+          if (!session?.accessToken) return;
+
+          await blockUserApi(session.accessToken, participantId);
+
+          Alert.alert('', t('blocked'));
+          navigation.goBack();
+        },
       },
       {
         text: t('deleteExchange'),
@@ -223,7 +240,21 @@ export function ConversationScreen({ route, navigation }: Props) {
       },
       {
         text: t('report'),
-        onPress: () => Alert.alert('', t('actionUnavailable')),
+        onPress: async () => {
+          if (!participantId) return;
+
+          const session = await getSession();
+
+          if (!session?.accessToken) return;
+
+          await reportUserApi(
+            session.accessToken,
+            participantId,
+            t('reportReason'),
+          );
+
+          Alert.alert('', t('reported'));
+        },
       },
       { text: t('cancel'), style: 'cancel' },
     ]);
@@ -345,10 +376,10 @@ export function ConversationScreen({ route, navigation }: Props) {
         </TouchableOpacity>
       </View>
 
-      {exchange?.isHost ? (
+      {exchange ? (
         <ExchangeBanner
           exchange={exchange}
-          onRespond={async (response) => {
+          onAccept={async () => {
             const session = await getSession();
 
             if (!session?.accessToken) return;
@@ -356,10 +387,24 @@ export function ConversationScreen({ route, navigation }: Props) {
             await respondToExchangeApi(
               session.accessToken,
               exchange.id,
-              response,
+              'ACCEPT',
             );
 
             setExchange(null);
+          }}
+          onChangeDates={async (start, end) => {
+            const session = await getSession();
+
+            if (!session?.accessToken) return;
+
+            const updated = await updateExchangeDatesApi(
+              session.accessToken,
+              exchange.id,
+              start.toISOString(),
+              end.toISOString(),
+            );
+
+            setExchange(updated);
           }}
         />
       ) : null}

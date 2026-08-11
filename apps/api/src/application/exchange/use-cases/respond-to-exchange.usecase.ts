@@ -53,3 +53,49 @@ export class RespondToExchangeUseCase {
     return this.exchangeRepository.updateStatus(exchangeId, nextStatus);
   }
 }
+
+@Injectable()
+export class UpdateExchangeDatesUseCase {
+  constructor(
+    @Inject(EXCHANGE_REPOSITORY)
+    private readonly exchangeRepository: ExchangeRepository,
+  ) {}
+
+  async execute(
+    exchangeId: string,
+    userId: string,
+    startDate: string,
+    endDate: string,
+  ): Promise<PendingExchange> {
+    const exchange = await this.exchangeRepository.findById(exchangeId);
+
+    if (!exchange) {
+      throw new NotFoundException('Échange introuvable.');
+    }
+
+    if (exchange.hostId !== userId && exchange.guestId !== userId) {
+      throw new ForbiddenException("Cet échange ne vous concerne pas.");
+    }
+
+    if (exchange.status !== 'PENDING') {
+      throw new BadRequestException(
+        'Les dates ne peuvent plus être modifiées.',
+      );
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      throw new BadRequestException('Dates invalides.');
+    }
+
+    if (end <= start) {
+      throw new BadRequestException(
+        'La date de fin doit suivre la date de début.',
+      );
+    }
+
+    return this.exchangeRepository.updateDates(exchangeId, start, end);
+  }
+}

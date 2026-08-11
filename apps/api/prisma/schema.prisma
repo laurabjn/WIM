@@ -43,6 +43,10 @@ model User {
   chatParticipants ChatParticipant[]
   messages         Message[]
   reviews          Review[]
+  blocksMade       BlockedUser[]     @relation("BlocksMade")
+  blocksReceived   BlockedUser[]     @relation("BlocksReceived")
+  reportsMade      UserReport[]      @relation("ReportsMade")
+  reportsReceived  UserReport[]      @relation("ReportsReceived")
 
   @@map("users")
 }
@@ -340,4 +344,38 @@ model Review {
   @@unique([homeId, authorId])
   @@index([homeId])
   @@map("reviews")
+}
+
+model BlockedUser {
+  id String @id @default(uuid())
+
+  blockerId String @map("blocker_id")
+  blockedId String @map("blocked_id")
+
+  blocker User @relation("BlocksMade", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("BlocksReceived", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@map("blocked_users")
+}
+
+model UserReport {
+  id String @id @default(uuid())
+
+  reporterId String @map("reporter_id")
+  reportedId String @map("reported_id")
+
+  reporter User @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported User @relation("ReportsReceived", fields: [reportedId], references: [id], onDelete: Cascade)
+
+  reason  String
+  message String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([reportedId])
+  @@map("user_reports")
 }

@@ -720,6 +720,11 @@
     "report": "Signaler",
     "cancel": "Annuler",
     "actionUnavailable": "Cette action n'est pas encore disponible.",
-    "matches": "Matchs"
+    "matches": "Matchs",
+    "exchangeFrom": "Du",
+    "exchangeTo": "au",
+    "blocked": "Utilisateur bloqué",
+    "reported": "Signalement envoyé",
+    "reportReason": "Comportement inapproprié"
   }
 }

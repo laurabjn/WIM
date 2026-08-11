@@ -8,4 +8,9 @@ export interface ExchangeRepository {
   ): Promise<PendingExchange | null>;
   findById(exchangeId: string): Promise<PendingExchange | null>;
   updateStatus(exchangeId: string, status: string): Promise<PendingExchange>;
+  updateDates(
+    exchangeId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<PendingExchange>;
 }

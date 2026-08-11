@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ListMyExchangesUseCase } from 'src/application/exchange/use-cases/list-my-exchanges.usecase';
-import { RespondToExchangeUseCase } from 'src/application/exchange/use-cases/respond-to-exchange.usecase';
+import {
+  RespondToExchangeUseCase,
+  UpdateExchangeDatesUseCase,
+} from 'src/application/exchange/use-cases/respond-to-exchange.usecase';
 import { GetChatExchangeUseCase } from 'src/application/exchange/use-cases/get-chat-exchange.usecase';
 import { RequestExchangeUseCase } from 'src/application/exchange/use-cases/request-exchange.usecase';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
@@ -29,6 +32,7 @@ import { CHAT_REPOSITORY, EXCHANGE_REPOSITORY } from '../tokens/token';
       inject: [ExchangeRepositoryPrisma],
     },
     RespondToExchangeUseCase,
+    UpdateExchangeDatesUseCase,
     GetChatExchangeUseCase,
     RequestExchangeUseCase,
   ],

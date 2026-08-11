@@ -12,6 +12,7 @@ import { ListMyExchangesUseCase } from 'src/application/exchange/use-cases/list-
 import {
   ExchangeResponse,
   RespondToExchangeUseCase,
+  UpdateExchangeDatesUseCase,
 } from 'src/application/exchange/use-cases/respond-to-exchange.usecase';
 import { GetChatExchangeUseCase } from 'src/application/exchange/use-cases/get-chat-exchange.usecase';
 import {
@@ -28,6 +29,7 @@ export class ExchangeController {
     private readonly respondToExchangeUseCase: RespondToExchangeUseCase,
     private readonly getChatExchangeUseCase: GetChatExchangeUseCase,
     private readonly requestExchangeUseCase: RequestExchangeUseCase,
+    private readonly updateExchangeDatesUseCase: UpdateExchangeDatesUseCase,
   ) {}
 
   @Post()
@@ -49,6 +51,20 @@ export class ExchangeController {
   @Get('chat/:chatId')
   async findForChat(@Req() req: any, @Param('chatId') chatId: string) {
     return this.getChatExchangeUseCase.execute(chatId, req.user.sub);
+  }
+
+  @Patch(':exchangeId/dates')
+  async updateDates(
+    @Req() req: any,
+    @Param('exchangeId') exchangeId: string,
+    @Body() body: { startDate: string; endDate: string },
+  ) {
+    return this.updateExchangeDatesUseCase.execute(
+      exchangeId,
+      req.user.sub,
+      body?.startDate,
+      body?.endDate,
+    );
   }
 
   @Patch(':exchangeId/respond')

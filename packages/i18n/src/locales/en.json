@@ -721,6 +721,11 @@
     "report": "Report",
     "cancel": "Cancel",
     "actionUnavailable": "This action is not available yet.",
-    "matches": "Matches"
+    "matches": "Matches",
+    "exchangeFrom": "From",
+    "exchangeTo": "to",
+    "blocked": "User blocked",
+    "reported": "Report sent",
+    "reportReason": "Inappropriate behaviour"
   }
 }

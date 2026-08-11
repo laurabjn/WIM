@@ -62,3 +62,21 @@ export async function requestExchangeApi(
 
   return parseOptional(response);
 }
+
+export async function updateExchangeDatesApi(
+  token: string,
+  exchangeId: string,
+  startDate: string,
+  endDate: string,
+): Promise<PendingExchange> {
+  const response = await fetch(`${API_URL}/exchanges/${exchangeId}/dates`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ startDate, endDate }),
+  });
+
+  return parseOptional(response);
+}
