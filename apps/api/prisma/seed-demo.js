@@ -573,6 +573,36 @@ async function main() {
     }
   }
 
+  const sophieHome = await prisma.home.findFirst({
+    where: { ownerId: ownersByKey.sophie.id },
+    select: { id: true },
+  });
+
+  await prisma.exchange.deleteMany({
+    where: {
+      OR: [
+        { hostId: { in: ownerIds } },
+        { guestId: { in: ownerIds } },
+      ],
+    },
+  });
+
+  if (sophieHome) {
+    await prisma.exchange.create({
+      data: {
+        homeId: sophieHome.id,
+        hostId: ownersByKey.sophie.id,
+        guestId: ownersByKey.thomas.id,
+        startDate: daysFromNow(14),
+        endDate: daysFromNow(24),
+        travelersCount: 2,
+        status: 'PENDING',
+      },
+    });
+
+    console.log('[seed] 1 echange en attente d acceptation.');
+  }
+
   console.log(
     `[seed] ${CONVERSATIONS.length} conversations creees, ${totalMessages} messages.`,
   );

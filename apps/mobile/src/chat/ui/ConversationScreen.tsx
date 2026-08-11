@@ -23,6 +23,7 @@ import {
 } from 'lucide-react-native';
 import type {
   ChatMessages,
+  PendingExchange,
   MessageCreatedSocketPayload,
 } from '@wim/shared';
 
@@ -33,6 +34,11 @@ import {
   sendMessageApi,
 } from '../infrastructure/chat.api';
 import { useChatSocket } from '../hooks/useChatSocket';
+import {
+  getChatExchangeApi,
+  respondToExchangeApi,
+} from '../infrastructure/exchange.api';
+import { ExchangeBanner } from './components/ExchangeBanner';
 import {
   formatMessageDay,
   formatMessageTime,
@@ -65,6 +71,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [sending, setSending] = useState(false);
   const [draft, setDraft] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [exchange, setExchange] = useState<PendingExchange | null>(null);
 
   const cursorRef = useRef<string | null>(null);
   const hasMoreRef = useRef(false);
@@ -91,6 +98,10 @@ export function ConversationScreen({ route, navigation }: Props) {
         hasMoreRef.current = page.hasMore;
 
         await markChatAsReadApi(session.accessToken, chatId);
+
+        const pending = await getChatExchangeApi(session.accessToken, chatId);
+
+        if (!cancelled) setExchange(pending);
       } catch (loadError) {
         console.log('Load messages error:', loadError);
         if (!cancelled) setError(t('loadError'));
@@ -284,6 +295,25 @@ export function ConversationScreen({ route, navigation }: Props) {
           <Info size={22} color="#111111" />
         </TouchableOpacity>
       </View>
+
+      {exchange ? (
+        <ExchangeBanner
+          exchange={exchange}
+          onRespond={async (response) => {
+            const session = await getSession();
+
+            if (!session?.accessToken) return;
+
+            await respondToExchangeApi(
+              session.accessToken,
+              exchange.id,
+              response,
+            );
+
+            setExchange(null);
+          }}
+        />
+      ) : null}
 
       {loading ? (
         <ActivityIndicator style={styles.loader} color="#087EBE" />

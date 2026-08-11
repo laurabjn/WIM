@@ -706,6 +706,9 @@
     "delivered": "Envoyé",
     "dateToday": "Aujourd'hui",
     "dateYesterday": "Hier",
-    "attachmentsSoon": "L'envoi de photos arrivera prochainement."
+    "attachmentsSoon": "L'envoi de photos arrivera prochainement.",
+    "exchangePending": "Vous n'avez pas encore accepté cet échange",
+    "exchangeAccept": "Accepter",
+    "exchangeDecline": "Refuser"
   }
 }

@@ -163,6 +163,8 @@ model HomeAvailability {
 }
 
 enum ExchangeStatus {
+  PENDING
+  DECLINED
   CURRENT
   FUTURE
   PAST

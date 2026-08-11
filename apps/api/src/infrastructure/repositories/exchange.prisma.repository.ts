@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { Exchange } from '@wim/shared';
+import type { Exchange, PendingExchange } from '@wim/shared';
 import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
@@ -54,5 +54,71 @@ export class ExchangeRepositoryPrisma {
     }
 
     return 'PAST';
+  }
+
+  private readonly pendingInclude = {
+    home: {
+      include: {
+        photos: { orderBy: { position: 'asc' }, take: 1 },
+      },
+    },
+  } as const;
+
+  private mapPending(exchange: any, viewerId?: string): PendingExchange {
+    return {
+      id: exchange.id,
+      homeId: exchange.homeId,
+      homeTitle: exchange.home.title,
+      homeImageUrl: exchange.home.photos[0]?.url ?? null,
+      location: `${exchange.home.city}, ${exchange.home.country}`,
+      startDate: exchange.startDate.toISOString(),
+      endDate: exchange.endDate.toISOString(),
+      travelersCount: exchange.travelersCount,
+      status: exchange.status,
+      hostId: exchange.hostId,
+      guestId: exchange.guestId,
+      isHost: viewerId ? exchange.hostId === viewerId : false,
+    };
+  }
+
+  async findPendingBetween(
+    firstUserId: string,
+    secondUserId: string,
+  ): Promise<PendingExchange | null> {
+    const exchange = await this.prisma.exchange.findFirst({
+      where: {
+        status: 'PENDING',
+        OR: [
+          { hostId: firstUserId, guestId: secondUserId },
+          { hostId: secondUserId, guestId: firstUserId },
+        ],
+      },
+      include: this.pendingInclude,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return exchange ? this.mapPending(exchange, firstUserId) : null;
+  }
+
+  async findById(exchangeId: string): Promise<PendingExchange | null> {
+    const exchange = await this.prisma.exchange.findUnique({
+      where: { id: exchangeId },
+      include: this.pendingInclude,
+    });
+
+    return exchange ? this.mapPending(exchange) : null;
+  }
+
+  async updateStatus(
+    exchangeId: string,
+    status: string,
+  ): Promise<PendingExchange> {
+    const exchange = await this.prisma.exchange.update({
+      where: { id: exchangeId },
+      data: { status: status as any },
+      include: this.pendingInclude,
+    });
+
+    return this.mapPending(exchange);
   }
 }
