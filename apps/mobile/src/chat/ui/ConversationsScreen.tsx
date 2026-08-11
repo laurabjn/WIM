@@ -20,6 +20,7 @@ import type {
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { getChatsApi } from '../infrastructure/chat.api';
 import { connectChatSocket } from '../infrastructure/chatSocket';
+import { usePresence } from '../hooks/usePresence';
 import { formatRelativeDate } from '../utils/formatRelativeDate';
 
 type Props = {
@@ -110,6 +111,10 @@ export function ConversationsScreen({ navigation }: Props) {
     };
   }, [loadChats]);
 
+  const onlineUsers = usePresence(
+    chats.map((chat) => chat.participant?.id).filter(Boolean) as string[],
+  );
+
   const requests = chats.filter((chat) => chat.isRequest);
   const conversations = chats.filter((chat) => !chat.isRequest);
   const visible = tab === 'requests' ? requests : conversations;
@@ -122,6 +127,9 @@ export function ConversationsScreen({ navigation }: Props) {
   function renderChat(chat: MyChatListItem) {
     const participant = chat.participant;
     const hasUnread = chat.unreadCount > 0;
+    const isOnline = participant?.id
+      ? onlineUsers.has(participant.id)
+      : false;
 
     return (
       <TouchableOpacity
@@ -135,15 +143,22 @@ export function ConversationsScreen({ navigation }: Props) {
           })
         }
       >
-        {participant?.avatarUrl ? (
-          <Image source={{ uri: participant.avatarUrl }} style={styles.avatar} />
-        ) : (
-          <View style={[styles.avatar, styles.avatarFallback]}>
-            <Text style={styles.avatarInitial}>
-              {(participant?.firstName ?? '?').charAt(0).toUpperCase()}
-            </Text>
-          </View>
-        )}
+        <View>
+          {participant?.avatarUrl ? (
+            <Image
+              source={{ uri: participant.avatarUrl }}
+              style={styles.avatar}
+            />
+          ) : (
+            <View style={[styles.avatar, styles.avatarFallback]}>
+              <Text style={styles.avatarInitial}>
+                {(participant?.firstName ?? '?').charAt(0).toUpperCase()}
+              </Text>
+            </View>
+          )}
+
+          {isOnline ? <View style={styles.onlineDot} /> : null}
+        </View>
 
         <View style={styles.rowContent}>
           <View style={styles.rowHeader}>
@@ -308,6 +323,18 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 27,
     backgroundColor: '#F1F1F1',
+  },
+
+  onlineDot: {
+    position: 'absolute',
+    right: 1,
+    bottom: 1,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#22C55E',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
 
   avatarFallback: {

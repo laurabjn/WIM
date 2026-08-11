@@ -52,6 +52,8 @@ export class AppGateway {
 
   private readonly logger = new Logger(AppGateway.name);
 
+  private readonly onlineUsers = new Map<string, number>();
+
   afterInit() {
     this.logger.log('WebSocket gateway initialized');
   }
@@ -73,13 +75,45 @@ export class AppGateway {
 
       client.userId = payload.sub;
       await client.join(userRoom(payload.sub));
+      this.markOnline(payload.sub);
     } catch {
       client.disconnect();
     }
   }
 
   handleDisconnect(client: AuthenticatedSocket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+    if (client.userId) this.markOffline(client.userId);
+  }
+
+  private markOnline(userId: string) {
+    const next = (this.onlineUsers.get(userId) ?? 0) + 1;
+
+    this.onlineUsers.set(userId, next);
+
+    if (next === 1) this.server.emit('presence:changed', { userId, isOnline: true });
+  }
+
+  private markOffline(userId: string) {
+    const next = (this.onlineUsers.get(userId) ?? 1) - 1;
+
+    if (next <= 0) {
+      this.onlineUsers.delete(userId);
+      this.server.emit('presence:changed', { userId, isOnline: false });
+      return;
+    }
+
+    this.onlineUsers.set(userId, next);
+  }
+
+  isOnline(userId: string): boolean {
+    return this.onlineUsers.has(userId);
+  }
+
+  @SubscribeMessage('presence:list')
+  listPresence(@MessageBody() body: { userIds?: string[] }) {
+    const userIds = body?.userIds ?? [];
+
+    return userIds.filter((userId) => this.onlineUsers.has(userId));
   }
 
   @SubscribeMessage('chat:join')
