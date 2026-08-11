@@ -21,7 +21,10 @@ import {
   Mic,
   Send,
 } from 'lucide-react-native';
-import type { ChatMessages } from '@wim/shared';
+import type {
+  ChatMessages,
+  MessageCreatedSocketPayload,
+} from '@wim/shared';
 
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import {
@@ -29,6 +32,7 @@ import {
   markChatAsReadApi,
   sendMessageApi,
 } from '../infrastructure/chat.api';
+import { useChatSocket } from '../hooks/useChatSocket';
 import {
   formatMessageDay,
   formatMessageTime,
@@ -101,6 +105,19 @@ export function ConversationScreen({ route, navigation }: Props) {
       cancelled = true;
     };
   }, [chatId, t]);
+
+  const handleIncomingMessage = useCallback(
+    (payload: MessageCreatedSocketPayload) => {
+      setMessages((current) =>
+        current.some((message) => message.id === payload.message.id)
+          ? current
+          : [payload.message, ...current],
+      );
+    },
+    [],
+  );
+
+  useChatSocket({ chatId, onMessage: handleIncomingMessage });
 
   const loadEarlier = useCallback(async () => {
     if (!hasMoreRef.current || loadingMore || !cursorRef.current) return;

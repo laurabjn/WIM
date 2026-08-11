@@ -18,6 +18,7 @@ import { GetMyChatsUseCase } from 'src/application/message/use-cases/get-my-chat
 import { SendMessageUseCase } from 'src/application/message/use-cases/send-message.usecase';
 import { MarkChatAsReadUseCase } from 'src/application/message/use-cases/mark-chat-as-read.usecase';
 import { GetUnreadCountUseCase } from 'src/application/message/use-cases/get-unread-count.usecase';
+import { AppGateway } from 'src/interfaces/websocket/app.gateway';
 
 type AuthenticatedRequest = {
   user?: {
@@ -36,6 +37,7 @@ export class ChatController {
     private readonly sendMessage: SendMessageUseCase,
     private readonly markChatAsRead: MarkChatAsReadUseCase,
     private readonly getUnreadCount: GetUnreadCountUseCase,
+    private readonly gateway: AppGateway,
   ) {}
 
   private getUserId(
@@ -68,12 +70,19 @@ export class ChatController {
   }
 
   @Patch(':chatId/read')
-  markAsRead(
+  async markAsRead(
     @Req() request: AuthenticatedRequest,
     @Param('chatId')
     chatId: string,
   ) {
-    return this.markChatAsRead.execute(chatId, this.getUserId(request));
+    const result = await this.markChatAsRead.execute(
+      chatId,
+      this.getUserId(request),
+    );
+
+    this.gateway.emitMessagesRead(result);
+
+    return result;
   }
 
   @Get(':chatId/messages')
@@ -92,16 +101,20 @@ export class ChatController {
   }
 
   @Post(':chatId/messages')
-  createMessage(
+  async createMessage(
     @Req() request: AuthenticatedRequest,
     @Param('chatId')
     chatId: string,
     @Body() dto: SendMessageDto,
   ) {
-    return this.sendMessage.execute({
+    const message = await this.sendMessage.execute({
       chatId,
       senderId: this.getUserId(request),
       content: dto.content,
     });
+
+    this.gateway.emitMessageCreated(chatId, message);
+
+    return message;
   }
 }
