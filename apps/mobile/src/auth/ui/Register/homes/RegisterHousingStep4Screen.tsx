@@ -14,6 +14,8 @@ import { Stepper } from '../../components/Stepper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { NumberChip } from 'src/profile/ui/components/NumberChip';
 import { createHome } from 'src/home/infrastructure/home.api';
+import { HOME_CATEGORIES } from '@wim/shared/src/utils/travelOption';
+import type { HomeCategory } from '@wim/shared/home/home.type';
 import { uploadHomeImage, UploadPhoto } from 'src/auth/infrastructure/upload/uploadHomeImage';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { HomePhoto } from '@wim/shared/home/home.type';
@@ -29,6 +31,7 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
   const [error, setError] = useState<string | null>(null);
     
   const [travelersCount, setTravelersCount] = useState<number>();
+  const [category, setCategory] = useState<HomeCategory | null>(null);
 
   useEffect(() => {
     async function loadSession() {
@@ -103,6 +106,7 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
         beds: 1,
         bathrooms: 1,
         homeType: 'HOUSE',
+        category,
         amenities: [],
         carExchangeAccepted: false,
       };
@@ -161,6 +165,37 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
                     />
                 ))}
               </View>
+
+              <Text style={styles.sectionTitle}>{t('home:category')}</Text>
+
+              <Text style={styles.sectionHint}>{t('home:categoryHint')}</Text>
+
+              <View style={styles.categoriesRow}>
+                {HOME_CATEGORIES.map((value) => {
+                  const selected = category === value;
+
+                  return (
+                    <TouchableOpacity
+                      key={value}
+                      style={[
+                        styles.categoryChip,
+                        selected && styles.categoryChipSelected,
+                      ]}
+                      activeOpacity={0.8}
+                      onPress={() => setCategory(selected ? null : value)}
+                    >
+                      <Text
+                        style={[
+                          styles.categoryText,
+                          selected && styles.categoryTextSelected,
+                        ]}
+                      >
+                        {t(`home:categories.${value}`, value)}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
 
             <View style={styles.footer}>
@@ -193,6 +228,40 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
 };
 
 const styles = StyleSheet.create({
+  sectionHint: {
+    marginTop: -6,
+    marginBottom: 12,
+    fontSize: 12,
+    lineHeight: 17,
+    color: '#6B7280',
+  },
+  categoriesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  categoryChip: {
+    height: 38,
+    paddingHorizontal: 16,
+    borderRadius: 19,
+    borderWidth: 1,
+    borderColor: '#E6E6E6',
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  categoryChipSelected: {
+    borderColor: '#52D1A6',
+    backgroundColor: '#52D1A6',
+  },
+  categoryText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#111111',
+  },
+  categoryTextSelected: {
+    color: '#FFFFFF',
+  },
   safeArea: {
     flex: 1,
     backgroundColor: '#F4F4F5',

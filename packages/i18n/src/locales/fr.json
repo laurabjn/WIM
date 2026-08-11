@@ -614,13 +614,7 @@
     "available": "Disponible",
     "unavailable": "Indisponible",
     "from": "à partir de",
-    "category": {
-      "all": "Tous",
-      "nature": "Nature",
-      "city": "Ville",
-      "beach": "Plage",
-      "culture": "Culture"
-    },
+    "category": "Theme du sejour",
     "reviews": {
       "reviewsCount": "commentaires",
       "showLess": "Voir moins",
@@ -633,7 +627,14 @@
     "unknownLocation": "Localisation non renseignée",
     "reduce": "Réduire",
     "readMore": "Lire la suite >",
-    "source": "Source : Wikipédia"
+    "source": "Source : Wikipédia",
+    "categoryHint": "Ce que l'on vient faire chez vous. Il classe votre logement sur l'accueil ; laissez vide si aucun ne convient.",
+    "categories": {
+      "NATURE": "Nature",
+      "BEACH": "Plage",
+      "CITY": "Ville",
+      "CULTURE": "Culture"
+    }
   },
   "availability": {
     "when": "Quand êtes-vous disponible pour échanger ?",

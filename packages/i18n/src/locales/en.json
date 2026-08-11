@@ -615,13 +615,7 @@
     "available": "Available",
     "unavailable": "Unavailable",
     "from": "from",
-    "category": {
-      "all": "All",
-      "nature": "Nature",
-      "city": "City",
-      "beach": "Beach",
-      "culture": "Culture"
-    },
+    "category": "Stay theme",
     "reviews": {
       "reviewsCount": "reviews",
       "showLess": "Show less",
@@ -634,7 +628,14 @@
     "unknownLocation": "Location not specified",
     "reduce": "Reduce",
     "readMore": "Read more",
-    "source": "Source : Wikipedia"
+    "source": "Source : Wikipedia",
+    "categoryHint": "What guests come for. It files your home on the home page; leave empty if none fits.",
+    "categories": {
+      "NATURE": "Nature",
+      "BEACH": "Beach",
+      "CITY": "City",
+      "CULTURE": "Culture"
+    }
   },
   "availability": {
     "when": "When are you available for exchange ?",

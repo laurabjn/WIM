@@ -103,6 +103,13 @@ export class HomeRepositoryPrisma implements HomeRepository {
   async update(id: string, data: UpdateHomeRepositoryData): Promise<HomeEntity> {
     const { vehicle, ...homeData } = data;
 
+    // Un `delete` imbrique echoue quand le logement n'a pas de vehicule, ce qui
+    // faisait planter toute modification d'un logement sans voiture. On le
+    // retire donc a part, ou l'absence est acceptee.
+    if (vehicle === null) {
+      await this.prisma.vehicle.deleteMany({ where: { homeId: id } });
+    }
+
     const home = await this.prisma.home.update({
       where: { id },
       data: {
@@ -129,9 +136,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
                     },
                   },
                 }
-              : {
-                  delete: true,
-                }
+              : undefined
             : undefined,
       },
       include: HOME_WITH_RELATIONS_INCLUDE,

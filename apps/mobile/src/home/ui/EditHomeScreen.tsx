@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomesStackParamList } from 'src/navigation/type/homeStack';
+import type { HomeCategory } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
 import { Home } from '@wim/shared/home/home.type';
 import { getSession } from 'src/auth/infrastructure/authStorage';
@@ -42,6 +43,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const [amenities, setAmenities] = useState<string[]>([]);
 
   const [homeType, setHomeType] = useState('HOUSE');
+  const [category, setCategory] = useState<HomeCategory | null>(null);
   const [carExchangeAccepted, setCarExchangeAccepted] = useState(false);
   const [isAvailableForExchange, setIsAvailableForExchange] = useState(true);
   const [pricePerNight, setPricePerNight] = useState<number | null>(null);
@@ -77,6 +79,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         setBathrooms(data.bathrooms ?? 1);
         setAmenities(data.amenities ?? []);
         setHomeType(data.homeType ?? 'HOUSE');
+        setCategory(data.category ?? null);
         setCarExchangeAccepted(data.carExchangeAccepted ?? false);
         setIsAvailableForExchange(data.isAvailableForExchange ?? true);
         setPricePerNight(data.pricePerNight ?? null);
@@ -112,6 +115,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         bathrooms,
         amenities,
         homeType,
+        category,
         carExchangeAccepted,
         isAvailableForExchange,
         pricePerNight,
@@ -125,6 +129,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
       setBathrooms(updatedHome.bathrooms ?? 1);
       setAmenities(updatedHome.amenities ?? []);
       setHomeType(updatedHome.homeType ?? 'HOUSE');
+      setCategory(updatedHome.category ?? null);
       setCarExchangeAccepted(updatedHome.carExchangeAccepted ?? false);
       setIsAvailableForExchange(updatedHome.isAvailableForExchange ?? true);
       setPricePerNight(updatedHome.pricePerNight ?? null);
@@ -145,6 +150,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     bathrooms,
     amenities,
     homeType,
+    category,
     carExchangeAccepted,
     isAvailableForExchange,
     pricePerNight,
@@ -218,10 +224,12 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
             beds={beds}
             bathrooms={bathrooms}
             homeType={homeType}
+            category={category}
             onChangeCapacity={setCapacity}
             onChangeBeds={setBeds}
             onChangeBathrooms={setBathrooms}
             onChangeHomeType={setHomeType}
+            onChangeCategory={setCategory}
           />
         )}
 

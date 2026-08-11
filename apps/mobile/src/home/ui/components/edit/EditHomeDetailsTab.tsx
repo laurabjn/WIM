@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { HOME_TYPES } from '@wim/shared/src/utils/travelOption';
+import { HOME_CATEGORIES, HOME_TYPES } from '@wim/shared/src/utils/travelOption';
+import type { HomeCategory } from '@wim/shared/home/home.type';
 import { CounterRow } from '../CounterRow';
 
 type Props = {
@@ -9,10 +10,12 @@ type Props = {
   beds: number;
   bathrooms: number;
   homeType: string;
+  category: HomeCategory | null;
   onChangeCapacity: (value: number) => void;
   onChangeBeds: (value: number) => void;
   onChangeBathrooms: (value: number) => void;
   onChangeHomeType: (value: string) => void;
+  onChangeCategory: (value: HomeCategory | null) => void;
 };
 
 export function EditHomeDetailsTab({
@@ -20,10 +23,12 @@ export function EditHomeDetailsTab({
   beds,
   bathrooms,
   homeType,
+  category,
   onChangeCapacity,
   onChangeBeds,
   onChangeBathrooms,
   onChangeHomeType,
+  onChangeCategory,
 }: Props) {
   const { t } = useTranslation(['home', "profile"]);
 
@@ -43,6 +48,31 @@ export function EditHomeDetailsTab({
             >
               <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
                 {t(`profile:homeType.${type}`, type)}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <Text style={styles.label}>{t('home:category')}</Text>
+
+      <Text style={styles.hint}>{t('home:categoryHint')}</Text>
+
+      <View style={styles.chipsRow}>
+        {HOME_CATEGORIES.map((value) => {
+          const selected = category === value;
+
+          return (
+            <TouchableOpacity
+              key={value}
+              style={[styles.chip, selected && styles.chipSelected]}
+              // Retaper le theme actif le retire : un logement peut n'en avoir aucun.
+              onPress={() => onChangeCategory(selected ? null : value)}
+            >
+              <Text
+                style={[styles.chipText, selected && styles.chipTextSelected]}
+              >
+                {t(`home:categories.${value}`, value)}
               </Text>
             </TouchableOpacity>
           );
@@ -81,6 +111,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#111111',
     marginBottom: 8,
+  },
+  hint: {
+    marginTop: -4,
+    marginBottom: 10,
+    fontSize: 12,
+    lineHeight: 17,
+    color: '#6B7280',
   },
   chipsRow: {
     flexDirection: 'row',

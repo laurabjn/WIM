@@ -27,10 +27,14 @@ export class UpdateHomeUseCase {
       longitude: input.longitude,
       capacity: input.capacity,
       homeType: input.homeType,
+      category: input.category,
       amenities: input.amenities,
       carExchangeAccepted: input.carExchangeAccepted,
       beds: input.beds,
+      bedrooms: input.bedrooms,
       bathrooms: input.bathrooms,
+      isAvailableForExchange: input.isAvailableForExchange,
+      pricePerNight: input.pricePerNight,
       vehicle: input.vehicle ?? null,
     });
   }
