@@ -25,7 +25,8 @@
     "contact": "Contact",
     "noAvailability": "No availability for the moment",
     "available": "Available",
-    "availableWithBlockDates": "Available with blocked dates"
+    "availableWithBlockDates": "Available with blocked dates",
+    "retry": "Try again"
   },
   "auth": {
     "welcomeTitle": "Welcome to Wim!",
@@ -688,7 +689,11 @@
     "homeNotFound": "Home not found",
     "homenotAvailable": "This home is no longer available",
     "match": "It's a match 🎉",
-    "matchText": "You and {{firstName}} liked each other."
+    "matchText": "You and {{firstName}} liked each other.",
+    "notSignedIn": "You must be signed in.",
+    "loadError": "Homes could not be loaded.",
+    "swipeError": "Your choice could not be saved.",
+    "openConversation": "Open conversation"
   },
   "chat": {
     "title": "Messages",

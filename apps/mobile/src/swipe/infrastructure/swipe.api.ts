@@ -20,6 +20,7 @@ export type SwipeApiResult = {
 
   match: boolean;
   matchId: string | null;
+  chatId?: string | null;
 };
 
 export type SwipeRecommendation = {
@@ -41,6 +42,19 @@ export type SwipeRecommendation = {
     url: string;
     position: number;
   }>;
+
+  beds?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  averageRating?: number | null;
+  reviewsCount?: number;
+
+  owner?: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    avatarUrl: string | null;
+  };
 
   recommendationScore?: number;
 };
@@ -75,6 +89,7 @@ export async function getSwipeRecommendationsApi(
 
 export async function createSwipeApi(
   token: string,
+  targetUserId: string,
   homeId: string,
   direction: SwipeDirection,
 ): Promise<SwipeApiResult> {
@@ -91,6 +106,7 @@ export async function createSwipeApi(
       },
 
       body: JSON.stringify({
+        targetUserId,
         homeId,
         direction,
       }),

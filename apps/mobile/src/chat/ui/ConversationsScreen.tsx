@@ -208,6 +208,7 @@ export function ConversationsScreen({ navigation }: Props) {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={styles.statusScroll}
         contentContainerStyle={styles.statusRow}
       >
         <View style={styles.statusItem}>
@@ -335,7 +336,13 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
 
-statusRow: {
+  // Un ScrollView naît avec flexGrow: 1 : sans cette bride, celui des statuts
+  // occupait toute la hauteur libre et repoussait les conversations en bas.
+  statusScroll: {
+    flexGrow: 0,
+  },
+
+  statusRow: {
     paddingHorizontal: 14,
     paddingBottom: 14,
     gap: 14,

@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Image,
@@ -34,7 +35,7 @@ import {
 
 import { Home } from '@wim/shared/home/home.type';
 import { SwipeStackParamList } from 'src/navigation/type/swipeTabs';
-import { swipeHomesMock } from 'src/swipe/infrastructure/mocks/swipeHomeMocks';
+import { getHomeById } from 'src/home/infrastructure/home.api';
 
 import { SearchResultsMap } from 'src/search/ui/components/SearchResultsMap';
 import { useTranslation } from 'react-i18next';
@@ -83,13 +84,8 @@ export function SwipeDetailHomeScreen({
   const [photoIndex, setPhotoIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  const home = useMemo(
-    () =>
-      swipeHomesMock.find(
-        item => item.id === homeId,
-      ) as Home | undefined,
-    [homeId],
-  );
+  const [home, setHome] = useState<Home | undefined>(undefined);
+  const [isHomeLoading, setIsHomeLoading] = useState(true);
 
   const photos = useMemo(() => {
     if (!home?.photos?.length) {
@@ -152,6 +148,32 @@ export function SwipeDetailHomeScreen({
 
     return () => clearTimeout(timer);
   }, [centerCamera, home]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadHome() {
+      try {
+        const session = await getSession();
+
+        if (!session?.accessToken || cancelled) return;
+
+        const loaded = await getHomeById(session.accessToken, homeId);
+
+        if (!cancelled) setHome(loaded);
+      } catch (loadError) {
+        console.log('Load home error:', loadError);
+      } finally {
+        if (!cancelled) setIsHomeLoading(false);
+      }
+    }
+
+    loadHome();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [homeId]);
 
   useEffect(() => {
     async function loadSession() {
@@ -353,6 +375,14 @@ export function SwipeDetailHomeScreen({
     } finally {
       setIsFavoriteLoading(false);
     }
+  }
+
+  if (isHomeLoading) {
+    return (
+      <SafeAreaView style={styles.emptyContainer}>
+        <ActivityIndicator color="#087EBE" />
+      </SafeAreaView>
+    );
   }
 
   if (!home) {

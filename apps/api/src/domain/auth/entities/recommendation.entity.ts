@@ -16,6 +16,22 @@ export type RecommendationHome = {
     url: string;
     position: number;
   }>;
+
+  // Champs d'affichage : la carte de swipe les montre, le calcul de score les
+  // ignore. Optionnels pour que tout appelant qui ne fait que scorer puisse
+  // construire un candidat sans les charger.
+  beds?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  averageRating?: number | null;
+  reviewsCount?: number;
+
+  owner?: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    avatarUrl: string | null;
+  };
 };
 
 export type WeightedPreference = {

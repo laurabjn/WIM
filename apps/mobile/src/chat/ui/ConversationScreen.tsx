@@ -214,7 +214,14 @@ export function ConversationScreen({ route, navigation }: Props) {
         content,
       );
 
-      setMessages((current) => [message, ...current]);
+      // Le serveur renvoie aussi le message par websocket : sans ce garde-fou,
+      // l'echo arrive avant la reponse HTTP et le message s'affiche deux fois.
+      setMessages((current) =>
+        current.some((item) => item.id === message.id)
+          ? current
+          : [message, ...current],
+      );
+
       setError(null);
     } catch (sendError) {
       console.log('Send message error:', sendError);

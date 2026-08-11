@@ -26,7 +26,8 @@
     "noAvailability": "Aucune disponibilité pour le moment",
     "available": "Disponiblité libre",
     "availableWithBlockDates": "Disponiblité avec dates bloquées",
-    "specificDates": "Dates précises"
+    "specificDates": "Dates précises",
+    "retry": "Reessayer"
   },
   "profile": {
     "exchange": "Échange",
@@ -687,7 +688,11 @@
     "homeNotFound": "Logement introuvable",
     "homenotAvailable": "Ce logement n'est plus disponible",
     "match": "C’est un match 🎉",
-    "matchText": "Vous et {{firstName}} vous êtes likés mutuellement."
+    "matchText": "Vous et {{firstName}} vous êtes likés mutuellement.",
+    "notSignedIn": "Vous devez etre connecte.",
+    "loadError": "Impossible de charger les logements.",
+    "swipeError": "Votre choix n'a pas pu etre enregistre.",
+    "openConversation": "Ouvrir la conversation"
   },
   "chat": {
     "title": "Messages",

@@ -56,13 +56,14 @@ export class SwipeRecommendationPrismaRepository {
             },
           },
 
-          /*
-           * Tu peux ajouter :
-           *
-           * owner: true,
-           * reviews: true,
-           * availabilities: true,
-           */
+          owner: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatarUrl: true,
+            },
+          },
         },
 
         take: limit,
@@ -93,6 +94,12 @@ export class SwipeRecommendationPrismaRepository {
           position: photo.position,
         }),
       ),
+      beds: home.beds,
+      bedrooms: home.bedrooms,
+      bathrooms: home.bathrooms,
+      averageRating: home.averageRating,
+      reviewsCount: home.reviewsCount,
+      owner: home.owner,
     }));
   }
 }
