@@ -43,10 +43,11 @@ export type MessagesReadSocketPayload = {
 
 export type MyChatListItem = {
   id: string;
-  matchId: string;
+  matchId: string | null;
   participant: MessageSender;
   lastMessage: ChatMessages | null;
   unreadCount: number;
+  isRequest: boolean;
   createdAt: string;
   updatedAt: string;
 };

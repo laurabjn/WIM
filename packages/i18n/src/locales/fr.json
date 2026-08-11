@@ -709,6 +709,10 @@
     "attachmentsSoon": "L'envoi de photos arrivera prochainement.",
     "exchangePending": "Vous n'avez pas encore accepté cet échange",
     "exchangeAccept": "Accepter",
-    "exchangeDecline": "Refuser"
+    "exchangeDecline": "Refuser",
+    "tabMessages": "Messages",
+    "tabRequests": "Demandes",
+    "emptyRequests": "Aucune demande",
+    "emptyRequestsDescription": "Les demandes d'échange que vous recevez apparaîtront ici."
   }
 }

@@ -710,6 +710,10 @@
     "attachmentsSoon": "Photo sharing is coming soon.",
     "exchangePending": "You have not accepted this exchange yet",
     "exchangeAccept": "Accept",
-    "exchangeDecline": "Decline"
+    "exchangeDecline": "Decline",
+    "tabMessages": "Messages",
+    "tabRequests": "Requests",
+    "emptyRequests": "No requests",
+    "emptyRequestsDescription": "Exchange requests you receive will appear here."
   }
 }

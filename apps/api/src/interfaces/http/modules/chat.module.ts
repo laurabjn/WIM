@@ -6,9 +6,14 @@ import { SendMessageUseCase } from 'src/application/message/use-cases/send-messa
 import { MarkChatAsReadUseCase } from 'src/application/message/use-cases/mark-chat-as-read.usecase';
 import { GetUnreadCountUseCase } from 'src/application/message/use-cases/get-unread-count.usecase';
 import { ChatPrismaRepository } from 'src/infrastructure/repositories/chat.prisma.repository';
+import { ExchangeRepositoryPrisma } from 'src/infrastructure/repositories/exchange.prisma.repository';
 import { PrismaMessageRepository } from 'src/infrastructure/repositories/message.prisma.repository';
 import { ChatController } from '../controllers/chat.controller';
-import { CHAT_REPOSITORY, MESSAGE_REPOSITORY } from '../tokens/token';
+import {
+  CHAT_REPOSITORY,
+  EXCHANGE_REPOSITORY,
+  MESSAGE_REPOSITORY,
+} from '../tokens/token';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 
 @Module({
@@ -30,6 +35,10 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
       {
         provide: MESSAGE_REPOSITORY,
         useClass: PrismaMessageRepository,
+      },
+      {
+        provide: EXCHANGE_REPOSITORY,
+        useClass: ExchangeRepositoryPrisma,
       },
   ],
   exports: [

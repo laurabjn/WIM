@@ -35,6 +35,7 @@ export function ConversationsScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<'messages' | 'requests'>('messages');
 
   const loadChats = useCallback(async () => {
     try {
@@ -109,6 +110,10 @@ export function ConversationsScreen({ navigation }: Props) {
     };
   }, [loadChats]);
 
+  const requests = chats.filter((chat) => chat.isRequest);
+  const conversations = chats.filter((chat) => !chat.isRequest);
+  const visible = tab === 'requests' ? requests : conversations;
+
   function handleRefresh() {
     setRefreshing(true);
     loadChats();
@@ -179,11 +184,38 @@ export function ConversationsScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <Text style={styles.title}>{t('title')}</Text>
 
+      <View style={styles.tabs}>
+        <TouchableOpacity
+          style={[styles.tab, tab === 'messages' && styles.tabActive]}
+          onPress={() => setTab('messages')}
+          activeOpacity={0.7}
+        >
+          <Text
+            style={[styles.tabText, tab === 'messages' && styles.tabTextActive]}
+          >
+            {t('tabMessages')}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.tab, tab === 'requests' && styles.tabActive]}
+          onPress={() => setTab('requests')}
+          activeOpacity={0.7}
+        >
+          <Text
+            style={[styles.tabText, tab === 'requests' && styles.tabTextActive]}
+          >
+            {t('tabRequests')}
+            {requests.length > 0 ? ` (${requests.length})` : ''}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {loading ? (
         <ActivityIndicator style={styles.loader} color="#087EBE" />
       ) : (
         <FlatList
-          data={chats}
+          data={visible}
           keyExtractor={(chat) => chat.id}
           renderItem={({ item }) => renderChat(item)}
           contentContainerStyle={styles.list}
@@ -193,11 +225,16 @@ export function ConversationsScreen({ navigation }: Props) {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>
-                {error ?? t('empty')}
+                {error ??
+                  (tab === 'requests' ? t('emptyRequests') : t('empty'))}
               </Text>
 
               {error ? null : (
-                <Text style={styles.emptyText}>{t('emptyDescription')}</Text>
+                <Text style={styles.emptyText}>
+                  {tab === 'requests'
+                    ? t('emptyRequestsDescription')
+                    : t('emptyDescription')}
+                </Text>
               )}
             </View>
           }
@@ -220,6 +257,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingTop: 8,
     paddingBottom: 12,
+  },
+
+  tabs: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingHorizontal: 18,
+    paddingBottom: 12,
+  },
+
+  tab: {
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+    borderRadius: 18,
+    backgroundColor: '#F4F4F5',
+  },
+
+  tabActive: {
+    backgroundColor: '#111111',
+  },
+
+  tabText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#6B7280',
+  },
+
+  tabTextActive: {
+    color: '#FFFFFF',
   },
 
   loader: {
