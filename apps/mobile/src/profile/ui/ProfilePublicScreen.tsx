@@ -9,13 +9,15 @@ import {
 import { ProfileHeaderCard } from './components/ProfileHeaderCard';
 import { UserHomeCard } from '../../home/ui/components/UserHomeCard';
 import { ProfileMenuList } from './components/ProfileMenuList';
-import { useMyHomes } from '../../home/infrastructure/hooks/useMyHomes';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { usePublicProfile } from '../infrastructure/hook/usePublicProfile';
 import { UserProfile } from '@wim/shared';
+import { getSession } from 'src/auth/infrastructure/authStorage';
+import { listHomesByOwner } from 'src/home/infrastructure/home.api';
+import { Home } from '@wim/shared/home/home.type';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'PublicProfile'> 
 
@@ -30,11 +32,42 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
     error: profileError,
   } = usePublicProfile(userId, token);
 
-  const {
-    homes,
-    isLoading: isHomesLoading,
-    error: homesError,
-  } = useMyHomes(token);
+  const [homes, setHomes] = useState<Home[]>([]);
+  const [isHomesLoading, setIsHomesLoading] = useState(true);
+  const [homesError, setHomesError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      const session = await getSession();
+
+      if (cancelled) return;
+
+      if (!session?.accessToken) {
+        setIsHomesLoading(false);
+        return;
+      }
+
+      setToken(session.accessToken);
+
+      try {
+        const data = await listHomesByOwner(session.accessToken, userId);
+
+        if (!cancelled) setHomes(data);
+      } catch (error) {
+        if (!cancelled) setHomesError(t('loadHomesError'));
+      } finally {
+        if (!cancelled) setIsHomesLoading(false);
+      }
+    }
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, t]);
 
   if (isProfileLoading) {
     return (

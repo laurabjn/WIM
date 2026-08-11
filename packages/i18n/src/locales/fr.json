@@ -417,7 +417,8 @@
         "frenchPolynesia": "Polynésie française",
         "cookIslands": "Îles Cook"
       }
-    }
+    },
+    "loadHomesError": "Impossible de charger les logements."
   },
   "auth": {
     "welcomeTitle": "Bienvenue sur Wim !",

@@ -520,7 +520,8 @@
         "frenchPolynesia": "Polynésie française",
         "cookIslands": "Îles Cook"
       }
-    }
+    },
+    "loadHomesError": "Could not load the homes."
   },
   "home": {
     "notFound": "Home not found",

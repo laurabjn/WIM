@@ -166,3 +166,17 @@ export async function removeFavoriteHome(
     throw new Error(text || 'Impossible de retirer des favoris');
   }
 }
+export async function listHomesByOwner(
+  token: string,
+  ownerId: string,
+): Promise<Home[]> {
+  const response = await fetch(`${API_URL}/homes/owner/${ownerId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    throw new Error('Impossible de charger les logements');
+  }
+
+  return response.json();
+}

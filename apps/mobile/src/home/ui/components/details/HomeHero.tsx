@@ -1,9 +1,21 @@
 import { Home } from '@wim/shared/home/home.type';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  Dimensions,
+  Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { Share } from 'react-native';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 type Props = {
   home: Home;
@@ -15,12 +27,36 @@ type Props = {
 
 export function HomeHero({ home, onBack, isFavorite, onToggleFavorite, onShare }: Props) {
   const { t } = useTranslation('home');
-  const coverUrl = resolveImageUrl(home.photos?.[0]?.url);
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  const photos = (home.photos ?? [])
+    .map((photo) => resolveImageUrl(photo.url))
+    .filter(Boolean) as string[];
+
+  function handleScrollEnd(event: NativeSyntheticEvent<NativeScrollEvent>) {
+    setPhotoIndex(
+      Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH),
+    );
+  }
 
   return (
     <View style={styles.hero}>
-      {coverUrl ? (
-        <Image source={{ uri: coverUrl }} style={styles.heroImage} />
+      {photos.length > 0 ? (
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={handleScrollEnd}
+          scrollEventThrottle={16}
+        >
+          {photos.map((url, index) => (
+            <Image
+              key={`${url}-${index}`}
+              source={{ uri: url }}
+              style={styles.heroImage}
+            />
+          ))}
+        </ScrollView>
       ) : (
         <View style={styles.emptyHero}>
           <Text style={styles.emptyHeroText}>{t('noPhotos')}</Text>
@@ -43,8 +79,10 @@ export function HomeHero({ home, onBack, isFavorite, onToggleFavorite, onShare }
         </TouchableOpacity>
       </View>
 
-      {home.photos?.length > 0 ? (
-        <Text style={styles.imageCounter}>1/{home.photos.length}</Text>
+      {photos.length > 0 ? (
+        <Text style={styles.imageCounter}>
+          {photoIndex + 1}/{photos.length}
+        </Text>
       ) : null}
     </View>
   );
@@ -56,7 +94,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   heroImage: {
-    width: '100%',
+    width: SCREEN_WIDTH,
     height: '100%',
   },
   emptyHero: {
