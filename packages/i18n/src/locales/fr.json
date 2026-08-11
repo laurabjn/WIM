@@ -728,6 +728,8 @@
     "reportReason": "Comportement inapproprié",
     "requestsTitle": "Invitations par message",
     "emptyRequestsTitle": "Aucune invitation par message récente",
-    "emptyRequestsHint": "Les demandes datant de plus de 90 jours ne sont pas affichées."
+    "emptyRequestsHint": "Les demandes datant de plus de 90 jours ne sont pas affichées.",
+    "shareStatus": "Partagez votre statut",
+    "statusExample": "Recherche échange à Lyon"
   }
 }

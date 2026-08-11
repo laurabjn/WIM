@@ -111,11 +111,17 @@ export function ConversationScreen({ route, navigation }: Props) {
         cursorRef.current = page.nextCursor;
         hasMoreRef.current = page.hasMore;
 
-        await markChatAsReadApi(session.accessToken, chatId);
+        markChatAsReadApi(session.accessToken, chatId).catch((readError) =>
+          console.log('Mark as read error:', readError),
+        );
 
-        const pending = await getChatExchangeApi(session.accessToken, chatId);
-
-        if (!cancelled) setExchange(pending);
+        getChatExchangeApi(session.accessToken, chatId)
+          .then((pending) => {
+            if (!cancelled) setExchange(pending);
+          })
+          .catch((exchangeError) =>
+            console.log('Load exchange error:', exchangeError),
+          );
       } catch (loadError) {
         console.log('Load messages error:', loadError);
         if (!cancelled) setError(t('loadError'));

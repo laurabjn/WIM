@@ -4,6 +4,7 @@ import {
   FlatList,
   Image,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -200,6 +201,52 @@ export function ConversationsScreen({ navigation }: Props) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <Text style={styles.title}>{t('title')}</Text>
 
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.statusRow}
+      >
+        <View style={styles.statusItem}>
+          <View style={[styles.statusAvatar, styles.statusAvatarOwn]} />
+          <Text style={styles.statusLabel} numberOfLines={2}>
+            {t('shareStatus')}
+          </Text>
+        </View>
+
+        {conversations.slice(0, 8).map((chat) => (
+          <TouchableOpacity
+            key={`status-${chat.id}`}
+            style={styles.statusItem}
+            activeOpacity={0.8}
+            onPress={() =>
+              navigation.navigate('Conversation', {
+                chatId: chat.id,
+                participantId: chat.participant?.id,
+                participantName: chat.participant?.firstName ?? '',
+                participantAvatar: chat.participant?.avatarUrl ?? null,
+              })
+            }
+          >
+            {chat.participant?.avatarUrl ? (
+              <Image
+                source={{ uri: chat.participant.avatarUrl }}
+                style={styles.statusAvatar}
+              />
+            ) : (
+              <View style={[styles.statusAvatar, styles.avatarFallback]}>
+                <Text style={styles.avatarInitial}>
+                  {(chat.participant?.firstName ?? '?').charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            )}
+
+            <Text style={styles.statusLabel} numberOfLines={1}>
+              {chat.participant?.firstName}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
       <View style={styles.listHeader}>
         <Text style={styles.sectionTitle}>{t('tabMessages')}</Text>
 
@@ -284,32 +331,55 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
   },
 
-  tabs: {
+statusRow: {
+    paddingHorizontal: 14,
+    paddingBottom: 14,
+    gap: 14,
+  },
+
+  statusItem: {
+    width: 72,
+    alignItems: 'center',
+  },
+
+  statusAvatar: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: '#F1F1F1',
+  },
+
+  statusAvatarOwn: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderStyle: 'dashed',
+  },
+
+  statusLabel: {
+    marginTop: 6,
+    fontSize: 11,
+    color: '#374151',
+    textAlign: 'center',
+  },
+
+  listHeader: {
     flexDirection: 'row',
-    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 18,
-    paddingBottom: 12,
+    paddingBottom: 10,
   },
 
-  tab: {
-    paddingHorizontal: 16,
-    paddingVertical: 7,
-    borderRadius: 18,
-    backgroundColor: '#F4F4F5',
-  },
-
-  tabActive: {
-    backgroundColor: '#111111',
-  },
-
-  tabText: {
-    fontSize: 13,
+  sectionTitle: {
+    fontSize: 15,
     fontWeight: '700',
-    color: '#6B7280',
+    color: '#111111',
   },
 
-  tabTextActive: {
-    color: '#FFFFFF',
+  requestsLink: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#087EBE',
   },
 
   loader: {

@@ -729,6 +729,8 @@
     "reportReason": "Inappropriate behaviour",
     "requestsTitle": "Message requests",
     "emptyRequestsTitle": "No recent message requests",
-    "emptyRequestsHint": "Requests older than 90 days are not shown."
+    "emptyRequestsHint": "Requests older than 90 days are not shown.",
+    "shareStatus": "Share your status",
+    "statusExample": "Looking for an exchange in Lyon"
   }
 }
