@@ -573,6 +573,53 @@ async function main() {
     }
   }
 
+  await prisma.swipe.deleteMany({
+    where: {
+      OR: [
+        { swiperId: { in: ownerIds } },
+        { targetUserId: { in: ownerIds } },
+      ],
+    },
+  });
+
+  const demoHomes = await prisma.home.findMany({
+    where: { ownerId: { in: ownerIds } },
+    select: { id: true, ownerId: true },
+  });
+
+  const firstHomeOf = new Map();
+
+  for (const home of demoHomes) {
+    if (!firstHomeOf.has(home.ownerId)) firstHomeOf.set(home.ownerId, home.id);
+  }
+
+  const sophie = ownersByKey.sophie;
+  let pendingLikes = 0;
+
+  for (const owner of OWNERS) {
+    if (owner.key === 'sophie') continue;
+
+    const admirer = ownersByKey[owner.key];
+    const sophieHomeId = firstHomeOf.get(sophie.id);
+
+    if (!sophieHomeId) continue;
+
+    await prisma.swipe.create({
+      data: {
+        swiperId: admirer.id,
+        targetUserId: sophie.id,
+        homeId: sophieHomeId,
+        direction: 'LIKE',
+      },
+    });
+
+    pendingLikes += 1;
+  }
+
+  console.log(
+    `[seed] ${pendingLikes} personnes ont deja like Sophie : son prochain swipe cree un match.`,
+  );
+
   const sophieHome = await prisma.home.findFirst({
     where: { ownerId: ownersByKey.sophie.id },
     select: { id: true },
