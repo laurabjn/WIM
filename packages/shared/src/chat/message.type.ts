@@ -51,3 +51,7 @@ export type MyChatListItem = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type MyRequestListItem = MyChatListItem & {
+  relevanceScore: number;
+};

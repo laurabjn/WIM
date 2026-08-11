@@ -72,7 +72,7 @@ export class GetMyChatsUseCase {
             : null,
 
           unreadCount,
-          isRequest: !hasReplied,
+          isRequest: lastMessage !== null && !hasReplied,
           createdAt: chat.createdAt.toISOString(),
           updatedAt: chat.updatedAt.toISOString(),
         };

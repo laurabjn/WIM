@@ -18,10 +18,10 @@ import {
   SlidersHorizontal,
   Zap,
 } from 'lucide-react-native';
-import type { MyChatListItem } from '@wim/shared';
+import type { MyRequestListItem } from '@wim/shared';
 
 import { getSession } from 'src/auth/infrastructure/authStorage';
-import { getChatsApi } from '../infrastructure/chat.api';
+import { getRequestsApi } from '../infrastructure/chat.api';
 import { getMyMatchesApi } from '../infrastructure/matches.api';
 
 type Props = {
@@ -34,7 +34,8 @@ type Props = {
 export function RequestsScreen({ navigation }: Props) {
   const { t } = useTranslation('chat');
 
-  const [requests, setRequests] = useState<MyChatListItem[]>([]);
+  const [requests, setRequests] = useState<MyRequestListItem[]>([]);
+  const [onlyRelevant, setOnlyRelevant] = useState(false);
   const [newMatches, setNewMatches] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -44,12 +45,12 @@ export function RequestsScreen({ navigation }: Props) {
 
       if (!session?.accessToken) return;
 
-      const [chats, matches] = await Promise.all([
-        getChatsApi(session.accessToken),
+      const [items, matches] = await Promise.all([
+        getRequestsApi(session.accessToken),
         getMyMatchesApi(session.accessToken),
       ]);
 
-      setRequests(chats.filter((chat) => chat.isRequest));
+      setRequests(items);
       setNewMatches(matches.filter((match) => !match.hasMessages).length);
     } catch (error) {
       console.log('Load requests error:', error);
@@ -57,6 +58,19 @@ export function RequestsScreen({ navigation }: Props) {
       setLoading(false);
     }
   }, []);
+
+  const bestScore = requests.reduce(
+    (best, request) => Math.max(best, request.relevanceScore),
+    0,
+  );
+
+  const visibleRequests = onlyRelevant
+    ? requests.filter(
+        (request) => request.relevanceScore >= Math.max(1, bestScore * 0.6),
+      )
+    : [...requests].sort(
+        (a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt),
+      );
 
   useFocusEffect(
     useCallback(() => {
@@ -98,11 +112,28 @@ export function RequestsScreen({ navigation }: Props) {
         </View>
       </TouchableOpacity>
 
+      <View style={styles.filterRow}>
+        <TouchableOpacity
+          style={[styles.filterPill, onlyRelevant && styles.filterPillActive]}
+          activeOpacity={0.85}
+          onPress={() => setOnlyRelevant((current) => !current)}
+        >
+          <Text
+            style={[
+              styles.filterLabel,
+              onlyRelevant && styles.filterLabelActive,
+            ]}
+          >
+            {onlyRelevant ? t('allRequests') : t('relevantRequests')}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {loading ? (
         <ActivityIndicator style={styles.loader} color="#087EBE" />
       ) : (
         <FlatList
-          data={requests}
+          data={visibleRequests}
           keyExtractor={(chat) => chat.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
@@ -218,6 +249,35 @@ const styles = StyleSheet.create({
   matchesCount: {
     fontSize: 15,
     color: '#6B7280',
+  },
+
+  filterRow: {
+    alignItems: 'center',
+    paddingBottom: 14,
+  },
+
+  filterPill: {
+    paddingHorizontal: 22,
+    paddingVertical: 9,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
+  },
+
+  filterPillActive: {
+    borderColor: '#52D1A6',
+    backgroundColor: '#52D1A6',
+  },
+
+  filterLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111111',
+  },
+
+  filterLabelActive: {
+    color: '#FFFFFF',
   },
 
   loader: {

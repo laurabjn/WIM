@@ -3,6 +3,7 @@ import type {
   ChatMessages,
   ChatMessagesPage,
   MyChatListItem,
+  MyRequestListItem,
   UnreadMessagesCount,
 } from '@wim/shared';
 
@@ -28,6 +29,16 @@ export async function getChatsApi(
   token: string,
 ): Promise<MyChatListItem[]> {
   const response = await fetch(`${API_URL}/chats`, {
+    headers: authHeaders(token),
+  });
+
+  return parseResponse(response);
+}
+
+export async function getRequestsApi(
+  token: string,
+): Promise<MyRequestListItem[]> {
+  const response = await fetch(`${API_URL}/chats/requests`, {
     headers: authHeaders(token),
   });
 
