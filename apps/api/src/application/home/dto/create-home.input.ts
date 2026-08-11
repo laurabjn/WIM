@@ -14,6 +14,7 @@ export interface CreateHomeInput {
   bedrooms: number;
   bathrooms: number;
   homeType: string;
+  category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE' | null;
   amenities: string[];
   isAvailableForExchange: boolean;
   pricePerNight?: number | null;

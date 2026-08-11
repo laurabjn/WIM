@@ -38,11 +38,25 @@ export class ExchangeRepositoryPrisma {
       startDate: exchange.startDate.toISOString(),
       endDate: exchange.endDate.toISOString(),
       travelersCount: exchange.travelersCount,
-      status: this.computeStatus(exchange.startDate, exchange.endDate),
+      status: this.computeStatus(
+        exchange.status,
+        exchange.startDate,
+        exchange.endDate,
+      ),
     }));
   }
 
-  private computeStatus(startDate: Date, endDate: Date): Exchange['status'] {
+  private computeStatus(
+    stored: Exchange['status'],
+    startDate: Date,
+    endDate: Date,
+  ): Exchange['status'] {
+    // Un echange non accepte reste en attente : le classer sur ses dates le
+    // ferait passer pour un sejour confirme dans la liste des echanges.
+    if (stored === 'PENDING' || stored === 'DECLINED') {
+      return stored;
+    }
+
     const now = new Date();
 
     if (startDate <= now && endDate >= now) {

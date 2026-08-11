@@ -1,3 +1,5 @@
+export type HomeCategory = 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
+
 export type SearchHomesFilters = {
   userId: string;
   city?: string;
@@ -16,6 +18,7 @@ export type HomeSearchResult = {
   country: string;
   capacity: number;
   homeType: string;
+  category: HomeCategory | null;
   latitude: number | null;
   longitude: number | null;
   coverPhotoUrl: string | null;

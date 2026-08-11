@@ -21,10 +21,6 @@ import { HomeReviews } from './components/details/HomeReviews';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeAvailabilityBadge } from './components/details/HomeAvailabilityBadge';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
-import { reviewMocks } from '../infrastructure/mocks/reviewMocks';
-import { amenitiesMocks } from '../infrastructure/mocks/amenitiesMocks';
-import { vehiculeMock } from '../infrastructure/mocks/vehiculeMocks';
-import { homeLocationSanFranciscoMock } from '../infrastructure/mocks/homeLocationMapMocks';
 import { HomeLocationMap } from './components/details/HomeLocationMap';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'HomeDetails'>;
@@ -193,7 +189,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
           <View style={styles.separator} />
 
-          <HomeLocationMap home={/*homeLocationSanFranciscoMock*/home} />
+          <HomeLocationMap home={home} />
 
           <View style={styles.separator} />
 

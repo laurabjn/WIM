@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Exchange } from '@wim/shared';
 import { getMyExchanges } from '../exchange.api';
-import { exchangeMocks } from '../mocks/exchangeMocks';
+import { resolveImageUrl } from '../home.api';
 
 export function useMyExchanges(token: string | null) {
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
@@ -19,7 +19,13 @@ export function useMyExchanges(token: string | null) {
       setLoading(true);
       setError(null);
       const data = await getMyExchanges(token);
-      setExchanges(exchangeMocks); // Replace with: setExchanges(data);
+
+      setExchanges(
+        data.map((exchange) => ({
+          ...exchange,
+          homeImageUrl: resolveImageUrl(exchange.homeImageUrl),
+        })),
+      );
     } catch (err) {
       setError(
         err instanceof Error

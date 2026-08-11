@@ -34,6 +34,7 @@ export interface CreateHomeRepositoryData {
   bedrooms: number;
   bathrooms: number;
   homeType: string;
+  category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE' | null;
   amenities: string[];
   isAvailableForExchange: boolean;
   pricePerNight?: number | null;
@@ -56,6 +57,7 @@ export interface UpdateHomeRepositoryData {
   bedrooms?: number;
   bathrooms?: number;
   homeType?: string;
+  category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE' | null;
   amenities?: string[];
   isAvailableForExchange?: boolean;
   pricePerNight?: number | null;

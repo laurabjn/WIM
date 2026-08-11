@@ -43,6 +43,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
         bathrooms: data.bathrooms,
 
         homeType: data.homeType,
+        category: data.category ?? null,
         amenities: data.amenities,
         isAvailableForExchange: data.isAvailableForExchange,
         pricePerNight: data.pricePerNight,

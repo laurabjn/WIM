@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsBoolean,
+  IsIn,
   IsInt,
   IsNumber,
   IsObject,
@@ -60,6 +61,10 @@ export class UpdateHomeDto {
 
   @IsString()
   homeType!: string;
+
+  @IsOptional()
+  @IsIn(['NATURE', 'BEACH', 'CITY', 'CULTURE'])
+  category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
 
   @IsArray()
   @IsString({ each: true })

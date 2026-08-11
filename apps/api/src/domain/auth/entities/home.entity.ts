@@ -1,3 +1,5 @@
+export type HomeCategory = 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
+
 export type HomeType =
   | 'APARTMENT'
   | 'HOUSE'
@@ -74,6 +76,7 @@ export interface HomeEntity {
   bathrooms: number;
   bedrooms: number;
   homeType: string;
+  category: HomeCategory | null;
   amenities: string[];
   isAvailableForExchange: boolean;
   pricePerNight?: number | null;

@@ -18,8 +18,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { clearSession, getSession } from 'src/auth/infrastructure/authStorage';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { useFocusEffect } from '@react-navigation/native';
-import { publicUserMock } from '../infrastructure/mocks/userMocks';
-import { publicUserHomesMock } from 'src/home/infrastructure/mocks/homeMocks';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,7 +26,6 @@ type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
 export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated, route }) => {
   const { t } = useTranslation('profile');
 
-  const USE_MOCKS = true;
   
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -92,13 +89,8 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
     reloadHomes: reloadHomes,
   } = useMyHomes(token);
 
-  const profileData = USE_MOCKS
-  ? publicUserMock
-  : profile;
-
-const homesData = USE_MOCKS
-  ? publicUserHomesMock
-  : homes;
+  const profileData = profile;
+  const homesData = homes;
 
   useFocusEffect(
     useCallback(() => {

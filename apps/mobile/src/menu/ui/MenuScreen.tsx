@@ -22,7 +22,6 @@ import { useTranslation } from 'react-i18next';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { Home } from '@wim/shared/home/home.type';
 import { searchHomesApi } from 'src/home/infrastructure/searchHome.api';
-import { publicUserHomesMock } from 'src/home/infrastructure/mocks/homeMocks';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { SearchToggle } from './components/SearchToggle';
@@ -34,14 +33,13 @@ export function MenuScreen({ navigation }: Props) {
     
   type CategoryFilter = 'ALL' | 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
 
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('NATURE');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('ALL');
   const [homes, setHomes] = useState<Home[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [quickSearch, setQuickSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [useMocks, setUseMocks] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -97,11 +95,21 @@ export function MenuScreen({ navigation }: Props) {
     loadExploreHomes();
   }, [token, isSessionLoading]);
 
-  const sourceHomes = useMocks ? publicUserHomesMock : homes;
+  const sourceHomes = homes;
 
-  const filteredHomes = sourceHomes.filter(
-    (home) => home.category === selectedCategory,
-  );
+  // Retaper la categorie active la desactive : sans cela, aucun geste ne
+  // permettrait de revenir a la liste complete.
+  const toggleCategory = (category: CategoryFilter) =>
+    setSelectedCategory((current) =>
+      current === category ? 'ALL' : category,
+    );
+
+  // Un logement sans theme ne doit pas disparaitre de l'accueil : il reste
+  // visible tant qu'aucun filtre n'est actif.
+  const filteredHomes =
+    selectedCategory === 'ALL'
+      ? sourceHomes
+      : sourceHomes.filter((home) => home.category === selectedCategory);
 
   const featuredCity = sourceHomes[0]?.city;
   const featuredCountry = sourceHomes[0]?.country;
@@ -166,25 +174,25 @@ export function MenuScreen({ navigation }: Props) {
             icon={<Umbrella color="white" size={24} />}
             label="Nature"
             color="#37c878"
-            onPress={() => setSelectedCategory('NATURE')}
+            onPress={() => toggleCategory('NATURE')}
           />
           <Category
             icon={<Waves color="white" size={24} />}
             label="Plage"
             color="#169bea"
-            onPress={() => setSelectedCategory('BEACH')}
+            onPress={() => toggleCategory('BEACH')}
           />
           <Category
             icon={<Building2 color="white" size={24} />}
             label="Ville"
             color="#777"
-            onPress={() => setSelectedCategory('CITY')}
+            onPress={() => toggleCategory('CITY')}
           />
           <Category
             icon={<Landmark color="white" size={24} />}
             label="Culture"
             color="#f47b20"
-            onPress={() => setSelectedCategory('CULTURE')}
+            onPress={() => toggleCategory('CULTURE')}
           />
         </View>
 

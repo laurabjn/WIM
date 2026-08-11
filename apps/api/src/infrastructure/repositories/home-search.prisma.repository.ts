@@ -94,6 +94,7 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
       country: home.country,
       capacity: home.capacity,
       homeType: home.homeType,
+      category: home.category ?? null,
       latitude: home.latitude,
       longitude: home.longitude,
       coverPhotoUrl: home.photos[0]?.url ?? null,

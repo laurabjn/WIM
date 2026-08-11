@@ -121,6 +121,7 @@ export class HomeController {
         bathrooms: dto.bathrooms ?? 1,
 
         homeType: dto.homeType,
+        category: dto.category ?? null,
         amenities: dto.amenities ?? [],
         isAvailableForExchange: dto.isAvailableForExchange ?? false,
         pricePerNight: dto.pricePerNight,

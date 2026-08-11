@@ -1,5 +1,7 @@
 import { HomeAvailability } from "./homeAvailability.type";
 
+export type HomeCategory = 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
+
 export interface Home {
   id: string;
   ownerId: string;
@@ -12,7 +14,7 @@ export interface Home {
   latitude?: number | null;
   longitude?: number | null;
   capacity: number;
-  category: string;
+  category: HomeCategory | null;
   beds: number;
   bedrooms: number;
   bathrooms: number;

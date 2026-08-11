@@ -130,6 +130,7 @@ export function mapHome(home: PrismaHomeWithRelations): HomeEntity {
     bedrooms: home.bedrooms ?? 0,
     bathrooms: home.bathrooms ?? 0,
     homeType: home.homeType,
+    category: home.category ?? null,
     amenities: Array.isArray(home.amenities) ? (home.amenities as string[]) : [],
     isAvailableForExchange: home.isAvailableForExchange ?? false,
     pricePerNight: home.pricePerNight ?? null,

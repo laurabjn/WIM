@@ -191,6 +191,7 @@ const HOMES = [
     bedrooms: 2,
     bathrooms: 1,
     homeType: 'APARTMENT',
+    category: 'CITY',
     amenities: ['wifi', 'kitchen', 'tv', 'washingMachine', 'balcony', 'workspace'],
     pricePerNight: 95,
     averageRating: 4.8,
@@ -225,6 +226,7 @@ const HOMES = [
     bedrooms: 3,
     bathrooms: 2,
     homeType: 'HOUSE',
+    category: 'CITY',
     amenities: ['wifi', 'kitchen', 'parking', 'tv', 'washingMachine', 'workspace'],
     pricePerNight: 140,
     averageRating: 4.6,
@@ -259,6 +261,7 @@ const HOMES = [
     bedrooms: 1,
     bathrooms: 1,
     homeType: 'APARTMENT',
+    category: 'CULTURE',
     amenities: ['wifi', 'kitchen', 'tv', 'airConditioning'],
     pricePerNight: 160,
     averageRating: 4.9,
@@ -285,6 +288,7 @@ const HOMES = [
     bedrooms: 4,
     bathrooms: 2,
     homeType: 'HOUSE',
+    category: 'NATURE',
     amenities: ['wifi', 'kitchen', 'parking', 'tv', 'washingMachine'],
     pricePerNight: 220,
     averageRating: 4.7,
@@ -319,6 +323,7 @@ const HOMES = [
     bedrooms: 3,
     bathrooms: 2,
     homeType: 'HOUSE',
+    category: 'CULTURE',
     amenities: ['wifi', 'kitchen', 'airConditioning', 'washingMachine', 'balcony'],
     pricePerNight: 110,
     averageRating: 4.5,
@@ -345,6 +350,7 @@ const HOMES = [
     bedrooms: 1,
     bathrooms: 1,
     homeType: 'STUDIO',
+    category: 'CITY',
     amenities: ['wifi', 'kitchen', 'tv', 'workspace'],
     pricePerNight: 65,
     averageRating: 4.4,
@@ -368,6 +374,7 @@ const HOMES = [
     bedrooms: 4,
     bathrooms: 3,
     homeType: 'VILLA',
+    category: 'BEACH',
     amenities: ['wifi', 'kitchen', 'parking', 'tv', 'washingMachine', 'balcony'],
     pricePerNight: 310,
     averageRating: 5.0,
@@ -394,6 +401,7 @@ const HOMES = [
     bedrooms: 2,
     bathrooms: 1,
     homeType: 'APARTMENT',
+    category: 'CULTURE',
     amenities: ['wifi', 'kitchen', 'tv', 'airConditioning', 'workspace'],
     pricePerNight: 130,
     averageRating: 4.3,
@@ -469,6 +477,7 @@ async function main() {
       data: {
         ownerId: owner.id,
         title: home.title,
+        category: home.category,
         description: home.description,
         address: home.address,
         city: home.city,
@@ -620,11 +629,6 @@ async function main() {
     `[seed] ${pendingLikes} personnes ont deja like Sophie : son prochain swipe cree un match.`,
   );
 
-  const sophieHome = await prisma.home.findFirst({
-    where: { ownerId: ownersByKey.sophie.id },
-    select: { id: true },
-  });
-
   await prisma.exchange.deleteMany({
     where: {
       OR: [
@@ -634,21 +638,45 @@ async function main() {
     },
   });
 
-  if (sophieHome) {
+  // Un echange en attente par conversation : le bandeau d'acceptation est
+  // visible dans chacune, pour les deux participants. Le demandeur est celui
+  // qui a ouvert la discussion, l'hote celui dont le logement est convoite.
+  let pendingExchanges = 0;
+
+  for (const conversation of CONVERSATIONS) {
+    const [firstKey, secondKey] = conversation.between;
+    const requesterKey = conversation.messages[0]?.from ?? firstKey;
+    const hostKey = requesterKey === firstKey ? secondKey : firstKey;
+
+    const host = ownersByKey[hostKey];
+    const guest = ownersByKey[requesterKey];
+
+    const hostHome = await prisma.home.findFirst({
+      where: { ownerId: host.id },
+      select: { id: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    if (!hostHome) continue;
+
     await prisma.exchange.create({
       data: {
-        homeId: sophieHome.id,
-        hostId: ownersByKey.sophie.id,
-        guestId: ownersByKey.thomas.id,
-        startDate: daysFromNow(14),
-        endDate: daysFromNow(24),
+        homeId: hostHome.id,
+        hostId: host.id,
+        guestId: guest.id,
+        startDate: daysFromNow(14 + pendingExchanges * 7),
+        endDate: daysFromNow(24 + pendingExchanges * 7),
         travelersCount: 2,
         status: 'PENDING',
       },
     });
 
-    console.log('[seed] 1 echange en attente d acceptation.');
+    pendingExchanges += 1;
   }
+
+  console.log(
+    `[seed] ${pendingExchanges} echanges en attente : une banniere par conversation.`,
+  );
 
   console.log(
     `[seed] ${CONVERSATIONS.length} conversations creees, ${totalMessages} messages.`,

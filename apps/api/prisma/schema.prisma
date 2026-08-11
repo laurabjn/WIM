@@ -67,6 +67,7 @@ model Home {
   bedrooms    Int     @default(1)
   bathrooms   Int     @default(1)
   homeType    String  @map("home_type")
+  category    HomeCategory?
   amenities   Json?
 
   isAvailableForExchange Boolean @default(true) @map("is_available_for_exchange")
@@ -103,6 +104,15 @@ model HomePhoto {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("home_photos")
+}
+
+// Theme d'un sejour, choisi par l'hote. Distinct de homeType, qui decrit le
+// bati : un chalet peut etre montagne comme culture selon ce qu'on vient y faire.
+enum HomeCategory {
+  NATURE
+  BEACH
+  CITY
+  CULTURE
 }
 
 enum VehicleFuelType {
