@@ -9,6 +9,7 @@ import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
 import { MessageRepository } from 'src/domain/auth/repositories/message.repository';
 import { CHAT_REPOSITORY, MESSAGE_REPOSITORY } from 'src/interfaces/http/tokens/token';
 import { mapMessage } from '../message.mapper';
+import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
 import type { ChatMessages } from '@wim/shared';
 
 type Input = {
@@ -24,6 +25,7 @@ export class SendMessageUseCase {
     private readonly chatRepository: ChatRepository,
     @Inject(MESSAGE_REPOSITORY)
     private readonly messageRepository: MessageRepository,
+    private readonly blockedUsers: BlockedUsersService,
   ) {}
 
   async execute({
@@ -59,6 +61,14 @@ export class SendMessageUseCase {
       throw new ForbiddenException(
         'Vous ne pouvez pas envoyer de message dans ce chat.',
       );
+    }
+
+    const other = chat.participants.find(
+      (member) => member.userId !== senderId,
+    );
+
+    if (other) {
+      await this.blockedUsers.assertNotBlocked(senderId, other.userId);
     }
 
     const message = await this.messageRepository.create({

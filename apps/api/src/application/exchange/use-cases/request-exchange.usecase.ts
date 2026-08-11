@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
 
 export type RequestExchangeInput = {
   requesterId: string;
@@ -22,7 +23,10 @@ export type RequestExchangeResult = {
 
 @Injectable()
 export class RequestExchangeUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly blockedUsers: BlockedUsersService,
+  ) {}
 
   async execute(input: RequestExchangeInput): Promise<RequestExchangeResult> {
     const content = input.message?.trim();
@@ -45,6 +49,8 @@ export class RequestExchangeUseCase {
         'Vous ne pouvez pas demander un échange sur votre propre logement.',
       );
     }
+
+    await this.blockedUsers.assertNotBlocked(input.requesterId, home.ownerId);
 
     const startDate = input.startDate
       ? new Date(input.startDate)

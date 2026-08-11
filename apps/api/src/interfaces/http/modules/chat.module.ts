@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { WebsocketModule } from 'src/interfaces/websocket/websocket.module';
+import { ModerationModule } from './moderation.module';
 import { GetChatMessagesUseCase } from 'src/application/message/use-cases/get-chat-messages.usecase';
 import { GetMyChatsUseCase } from 'src/application/message/use-cases/get-my-chat.usecase';
 import { SendMessageUseCase } from 'src/application/message/use-cases/send-message.usecase';
@@ -17,7 +18,7 @@ import {
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 
 @Module({
-  imports: [WebsocketModule],
+  imports: [WebsocketModule, ModerationModule],
   controllers: [
     ChatController,
   ],

@@ -18,6 +18,7 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
       where: {
         ownerId: {
           not: userId,
+          notIn: await this.hiddenOwnerIds(userId),
         },
 
         city: city
@@ -113,5 +114,18 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
         avatarUrl: home.owner.avatarUrl,
       },
     }));
+  }
+
+  private async hiddenOwnerIds(userId: string): Promise<string[]> {
+    const relations = await this.prisma.blockedUser.findMany({
+      where: {
+        OR: [{ blockerId: userId }, { blockedId: userId }],
+      },
+      select: { blockerId: true, blockedId: true },
+    });
+
+    return relations.map((relation) =>
+      relation.blockerId === userId ? relation.blockedId : relation.blockerId,
+    );
   }
 }

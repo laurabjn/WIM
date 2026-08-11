@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { ModerationController } from '../controllers/moderation.controller';
+import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
 import {
   BlockUserUseCase,
   ListBlockedUsersUseCase,
@@ -17,6 +18,8 @@ import {
     UnblockUserUseCase,
     ReportUserUseCase,
     ListBlockedUsersUseCase,
+    BlockedUsersService,
   ],
+  exports: [BlockedUsersService],
 })
 export class ModerationModule {}
