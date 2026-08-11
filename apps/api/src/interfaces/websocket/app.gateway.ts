@@ -10,8 +10,10 @@ import { JwtService } from '@nestjs/jwt';
 import { Server, Socket } from 'socket.io';
 import type {
   ChatMessages,
+  ChatUpdatedSocketPayload,
   MessageCreatedSocketPayload,
   MessagesReadSocketPayload,
+  UnreadCountUpdatedSocketPayload,
 } from '@wim/shared';
 
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
@@ -25,6 +27,10 @@ type AuthenticatedSocket = Socket & { userId?: string };
 
 function chatRoom(chatId: string): string {
   return `chat:${chatId}`;
+}
+
+function userRoom(userId: string): string {
+  return `user:${userId}`;
 }
 
 @WebSocketGateway({
@@ -66,6 +72,7 @@ export class AppGateway {
       });
 
       client.userId = payload.sub;
+      await client.join(userRoom(payload.sub));
     } catch {
       client.disconnect();
     }
@@ -120,5 +127,15 @@ export class AppGateway {
 
   emitMessagesRead(payload: MessagesReadSocketPayload) {
     this.server.to(chatRoom(payload.chatId)).emit('messages:read', payload);
+  }
+
+  emitChatUpdated(userId: string, payload: ChatUpdatedSocketPayload) {
+    this.server.to(userRoom(userId)).emit('chat:updated', payload);
+  }
+
+  emitUnreadCount(userId: string, count: number) {
+    const payload: UnreadCountUpdatedSocketPayload = { count };
+
+    this.server.to(userRoom(userId)).emit('unread:updated', payload);
   }
 }

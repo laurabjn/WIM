@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AppState } from 'react-native';
+import type { UnreadCountUpdatedSocketPayload } from '@wim/shared';
 
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { getUnreadCountApi } from '../infrastructure/chat.api';
+import { connectChatSocket } from '../infrastructure/chatSocket';
 
-const REFRESH_INTERVAL_MS = 30000;
+const REFRESH_INTERVAL_MS = 60000;
 
 export function useUnreadMessages(): number {
   const [count, setCount] = useState(0);
@@ -26,7 +28,28 @@ export function useUnreadMessages(): number {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
+
     refresh();
+
+    async function listen() {
+      const session = await getSession();
+
+      if (!session?.accessToken || cancelled) return;
+
+      const socket = connectChatSocket(session.accessToken);
+
+      function handleUnread(payload: UnreadCountUpdatedSocketPayload) {
+        setCount(payload.count);
+      }
+
+      socket.on('unread:updated', handleUnread);
+
+      cleanup = () => socket.off('unread:updated', handleUnread);
+    }
+
+    listen();
 
     const interval = setInterval(refresh, REFRESH_INTERVAL_MS);
 
@@ -35,6 +58,8 @@ export function useUnreadMessages(): number {
     });
 
     return () => {
+      cancelled = true;
+      cleanup?.();
       clearInterval(interval);
       subscription.remove();
     };

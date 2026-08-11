@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -12,10 +12,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
-import type { MyChatListItem } from '@wim/shared';
+import type {
+  ChatUpdatedSocketPayload,
+  MyChatListItem,
+} from '@wim/shared';
 
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { getChatsApi } from '../infrastructure/chat.api';
+import { connectChatSocket } from '../infrastructure/chatSocket';
 import { formatRelativeDate } from '../utils/formatRelativeDate';
 
 type Props = {
@@ -58,6 +62,52 @@ export function ConversationsScreen({ navigation }: Props) {
       loadChats();
     }, [loadChats]),
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
+
+    async function listen() {
+      const session = await getSession();
+
+      if (!session?.accessToken || cancelled) return;
+
+      const socket = connectChatSocket(session.accessToken);
+
+      function handleChatUpdated(payload: ChatUpdatedSocketPayload) {
+        setChats((current) => {
+          const index = current.findIndex((chat) => chat.id === payload.chatId);
+
+          if (index === -1) {
+            loadChats();
+            return current;
+          }
+
+          const updated = {
+            ...current[index],
+            lastMessage: payload.lastMessage,
+            unreadCount: payload.unreadCount ?? current[index].unreadCount,
+          };
+
+          return [
+            updated,
+            ...current.filter((chat) => chat.id !== payload.chatId),
+          ];
+        });
+      }
+
+      socket.on('chat:updated', handleChatUpdated);
+
+      cleanup = () => socket.off('chat:updated', handleChatUpdated);
+    }
+
+    listen();
+
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
+  }, [loadChats]);
 
   function handleRefresh() {
     setRefreshing(true);
