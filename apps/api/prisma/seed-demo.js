@@ -202,6 +202,76 @@ const OWNERS = [
     languages: ['portuguese', 'french', 'english'],
     rating: 4,
   },
+  {
+    key: 'chloe',
+    memberSince: new Date('2021-06-02T00:00:00.000Z'),
+    birthDate: new Date('1980-05-10T00:00:00.000Z'),
+    email: `chloe${DEMO_DOMAIN}`,
+    firstName: 'Chloé',
+    lastName: 'Berger',
+    avatar: avatar(24),
+    country: 'France',
+    nationality: 'française',
+    bio: "Illustratrice à Annecy, je pars souvent en montagne.",
+    languages: ["french", "english"],
+    rating: 5,
+  },
+  {
+    key: 'karim',
+    memberSince: new Date('2022-01-19T00:00:00.000Z'),
+    birthDate: new Date('1981-05-11T00:00:00.000Z'),
+    email: `karim${DEMO_DOMAIN}`,
+    firstName: 'Karim',
+    lastName: 'Haddad',
+    avatar: avatar(33),
+    country: 'Maroc',
+    nationality: 'marocaine',
+    bio: "Photographe à Marrakech, toujours partant pour un échange.",
+    languages: ["french", "arabic", "english"],
+    rating: 4,
+  },
+  {
+    key: 'ines',
+    memberSince: new Date('2020-09-30T00:00:00.000Z'),
+    birthDate: new Date('1982-05-12T00:00:00.000Z'),
+    email: `ines${DEMO_DOMAIN}`,
+    firstName: 'Inès',
+    lastName: 'Costa',
+    avatar: avatar(47),
+    country: 'Portugal',
+    nationality: 'portugaise',
+    bio: "Libraire à Lisbonne, amoureuse des vieilles pierres.",
+    languages: ["portuguese", "french"],
+    rating: 5,
+  },
+  {
+    key: 'bruno',
+    memberSince: new Date('2023-03-14T00:00:00.000Z'),
+    birthDate: new Date('1983-05-13T00:00:00.000Z'),
+    email: `bruno${DEMO_DOMAIN}`,
+    firstName: 'Bruno',
+    lastName: 'Keller',
+    avatar: avatar(15),
+    country: 'Suisse',
+    nationality: 'suisse',
+    bio: "Guide de montagne à Interlaken, je voyage hors saison.",
+    languages: ["german", "french", "english"],
+    rating: 4,
+  },
+  {
+    key: 'mila',
+    memberSince: new Date('2022-07-08T00:00:00.000Z'),
+    birthDate: new Date('1984-05-14T00:00:00.000Z'),
+    email: `mila${DEMO_DOMAIN}`,
+    firstName: 'Mila',
+    lastName: 'Novak',
+    avatar: avatar(26),
+    country: 'Croatie',
+    nationality: 'croate',
+    bio: "Prof de plongée à Split, ma maison est face à la mer.",
+    languages: ["croatian", "english"],
+    rating: 5,
+  },
 ];
 
 const HOMES = [
@@ -464,7 +534,137 @@ const HOMES = [
     carExchangeAccepted: false,
     photos: [IMG.salonLumineux, IMG.chambre2, IMG.sallePain],
     availabilities: [[25, 65]],
+  },  {
+    owner: 'chloe',
+    title: "Chalet face au lac d'Annecy",
+    description:
+      "Chalet en bois clair a cinq minutes du lac, avec un grand balcon plein sud. Depart de randonnees juste derriere la maison.",
+    address: '3 chemin des Cretes',
+    city: 'Annecy',
+    country: 'France',
+    latitude: 45.8992,
+    longitude: 6.1294,
+    capacity: 6,
+    beds: 3,
+    bedrooms: 3,
+    bathrooms: 2,
+    homeType: 'HOUSE',
+    category: 'NATURE',
+    amenities: ['wifi', 'kitchen', 'parking', 'tv', 'washingMachine'],
+    pricePerNight: 120,
+    averageRating: 4.7,
+    reviewsCount: 11,
+    carExchangeAccepted: true,
+    photos: [IMG.chaletBois, IMG.chaletMontagne, IMG.salonCosy, IMG.chambre3],
+    availabilities: [
+      [10, 90],
+    ],
   },
+  {
+    owner: 'karim',
+    title: "Riad avec patio et fontaine",
+    description:
+      "Riad traditionnel au coeur de la medina, organise autour d'un patio frais. Terrasse sur le toit pour les soirees.",
+    address: 'Derb Sidi Bouloukat 21',
+    city: 'Marrakech',
+    country: 'Maroc',
+    latitude: 31.6295,
+    longitude: -7.9811,
+    capacity: 6,
+    beds: 3,
+    bedrooms: 3,
+    bathrooms: 2,
+    homeType: 'HOUSE',
+    category: 'CULTURE',
+    amenities: ['wifi', 'kitchen', 'airConditioning', 'tv'],
+    pricePerNight: 95,
+    averageRating: 4.9,
+    reviewsCount: 17,
+    carExchangeAccepted: false,
+    photos: [IMG.maison2, IMG.salonLumineux, IMG.chambre2, IMG.cuisine],
+    availabilities: [
+      [10, 90],
+    ],
+  },
+  {
+    owner: 'ines',
+    title: "Appartement azulejos a l'Alfama",
+    description:
+      "Deux-pieces renove dans le plus vieux quartier de Lisbonne, azulejos d'origine au mur. Tram a trente metres.",
+    address: 'Rua dos Remedios 44',
+    city: 'Lisbonne',
+    country: 'Portugal',
+    latitude: 38.7139,
+    longitude: -9.1265,
+    capacity: 3,
+    beds: 2,
+    bedrooms: 1,
+    bathrooms: 1,
+    homeType: 'APARTMENT',
+    category: 'CULTURE',
+    amenities: ['wifi', 'kitchen', 'tv', 'balcony'],
+    pricePerNight: 85,
+    averageRating: 4.5,
+    reviewsCount: 14,
+    carExchangeAccepted: false,
+    photos: [IMG.salon, IMG.chambre, IMG.cuisine2],
+    availabilities: [
+      [10, 90],
+    ],
+  },
+  {
+    owner: 'bruno',
+    title: "Refuge au pied de la Jungfrau",
+    description:
+      "Ancien refuge de berger entierement isole, vue directe sur les glaciers. Poele a bois et silence complet.",
+    address: 'Alpenweg 7',
+    city: 'Interlaken',
+    country: 'Suisse',
+    latitude: 46.6863,
+    longitude: 7.8632,
+    capacity: 4,
+    beds: 2,
+    bedrooms: 2,
+    bathrooms: 1,
+    homeType: 'HOUSE',
+    category: 'NATURE',
+    amenities: ['kitchen', 'parking', 'washingMachine'],
+    pricePerNight: 140,
+    averageRating: 4.8,
+    reviewsCount: 8,
+    carExchangeAccepted: true,
+    photos: [IMG.chalet, IMG.chaletMontagne, IMG.interieur],
+    availabilities: [
+      [10, 90],
+    ],
+  },
+  {
+    owner: 'mila',
+    title: "Maison de pierre face a l'Adriatique",
+    description:
+      "Maison en pierre blanche a dix metres de l'eau, terrasse ombragee par une vigne. Palmes et masques fournis.",
+    address: 'Ulica Obala 12',
+    city: 'Split',
+    country: 'Croatie',
+    latitude: 43.5081,
+    longitude: 16.4402,
+    capacity: 5,
+    beds: 3,
+    bedrooms: 2,
+    bathrooms: 1,
+    homeType: 'HOUSE',
+    category: 'BEACH',
+    amenities: ['wifi', 'kitchen', 'airConditioning', 'balcony', 'parking'],
+    pricePerNight: 110,
+    averageRating: 4.9,
+    reviewsCount: 21,
+    carExchangeAccepted: false,
+    photos: [IMG.maison3, IMG.villa, IMG.salonCosy, IMG.chambre2],
+    availabilities: [
+      [10, 90],
+    ],
+  },
+
 ];
 
 async function main() {
@@ -658,30 +858,31 @@ async function main() {
   }
 
   const sophie = ownersByKey.sophie;
-  let pendingLikes = 0;
 
-  for (const owner of OWNERS) {
-    if (owner.key === 'sophie') continue;
+  // Ceux-la ont deja like Sophie : quand elle swipe leur logement, le match part
+  // aussitot. Bruno et Mila ne l'ont pas likee : leur carte se passe sans rien
+  // declencher, pour que les deux issues soient testables.
+  const ADMIRATEURS = ['chloe', 'karim', 'ines'];
 
-    const admirer = ownersByKey[owner.key];
-    const sophieHomeId = firstHomeOf.get(sophie.id);
+  const sophieHomeId = firstHomeOf.get(sophie.id);
 
-    if (!sophieHomeId) continue;
+  for (const key of ADMIRATEURS) {
+    const admirateur = ownersByKey[key];
+
+    if (!admirateur || !sophieHomeId) continue;
 
     await prisma.swipe.create({
       data: {
-        swiperId: admirer.id,
+        swiperId: admirateur.id,
         targetUserId: sophie.id,
         homeId: sophieHomeId,
         direction: 'LIKE',
       },
     });
-
-    pendingLikes += 1;
   }
 
   console.log(
-    `[seed] ${pendingLikes} personnes ont deja like Sophie : son prochain swipe cree un match.`,
+    `[seed] ${ADMIRATEURS.length} personnes ont deja like Sophie : swiper leur logement cree un match.`,
   );
 
   await prisma.exchange.deleteMany({
@@ -764,17 +965,41 @@ async function main() {
 
   console.log('[seed] 1 match non ouvert : aucune conversation entamee.');
 
-  // Thomas a lu jusqu'au dernier message : Sophie voit "Vu" sous le sien, et
-  // seulement la.
-  const thomasChat = await prisma.chat.findFirst({
-    where: {
-      AND: [
-        { participants: { some: { userId: ownersByKey.thomas.id } } },
-        { participants: { some: { userId: ownersByKey.sophie.id } } },
-      ],
+  // Sans marque de lecture, une conversation ou l'on a deja repondu affichait
+  // quand meme ses anciens messages comme non lus. On considere donc que chacun
+  // a lu jusqu'a son propre dernier message : ne restent non lus que ceux
+  // arrives apres sa derniere reponse.
+  const tousLesChats = await prisma.chat.findMany({
+    where: { participants: { some: { userId: { in: ownerIds } } } },
+    select: {
+      id: true,
+      participants: { select: { userId: true } },
     },
-    select: { id: true },
   });
+
+  for (const chat of tousLesChats) {
+    for (const participant of chat.participants) {
+      const sien = await prisma.message.findFirst({
+        where: { chatId: chat.id, senderId: participant.userId },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      });
+
+      if (!sien) continue;
+
+      await prisma.chatParticipant.updateMany({
+        where: { chatId: chat.id, userId: participant.userId },
+        data: { lastReadMessageId: sien.id },
+      });
+    }
+  }
+
+  // Thomas, lui, a tout lu : Sophie voit donc "Vu" sous son dernier message.
+  const thomasChat = tousLesChats.find(
+    (chat) =>
+      chat.participants.some((p) => p.userId === ownersByKey.thomas.id) &&
+      chat.participants.some((p) => p.userId === ownersByKey.sophie.id),
+  );
 
   if (thomasChat) {
     const dernier = await prisma.message.findFirst({

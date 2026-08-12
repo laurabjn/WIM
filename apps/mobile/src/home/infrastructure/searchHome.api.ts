@@ -7,6 +7,7 @@ type SearchHomesParams = {
   country?: string;
   capacity?: number;
   homeType?: string;
+  category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
   startDate?: string;
   endDate?: string;
 };

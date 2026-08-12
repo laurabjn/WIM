@@ -7,6 +7,7 @@ export type SearchStackParamList = {
     };
   SearchResults: {
     city: string;
+    category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
     startDate?: string;
     endDate?: string;
     capacity: number | undefined;

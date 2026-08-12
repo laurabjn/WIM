@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -41,10 +42,26 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
         message: message.trim(),
       });
 
-      navigation.navigate('Conversation', { chatId: result.chatId });
+      // La conversation vit dans l'onglet Messages : depuis les piles Logements
+      // ou Profil, y aller directement echouait, et l'erreur renvoyait sur la
+      // fiche du logement en laissant croire que le message n'etait pas parti.
+      const parent = navigation.getParent?.();
+
+      if (parent) {
+        parent.navigate('MessagesTab', {
+          screen: 'Conversation',
+          params: { chatId: result.chatId },
+        });
+      } else {
+        navigation.navigate('Conversation', { chatId: result.chatId });
+      }
     } catch (error) {
       console.log('Request exchange error:', error);
-      navigation.navigate('HomeDetails', { homeId });
+
+      Alert.alert(
+        '',
+        error instanceof Error ? error.message : t('sendError'),
+      );
     } finally {
       setSending(false);
     }

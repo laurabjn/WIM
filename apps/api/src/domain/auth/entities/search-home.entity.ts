@@ -6,6 +6,7 @@ export type SearchHomesFilters = {
   country?: string;
   capacity?: number;
   homeType?: string;
+  category?: HomeCategory;
   startDate?: string;
   endDate?: string;
 };

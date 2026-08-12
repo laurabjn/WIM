@@ -594,6 +594,13 @@ export function ConversationScreen({ route, navigation }: Props) {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
         >
+          {messages.length === 0 && !loadingMore ? (
+            <View style={styles.empty}>
+              <Text style={styles.emptyTitle}>{t('noMessages')}</Text>
+              <Text style={styles.emptyText}>{t('startConversation')}</Text>
+            </View>
+          ) : null}
+
           <FlatList
             data={messages}
             keyExtractor={(message) => message.id}
@@ -606,12 +613,6 @@ export function ConversationScreen({ route, navigation }: Props) {
               loadingMore ? (
                 <ActivityIndicator style={styles.moreLoader} color="#087EBE" />
               ) : null
-            }
-            ListEmptyComponent={
-              <View style={styles.empty}>
-                <Text style={styles.emptyTitle}>{t('noMessages')}</Text>
-                <Text style={styles.emptyText}>{t('startConversation')}</Text>
-              </View>
             }
           />
 
@@ -936,12 +937,13 @@ menuBackdrop: {
     color: '#9CA3AF',
   },
 
+  // Rendu hors de la liste inversee : a l'interieur, il heritait du
+  // retournement et s'affichait a l'envers.
   empty: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 40,
-    transform: [{ scaleY: -1 }],
   },
 
   emptyTitle: {

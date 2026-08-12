@@ -5,7 +5,23 @@ async function parseOptional(response: Response) {
   const raw = await response.text();
 
   if (!response.ok) {
-    throw new Error('Une erreur est survenue');
+    // L'API explique pourquoi elle refuse : le taire priverait l'ecran du seul
+    // message utile a montrer.
+    let message = 'Une erreur est survenue';
+
+    try {
+      const body = raw ? JSON.parse(raw) : null;
+
+      if (body?.message) {
+        message = Array.isArray(body.message)
+          ? body.message.join(', ')
+          : body.message;
+      }
+    } catch {
+      // Corps non lisible : on garde le message generique.
+    }
+
+    throw new Error(message);
   }
 
   if (!raw) return null;

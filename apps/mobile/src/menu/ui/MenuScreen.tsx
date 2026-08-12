@@ -33,7 +33,6 @@ export function MenuScreen({ navigation }: Props) {
     
   type CategoryFilter = 'ALL' | 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
 
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('ALL');
   const [homes, setHomes] = useState<Home[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -97,20 +96,17 @@ export function MenuScreen({ navigation }: Props) {
 
   const sourceHomes = homes;
 
-  // Retaper la categorie active la desactive : sans cela, aucun geste ne
-  // permettrait de revenir a la liste complete.
-  const toggleCategory = (category: CategoryFilter) =>
-    setSelectedCategory((current) =>
-      current === category ? 'ALL' : category,
-    );
+  // Une categorie ouvre la page de resultats, carte comprise, plutot que de
+  // filtrer en silence une liste que rien n'affichait.
+  const openCategory = (category: Exclude<CategoryFilter, 'ALL'>) =>
+    navigation.navigate('SearchResults', {
+      city: '',
+      category,
+      capacity: undefined,
+    });
 
   // Un logement sans theme ne doit pas disparaitre de l'accueil : il reste
   // visible tant qu'aucun filtre n'est actif.
-  const filteredHomes =
-    selectedCategory === 'ALL'
-      ? sourceHomes
-      : sourceHomes.filter((home) => home.category === selectedCategory);
-
   const featuredCity = sourceHomes[0]?.city;
   const featuredCountry = sourceHomes[0]?.country;
 
@@ -159,7 +155,17 @@ export function MenuScreen({ navigation }: Props) {
                 <Text style={styles.exchangeCount}>{featuredHomes.length}</Text>
               </View>
 
-              <TouchableOpacity style={styles.heroButton}>
+              <TouchableOpacity
+                style={styles.heroButton}
+                activeOpacity={0.85}
+                disabled={!featuredCity}
+                onPress={() =>
+                  navigation.navigate('SearchResults', {
+                    city: featuredCity ?? '',
+                    capacity: undefined,
+                  })
+                }
+              >
                 <Text style={styles.heroButtonText}>{t('common:seeMore')}</Text>
                 <Text style={styles.arrow}>→</Text>
               </TouchableOpacity>
@@ -174,25 +180,25 @@ export function MenuScreen({ navigation }: Props) {
             icon={<Umbrella color="white" size={24} />}
             label="Nature"
             color="#37c878"
-            onPress={() => toggleCategory('NATURE')}
+            onPress={() => openCategory('NATURE')}
           />
           <Category
             icon={<Waves color="white" size={24} />}
             label="Plage"
             color="#169bea"
-            onPress={() => toggleCategory('BEACH')}
+            onPress={() => openCategory('BEACH')}
           />
           <Category
             icon={<Building2 color="white" size={24} />}
             label="Ville"
             color="#777"
-            onPress={() => toggleCategory('CITY')}
+            onPress={() => openCategory('CITY')}
           />
           <Category
             icon={<Landmark color="white" size={24} />}
             label="Culture"
             color="#f47b20"
-            onPress={() => toggleCategory('CULTURE')}
+            onPress={() => openCategory('CULTURE')}
           />
         </View>
 
@@ -209,6 +215,9 @@ export function MenuScreen({ navigation }: Props) {
             title={`${home.city}, ${home.country}`}
             dates="Dates disponibles"
             travelers={`${home.capacity} voyageurs`}
+            onPress={() =>
+              navigation.navigate('HomeDetails', { homeId: home.id })
+            }
           />
         ))}
       </ScrollView>

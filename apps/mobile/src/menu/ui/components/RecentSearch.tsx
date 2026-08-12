@@ -5,14 +5,20 @@ export function RecentSearch({
   title,
   dates,
   travelers,
+  onPress,
 }: {
   image: string;
   title: string;
   dates: string;
   travelers: string;
+  onPress?: () => void;
 }) {
   return (
-    <TouchableOpacity style={styles.recentCard}>
+    <TouchableOpacity
+      style={styles.recentCard}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
       <Image source={{ uri: image }} style={styles.recentImage} />
 
       <View style={styles.recentContent}>

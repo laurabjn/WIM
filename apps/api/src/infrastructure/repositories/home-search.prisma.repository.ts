@@ -11,8 +11,16 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async search(filters: SearchHomesFilters): Promise<HomeSearchResult[]> {
-    const { userId, city, country, capacity, homeType, startDate, endDate } =
-      filters;
+    const {
+      userId,
+      city,
+      country,
+      capacity,
+      homeType,
+      category,
+      startDate,
+      endDate,
+    } = filters;
 
     const homes = await this.prisma.home.findMany({
       where: {
@@ -42,6 +50,7 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
           : undefined,
 
         homeType: homeType || undefined,
+        category: category || undefined,
 
         ...(startDate && endDate
           ? {

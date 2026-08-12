@@ -36,7 +36,7 @@ export const SearchResultsScreen: React.FC<Props> = ({
   navigation,
   route,
 }) => {
-  const { city, capacity, startDate, endDate } = route.params ?? {};
+  const { city, capacity, startDate, endDate, category } = route.params ?? {};
 
   const [homes, setHomes] = useState<Home[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,6 +86,7 @@ export const SearchResultsScreen: React.FC<Props> = ({
 
         const data = await searchHomesApi(session.accessToken, {
           city: city?.split(',')[0]?.trim(),
+          category,
           startDate,
           endDate,
           capacity,
@@ -100,7 +101,7 @@ export const SearchResultsScreen: React.FC<Props> = ({
     }
 
     loadHomes();
-  }, [city, capacity, startDate, endDate]);
+  }, [city, capacity, startDate, endDate, category]);
 
   const moveSheet = useCallback(
     (position: number) => {
