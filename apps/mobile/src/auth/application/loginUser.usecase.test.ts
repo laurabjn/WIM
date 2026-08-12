@@ -1,4 +1,4 @@
-import { loginUserApi } from "./loginUser.usecase";
+import { loginUser } from "./loginUser.usecase";
 
 describe('loginUser (mobile)', () => {
   const API_URL = 'http://localhost:3002/api';
@@ -18,7 +18,7 @@ describe('loginUser (mobile)', () => {
       }),
     });
 
-    const result = await loginUserApi({
+    const result = await loginUser({
       email: 'test@example.com',
       password: 'secret123',
     });
