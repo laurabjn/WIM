@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ListMyExchangesUseCase } from 'src/application/exchange/use-cases/list-my-exchanges.usecase';
 import {
+  CancelExchangeUseCase,
   RespondToExchangeUseCase,
   UpdateExchangeDatesUseCase,
 } from 'src/application/exchange/use-cases/respond-to-exchange.usecase';
@@ -35,6 +36,7 @@ import { ModerationModule } from './moderation.module';
     },
     RespondToExchangeUseCase,
     UpdateExchangeDatesUseCase,
+    CancelExchangeUseCase,
     GetChatExchangeUseCase,
     RequestExchangeUseCase,
   ],

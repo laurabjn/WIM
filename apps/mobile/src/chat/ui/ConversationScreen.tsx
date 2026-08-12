@@ -12,7 +12,10 @@ import {
   View,
 } from 'react-native';
 import { Alert, Modal } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -29,6 +32,7 @@ import type {
   ChatMessages,
   PendingExchange,
   MessageCreatedSocketPayload,
+  MessagesReadSocketPayload,
 } from '@wim/shared';
 
 import { getSession } from 'src/auth/infrastructure/authStorage';
@@ -41,10 +45,12 @@ import {
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { useChatSocket } from '../hooks/useChatSocket';
 import {
+  cancelExchangeApi,
   getChatExchangeApi,
   respondToExchangeApi,
   updateExchangeDatesApi,
 } from '../infrastructure/exchange.api';
+import { getHomesByOwner } from 'src/home/infrastructure/home.api';
 import {
   blockUserApi,
   reportUserApi,
@@ -77,6 +83,7 @@ type Props = {
 
 export function ConversationScreen({ route, navigation }: Props) {
   const { t } = useTranslation('chat');
+  const insets = useSafeAreaInsets();
   const {
     chatId,
     participantId,
@@ -95,6 +102,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [translated, setTranslated] = useState(true);
+  const [participantLastReadAt, setParticipantLastReadAt] = useState<string | null>(null);
 
   const translatedRef = useRef(true);
 
@@ -127,6 +135,7 @@ export function ConversationScreen({ route, navigation }: Props) {
         if (cancelled) return;
 
         setMessages(page.messages);
+        setParticipantLastReadAt(page.participantLastReadAt ?? null);
         cursorRef.current = page.nextCursor;
         hasMoreRef.current = page.hasMore;
 
@@ -167,7 +176,22 @@ export function ConversationScreen({ route, navigation }: Props) {
     [],
   );
 
-  useChatSocket({ chatId, onMessage: handleIncomingMessage });
+  const handleRead = useCallback(
+    (payload: MessagesReadSocketPayload) => {
+      // L'autre vient d'ouvrir la conversation : le "Vu" apparait sans avoir a
+      // recharger la page.
+      if (payload.userId !== currentUserId) {
+        setParticipantLastReadAt(payload.readAt);
+      }
+    },
+    [currentUserId],
+  );
+
+  useChatSocket({
+    chatId,
+    onMessage: handleIncomingMessage,
+    onRead: handleRead,
+  });
 
   const loadEarlier = useCallback(async () => {
     if (!hasMoreRef.current || loadingMore || !cursorRef.current) return;
@@ -320,20 +344,62 @@ export function ConversationScreen({ route, navigation }: Props) {
     navigation.goBack();
   }
 
-  async function deleteExchange() {
+  function cancelExchange() {
     setMenuOpen(false);
 
-    if (!exchange) {
-      Alert.alert('', t('actionUnavailable'));
-      return;
-    }
+    if (!exchange) return;
+
+    Alert.alert('', t('cancelExchangeConfirm'), [
+      { text: t('cancel'), style: 'cancel' },
+      {
+        text: t('cancelExchangeConfirmed'),
+        style: 'destructive',
+        onPress: async () => {
+          const session = await getSession();
+
+          if (!session?.accessToken) return;
+
+          try {
+            await cancelExchangeApi(session.accessToken, exchange.id);
+            setExchange(null);
+          } catch (cancelError) {
+            console.log('Cancel exchange error:', cancelError);
+            Alert.alert('', t('cancelExchangeError'));
+          }
+        },
+      },
+    ]);
+  }
+
+  async function proposeExchange() {
+    setMenuOpen(false);
+
+    if (!participantId) return;
 
     const session = await getSession();
 
     if (!session?.accessToken) return;
 
-    await respondToExchangeApi(session.accessToken, exchange.id, 'DECLINE');
-    setExchange(null);
+    try {
+      const homes = await getHomesByOwner(session.accessToken, participantId);
+
+      if (homes.length === 0) {
+        Alert.alert('', t('noHomeToExchange'));
+        return;
+      }
+
+      // Un seul logement : inutile de faire choisir. Sinon on ouvre le profil,
+      // ou ils sont tous presentes.
+      if (homes.length === 1) {
+        navigation.navigate('ExchangeAvailability', { homeId: homes[0].id });
+        return;
+      }
+
+      navigation.navigate('PublicProfile', { userId: participantId });
+    } catch (loadError) {
+      console.log('Load participant homes error:', loadError);
+      Alert.alert('', t('actionUnavailable'));
+    }
   }
 
   async function reportParticipant() {
@@ -353,9 +419,15 @@ export function ConversationScreen({ route, navigation }: Props) {
   const showTranslationNotice =
     translated && messages.some((message) => message.translatedContent);
 
-  const lastOwnMessageId = messages.find(
-    (message) => message.senderId === currentUserId,
-  )?.id;
+  // "Vu" ne s'affiche que sous le dernier message que l'autre a reellement lu,
+  // et non des l'envoi.
+  const lastSeenOwnMessageId = participantLastReadAt
+    ? messages.find(
+        (message) =>
+          message.senderId === currentUserId &&
+          Date.parse(message.createdAt) <= Date.parse(participantLastReadAt),
+      )?.id
+    : undefined;
 
   function renderMessage(message: ChatMessages, index: number) {
     const isMine = message.senderId === currentUserId;
@@ -420,7 +492,7 @@ export function ConversationScreen({ route, navigation }: Props) {
           </View>
         </View>
 
-        {isMine && message.id === lastOwnMessageId ? (
+        {isMine && message.id === lastSeenOwnMessageId ? (
           <Text style={styles.seen}>{t('seenLabel')}</Text>
         ) : null}
 
@@ -481,7 +553,7 @@ export function ConversationScreen({ route, navigation }: Props) {
         </TouchableOpacity>
       </View>
 
-      {exchange ? (
+      {exchange?.status === 'PENDING' ? (
         <ExchangeBanner
           exchange={exchange}
           onAccept={async () => {
@@ -632,14 +704,25 @@ export function ConversationScreen({ route, navigation }: Props) {
           activeOpacity={1}
           onPress={() => setMenuOpen(false)}
         >
-          <View style={styles.menuSheet}>
+          <View
+            style={[
+              styles.menuSheet,
+              { paddingBottom: 20 + insets.bottom },
+            ]}
+          >
             <TouchableOpacity style={styles.menuItem} onPress={blockParticipant}>
               <Text style={styles.menuDanger}>{t('blockUser')}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem} onPress={deleteExchange}>
-              <Text style={styles.menuText}>{t('deleteExchange')}</Text>
-            </TouchableOpacity>
+            {exchange ? (
+              <TouchableOpacity style={styles.menuItem} onPress={cancelExchange}>
+                <Text style={styles.menuText}>{t('cancelExchange')}</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.menuItem} onPress={proposeExchange}>
+                <Text style={styles.menuText}>{t('proposeExchange')}</Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity style={styles.menuItem} onPress={reportParticipant}>
               <Text style={styles.menuText}>{t('report')}</Text>
@@ -688,8 +771,7 @@ menuBackdrop: {
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
-    paddingVertical: 8,
-    paddingBottom: 26,
+    paddingTop: 8,
   },
 
   menuItem: {

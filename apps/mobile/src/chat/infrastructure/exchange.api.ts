@@ -41,6 +41,20 @@ export async function respondToExchangeApi(
   return parseOptional(result);
 }
 
+export async function cancelExchangeApi(
+  token: string,
+  exchangeId: string,
+): Promise<PendingExchange> {
+  const result = await fetch(`${API_URL}/exchanges/${exchangeId}/cancel`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return parseOptional(result);
+}
+
 export async function requestExchangeApi(
   token: string,
   input: {

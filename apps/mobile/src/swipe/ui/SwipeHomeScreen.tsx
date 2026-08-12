@@ -59,8 +59,6 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
   const [swipeLoading, setSwipeLoading] = useState(false);
   const [quickSearch, setQuickSearch] = useState(true);
   const [matchedName, setMatchedName] = useState<string | null>(null);
-  const [chatId, setChatId] = useState<string | null>(null);
-  const [matchedUserId, setMatchedUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const home = homes[index];
@@ -121,8 +119,6 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
 
       if (result.match) {
         setMatchedName(home.owner?.firstName ?? '');
-        setMatchedUserId(home.ownerId);
-        setChatId(result.chatId ?? null);
         return;
       }
 
@@ -141,31 +137,7 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
 
   function closeMatch() {
     setMatchedName(null);
-    setMatchedUserId(null);
-    setChatId(null);
     next();
-  }
-
-  function openMatchedChat() {
-    const targetChatId = chatId;
-    const targetUserId = matchedUserId;
-    const name = matchedName;
-
-    closeMatch();
-
-    if (!targetChatId) return;
-
-    // La conversation vit dans l'onglet Messages : il faut passer par le
-    // navigateur parent, elle est hors de la pile de recherche.
-    navigation.getParent()?.navigate('MessagesTab', {
-      screen: 'Conversation',
-      params: {
-        chatId: targetChatId,
-        participantId: targetUserId,
-        participantName: name ?? '',
-        participantAvatar: null,
-      },
-    });
   }
 
   const toggleSearch = () => {
@@ -271,22 +243,11 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
               {t('swipe:matchText', { firstName: matchedName })}
             </Text>
 
-            {chatId ? (
-              <TouchableOpacity
-                style={styles.matchButton}
-                onPress={openMatchedChat}
-              >
-                <Text style={styles.matchButtonText}>
-                  {t('swipe:openConversation')}
-                </Text>
-              </TouchableOpacity>
-            ) : null}
-
             <TouchableOpacity
-              style={styles.matchSecondary}
+              style={styles.matchButton}
               onPress={closeMatch}
             >
-              <Text style={styles.matchSecondaryText}>
+              <Text style={styles.matchButtonText}>
                 {t('common:continue')}
               </Text>
             </TouchableOpacity>
@@ -416,14 +377,5 @@ const styles = StyleSheet.create({
   matchButtonText: {
     color: '#fff',
     fontWeight: '800',
-  },
-  matchSecondary: {
-    marginTop: 12,
-    paddingVertical: 8,
-  },
-  matchSecondaryText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#6B7280',
   },
 });

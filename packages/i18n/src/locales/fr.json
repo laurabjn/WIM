@@ -745,6 +745,12 @@
     "cameraDenied": "L'acces a l'appareil photo est refuse.",
     "galleryDenied": "L'acces aux photos est refuse.",
     "voiceSoon": "Les messages vocaux arrivent bientot.",
-    "photoPreview": "Photo"
+    "photoPreview": "Photo",
+    "cancelExchange": "Annuler l'echange",
+    "proposeExchange": "Proposer un nouvel echange",
+    "cancelExchangeConfirm": "Voulez-vous vraiment annuler cet echange ?",
+    "cancelExchangeConfirmed": "Annuler l'echange",
+    "cancelExchangeError": "L'echange n'a pas pu etre annule.",
+    "noHomeToExchange": "Cette personne n'a aucun logement a echanger."
   }
 }

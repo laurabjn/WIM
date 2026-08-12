@@ -746,6 +746,12 @@
     "cameraDenied": "Camera access is denied.",
     "galleryDenied": "Photo access is denied.",
     "voiceSoon": "Voice messages are coming soon.",
-    "photoPreview": "Photo"
+    "photoPreview": "Photo",
+    "cancelExchange": "Cancel the exchange",
+    "proposeExchange": "Propose a new exchange",
+    "cancelExchangeConfirm": "Do you really want to cancel this exchange?",
+    "cancelExchangeConfirmed": "Cancel the exchange",
+    "cancelExchangeError": "The exchange could not be cancelled.",
+    "noHomeToExchange": "This person has no home to exchange."
   }
 }

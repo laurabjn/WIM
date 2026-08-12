@@ -66,7 +66,18 @@ export class GetChatMessagesUseCase {
 
     const messages = result.messages.map(mapMessage);
 
+    const other = chat.participants.find(
+      (member) => member.userId !== userId,
+    );
+
+    const lastRead = other?.lastReadMessageId
+      ? await this.messageRepository.findById(other.lastReadMessageId)
+      : null;
+
     return {
+      participantLastReadAt: lastRead
+        ? lastRead.createdAt.toISOString()
+        : null,
       messages: translate
         ? await this.translation.translate(messages, userId)
         : messages,

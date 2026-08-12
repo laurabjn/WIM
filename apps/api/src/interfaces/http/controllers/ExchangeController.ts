@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ListMyExchangesUseCase } from 'src/application/exchange/use-cases/list-my-exchanges.usecase';
 import {
+  CancelExchangeUseCase,
   ExchangeResponse,
   RespondToExchangeUseCase,
   UpdateExchangeDatesUseCase,
@@ -30,6 +31,7 @@ export class ExchangeController {
     private readonly getChatExchangeUseCase: GetChatExchangeUseCase,
     private readonly requestExchangeUseCase: RequestExchangeUseCase,
     private readonly updateExchangeDatesUseCase: UpdateExchangeDatesUseCase,
+    private readonly cancelExchangeUseCase: CancelExchangeUseCase,
   ) {}
 
   @Post()
@@ -78,5 +80,13 @@ export class ExchangeController {
       req.user.sub,
       body?.response === 'DECLINE' ? 'DECLINE' : 'ACCEPT',
     );
+  }
+
+  @Patch(':exchangeId/cancel')
+  async cancel(
+    @Req() req: any,
+    @Param('exchangeId') exchangeId: string,
+  ) {
+    return this.cancelExchangeUseCase.execute(exchangeId, req.user.sub);
   }
 }

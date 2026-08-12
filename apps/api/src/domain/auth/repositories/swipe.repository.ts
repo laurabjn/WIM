@@ -41,4 +41,5 @@ export interface SwipeRepository {
   hasLike(swiperId: string, targetUserId: string): Promise<boolean>;
   createMatch(firstUserId: string, secondUserId: string): Promise<MatchRecord>;
   homeBelongsToUser(homeId: string, userId: string): Promise<boolean>;
+  hasOpenConversation(firstUserId: string, secondUserId: string): Promise<boolean>;
 }

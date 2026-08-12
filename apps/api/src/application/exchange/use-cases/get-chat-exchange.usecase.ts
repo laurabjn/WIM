@@ -49,6 +49,6 @@ export class GetChatExchangeUseCase {
       return null;
     }
 
-    return this.exchangeRepository.findPendingBetween(userId, other.userId);
+    return this.exchangeRepository.findActiveBetween(userId, other.userId);
   }
 }

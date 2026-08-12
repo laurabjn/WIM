@@ -6,6 +6,8 @@ import { MatchesScreen } from 'src/chat/ui/MatchesScreen';
 import { RequestsScreen } from 'src/chat/ui/RequestsScreen';
 import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
 import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
+import { ExchangeAvailabilityScreen } from 'src/home/ui/ExchangeAvailabilityScreen';
+import { ExchangeMessageScreen } from 'src/home/ui/ExchangeMessageScreen';
 
 export type MessagesStackParamList = {
   Conversations: undefined;
@@ -19,6 +21,11 @@ export type MessagesStackParamList = {
   Matches: undefined;
   PublicProfile: { userId: string };
   HomeDetails: { homeId: string };
+  ExchangeAvailability: { homeId: string };
+  ExchangeMessage: {
+    homeId: string;
+    availabilityType: 'FREE' | 'EXCHANGER_DATES' | 'SPECIFIC_DATES';
+  };
 };
 
 const Stack = createStackNavigator<MessagesStackParamList>();
@@ -32,6 +39,11 @@ export function MessagesStackNavigator() {
       <Stack.Screen name="Matches" component={MatchesScreen} />
       <Stack.Screen name="PublicProfile" component={ProfilePublicScreen} />
       <Stack.Screen name="HomeDetails" component={HomeDetailsScreen} />
+      <Stack.Screen
+        name="ExchangeAvailability"
+        component={ExchangeAvailabilityScreen}
+      />
+      <Stack.Screen name="ExchangeMessage" component={ExchangeMessageScreen} />
     </Stack.Navigator>
   );
 }

@@ -55,6 +55,42 @@ export class RespondToExchangeUseCase {
 }
 
 @Injectable()
+export class CancelExchangeUseCase {
+  constructor(
+    @Inject(EXCHANGE_REPOSITORY)
+    private readonly exchangeRepository: ExchangeRepository,
+  ) {}
+
+  async execute(
+    exchangeId: string,
+    userId: string,
+  ): Promise<PendingExchange> {
+    const exchange = await this.exchangeRepository.findById(exchangeId);
+
+    if (!exchange) {
+      throw new NotFoundException('Echange introuvable.');
+    }
+
+    if (exchange.hostId !== userId && exchange.guestId !== userId) {
+      throw new ForbiddenException('Cet echange ne vous concerne pas.');
+    }
+
+    // Un sejour passe appartient a l'historique des deux personnes : l'annuler
+    // reecrirait ce qui a eu lieu. Seul ce qui n'a pas encore eu lieu, ou court
+    // encore, peut etre annule.
+    const annulable = ['PENDING', 'FUTURE', 'CURRENT'];
+
+    if (!annulable.includes(exchange.status)) {
+      throw new BadRequestException(
+        'Cet echange ne peut plus etre annule.',
+      );
+    }
+
+    return this.exchangeRepository.updateStatus(exchangeId, 'CANCELLED');
+  }
+}
+
+@Injectable()
 export class UpdateExchangeDatesUseCase {
   constructor(
     @Inject(EXCHANGE_REPOSITORY)

@@ -95,13 +95,16 @@ export class ExchangeRepositoryPrisma {
     };
   }
 
-  async findPendingBetween(
+  // Les trois etats vivants d'un echange : en attente d'acceptation, a venir,
+  // ou en cours. La conversation en a besoin pour proposer l'annulation, pas
+  // seulement pour afficher le bandeau d'acceptation.
+  async findActiveBetween(
     firstUserId: string,
     secondUserId: string,
   ): Promise<PendingExchange | null> {
     const exchange = await this.prisma.exchange.findFirst({
       where: {
-        status: 'PENDING',
+        status: { in: ['PENDING', 'FUTURE', 'CURRENT'] },
         OR: [
           { hostId: firstUserId, guestId: secondUserId },
           { hostId: secondUserId, guestId: firstUserId },

@@ -97,6 +97,25 @@ export async function updateHome(token: string, homeId: string, homeData: Partia
   return normalizeHome(data);
 }
 
+export async function getHomesByOwner(
+  token: string,
+  ownerId: string,
+): Promise<Home[]> {
+  const response = await fetch(`${API_URL}/homes/owner/${ownerId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Impossible de charger les logements');
+  }
+
+  const data = await response.json();
+
+  return (Array.isArray(data) ? data : []).map(normalizeHome);
+}
+
 export async function getHomeById(token: string, homeId: string): Promise<Home> {
   const response = await fetch(`${API_URL}/homes/${homeId}`, {
     method: 'GET',

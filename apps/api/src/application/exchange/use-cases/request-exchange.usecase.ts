@@ -52,6 +52,29 @@ export class RequestExchangeUseCase {
 
     await this.blockedUsers.assertNotBlocked(input.requesterId, home.ownerId);
 
+    // Un seul echange vivant a la fois entre deux personnes. Sans ce garde-fou,
+    // les demandes s'empilent et le bandeau n'en montre qu'une, les autres
+    // devenant invisibles. Une fois l'echange termine, refuse ou annule, un
+    // nouveau peut etre propose.
+    const active = await this.prisma.exchange.findFirst({
+      where: {
+        status: { in: ['PENDING', 'CURRENT', 'FUTURE'] },
+        OR: [
+          { hostId: home.ownerId, guestId: input.requesterId },
+          { hostId: input.requesterId, guestId: home.ownerId },
+        ],
+      },
+      select: { id: true, status: true },
+    });
+
+    if (active) {
+      throw new BadRequestException(
+        active.status === 'PENDING'
+          ? 'Une demande d echange est deja en attente avec cette personne.'
+          : 'Un echange est deja en cours avec cette personne.',
+      );
+    }
+
     const startDate = input.startDate
       ? new Date(input.startDate)
       : defaultStart();

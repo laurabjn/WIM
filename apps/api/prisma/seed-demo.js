@@ -87,6 +87,21 @@ const CONVERSATIONS = [
     ],
   },
   {
+    // Marc ecrit, Sophie ne repond pas : la conversation reste une demande.
+    between: ['sophie', 'marc'],
+    messages: [
+      { from: 'marc', content: 'Bonjour Sophie, je serais interesse par un echange avec votre studio a Lyon en octobre. Mon chalet est libre a ces dates.', daysAgo: 2 },
+    ],
+  },
+  {
+    between: ['sophie', 'lucia'],
+    messages: [
+      { from: 'lucia', content: 'Bonjour Sophie ! Valence en novembre, cela vous dirait ? Ma maison est a dix minutes du centre historique.', daysAgo: 12 },
+      { from: 'sophie', content: 'Avec grand plaisir Lucia, novembre me convient tres bien. Je bloque les dates de mon cote.', daysAgo: 11 },
+      { from: 'lucia', content: 'Parfait, je valide. A tres vite !', daysAgo: 10 },
+    ],
+  },
+  {
     between: ['marc', 'lucia'],
     messages: [
       { from: 'lucia', content: 'Bonjour Marc, votre chalet a Chamonix est magnifique. Est-il accessible en hiver sans equipement particulier ?', daysAgo: 9 },
@@ -172,6 +187,20 @@ const OWNERS = [
     bio: 'Prof de yoga à Valence, ma maison est ouverte toute l\'année.',
     languages: ['english'],
     rating: 5,
+  },
+  {
+    key: 'hugo',
+    memberSince: new Date('2023-02-11T00:00:00.000Z'),
+    birthDate: new Date('1990-07-22T00:00:00.000Z'),
+    email: `hugo${DEMO_DOMAIN}`,
+    firstName: 'Hugo',
+    lastName: 'Nardi',
+    avatar: avatar(12),
+    country: 'Portugal',
+    nationality: 'portugaise',
+    bio: "Developpeur a Porto, je cherche des sejours au calme pour ecrire.",
+    languages: ['portuguese', 'french', 'english'],
+    rating: 4,
   },
 ];
 
@@ -384,6 +413,32 @@ const HOMES = [
     availabilities: [
       [30, 70],
       [110, 150],
+    ],
+  },
+  {
+    owner: 'hugo',
+    title: 'Maison de pecheur renovee',
+    description:
+      "Petite maison en pierre a deux rues de la plage, renovee avec soin. Patio ombrage, cuisine ouverte et velos a disposition pour longer le front de mer.",
+    address: 'Rua das Redes 8',
+    city: 'Porto',
+    country: 'Portugal',
+    latitude: 41.1496,
+    longitude: -8.6109,
+    capacity: 4,
+    beds: 2,
+    bedrooms: 2,
+    bathrooms: 1,
+    homeType: 'HOUSE',
+    category: 'BEACH',
+    amenities: ['wifi', 'kitchen', 'tv', 'washingMachine', 'balcony'],
+    pricePerNight: 105,
+    averageRating: 4.6,
+    reviewsCount: 9,
+    carExchangeAccepted: false,
+    photos: [IMG.maison3, IMG.salonCosy, IMG.chambre3, IMG.cuisine2],
+    availabilities: [
+      [20, 60],
     ],
   },
   {
@@ -638,18 +693,25 @@ async function main() {
     },
   });
 
-  // Un echange en attente par conversation : le bandeau d'acceptation est
-  // visible dans chacune, pour les deux participants. Le demandeur est celui
-  // qui a ouvert la discussion, l'hote celui dont le logement est convoite.
-  let pendingExchanges = 0;
+  // Un etat par paire, pour que chaque cas de l'application soit visible depuis
+  // le compte de Sophie. Un seul echange vivant par paire : c'est aussi la
+  // regle que l'API applique.
+  const PLANNED_EXCHANGES = [
+    // En cours : commence il y a trois jours, se termine dans quatre.
+    { host: 'thomas', guest: 'sophie', status: 'CURRENT', from: -3, to: 4 },
+    // Termine il y a un mois : Sophie peut donc en proposer un nouveau.
+    { host: 'elena', guest: 'sophie', status: 'PAST', from: -40, to: -30 },
+    // En attente : le bandeau d'acceptation s'affiche pour les deux.
+    { host: 'sophie', guest: 'marc', status: 'PENDING', from: 21, to: 31 },
+    // Accepte, pas encore commence.
+    { host: 'lucia', guest: 'sophie', status: 'FUTURE', from: 60, to: 70 },
+  ];
 
-  for (const conversation of CONVERSATIONS) {
-    const [firstKey, secondKey] = conversation.between;
-    const requesterKey = conversation.messages[0]?.from ?? firstKey;
-    const hostKey = requesterKey === firstKey ? secondKey : firstKey;
+  let createdExchanges = 0;
 
-    const host = ownersByKey[hostKey];
-    const guest = ownersByKey[requesterKey];
+  for (const planned of PLANNED_EXCHANGES) {
+    const host = ownersByKey[planned.host];
+    const guest = ownersByKey[planned.guest];
 
     const hostHome = await prisma.home.findFirst({
       where: { ownerId: host.id },
@@ -664,19 +726,70 @@ async function main() {
         homeId: hostHome.id,
         hostId: host.id,
         guestId: guest.id,
-        startDate: daysFromNow(14 + pendingExchanges * 7),
-        endDate: daysFromNow(24 + pendingExchanges * 7),
+        startDate: daysFromNow(planned.from),
+        endDate: daysFromNow(planned.to),
         travelersCount: 2,
-        status: 'PENDING',
+        status: planned.status,
       },
     });
 
-    pendingExchanges += 1;
+    createdExchanges += 1;
   }
 
   console.log(
-    `[seed] ${pendingExchanges} echanges en attente : une banniere par conversation.`,
+    `[seed] ${createdExchanges} echanges : un en cours, un passe, un en attente, un a venir.`,
   );
+
+  // Un match que personne n'a ouvert : il appartient a Demandes > Matchs, et
+  // n'apparait pas dans la liste des conversations.
+  const hugo = ownersByKey.hugo;
+
+  await prisma.match.create({
+    data: {
+      user1Id: [ownersByKey.sophie.id, hugo.id].sort()[0],
+      user2Id: [ownersByKey.sophie.id, hugo.id].sort()[1],
+      status: 'ACCEPTED',
+      chat: {
+        create: {
+          participants: {
+            create: [
+              { userId: ownersByKey.sophie.id },
+              { userId: hugo.id },
+            ],
+          },
+        },
+      },
+    },
+  });
+
+  console.log('[seed] 1 match non ouvert : aucune conversation entamee.');
+
+  // Thomas a lu jusqu'au dernier message : Sophie voit "Vu" sous le sien, et
+  // seulement la.
+  const thomasChat = await prisma.chat.findFirst({
+    where: {
+      AND: [
+        { participants: { some: { userId: ownersByKey.thomas.id } } },
+        { participants: { some: { userId: ownersByKey.sophie.id } } },
+      ],
+    },
+    select: { id: true },
+  });
+
+  if (thomasChat) {
+    const dernier = await prisma.message.findFirst({
+      where: { chatId: thomasChat.id },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true },
+    });
+
+    if (dernier) {
+      await prisma.chatParticipant.updateMany({
+        where: { chatId: thomasChat.id, userId: ownersByKey.thomas.id },
+        data: { lastReadMessageId: dernier.id },
+      });
+    }
+  }
 
   console.log(
     `[seed] ${CONVERSATIONS.length} conversations creees, ${totalMessages} messages.`,

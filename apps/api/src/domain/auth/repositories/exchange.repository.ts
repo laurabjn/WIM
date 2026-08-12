@@ -2,7 +2,7 @@ import type { Exchange, PendingExchange } from '@wim/shared';
 
 export interface ExchangeRepository {
   findMine(userId: string): Promise<Exchange[]>;
-  findPendingBetween(
+  findActiveBetween(
     firstUserId: string,
     secondUserId: string,
   ): Promise<PendingExchange | null>;
