@@ -38,6 +38,13 @@ export function ExchangeCard({
           {exchange.homeTitle}
         </Text>
 
+        {exchange.partner ? (
+          <Text style={styles.partner} numberOfLines={1}>
+            {exchange.isHost ? t('guest') : t('host')} ·{' '}
+            {exchange.partner.firstName} {exchange.partner.lastName}
+          </Text>
+        ) : null}
+
         <Text style={styles.dates}>
           {formatDate(exchange.startDate)} - {formatDate(exchange.endDate)}
         </Text>
@@ -53,8 +60,16 @@ export function ExchangeCard({
           <Text style={styles.icon}>ⓘ</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.iconButton} onPress={onPressMessages}>
-          <Text style={styles.icon}>▤</Text>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={onPressMessages}
+          disabled={!exchange.chatId}
+        >
+          <Text
+            style={[styles.icon, !exchange.chatId && styles.iconDisabled]}
+          >
+            ▤
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -97,6 +112,15 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#111111',
     marginBottom: 8,
+  },
+  partner: {
+    marginTop: 2,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#111111',
+  },
+  iconDisabled: {
+    opacity: 0.3,
   },
   dates: {
     fontSize: 12,

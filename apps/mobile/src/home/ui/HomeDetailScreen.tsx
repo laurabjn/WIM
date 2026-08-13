@@ -194,6 +194,9 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           <View style={styles.separator} />
 
           <HomeReviews
+            onPressAuthor={(userId) =>
+              navigation.navigate('PublicProfile', { userId })
+            }
             reviews={home.reviews ?? []}
             averageRating={home.averageRating}
             reviewsCount={home.reviewsCount ?? 0}

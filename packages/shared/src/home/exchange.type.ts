@@ -21,6 +21,13 @@ export type PendingExchange = {
   isHost: boolean;
 };
 
+export type ExchangePartner = {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  avatarUrl: string | null;
+};
+
 export type Exchange = {
   id: string;
   homeId: string;
@@ -31,4 +38,9 @@ export type Exchange = {
   endDate: string;
   travelersCount: number;
   status: ExchangeStatus;
+  // L'autre personne de l'echange, et la conversation qui les relie : la carte
+  // affiche son nom et le bouton y mene.
+  partner: ExchangePartner | null;
+  isHost: boolean;
+  chatId: string | null;
 };

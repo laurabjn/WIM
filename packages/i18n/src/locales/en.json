@@ -522,7 +522,8 @@
         "cookIslands": "Îles Cook"
       }
     },
-    "loadHomesError": "Could not load the homes."
+    "loadHomesError": "Could not load the homes.",
+    "addHome": "Add a home"
   },
   "home": {
     "notFound": "Home not found",
@@ -635,7 +636,8 @@
       "BEACH": "Beach",
       "CITY": "City",
       "CULTURE": "Culture"
-    }
+    },
+    "guest": "Guest"
   },
   "availability": {
     "when": "When are you available for exchange ?",
@@ -656,7 +658,9 @@
     "pastExchanges": "Past exchanges",
     "upcomingExchanges": "Upcoming exchanges",
     "noExchanges": "No exchanges for the moment.",
-    "noExchangesDescription": "Your exchanges will appear here once they are confirmed."
+    "noExchangesDescription": "Your exchanges will appear here once they are confirmed.",
+    "host": "Host",
+    "guest": "Guest"
   },
   "admin": {
     "adminTitle": "Admin dashboard",
@@ -748,7 +752,7 @@
     "voiceSoon": "Voice messages are coming soon.",
     "photoPreview": "Photo",
     "cancelExchange": "Cancel the exchange",
-    "proposeExchange": "Propose a new exchange",
+    "proposeExchange": "Propose an exchange",
     "cancelExchangeConfirm": "Do you really want to cancel this exchange?",
     "cancelExchangeConfirmed": "Cancel the exchange",
     "cancelExchangeError": "The exchange could not be cancelled.",

@@ -6,6 +6,7 @@ import {
   View,
   ActivityIndicator,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { ProfileHeaderCard } from './components/ProfileHeaderCard';
 import { UserHomeCard } from '../../home/ui/components/UserHomeCard';
@@ -139,7 +140,17 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
           }}
         />
 
-        <Text style={styles.sectionTitle}>{t('homes')}</Text>
+        <View style={styles.homesHeader}>
+          <Text style={styles.sectionTitle}>{t('homes')}</Text>
+
+          <TouchableOpacity
+            style={styles.addHomeButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('EditHome', {})}
+          >
+            <Text style={styles.addHomeText}>{t('addHome')}</Text>
+          </TouchableOpacity>
+        </View>
 
         {isHomesLoading ? (
           <ActivityIndicator />
@@ -198,6 +209,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     backgroundColor: '#F7F7F7',
+  },
+  homesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  addHomeButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#111111',
+  },
+  addHomeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#111111',
   },
   sectionTitle: {
     marginTop: 20,

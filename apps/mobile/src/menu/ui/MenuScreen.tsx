@@ -121,7 +121,11 @@ export function MenuScreen({ navigation }: Props) {
     : t('search:toExplore');
   
   const toggleSearch = () => {
-    navigation.navigate('Swipe');
+    // On laisse le curseur glisser avant de changer d'ecran : sinon
+    // l'animation etait remplacee par la navigation.
+    setQuickSearch(true);
+
+    setTimeout(() => navigation.navigate('Swipe'), 260);
   };
     
   return (

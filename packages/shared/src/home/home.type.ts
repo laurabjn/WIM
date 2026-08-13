@@ -81,6 +81,7 @@ export type Review = {
   comment: string;
   createdAt: string;
   author: {
+    id: string;
     firstName?: string | null;
     avatarUrl?: string | null;
     createdAt?: string | null;

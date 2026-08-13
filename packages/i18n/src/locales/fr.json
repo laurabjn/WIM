@@ -419,7 +419,8 @@
         "cookIslands": "Îles Cook"
       }
     },
-    "loadHomesError": "Impossible de charger les logements."
+    "loadHomesError": "Impossible de charger les logements.",
+    "addHome": "Ajouter un logement"
   },
   "auth": {
     "welcomeTitle": "Bienvenue sur Wim !",
@@ -634,7 +635,8 @@
       "BEACH": "Plage",
       "CITY": "Ville",
       "CULTURE": "Culture"
-    }
+    },
+    "guest": "Invite"
   },
   "availability": {
     "when": "Quand êtes-vous disponible pour échanger ?",
@@ -655,7 +657,9 @@
     "pastExchanges": "Échanges passés",
     "upcomingExchanges": "Échanges à venir",
     "noExchanges": "Aucun échange pour le moment.",
-    "noExchangesDescription": "Vos échanges apparaîtront ici lorsqu’ils seront confirmés."
+    "noExchangesDescription": "Vos échanges apparaîtront ici lorsqu’ils seront confirmés.",
+    "host": "Hote",
+    "guest": "Invite"
   },
   "admin": {
     "adminTitle": "Tableau de bord administrateur",
@@ -747,7 +751,7 @@
     "voiceSoon": "Les messages vocaux arrivent bientot.",
     "photoPreview": "Photo",
     "cancelExchange": "Annuler l'echange",
-    "proposeExchange": "Proposer un nouvel echange",
+    "proposeExchange": "Proposer un echange",
     "cancelExchangeConfirm": "Voulez-vous vraiment annuler cet echange ?",
     "cancelExchangeConfirmed": "Annuler l'echange",
     "cancelExchangeError": "L'echange n'a pas pu etre annule.",

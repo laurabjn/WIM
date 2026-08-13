@@ -141,13 +141,9 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
   }
 
   const toggleSearch = () => {
-    const nextValue = !quickSearch;
+    setQuickSearch(false);
 
-    setQuickSearch(nextValue);
-
-    if (nextValue) {
-      navigation.navigate('Menu');
-    }
+    setTimeout(() => navigation.navigate('Menu'), 260);
   };
 
   function openHomeDetails() {
@@ -190,8 +186,8 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
     <SafeAreaView style={styles.container}>
       <View style={styles.toggleWrapper}>
         <SearchToggle
-          quickSearch={true}
-          onToggle={() => navigation.navigate('Menu')}
+          quickSearch={quickSearch}
+          onToggle={toggleSearch}
           exploreLabel={t('search:toExplore')}
           quickSearchLabel={t('search:fastSearch')}
         />

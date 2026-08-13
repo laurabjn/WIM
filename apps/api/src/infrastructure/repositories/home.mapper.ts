@@ -29,6 +29,7 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
     include: {
       author: {
         select: {
+          id: true,
           firstName: true,
           avatarUrl: true,
           createdAt: true,
@@ -38,6 +39,12 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
   },
   availabilities: {
     orderBy: { startDate: 'asc' },
+  },
+  // Un sejour en cours occupe le logement : sa disponibilite affichee doit le
+  // refleter, quel que soit le reglage du proprietaire.
+  exchanges: {
+    where: { status: 'CURRENT' },
+    select: { id: true },
   },
 } satisfies Prisma.HomeInclude;
 
@@ -106,6 +113,7 @@ export function mapReview(
     comment: review.comment,
     createdAt: review.createdAt,
     author: {
+      id: review.author.id,
       firstName: review.author.firstName,
       avatarUrl: review.author.avatarUrl,
       createdAt: review.author.createdAt,
@@ -132,7 +140,8 @@ export function mapHome(home: PrismaHomeWithRelations): HomeEntity {
     homeType: home.homeType,
     category: home.category ?? null,
     amenities: Array.isArray(home.amenities) ? (home.amenities as string[]) : [],
-    isAvailableForExchange: home.isAvailableForExchange ?? false,
+    isAvailableForExchange:
+      (home.isAvailableForExchange ?? false) && home.exchanges.length === 0,
     pricePerNight: home.pricePerNight ?? null,
     averageRating: home.averageRating ?? null,
     reviewsCount: home.reviewsCount ?? 0,

@@ -16,7 +16,12 @@ import type { HomeCategory } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
 import { Home } from '@wim/shared/home/home.type';
 import { getSession } from 'src/auth/infrastructure/authStorage';
-import { getHomeById, resolveImageUrl, updateHome } from '../infrastructure/home.api';
+import {
+  createHome,
+  getHomeById,
+  resolveImageUrl,
+  updateHome,
+} from '../infrastructure/home.api';
 import { HomeTabs } from './components/HomeTabs';
 import { EditHomeGeneralTab } from './components/EditHomeGeneralTab';
 import { EditHomeDetailsTab } from './components/edit/EditHomeDetailsTab';
@@ -30,7 +35,11 @@ const tabs = ['Général', 'Détails', 'Équipements', 'Règles', 'Disponibilit�
 
 export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation("home");
-  const { homeId } = route.params;
+  const { homeId } = route.params ?? {};
+
+  // Le meme ecran sert a creer : sans identifiant, il n'y a rien a charger et
+  // l'enregistrement cree au lieu de mettre a jour.
+  const isCreating = !homeId;
     
   const [activeTab, setActiveTab] = useState('Général');
   const [home, setHome] = useState<Home | null>(null);
@@ -69,6 +78,8 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
         setToken(session.accessToken);
 
+        if (isCreating) return;
+
         const data = await getHomeById(session.accessToken, homeId);
 
         setHome(data);
@@ -92,7 +103,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     }
 
     loadHome();
-  }, [homeId]);
+  }, [homeId, isCreating]);
     
   const photos = useMemo(() => {
     return home?.photos
@@ -101,13 +112,14 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [home]);
 
   const handleSave = useCallback(async () => {
-    if (!token || !home || isSaving) return;
+    if (!token || isSaving) return;
+    if (!isCreating && !home) return;
 
     try {
       setIsSaving(true);
       setError(null);
 
-      const updatedHome = await updateHome(token, home.id, {
+      const payload = {
         title: title.trim(),
         description: description.trim(),
         capacity,
@@ -119,7 +131,22 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         carExchangeAccepted,
         isAvailableForExchange,
         pricePerNight,
-      });
+      };
+
+      if (isCreating) {
+        const created = await createHome(token, {
+          ...payload,
+          bedrooms: 1,
+          address: '',
+          city: '',
+          country: '',
+        });
+
+        navigation.replace('EditHome', { homeId: created.id });
+        return;
+      }
+
+      const updatedHome = await updateHome(token, home!.id, payload);
 
       setHome(updatedHome);
       setTitle(updatedHome.title ?? '');
@@ -134,14 +161,21 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
       setIsAvailableForExchange(updatedHome.isAvailableForExchange ?? true);
       setPricePerNight(updatedHome.pricePerNight ?? null);
     } catch (err) {
-      console.log('Update home error:', err);
-      setError('Impossible de mettre à jour le logement.');
+      console.log(isCreating ? 'Create home error:' : 'Update home error:', err);
+
+      setError(
+        isCreating
+          ? 'Impossible de créer le logement.'
+          : 'Impossible de mettre à jour le logement.',
+      );
     } finally {
       setIsSaving(false);
     }
   }, [
     token,
     home,
+    isCreating,
+    navigation,
     isSaving,
     title,
     description,

@@ -53,6 +53,12 @@ export type UserRecommendationProfile = {
 
   lastSearchLatitude: number | null;
   lastSearchLongitude: number | null;
+
+  // Ce que l'utilisateur a declare lui-meme dans ses preferences de voyage.
+  // Une declaration explicite pese plus qu'un comportement devine.
+  requiredAmenities: string[];
+  wantsCarExchange: boolean | null;
+  desiredCapacity: number | null;
 };
 
 export type RecommendationScoreDetails = {

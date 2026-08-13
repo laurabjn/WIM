@@ -34,7 +34,7 @@ import {
 } from 'react-native-safe-area-context';
 
 import { Home } from '@wim/shared/home/home.type';
-import { SwipeStackParamList } from 'src/navigation/type/swipeTabs';
+import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { getHomeById } from 'src/home/infrastructure/home.api';
 
 import { SearchResultsMap } from 'src/search/ui/components/SearchResultsMap';
@@ -54,7 +54,7 @@ const SHEET_EXPANDED = 85;
 const PHOTO_WIDTH = SCREEN_WIDTH - 36;
 
 type Props = NativeStackScreenProps<
-  SwipeStackParamList,
+  SearchStackParamList,
   'SwipeHomeDetails'
 >;
 
@@ -649,6 +649,9 @@ export function SwipeDetailHomeScreen({
               }}
             >
               <HomeReviews
+                onPressAuthor={(userId) =>
+                  navigation.navigate('PublicProfile', { userId })
+                }
                 reviews={home.reviews ?? []}
                 averageRating={home.averageRating}
                 reviewsCount={home.reviewsCount ?? 0}

@@ -29,6 +29,40 @@ export class ExchangeRepositoryPrisma {
       },
     });
 
+    // Exchange ne porte que des identifiants, sans relation vers User : on
+    // charge donc les personnes a part.
+    const partnerIds = exchanges.map((exchange) =>
+      exchange.hostId === userId ? exchange.guestId : exchange.hostId,
+    );
+
+    const partners = await this.prisma.user.findMany({
+      where: { id: { in: partnerIds } },
+      select: { id: true, firstName: true, lastName: true, avatarUrl: true },
+    });
+
+    const partnerById = new Map(partners.map((p) => [p.id, p]));
+
+    const chats = await this.prisma.chat.findMany({
+      where: {
+        AND: [
+          { participants: { some: { userId } } },
+          { participants: { some: { userId: { in: partnerIds } } } },
+        ],
+      },
+      select: {
+        id: true,
+        participants: { select: { userId: true } },
+      },
+    });
+
+    const chatByPartnerId = new Map<string, string>();
+
+    for (const chat of chats) {
+      const other = chat.participants.find((p) => p.userId !== userId);
+
+      if (other) chatByPartnerId.set(other.userId, chat.id);
+    }
+
     return exchanges.map((exchange) => ({
       id: exchange.id,
       homeId: exchange.homeId,
@@ -43,6 +77,15 @@ export class ExchangeRepositoryPrisma {
         exchange.startDate,
         exchange.endDate,
       ),
+      partner:
+        partnerById.get(
+          exchange.hostId === userId ? exchange.guestId : exchange.hostId,
+        ) ?? null,
+      isHost: exchange.hostId === userId,
+      chatId:
+        chatByPartnerId.get(
+          exchange.hostId === userId ? exchange.guestId : exchange.hostId,
+        ) ?? null,
     }));
   }
 

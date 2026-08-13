@@ -51,8 +51,33 @@ export class UserRecommendationProfileBuilder {
       ...favoriteHomes,
     ];
 
+    const preferences = (user?.travelPreferences ?? {}) as {
+      preferredCountries?: string[];
+      preferredCities?: string[];
+      preferredHomeTypes?: string[];
+      essentialAmenities?: string[];
+      minCapacity?: number | null;
+      maxCapacity?: number | null;
+      travelersCount?: number | null;
+      carExchangeAccepted?: boolean | null;
+    };
+
+    const asList = (values?: string[]) =>
+      Array.isArray(values) ? values.filter(Boolean) : [];
+
+    // Une preference declaree est repetee pour peser plus lourd qu'un logement
+    // aime au hasard d'un swipe : le poids etant une frequence, la repetition
+    // est la facon naturelle de l'exprimer.
+    const DECLARED_WEIGHT = 3;
+
+    const declared = (values?: string[]) =>
+      asList(values).flatMap((value) =>
+        Array.from({ length: DECLARED_WEIGHT }, () => value),
+      );
+
     const preferredCities =
       calculateWeightedPreferences([
+        ...declared(preferences.preferredCities),
         ...positiveHomes.map((home) => home.city),
         ...recentSearches.map(
           (search) => search.city,
@@ -64,6 +89,7 @@ export class UserRecommendationProfileBuilder {
 
     const preferredCountries =
       calculateWeightedPreferences([
+        ...declared(preferences.preferredCountries),
         ...positiveHomes.map(
           (home) => home.country,
         ),
@@ -73,16 +99,16 @@ export class UserRecommendationProfileBuilder {
       ]);
 
     const preferredHomeTypes =
-      calculateWeightedPreferences(
-        positiveHomes.map(
-          (home) => home.homeType,
-        ),
-      );
+      calculateWeightedPreferences([
+        ...declared(preferences.preferredHomeTypes),
+        ...positiveHomes.map((home) => home.homeType),
+      ]);
 
     const preferredAmenities =
-      calculateWeightedPreferences(
-        flattenAmenities(positiveHomes),
-      );
+      calculateWeightedPreferences([
+        ...declared(preferences.essentialAmenities),
+        ...flattenAmenities(positiveHomes),
+      ]);
 
     const capacities = [
       ...positiveHomes.map(
@@ -131,6 +157,18 @@ export class UserRecommendationProfileBuilder {
 
       lastSearchLongitude:
         lastSearch?.longitude ?? null,
+
+      requiredAmenities: asList(preferences.essentialAmenities).map((value) =>
+        value.normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase(),
+      ),
+
+      wantsCarExchange: preferences.carExchangeAccepted ?? null,
+
+      desiredCapacity:
+        preferences.travelersCount ??
+        preferences.minCapacity ??
+        preferences.maxCapacity ??
+        null,
     };
   }
 

@@ -34,15 +34,31 @@ export function ExchangesScreen({ navigation }: any) {
   } = useMyExchanges(token);
 
   function goToDetails(exchange: Exchange) {
-    navigation.navigate('ExchangeDetails', {
-      exchangeId: exchange.id,
-    });
+    navigation.navigate('HomeDetails', { homeId: exchange.homeId });
   }
 
   function goToMessages(exchange: Exchange) {
-    navigation.navigate('Conversation', {
-      exchangeId: exchange.id,
-    });
+    if (!exchange.chatId) return;
+
+    // La conversation vit dans l'onglet Messages : depuis la pile des
+    // echanges, il faut passer par le navigateur parent.
+    const parent = navigation.getParent?.();
+
+    if (parent) {
+      parent.navigate('MessagesTab', {
+        screen: 'Conversation',
+        params: {
+          chatId: exchange.chatId,
+          participantId: exchange.partner?.id,
+          participantName: exchange.partner?.firstName ?? '',
+          participantAvatar: exchange.partner?.avatarUrl ?? null,
+        },
+      });
+
+      return;
+    }
+
+    navigation.navigate('Conversation', { chatId: exchange.chatId });
   }
 
   if (loading) {

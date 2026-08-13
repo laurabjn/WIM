@@ -37,6 +37,7 @@ export interface HomeOwnerEntity {
 }
 
 export interface ReviewAuthorEntity {
+  id: string;
   firstName?: string | null;
   avatarUrl?: string | null;
   createdAt: Date;

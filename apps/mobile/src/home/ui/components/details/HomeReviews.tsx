@@ -9,12 +9,14 @@ type Props = {
   reviews?: Review[];
   averageRating?: number | null;
   reviewsCount?: number;
+  onPressAuthor?: (userId: string) => void;
 };
 
 export function HomeReviews({
   reviews = [],
   averageRating,
-  reviewsCount = 0
+  reviewsCount = 0,
+  onPressAuthor,
 }: Props) {
   const { t } = useTranslation('home');
   const [expandedReviewIds, setExpandedReviewIds] = useState<string[]>([]);
@@ -97,7 +99,14 @@ export function HomeReviews({
               </TouchableOpacity>
             ) : null}
 
-            <View style={styles.authorRow}>
+            <TouchableOpacity
+              style={styles.authorRow}
+              activeOpacity={0.7}
+              disabled={!onPressAuthor || !review.author?.id}
+              onPress={() =>
+                review.author?.id && onPressAuthor?.(review.author.id)
+              }
+            >
               <Image
                 source={{
                   uri:
@@ -118,7 +127,7 @@ export function HomeReviews({
                   })}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
         );
       })}
