@@ -5,10 +5,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {
-  ArrowLeft,
-  SlidersHorizontal,
-} from 'lucide-react-native';
+import { SlidersHorizontal } from 'lucide-react-native';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = {
   title: string;
@@ -23,12 +21,7 @@ export function SearchResultsHeader({
 }: Props) {
   return (
     <View style={styles.header}>
-      <TouchableOpacity
-        style={styles.iconButton}
-        onPress={onBack}
-      >
-        <ArrowLeft size={20} color="#111" />
-      </TouchableOpacity>
+      <BackButton onPress={onBack} style={styles.iconButton} />
 
       <Text style={styles.title}>{title}</Text>
 

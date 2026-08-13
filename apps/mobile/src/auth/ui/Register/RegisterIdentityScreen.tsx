@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { checkIdentityStatus } from '../../application/checkIdentityStatus.usecase';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterIdentity'>;
 
@@ -82,12 +83,7 @@ export const RegisterIdentityScreen: React.FC<Props> = ({
         <View style={styles.container}>
           <View style={styles.card}>
             <View style={styles.header}>
-              <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.backButtonText}>←</Text>
-              </TouchableOpacity>
+              <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
 
               <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
             </View>

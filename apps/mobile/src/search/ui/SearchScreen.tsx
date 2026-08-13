@@ -10,11 +10,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Calendar, SlidersHorizontal } from 'lucide-react-native';
+import { Calendar, SlidersHorizontal } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<SearchStackParamList, 'Search'>;
 
@@ -68,9 +69,10 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
       >
         <ScrollView contentContainerStyle={styles.content}>
             <View style={styles.header}>
-                <TouchableOpacity style={styles.iconButton} onPress={() => navigation.goBack()}>
-                <ArrowLeft size={20} color="#111" />
-                </TouchableOpacity>
+                <BackButton
+                  onPress={() => navigation.goBack()}
+                  style={styles.iconButton}
+                />
 
                 <Text style={styles.title}>{t("search")}</Text>
 

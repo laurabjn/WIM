@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { registerUserApi } from '../../infrastructure/api';
 import { Stepper } from '../components/Stepper';
 import { FontAwesome } from '@expo/vector-icons';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep4'>;
 
@@ -75,12 +76,7 @@ export const RegisterStep4Screen: React.FC<Props> = ({ route, navigation }) => {
             <View style={styles.container}>
                 <View style={styles.card}>
                 <View style={styles.header}>
-                    <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                    >
-                    <Text style={styles.backButtonText}>←</Text>
-                    </TouchableOpacity>
+                    <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
 
                     <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
                 </View>

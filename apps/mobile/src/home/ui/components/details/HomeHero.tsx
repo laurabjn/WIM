@@ -14,6 +14,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { Share } from 'react-native';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -63,9 +64,7 @@ export function HomeHero({ home, onBack, isFavorite, onToggleFavorite, onShare }
         </View>
       )}
 
-      <TouchableOpacity style={[styles.circleButton, styles.backButton]} onPress={onBack}>
-        <Text style={styles.icon}>‹</Text>
-      </TouchableOpacity>
+      <BackButton onPress={onBack} style={[styles.circleButton, styles.backButton]} />
 
       <View style={styles.topActions}>
         <TouchableOpacity style={styles.circleButton} onPress={onShare}>

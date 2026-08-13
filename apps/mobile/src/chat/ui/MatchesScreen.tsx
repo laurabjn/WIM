@@ -11,10 +11,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
-import { ChevronLeft } from 'lucide-react-native';
-
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { getMyMatchesApi, MatchItem } from '../infrastructure/matches.api';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = {
   navigation: {
@@ -54,13 +53,7 @@ export function MatchesScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={navigation.goBack}
-          activeOpacity={0.7}
-        >
-          <ChevronLeft size={26} color="#111111" />
-        </TouchableOpacity>
+        <BackButton onPress={navigation.goBack} style={styles.backButton} />
 
         <Text style={styles.title}>{t('matches')}</Text>
       </View>

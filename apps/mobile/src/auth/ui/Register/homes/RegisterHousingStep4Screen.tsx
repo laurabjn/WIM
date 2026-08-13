@@ -19,6 +19,7 @@ import type { HomeCategory } from '@wim/shared/home/home.type';
 import { uploadHomeImage, UploadPhoto } from 'src/auth/infrastructure/upload/uploadHomeImage';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { HomePhoto } from '@wim/shared/home/home.type';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<AuthStackParamList,'RegisterHousingStep4'>;
 
@@ -146,9 +147,10 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
         <View style={styles.container}>
           <View style={styles.card}>
             <View style={styles.header}>
-              <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                <Text style={styles.backButtonText}>←</Text>
-              </TouchableOpacity>
+              <BackButton
+                onPress={() => navigation.goBack()}
+                style={styles.backButton}
+              />
               <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
             </View>
 

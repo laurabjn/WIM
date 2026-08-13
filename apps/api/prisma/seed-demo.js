@@ -102,6 +102,20 @@ const CONVERSATIONS = [
     ],
   },
   {
+    // Trois demandes sans reponse, de pertinence differente : de quoi voir le
+    // bouton "Demandes pertinentes" trier vraiment.
+    between: ['sophie', 'yara'],
+    messages: [
+      { from: 'yara', content: 'Bonjour Sophie, votre appartement lyonnais me plairait beaucoup pour un long week-end en octobre.', daysAgo: 4 },
+    ],
+  },
+  {
+    between: ['sophie', 'tom'],
+    messages: [
+      { from: 'tom', content: 'Salut ! Un echange Nantes-Lyon te dirait ? Mon studio est libre presque tout l automne.', daysAgo: 1 },
+    ],
+  },
+  {
     between: ['marc', 'lucia'],
     messages: [
       { from: 'lucia', content: 'Bonjour Marc, votre chalet a Chamonix est magnifique. Est-il accessible en hiver sans equipement particulier ?', daysAgo: 9 },
@@ -271,6 +285,34 @@ const OWNERS = [
     bio: "Prof de plongée à Split, ma maison est face à la mer.",
     languages: ["croatian", "english"],
     rating: 5,
+  },
+  {
+    key: 'yara',
+    memberSince: new Date('2021-11-05T00:00:00.000Z'),
+    birthDate: new Date('1988-02-17T00:00:00.000Z'),
+    email: `yara${DEMO_DOMAIN}`,
+    firstName: 'Yara',
+    lastName: 'Benali',
+    avatar: avatar(31),
+    country: 'Belgique',
+    nationality: 'belge',
+    bio: "Architecte d'interieur a Gand, je pars souvent en week-end prolonge.",
+    languages: ['dutch', 'french', 'english'],
+    rating: 4,
+  },
+  {
+    key: 'tom',
+    memberSince: new Date('2023-08-21T00:00:00.000Z'),
+    birthDate: new Date('1995-12-03T00:00:00.000Z'),
+    email: `tom${DEMO_DOMAIN}`,
+    firstName: 'Tom',
+    lastName: 'Vasseur',
+    avatar: avatar(52),
+    country: 'France',
+    nationality: 'francaise',
+    bio: 'Cuisinier a Nantes, je cherche des echanges hors saison.',
+    languages: ['french'],
+    rating: 3,
   },
 ];
 
@@ -665,6 +707,58 @@ const HOMES = [
     ],
   },
 
+  {
+    owner: 'yara',
+    title: "Maison de maitre pres des quais",
+    description:
+      "Maison de ville sur trois niveaux, moulures et parquet d'origine, a cinq minutes a pied du chateau des comtes. Jardin clos a l'arriere.",
+    address: 'Sint-Baafsplein 14',
+    city: 'Gand',
+    country: 'Belgique',
+    latitude: 51.0543,
+    longitude: 3.7174,
+    capacity: 6,
+    beds: 3,
+    bedrooms: 3,
+    bathrooms: 2,
+    homeType: 'HOUSE',
+    category: 'CULTURE',
+    amenities: ['wifi', 'kitchen', 'tv', 'washingMachine', 'workspace'],
+    pricePerNight: 125,
+    averageRating: 4.4,
+    reviewsCount: 7,
+    carExchangeAccepted: false,
+    photos: [IMG.maisonModerne, IMG.salon, IMG.chambre],
+    availabilities: [
+      [15, 80],
+    ],
+  },
+  {
+    owner: 'tom',
+    title: "Studio au bord de l'Erdre",
+    description:
+      "Petit studio calme donnant sur la riviere, ideal pour deux. Velos fournis et arret de tram devant la porte.",
+    address: 'Quai de Versailles 3',
+    city: 'Nantes',
+    country: 'France',
+    latitude: 47.2270,
+    longitude: -1.5536,
+    capacity: 2,
+    beds: 1,
+    bedrooms: 1,
+    bathrooms: 1,
+    homeType: 'STUDIO',
+    category: 'CITY',
+    amenities: ['wifi', 'kitchen'],
+    pricePerNight: 65,
+    averageRating: 3.9,
+    reviewsCount: 4,
+    carExchangeAccepted: false,
+    photos: [IMG.canape, IMG.cuisine2],
+    availabilities: [
+      [5, 45],
+    ],
+  },
 ];
 
 async function main() {
@@ -695,6 +789,30 @@ async function main() {
     });
   }
   console.log(`[seed] ${OWNERS.length} comptes de démonstration prêts.`);
+
+  // Sophie declare ses gouts : sans cela l'algorithme n'a rien a exploiter et
+  // toutes les recommandations se valent. C'est aussi ce qui differencie les
+  // demandes entre elles.
+  await prisma.user.update({
+    where: { id: ownersByKey.sophie.id },
+    data: {
+      travelPreferences: {
+        preferredCountries: ['Italie', 'Portugal'],
+        preferredCities: ['Florence', 'Lisbonne'],
+        preferredHomeTypes: ['APARTMENT'],
+        essentialAmenities: ['wifi', 'workspace'],
+        minCapacity: null,
+        maxCapacity: null,
+        travelersCount: 2,
+        carExchangeAccepted: false,
+        flexibleDates: true,
+      },
+    },
+  });
+
+  console.log(
+    '[seed] Preferences de voyage de Sophie : Italie et Portugal, appartement, wifi et bureau.',
+  );
 
   const ownerIds = Object.values(ownersByKey).map((u) => u.id);
   const removed = await prisma.home.deleteMany({

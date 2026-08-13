@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
 import {
-  ArrowLeft,
+
   ArrowRight,
   Send,
   SlidersHorizontal,
@@ -23,6 +23,7 @@ import type { MyRequestListItem } from '@wim/shared';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { getRequestsApi } from '../infrastructure/chat.api';
 import { getMyMatchesApi } from '../infrastructure/matches.api';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = {
   navigation: {
@@ -81,13 +82,7 @@ export function RequestsScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.circleButton}
-          onPress={navigation.goBack}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft size={20} color="#111111" />
-        </TouchableOpacity>
+        <BackButton onPress={navigation.goBack} style={styles.circleButton} />
 
         <Text style={styles.headerTitle}>{t('requestsTitle')}</Text>
 

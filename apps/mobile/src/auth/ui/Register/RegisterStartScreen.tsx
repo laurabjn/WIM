@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../../navigation/authStack';
 import { useTranslation } from 'react-i18next';
 import { FontAwesome } from '@expo/vector-icons';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStart'>;
 
@@ -16,12 +17,7 @@ export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.container}>
         <View style={styles.card}>
           <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={styles.backButtonText}>←</Text>
-            </TouchableOpacity>
+            <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
           </View>
           
           <View style={styles.centerSection}>

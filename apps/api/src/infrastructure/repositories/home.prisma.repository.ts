@@ -71,13 +71,56 @@ export class HomeRepositoryPrisma implements HomeRepository {
     return this.mapHome(home);
   }
 
+  // Un echange de maison occupe les deux logements, mais n'en enregistre qu'un.
+  // Le proprietaire engage dans un sejour en cours a donc son logement occupe,
+  // qu'il y figure comme hote ou comme invite.
+  private async ownersWithCurrentExchange(
+    ownerIds: string[],
+  ): Promise<Set<string>> {
+    if (ownerIds.length === 0) return new Set();
+
+    const exchanges = await this.prisma.exchange.findMany({
+      where: {
+        status: 'CURRENT',
+        OR: [
+          { hostId: { in: ownerIds } },
+          { guestId: { in: ownerIds } },
+        ],
+      },
+      select: { hostId: true, guestId: true },
+    });
+
+    const busy = new Set<string>();
+
+    for (const exchange of exchanges) {
+      busy.add(exchange.hostId);
+      busy.add(exchange.guestId);
+    }
+
+    return busy;
+  }
+
+  private async withRealAvailability(
+    homes: HomeEntity[],
+  ): Promise<HomeEntity[]> {
+    const busy = await this.ownersWithCurrentExchange(
+      [...new Set(homes.map((home) => home.ownerId))],
+    );
+
+    return homes.map((home) =>
+      busy.has(home.ownerId)
+        ? { ...home, isAvailableForExchange: false }
+        : home,
+    );
+  }
+
   async findAll(): Promise<HomeEntity[]> {
     const homes = await this.prisma.home.findMany({
       include: HOME_WITH_RELATIONS_INCLUDE,
       orderBy: { createdAt: 'desc' },
     });
 
-    return homes.map((home) => this.mapHome(home));
+    return this.withRealAvailability(homes.map((home) => this.mapHome(home)));
   }
 
   async findById(id: string): Promise<HomeEntity | null> {
@@ -87,7 +130,10 @@ export class HomeRepositoryPrisma implements HomeRepository {
     });
 
     if (!home) return null;
-    return this.mapHome(home);
+
+    const [mapped] = await this.withRealAvailability([this.mapHome(home)]);
+
+    return mapped;
   }
 
   async findByOwnerId(ownerId: string): Promise<HomeEntity[]> {
@@ -97,7 +143,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
       orderBy: { createdAt: 'desc' },
     });
 
-    return homes.map((home) => this.mapHome(home));
+    return this.withRealAvailability(homes.map((home) => this.mapHome(home)));
   }
 
   async update(id: string, data: UpdateHomeRepositoryData): Promise<HomeEntity> {

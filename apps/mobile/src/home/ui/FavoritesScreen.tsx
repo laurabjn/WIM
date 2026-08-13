@@ -17,6 +17,7 @@ import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { FavoriteHomeCard } from './components/FavoriteHomeCard';
 import { addFavoriteHome, listFavoriteHomes, removeFavoriteHome } from '../infrastructure/home.api';
 import { Home } from '@wim/shared/home/home.type';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Favorites'>;
 
@@ -116,12 +117,7 @@ export function FavoritesScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerIconButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.headerIcon}>‹</Text>
-        </TouchableOpacity>
+        <BackButton onPress={() => navigation.goBack()} style={styles.headerIconButton} />
 
         <Text style={styles.headerTitle}>
           {t('favorites.title', 'Logements favoris')}

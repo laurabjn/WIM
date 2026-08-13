@@ -28,6 +28,7 @@ import { EditHomeDetailsTab } from './components/edit/EditHomeDetailsTab';
 import { EditHomeAmenitiesTab } from './components/edit/EditHomeAmenitiesTab';
 import { EditHomeRulesTab } from './components/edit/EditHomeRulesTab';
 import { EditHomeAvailabilityTab } from './components/edit/EditHomeAvailabilityTab';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<HomesStackParamList, 'EditHome'>;
 
@@ -192,7 +193,10 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (event) => {
-      if (!home || !token || isSaving) return;
+      if (!token || isSaving) return;
+      if (!isCreating && !home) return;
+      // Quitter un formulaire de creation reste vide ne doit rien creer.
+      if (isCreating && !title.trim()) return;
 
       event.preventDefault();
 
@@ -202,7 +206,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     });
 
     return unsubscribe;
-  }, [navigation, home, token, isSaving, handleSave]);
+  }, [navigation, home, token, isSaving, isCreating, title, handleSave]);
  
   if (isLoading) {
     return (
@@ -212,7 +216,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     );
   }
 
-  if (error || !home) {
+  if (error || (!isCreating && !home)) {
     return (
       <SafeAreaView style={styles.center}>
         <Text style={styles.errorText}>{error ?? t('home.not_found')}</Text>
@@ -227,9 +231,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.backIcon}>←</Text>
-          </TouchableOpacity>
+          <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
 
           <Text style={styles.headerTitle}>{t('editHomePage')}</Text>
 

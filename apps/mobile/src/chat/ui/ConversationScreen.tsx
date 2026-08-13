@@ -22,7 +22,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import {
   Camera,
-  ChevronLeft,
+
   ImageIcon,
   Info,
   Mic,
@@ -37,6 +37,7 @@ import type {
 
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import {
+  getChatsApi,
   getMessagesApi,
   markChatAsReadApi,
   sendMessageApi,
@@ -56,6 +57,7 @@ import {
   reportUserApi,
 } from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
+import { BackButton } from 'src/shared/ui/BackButton';
 import {
   formatMessageDay,
   formatMessageTime,
@@ -84,12 +86,24 @@ type Props = {
 export function ConversationScreen({ route, navigation }: Props) {
   const { t } = useTranslation('chat');
   const insets = useSafeAreaInsets();
-  const {
-    chatId,
-    participantId,
-    participantName,
-    participantAvatar,
-  } = route.params;
+  const { chatId } = route.params;
+
+  // L'ecran ne peut pas dependre de ce que l'appelant lui passe : ouvert depuis
+  // les echanges ou une notification, il n'a que l'identifiant de la
+  // conversation. Il retrouve donc lui-meme son interlocuteur.
+  const [participant, setParticipant] = useState<{
+    id?: string;
+    firstName?: string;
+    avatarUrl?: string | null;
+  }>({
+    id: route.params.participantId,
+    firstName: route.params.participantName,
+    avatarUrl: route.params.participantAvatar ?? null,
+  });
+
+  const participantId = participant.id;
+  const participantName = participant.firstName;
+  const participantAvatar = participant.avatarUrl;
 
   const [messages, setMessages] = useState<ChatMessages[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -119,6 +133,19 @@ export function ConversationScreen({ route, navigation }: Props) {
         if (!session?.accessToken || cancelled) return;
 
         setCurrentUserId(session.user?.id ?? null);
+
+        if (!route.params.participantId || !route.params.participantName) {
+          const chats = await getChatsApi(session.accessToken);
+          const current = chats.find((chat) => chat.id === chatId);
+
+          if (current?.participant && !cancelled) {
+            setParticipant({
+              id: current.participant.id,
+              firstName: current.participant.firstName,
+              avatarUrl: current.participant.avatarUrl ?? null,
+            });
+          }
+        }
 
         const stored = await AsyncStorage.getItem(translationKey(chatId));
         const wantsTranslation = stored !== 'off';
@@ -510,13 +537,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={navigation.goBack}
-          activeOpacity={0.7}
-        >
-          <ChevronLeft size={26} color="#111111" />
-        </TouchableOpacity>
+        <BackButton onPress={navigation.goBack} style={styles.headerButton} />
 
         <TouchableOpacity
           style={styles.headerIdentity}

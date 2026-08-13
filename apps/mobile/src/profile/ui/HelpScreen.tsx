@@ -19,6 +19,7 @@ import {
   type SupportTopic
 } from '../infrastructure/support.api';
 import { AuthSession, getSession } from 'src/auth/infrastructure/authStorage';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Help'>;
 
@@ -123,12 +124,7 @@ export function HelpScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerIconButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.headerIcon}>←</Text>
-          </TouchableOpacity>
+          <BackButton onPress={() => navigation.goBack()} style={styles.headerIconButton} />
 
           <Text style={styles.headerTitle}>
             {t('profile:helpScreen.title')}

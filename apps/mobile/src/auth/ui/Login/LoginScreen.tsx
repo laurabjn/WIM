@@ -18,6 +18,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesome } from '@expo/vector-icons';
 import { loginUser } from '../../application/loginUser.usecase';
 import { saveSession } from 'src/auth/infrastructure/authStorage';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -112,12 +113,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
 
             <View style={styles.card}>
               <View style={styles.header}>
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={() => navigation.goBack()}
-                >
-                  <Text style={styles.backButtonText}>←</Text>
-                </TouchableOpacity>
+                <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
               </View>
 
               <View style={styles.topSection}>

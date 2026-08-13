@@ -25,6 +25,7 @@ import { StayDurationSlider } from './components/StayDurationSlider';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Preferences'>;
 
@@ -172,12 +173,7 @@ export function PreferencesScreen({ route, navigation }: Props) {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerIconButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.headerIcon}>←</Text>
-          </TouchableOpacity>
+          <BackButton onPress={() => navigation.goBack()} style={styles.headerIconButton} />
 
           <View style={styles.headerTitleWrapper}>
             <Text style={styles.headerTitle}>

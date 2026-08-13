@@ -20,7 +20,7 @@ import {
   View,
 } from 'react-native';
 import {
-  ArrowLeft,
+
   Heart,
   Home as HomeIcon,
 } from 'lucide-react-native';
@@ -46,6 +46,7 @@ import { HomeAmenities } from 'src/home/ui/components/details/HomeAmenities';
 import { HomeReviews } from 'src/home/ui/components/details/HomeReviews';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { addFavoriteHome, listFavoriteHomes, removeFavoriteHome } from 'src/home/infrastructure/home.api';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -420,12 +421,7 @@ export function SwipeDetailHomeScreen({
       edges={['top']}
     >
       <View style={styles.header}>
-        <TouchableOpacity
-        style={styles.iconButton}
-        onPress={handleBack}
-        >
-           <ArrowLeft size={20} color="#111" />
-        </TouchableOpacity>
+        <BackButton onPress={handleBack} style={styles.iconButton} />
       </View>
 
       <SearchResultsMap

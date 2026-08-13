@@ -24,6 +24,7 @@ import { MapPin, Search, X } from 'lucide-react-native';
 import { AuthStackParamList } from 'src/navigation/authStack';
 import { Stepper } from '../../components/Stepper';
 import { SelectedAddress, AddressSuggestion, suggestAddressesApi, retrieveAddressApi } from 'src/auth/infrastructure/mapboxAdress.api';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<
   AuthStackParamList,
@@ -235,18 +236,8 @@ export const RegisterHousingStep3Screen: React.FC<Props> = ({
             <View style={styles.card}>
               <View>
                 <View style={styles.header}>
-                  <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() =>
-                      navigation.goBack()
-                    }
-                  >
-                    <Text
-                      style={styles.backButtonText}
-                    >
-                      ←
-                    </Text>
-                  </TouchableOpacity>
+                  <BackButton onPress={() =>
+                      navigation.goBack()} style={styles.backButton} />
 
                   <Text style={styles.headerTitle}>
                     {t('auth:register.title')}

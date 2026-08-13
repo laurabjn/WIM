@@ -13,6 +13,7 @@ import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { requestExchangeApi } from 'src/chat/infrastructure/exchange.api';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeMessage'>;
 
@@ -69,9 +70,7 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
-        <Text style={styles.backText}>‹</Text>
-      </TouchableOpacity>
+      <BackButton onPress={navigation.goBack} style={styles.backButton} />
 
       <View style={styles.content}>
         <Text style={styles.title}>{t("messagePlaceholder")}</Text>

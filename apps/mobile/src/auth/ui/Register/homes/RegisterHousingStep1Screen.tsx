@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stepper } from '../../components/Stepper';
 import { PickedPhoto } from '@wim/shared/home/home.type';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterHousingStep1'>;
 
@@ -85,9 +86,10 @@ export const RegisterHousingStep1Screen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.container}>
           <View style={styles.card}>
             <View style={styles.header}>
-              <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                <Text style={styles.backButtonText}>←</Text>
-              </TouchableOpacity>
+              <BackButton
+                onPress={() => navigation.goBack()}
+                style={styles.backButton}
+              />
               <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
             </View>
 

@@ -19,6 +19,7 @@ import { updateMyProfile } from '../infrastructure/profile.api';
 import { ENVIRONMENTS } from '@wim/shared/src/utils/travelOption';
 import { LANGUAGES_OPTIONS } from '../../../../../packages/shared/src/utils/languagesOptions';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'EditProfile'>;
 
@@ -136,12 +137,7 @@ export function EditProfileScreen({ route, navigation }: Props) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerIconButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.headerIcon}>←</Text>
-          </TouchableOpacity>
+          <BackButton onPress={() => navigation.goBack()} style={styles.headerIconButton} />
           
           <TouchableOpacity onPress={handleSave} disabled={isSaving}>
             <Text style={styles.headerSaveText}>

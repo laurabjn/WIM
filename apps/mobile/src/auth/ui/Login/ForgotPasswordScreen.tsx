@@ -15,6 +15,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { requestPasswordReset } from '../../application/requestPassword.usecase';
 import { AuthStackParamList } from '../../../navigation/authStack';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
 
@@ -64,13 +65,7 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.container}>
             <View style={styles.card}>
               <View style={styles.header}>
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={() => navigation.goBack()}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.backButtonText}>←</Text>
-                </TouchableOpacity>
+                <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
               </View>
 
               <View style={styles.centerSection}>

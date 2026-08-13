@@ -21,6 +21,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { uploadProfileImage } from '../../infrastructure/upload/uploadProfileImage';
 import { Stepper } from '../components/Stepper';
 import { clearSession, saveSession } from 'src/auth/infrastructure/authStorage';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep5'>;
 
@@ -138,12 +139,7 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
           <View style={styles.container}>
             <View style={styles.card}>
               <View style={styles.header}>
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={() => navigation.goBack()}
-                >
-                  <Text style={styles.backButtonText}>←</Text>
-                </TouchableOpacity>
+                <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
 
                 <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
               </View>

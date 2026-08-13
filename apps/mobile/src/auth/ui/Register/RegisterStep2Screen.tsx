@@ -18,6 +18,7 @@ import {
   COUNTRY_OPTIONS,
 } from '../../../utils/locationOptions';
 import { Stepper } from '../components/Stepper';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep2'>;
 
@@ -61,12 +62,7 @@ export const RegisterStep2Screen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.container}>
           <View style={styles.card}>
             <View style={styles.header}>
-              <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.backButtonText}>←</Text>
-              </TouchableOpacity>
+              <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
 
               <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
             </View>

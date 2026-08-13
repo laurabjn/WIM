@@ -12,7 +12,7 @@ import { AppTabsParamList } from './type/appTabs';
 import { ProfileStackNavigator } from './ProfileStack';
 import { useTranslation } from 'react-i18next';
 import { CustomTabBar } from './components/CustomTabBar';
-import { ExchangesScreen } from 'src/home/ui/ExchangesScreen';
+import { ExchangeStackNavigator } from './ExchangeStack';
 import { SearchStackNavigator } from './SearchStack';
 import { SearchOnlyStackNavigator } from './SearchOnlyStack';
 import { MessagesStackNavigator } from './MessagesStack';
@@ -64,7 +64,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
       />
       <Tab.Screen
         name="ExchangeTab"
-        component={ExchangesScreen}
+        component={ExchangeStackNavigator}
         options={{
           title: t('exchange'),
         }}

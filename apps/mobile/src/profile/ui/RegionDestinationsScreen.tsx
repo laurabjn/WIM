@@ -12,6 +12,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { REGION_DESTINATIONS } from '@wim/shared/src/utils/travelOption';
+import { BackButton } from 'src/shared/ui/BackButton';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'RegionDestinations'>;
 
@@ -78,12 +79,7 @@ export function RegionDestinationsScreen({ route, navigation }: Props) {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerIconButton}
-            onPress={handleBack}
-          >
-            <Text style={styles.headerIcon}>←</Text>
-          </TouchableOpacity>
+          <BackButton onPress={handleBack} style={styles.headerIconButton} />
 
           <Text style={styles.headerTitle}>
             {t(`profile:continent.${region}`)}
