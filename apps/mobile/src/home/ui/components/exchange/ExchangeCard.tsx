@@ -34,6 +34,10 @@ export function ExchangeCard({
       />
 
       <View style={styles.content}>
+        <Text style={styles.whose}>
+          {exchange.isHost ? t('myHome') : t('theirHome')}
+        </Text>
+
         <Text style={styles.title} numberOfLines={1}>
           {exchange.homeTitle}
         </Text>
@@ -112,6 +116,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#111111',
     marginBottom: 8,
+  },
+  whose: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+    color: '#6B7280',
+    marginBottom: 2,
   },
   partner: {
     marginTop: 2,

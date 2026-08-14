@@ -22,6 +22,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeAvailabilityBadge } from './components/details/HomeAvailabilityBadge';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { HomeLocationMap } from './components/details/HomeLocationMap';
+import { OwnerHomeStatus } from './components/details/OwnerHomeStatus';
+import { getMyExchanges } from '../infrastructure/exchange.api';
+import type { Exchange } from '@wim/shared';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'HomeDetails'>;
 
@@ -31,6 +34,8 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     
   const [home, setHome] = useState<Home | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [myExchanges, setMyExchanges] = useState<Exchange[]>([]);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +45,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         try {
             const session = await getSession();
             setToken(session?.accessToken ?? null);
+            setCurrentUserId(session?.user?.id ?? null);
             console.log('Loaded session:', session);
         } catch (error) {
             console.log('Error loading session:', error);
@@ -51,6 +57,28 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
     loadSession();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadExchanges() {
+      if (!token) return;
+
+      try {
+        const mine = await getMyExchanges(token);
+
+        if (!cancelled) setMyExchanges(mine);
+      } catch (loadError) {
+        console.log('Load exchanges error:', loadError);
+      }
+    }
+
+    loadExchanges();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
     
   useEffect(() => {
     async function loadHome() {
@@ -145,6 +173,8 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     .filter(Boolean)
     .join(', ');
     
+  const isMine = !!currentUserId && home.owner?.id === currentUserId;
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -154,6 +184,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           isFavorite={home.isFavorite ?? false}
           onToggleFavorite={toggleFavorite}
           onShare={handleShare}
+          showFavorite={!isMine}
         />
         
         <HomeSummary home={home} />
@@ -161,19 +192,34 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.content}>
           <View style={styles.separator} />
 
-          <HostSummary
-            owner={home.owner}
-            onPress={() => navigation.navigate('PublicProfile', { userId: home.owner.id })}
-          />
+          {isMine ? null : (
+            <>
+              <HostSummary
+                owner={home.owner}
+                onPress={() =>
+                  navigation.navigate('PublicProfile', { userId: home.owner.id })
+                }
+              />
 
-          <View style={styles.separator} />
-          
-          <HomeAvailabilityBadge
-            home={home}
-            onPressContact={() =>
-              navigation.navigate('ExchangeAvailability', { homeId: home.id })
-            }
-          />
+              <View style={styles.separator} />
+            </>
+          )}
+
+          {isMine ? (
+            <OwnerHomeStatus
+              availabilities={home.availabilities ?? []}
+              exchanges={myExchanges.filter(
+                (exchange) => exchange.homeId === home.id,
+              )}
+            />
+          ) : (
+            <HomeAvailabilityBadge
+              home={home}
+              onPressContact={() =>
+                navigation.navigate('ExchangeAvailability', { homeId: home.id })
+              }
+            />
+          )}
 
           <HomeDescription description={home.description} />
 

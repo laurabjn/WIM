@@ -6,11 +6,21 @@ export interface ExchangeRepository {
     firstUserId: string,
     secondUserId: string,
   ): Promise<PendingExchange | null>;
-  findById(exchangeId: string): Promise<PendingExchange | null>;
-  updateStatus(exchangeId: string, status: string): Promise<PendingExchange>;
+  // viewerId sert a savoir de quel cote se place le lecteur : sans lui,
+  // isHost vaut faux pour tout le monde.
+  findById(
+    exchangeId: string,
+    viewerId?: string,
+  ): Promise<PendingExchange | null>;
+  updateStatus(
+    exchangeId: string,
+    status: string,
+    viewerId?: string,
+  ): Promise<PendingExchange>;
   updateDates(
     exchangeId: string,
     startDate: Date,
     endDate: Date,
+    viewerId?: string,
   ): Promise<PendingExchange>;
 }

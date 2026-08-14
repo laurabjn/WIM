@@ -23,10 +23,18 @@ type Props = {
   onBack: () => void;
   isFavorite: boolean;
   onToggleFavorite: (homeId: string) => void;
+  showFavorite?: boolean;
   onShare?: () => void;
 };
 
-export function HomeHero({ home, onBack, isFavorite, onToggleFavorite, onShare }: Props) {
+export function HomeHero({
+  home,
+  onBack,
+  isFavorite,
+  onToggleFavorite,
+  onShare,
+  showFavorite = true,
+}: Props) {
   const { t } = useTranslation('home');
   const [photoIndex, setPhotoIndex] = useState(0);
 
@@ -71,11 +79,16 @@ export function HomeHero({ home, onBack, isFavorite, onToggleFavorite, onShare }
           <Text style={styles.icon}>↗</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.circleButton} onPress={() => onToggleFavorite(home.id)}>
-          <Text style={[styles.icon, isFavorite && styles.favoriteIcon]}>
-            {isFavorite ? '★' : '☆'}
-          </Text>
-        </TouchableOpacity>
+        {showFavorite ? (
+          <TouchableOpacity
+            style={styles.circleButton}
+            onPress={() => onToggleFavorite(home.id)}
+          >
+            <Text style={[styles.icon, isFavorite && styles.favoriteIcon]}>
+              {isFavorite ? '★' : '☆'}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {photos.length > 0 ? (

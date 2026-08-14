@@ -77,6 +77,11 @@ export function ExchangeBanner({
     <View style={styles.container}>
       <Text style={styles.title}>{t('exchangePending')}</Text>
 
+      <Text style={styles.home} numberOfLines={1}>
+        {exchange.isHost ? t('bannerMyHome') : t('bannerTheirHome')} ·{' '}
+        {exchange.homeTitle}
+      </Text>
+
       <Text style={styles.dates}>
         {t('exchangeFrom')} {formatDay(exchange.startDate)}{' '}
         {t('exchangeTo')} {formatDay(exchange.endDate)}
@@ -138,6 +143,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#111111',
+    textAlign: 'center',
+  },
+
+  home: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#4B5563',
     textAlign: 'center',
   },
 

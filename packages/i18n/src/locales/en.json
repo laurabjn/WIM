@@ -637,7 +637,18 @@
       "CITY": "City",
       "CULTURE": "Culture"
     },
-    "guest": "Guest"
+    "guest": "Guest",
+    "ownerAvailability": "Your available periods",
+    "ownerNoAvailability": "You have not opened any period.",
+    "ownerBlocked": "blocked",
+    "ownerExchanges": "Exchanges on this home",
+    "ownerStatus": {
+      "PENDING": "pending",
+      "FUTURE": "upcoming",
+      "CURRENT": "ongoing"
+    },
+    "myHome": "My home",
+    "theirHome": "At my host's"
   },
   "availability": {
     "when": "When are you available for exchange ?",
@@ -756,6 +767,8 @@
     "cancelExchangeConfirm": "Do you really want to cancel this exchange?",
     "cancelExchangeConfirmed": "Cancel the exchange",
     "cancelExchangeError": "The exchange could not be cancelled.",
-    "noHomeToExchange": "This person has no home to exchange."
+    "noHomeToExchange": "This person has no home to exchange.",
+    "bannerMyHome": "My home",
+    "bannerTheirHome": "At my host's"
   }
 }

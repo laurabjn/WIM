@@ -24,7 +24,7 @@ export class RespondToExchangeUseCase {
     userId: string,
     response: ExchangeResponse,
   ): Promise<PendingExchange> {
-    const exchange = await this.exchangeRepository.findById(exchangeId);
+    const exchange = await this.exchangeRepository.findById(exchangeId, userId);
 
     if (!exchange) {
       throw new NotFoundException('Échange introuvable.');
@@ -50,7 +50,7 @@ export class RespondToExchangeUseCase {
           ? 'FUTURE'
           : 'CURRENT';
 
-    return this.exchangeRepository.updateStatus(exchangeId, nextStatus);
+    return this.exchangeRepository.updateStatus(exchangeId, nextStatus, userId);
   }
 }
 
@@ -65,7 +65,7 @@ export class CancelExchangeUseCase {
     exchangeId: string,
     userId: string,
   ): Promise<PendingExchange> {
-    const exchange = await this.exchangeRepository.findById(exchangeId);
+    const exchange = await this.exchangeRepository.findById(exchangeId, userId);
 
     if (!exchange) {
       throw new NotFoundException('Echange introuvable.');
@@ -86,7 +86,7 @@ export class CancelExchangeUseCase {
       );
     }
 
-    return this.exchangeRepository.updateStatus(exchangeId, 'CANCELLED');
+    return this.exchangeRepository.updateStatus(exchangeId, 'CANCELLED', userId);
   }
 }
 
@@ -103,7 +103,7 @@ export class UpdateExchangeDatesUseCase {
     startDate: string,
     endDate: string,
   ): Promise<PendingExchange> {
-    const exchange = await this.exchangeRepository.findById(exchangeId);
+    const exchange = await this.exchangeRepository.findById(exchangeId, userId);
 
     if (!exchange) {
       throw new NotFoundException('Échange introuvable.');
@@ -132,6 +132,6 @@ export class UpdateExchangeDatesUseCase {
       );
     }
 
-    return this.exchangeRepository.updateDates(exchangeId, start, end);
+    return this.exchangeRepository.updateDates(exchangeId, start, end, userId);
   }
 }

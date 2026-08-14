@@ -160,18 +160,22 @@ export class ExchangeRepositoryPrisma {
     return exchange ? this.mapPending(exchange, firstUserId) : null;
   }
 
-  async findById(exchangeId: string): Promise<PendingExchange | null> {
+  async findById(
+    exchangeId: string,
+    viewerId?: string,
+  ): Promise<PendingExchange | null> {
     const exchange = await this.prisma.exchange.findUnique({
       where: { id: exchangeId },
       include: this.pendingInclude,
     });
 
-    return exchange ? this.mapPending(exchange) : null;
+    return exchange ? this.mapPending(exchange, viewerId) : null;
   }
 
   async updateStatus(
     exchangeId: string,
     status: string,
+    viewerId?: string,
   ): Promise<PendingExchange> {
     const exchange = await this.prisma.exchange.update({
       where: { id: exchangeId },
@@ -179,13 +183,14 @@ export class ExchangeRepositoryPrisma {
       include: this.pendingInclude,
     });
 
-    return this.mapPending(exchange);
+    return this.mapPending(exchange, viewerId);
   }
 
   async updateDates(
     exchangeId: string,
     startDate: Date,
     endDate: Date,
+    viewerId?: string,
   ): Promise<PendingExchange> {
     const exchange = await this.prisma.exchange.update({
       where: { id: exchangeId },
@@ -193,6 +198,6 @@ export class ExchangeRepositoryPrisma {
       include: this.pendingInclude,
     });
 
-    return this.mapPending(exchange);
+    return this.mapPending(exchange, viewerId);
   }
 }

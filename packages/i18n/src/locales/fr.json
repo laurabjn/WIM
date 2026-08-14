@@ -636,7 +636,18 @@
       "CITY": "Ville",
       "CULTURE": "Culture"
     },
-    "guest": "Invite"
+    "guest": "Invite",
+    "ownerAvailability": "Vos periodes de disponibilite",
+    "ownerNoAvailability": "Vous n'avez ouvert aucune periode.",
+    "ownerBlocked": "bloquee",
+    "ownerExchanges": "Echanges sur ce logement",
+    "ownerStatus": {
+      "PENDING": "en attente",
+      "FUTURE": "a venir",
+      "CURRENT": "en cours"
+    },
+    "myHome": "Mon logement",
+    "theirHome": "Chez mon hote"
   },
   "availability": {
     "when": "Quand êtes-vous disponible pour échanger ?",
@@ -755,6 +766,8 @@
     "cancelExchangeConfirm": "Voulez-vous vraiment annuler cet echange ?",
     "cancelExchangeConfirmed": "Annuler l'echange",
     "cancelExchangeError": "L'echange n'a pas pu etre annule.",
-    "noHomeToExchange": "Cette personne n'a aucun logement a echanger."
+    "noHomeToExchange": "Cette personne n'a aucun logement a echanger.",
+    "bannerMyHome": "Mon logement",
+    "bannerTheirHome": "Chez mon hote"
   }
 }
