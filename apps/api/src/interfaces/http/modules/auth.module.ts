@@ -16,6 +16,10 @@ import { PASSWORD_RESET_TOKEN } from 'src/application/auth/tokens/tokens';
 import { ResetPasswordUseCase } from 'src/application/auth/use-cases/reset-password.usecase';
 import { RequestPasswordResetUseCase } from 'src/application/auth/use-cases/request-password-reset.usecase';
 import { ConsoleEmailSender } from 'src/infrastructure/notifications/console-email.sender';
+import {
+  isSmtpConfigured,
+  NodemailerEmailSender,
+} from 'src/infrastructure/notifications/nodemailer-email.sender';
 import { IdentityModule } from './identity.module';
 import { JwtStrategy } from '../jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
@@ -38,14 +42,22 @@ const ACCESS_TOKEN_TTL = '30m';
     BcryptPasswordHasher,
     JwtPasswordResetTokenAdapter,
     ConsoleEmailSender,
+    NodemailerEmailSender,
     JwtStrategy,
     {
       provide: PASSWORD_RESET_TOKEN,
       useExisting: JwtPasswordResetTokenAdapter,
     },
     {
+      // Sans SMTP configure, les mails restent affiches dans la console : le
+      // developpement local n'a pas a dependre d'un serveur de messagerie, et
+      // la production n'a pas a se contenter d'un journal.
       provide: EMAIL_SENDER,
-      useExisting: ConsoleEmailSender,
+      useFactory: (
+        nodemailer: NodemailerEmailSender,
+        console_: ConsoleEmailSender,
+      ) => (isSmtpConfigured() ? nodemailer : console_),
+      inject: [NodemailerEmailSender, ConsoleEmailSender],
     },
     {
       provide: RequestPasswordResetUseCase,
