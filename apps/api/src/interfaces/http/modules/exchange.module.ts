@@ -13,9 +13,10 @@ import { ExchangeRepositoryPrisma } from 'src/infrastructure/repositories/exchan
 import { ChatPrismaRepository } from 'src/infrastructure/repositories/chat.prisma.repository';
 import { CHAT_REPOSITORY, EXCHANGE_REPOSITORY } from '../tokens/token';
 import { ModerationModule } from './moderation.module';
+import { WebsocketModule } from 'src/interfaces/websocket/websocket.module';
 
 @Module({
-  imports: [ModerationModule],
+  imports: [ModerationModule, WebsocketModule],
   controllers: [ExchangeController],
   providers: [
     PrismaService,

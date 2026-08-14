@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
@@ -21,6 +22,9 @@ import {
   RequestExchangeUseCase,
 } from 'src/application/exchange/use-cases/request-exchange.usecase';
 import { JwtAuthGuard } from '../jwt-auth.guard';
+import { AppGateway } from 'src/interfaces/websocket/app.gateway';
+import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
+import { CHAT_REPOSITORY } from '../tokens/token';
 
 @Controller('exchanges')
 @UseGuards(JwtAuthGuard)
@@ -32,6 +36,9 @@ export class ExchangeController {
     private readonly requestExchangeUseCase: RequestExchangeUseCase,
     private readonly updateExchangeDatesUseCase: UpdateExchangeDatesUseCase,
     private readonly cancelExchangeUseCase: CancelExchangeUseCase,
+    private readonly gateway: AppGateway,
+    @Inject(CHAT_REPOSITORY)
+    private readonly chatRepository: ChatRepository,
   ) {}
 
   @Post()
@@ -39,10 +46,36 @@ export class ExchangeController {
     @Req() req: any,
     @Body() body: Omit<RequestExchangeInput, 'requesterId'>,
   ) {
-    return this.requestExchangeUseCase.execute({
+    const result = await this.requestExchangeUseCase.execute({
       ...body,
       requesterId: req.user.sub,
     });
+
+    // Le message d'introduction etait ecrit directement en base : sans cette
+    // annonce, ni l'auteur ni le destinataire ne le voyaient arriver.
+    this.gateway.emitMessageCreated(result.chatId, result.message);
+
+    const chat = await this.chatRepository.findById(result.chatId);
+
+    for (const participant of chat?.participants ?? []) {
+      const unreadCount = await this.chatRepository.countUnreadMessages(
+        result.chatId,
+        participant.userId,
+      );
+
+      this.gateway.emitChatUpdated(participant.userId, {
+        chatId: result.chatId,
+        lastMessage: result.message,
+        unreadCount,
+      });
+
+      this.gateway.emitUnreadCount(
+        participant.userId,
+        await this.chatRepository.countAllUnreadMessages(participant.userId),
+      );
+    }
+
+    return result;
   }
 
   @Get('me')

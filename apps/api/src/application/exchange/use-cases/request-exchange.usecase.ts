@@ -6,6 +6,8 @@ import {
 
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
+import { mapMessage } from 'src/application/message/message.mapper';
+import type { ChatMessages } from '@wim/shared';
 
 export type RequestExchangeInput = {
   requesterId: string;
@@ -22,6 +24,8 @@ export type RequestExchangeInput = {
 export type RequestExchangeResult = {
   exchangeId: string;
   chatId: string;
+  // Le message d'introduction, pour que l'appelant puisse l'annoncer en direct.
+  message: ChatMessages;
 };
 
 @Injectable()
@@ -140,11 +144,21 @@ export class RequestExchangeUseCase {
         select: { id: true },
       });
 
-      await prisma.message.create({
+      const message = await prisma.message.create({
         data: {
           chatId: chat.id,
           senderId: input.requesterId,
           content,
+        },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatarUrl: true,
+            },
+          },
         },
       });
 
@@ -153,7 +167,11 @@ export class RequestExchangeUseCase {
         data: { updatedAt: new Date() },
       });
 
-      return { exchangeId: exchange.id, chatId: chat.id };
+      return {
+        exchangeId: exchange.id,
+        chatId: chat.id,
+        message: mapMessage(message),
+      };
     });
   }
 }

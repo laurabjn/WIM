@@ -20,6 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   Camera,
 
@@ -191,6 +192,56 @@ export function ConversationScreen({ route, navigation }: Props) {
       cancelled = true;
     };
   }, [chatId, t]);
+
+  // Revenir sur une conversation deja montee ne relance pas le chargement
+  // initial : sans ce rafraichissement, un message ecrit ailleurs (une demande
+  // d'echange, par exemple) n'apparaissait qu'apres etre ressorti de l'ecran.
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+
+      async function refresh() {
+        try {
+          const session = await getSession();
+
+          if (!session?.accessToken || cancelled) return;
+
+          const page = await getMessagesApi(session.accessToken, chatId, {
+            limit: PAGE_SIZE,
+            translate: translatedRef.current,
+          });
+
+          if (cancelled) return;
+
+          setParticipantLastReadAt(page.participantLastReadAt ?? null);
+
+          setMessages((current) => {
+            const connus = new Set(current.map((message) => message.id));
+
+            const nouveaux = page.messages.filter(
+              (message) => !connus.has(message.id),
+            );
+
+            if (nouveaux.length === 0) return current;
+
+            // On fusionne au lieu de remplacer : les messages plus anciens
+            // deja charges ne doivent pas disparaitre.
+            return [...nouveaux, ...current].sort(
+              (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt),
+            );
+          });
+        } catch (refreshError) {
+          console.log('Refresh messages error:', refreshError);
+        }
+      }
+
+      refresh();
+
+      return () => {
+        cancelled = true;
+      };
+    }, [chatId]),
+  );
 
   const handleIncomingMessage = useCallback(
     (payload: MessageCreatedSocketPayload) => {
