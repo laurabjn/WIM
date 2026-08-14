@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { Home } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 import {
   View,
   Text,
@@ -17,6 +20,8 @@ type Props = {
 
 export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }: Props) {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
     
   const coverUrl =
     home.photos?.[0]?.url ??
@@ -83,9 +88,10 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: c.surface,
     borderRadius: 22,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -125,7 +131,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     flex: 1,
-    color: '#1F1F1F',
+    color: c.text,
   },
   rating: {
     fontSize: 12,
@@ -134,7 +140,7 @@ const styles = StyleSheet.create({
   location: {
     marginTop: 4,
     fontSize: 12,
-    color: '#666',
+    color: c.textMuted,
   },
   details: {
     marginTop: 6,
@@ -164,6 +170,6 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
   },
 });

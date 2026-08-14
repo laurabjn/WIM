@@ -8,13 +8,50 @@ import { enableScreens } from 'react-native-screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootNavigator } from 'src/navigation/rootNavigator';
-import { ThemeProvider } from 'src/theme/ThemeContext';
+import { ThemeProvider, useAppTheme } from 'src/theme/ThemeContext';
+import { StatusBar } from 'expo-status-bar';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 
 import 'src/search/infrastructure/map/mapbox.config';
 
 enableScreens();
 
 const Stack = createNativeStackNavigator();
+
+// La coquille de navigation doit connaitre le theme : sans elle, le fond des
+// transitions entre ecrans reste blanc dans le mode sombre.
+function Coquille({
+  isAuthenticated,
+  setIsAuthenticated,
+}: {
+  isAuthenticated: boolean;
+  setIsAuthenticated: (value: boolean) => void;
+}) {
+  const { isDark, colors } = useAppTheme();
+
+  const navigationTheme = {
+    ...(isDark ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(isDark ? DarkTheme : DefaultTheme).colors,
+      background: colors.background,
+      card: colors.surface,
+      text: colors.text,
+      border: colors.border,
+      primary: colors.primary,
+    },
+  };
+
+  return (
+    <NavigationContainer theme={navigationTheme}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+
+      <RootNavigator
+        isAuthenticated={isAuthenticated}
+        setIsAuthenticated={setIsAuthenticated}
+      />
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -34,13 +71,11 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <NavigationContainer>
-            <RootNavigator
-              isAuthenticated={isAuthenticated}
-              setIsAuthenticated={setIsAuthenticated}
-            />
-            </NavigationContainer>
-          </ThemeProvider>
+          <Coquille
+            isAuthenticated={isAuthenticated}
+            setIsAuthenticated={setIsAuthenticated}
+          />
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

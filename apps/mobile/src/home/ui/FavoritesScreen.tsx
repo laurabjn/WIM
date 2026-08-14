@@ -18,11 +18,15 @@ import { FavoriteHomeCard } from './components/FavoriteHomeCard';
 import { addFavoriteHome, listFavoriteHomes, removeFavoriteHome } from '../infrastructure/home.api';
 import { Home } from '@wim/shared/home/home.type';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Favorites'>;
 
 export function FavoritesScreen({ navigation }: Props) {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [homes, setHomes] = useState<Home[]>([]);
   const [token, setToken] = useState<string | null>(null);
@@ -203,14 +207,15 @@ export function FavoritesScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
   },
   screen: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
   },
   container: {
     paddingHorizontal: 12,
@@ -219,7 +224,7 @@ const styles = StyleSheet.create({
   },
   centered: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
@@ -231,24 +236,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 6,
     paddingBottom: 10,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
   },
   headerIconButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerIcon: {
     fontSize: 16,
-    color: '#1F1F1F',
+    color: c.text,
   },
   headerTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
   },
   emptyWrapper: {
     paddingTop: 40,
@@ -262,7 +267,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 8,
     marginBottom: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 16,
     paddingVertical: 8,
     shadowColor: '#000',
@@ -278,6 +283,6 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 });

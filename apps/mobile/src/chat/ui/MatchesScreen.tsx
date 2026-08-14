@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -14,6 +14,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { getMyMatchesApi, MatchItem } from '../infrastructure/matches.api';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   navigation: {
@@ -24,6 +26,8 @@ type Props = {
 
 export function MatchesScreen({ navigation }: Props) {
   const { t } = useTranslation('chat');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [matches, setMatches] = useState<MatchItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,10 +113,11 @@ export function MatchesScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   header: {
@@ -133,7 +138,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
   },
 
   loader: {
@@ -155,7 +160,7 @@ const styles = StyleSheet.create({
     width: 78,
     height: 78,
     borderRadius: 39,
-    backgroundColor: '#F1F1F1',
+    backgroundColor: c.surfaceAlt,
   },
 
   avatarFallback: {
@@ -166,13 +171,13 @@ const styles = StyleSheet.create({
   initial: {
     fontSize: 26,
     fontWeight: '700',
-    color: '#087EBE',
+    color: c.primary,
   },
 
   name: {
     marginTop: 6,
     fontSize: 12,
-    color: '#111111',
+    color: c.text,
   },
 
   empty: {
@@ -182,6 +187,6 @@ const styles = StyleSheet.create({
 
   emptyText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 });

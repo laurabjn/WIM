@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -11,6 +11,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays } from 'lucide-react-native';
 import type { PendingExchange } from '@wim/shared';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   exchange: PendingExchange;
@@ -31,6 +33,8 @@ export function ExchangeBanner({
   onChangeDates,
 }: Props) {
   const { t } = useTranslation('chat');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [pending, setPending] = useState(false);
   const [editing, setEditing] = useState<'start' | 'end' | null>(null);
@@ -97,7 +101,7 @@ export function ExchangeBanner({
       </Text>
 
       {pending ? (
-        <ActivityIndicator style={styles.loader} color="#111111" />
+        <ActivityIndicator style={styles.loader} color={themeColors.text} />
       ) : (
         <View style={styles.actions}>
           <TouchableOpacity
@@ -113,7 +117,7 @@ export function ExchangeBanner({
             onPress={() => setEditing('start')}
             activeOpacity={0.85}
           >
-            <CalendarDays size={18} color="#111111" />
+            <CalendarDays size={18} color={themeColors.text} />
           </TouchableOpacity>
         </View>
       )}
@@ -137,21 +141,22 @@ export function ExchangeBanner({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     marginHorizontal: 14,
     marginTop: 10,
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 20,
-    backgroundColor: '#F1F1F1',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
   },
 
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
   },
 
@@ -165,7 +170,7 @@ const styles = StyleSheet.create({
   dates: {
     marginTop: 4,
     fontSize: 12,
-    color: '#087EBE',
+    color: c.primary,
     textAlign: 'center',
   },
 
@@ -185,21 +190,21 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 11,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
   },
 
   acceptText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   datesButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },

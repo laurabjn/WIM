@@ -29,6 +29,8 @@ import { EditHomeAmenitiesTab } from './components/edit/EditHomeAmenitiesTab';
 import { EditHomeRulesTab } from './components/edit/EditHomeRulesTab';
 import { EditHomeAvailabilityTab } from './components/edit/EditHomeAvailabilityTab';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<HomesStackParamList, 'EditHome'>;
 
@@ -36,6 +38,8 @@ const tabs = ['Général', 'Détails', 'Équipements', 'Règles', 'Disponibilit�
 
 export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation("home");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params ?? {};
 
   // Le meme ecran sert a creer : sans identifiant, il n'y a rien a charger et
@@ -323,17 +327,18 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     paddingHorizontal: 24,
   },
 
   errorText: {
-    color: '#DC2626',
+    color: c.danger,
     fontSize: 14,
     textAlign: 'center',
   },
@@ -346,19 +351,19 @@ const styles = StyleSheet.create({
   emptyPhotos: {
     height: 180,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   emptyPhotosText: {
-    color: '#6B7280',
+    color: c.textMuted,
     fontSize: 13,
   },
 
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   scrollContent: {
@@ -385,13 +390,13 @@ const styles = StyleSheet.create({
 
   backIcon: {
     fontSize: 18,
-    color: '#111111',
+    color: c.text,
   },
 
   headerTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   headerSpacer: {
@@ -420,11 +425,11 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   activeTabText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 
   form: {
@@ -434,7 +439,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
 
@@ -442,10 +447,10 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     marginBottom: 18,
   },
 
@@ -453,11 +458,11 @@ const styles = StyleSheet.create({
     minHeight: 145,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     marginBottom: 18,
   },
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -28,6 +28,8 @@ import {
 } from '../infrastructure/swipe.api';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { SwipeTopPreview } from './components/SwipeTopPreview';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<SearchStackParamList, 'Swipe'>;
 
@@ -51,6 +53,8 @@ function withResolvedPhotos(
 
 export function SwipeHomeScreen({ navigation, route }: Props) {
   const { t } = useTranslation(['common', 'swipe']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const position = useRef(new Animated.ValueXY()).current;
 
   const [index, setIndex] = useState(0);
@@ -216,7 +220,7 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.moreButton} onPress={openHomeDetails}>
-          <Info size={16} color="#111" />
+          <Info size={16} color={themeColors.text} />
           <Text style={styles.moreText}>{t('common:seeMore')}</Text>
         </TouchableOpacity>
 
@@ -254,10 +258,11 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
   loader: {
     marginTop: 90,
@@ -267,7 +272,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15,
     fontWeight: '700',
-    color: '#555',
+    color: c.textMuted,
     paddingHorizontal: 40,
   },
   retryButton: {
@@ -277,12 +282,12 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: c.border,
   },
   retryText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   error: {
     position: 'absolute',
@@ -291,7 +296,7 @@ const styles = StyleSheet.create({
     bottom: 115,
     textAlign: 'center',
     fontSize: 12,
-    color: '#DC2626',
+    color: c.danger,
   },
   toggleWrapper: {
     paddingHorizontal: 18,
@@ -310,7 +315,7 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 8,
@@ -325,8 +330,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 18,
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    backgroundColor: '#fff',
+    borderColor: c.border,
+    backgroundColor: c.surface,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -335,7 +340,7 @@ const styles = StyleSheet.create({
   moreText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111',
+    color: c.text,
   },
   matchOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -347,7 +352,7 @@ const styles = StyleSheet.create({
   matchCard: {
     width: '100%',
     borderRadius: 24,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     padding: 24,
     alignItems: 'center',
   },
@@ -358,7 +363,7 @@ const styles = StyleSheet.create({
   },
   matchText: {
     fontSize: 14,
-    color: '#555',
+    color: c.textMuted,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -371,7 +376,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   matchButtonText: {
-    color: '#fff',
+    color: c.onContrast,
     fontWeight: '800',
   },
 });

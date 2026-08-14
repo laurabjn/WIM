@@ -14,11 +14,15 @@ import { useTranslation } from 'react-i18next';
 import { Stepper } from '../../components/Stepper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<AuthStackParamList,'RegisterHousingStep2'>;
 
 export const RegisterHousingStep2Screen: React.FC<Props> = ({ route, navigation }) => {
   const { t } = useTranslation(['auth', 'common', 'home']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { photos } = route.params;
 
   const [description, setDescription] = useState('');
@@ -101,15 +105,16 @@ export const RegisterHousingStep2Screen: React.FC<Props> = ({ route, navigation 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   keyboardContainer: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   scrollContent: {
@@ -118,12 +123,12 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -142,7 +147,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -150,13 +155,13 @@ const styles = StyleSheet.create({
 
   backButtonText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
 
   headerTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 
   content: {
@@ -167,7 +172,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
     marginBottom: 18,
    },
@@ -175,13 +180,13 @@ const styles = StyleSheet.create({
   bioInput: {
     minHeight: 260,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 15,
     color: '#111827',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   charCount: {
@@ -208,7 +213,7 @@ const styles = StyleSheet.create({
   },
 
   primaryText: {
-    color: '#FFF',
+    color: c.onContrast,
     fontWeight: '700',
     fontSize: 16,
   },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { checkIdentityStatus } from '../../application/checkIdentityStatus.usecase';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterIdentity'>;
 
@@ -23,6 +25,8 @@ export const RegisterIdentityScreen: React.FC<Props> = ({
   navigation,
 }) => {
   const { t } = useTranslation(['auth', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { identityRedirectUrl } = route.params;
   
   const [isChecking, setIsChecking] = useState(false);
@@ -126,10 +130,11 @@ export const RegisterIdentityScreen: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   scrollContent: {
@@ -138,12 +143,12 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 40,
@@ -162,7 +167,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -170,13 +175,13 @@ const styles = StyleSheet.create({
 
   backButtonText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
 
   headerTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 
   content: {
@@ -189,7 +194,7 @@ const styles = StyleSheet.create({
   centerText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
   },
 
@@ -197,7 +202,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 12,
     lineHeight: 18,
-    color: '#6B7280',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
@@ -220,7 +225,7 @@ const styles = StyleSheet.create({
   },
 
   primaryText: {
-    color: '#FFF',
+    color: c.onContrast,
     fontWeight: '700',
     fontSize: 16,
   },

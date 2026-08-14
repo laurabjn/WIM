@@ -25,6 +25,8 @@ import { AuthStackParamList } from 'src/navigation/authStack';
 import { Stepper } from '../../components/Stepper';
 import { SelectedAddress, AddressSuggestion, suggestAddressesApi, retrieveAddressApi } from 'src/auth/infrastructure/mapboxAdress.api';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<
   AuthStackParamList,
@@ -41,6 +43,8 @@ export const RegisterHousingStep3Screen: React.FC<Props> = ({
   navigation,
   route,
 }) => {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { t } = useTranslation([
     'auth',
     'common',
@@ -324,7 +328,7 @@ export const RegisterHousingStep3Screen: React.FC<Props> = ({
                               >
                                 <MapPin
                                   size={16}
-                                  color="#111"
+                                  color={themeColors.text}
                                 />
                               </View>
 
@@ -450,15 +454,16 @@ export const RegisterHousingStep3Screen: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   keyboardContainer: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   scrollContent: {
@@ -467,13 +472,13 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   card: {
     flex: 1,
     minHeight: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -492,7 +497,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -500,13 +505,13 @@ const styles = StyleSheet.create({
 
   backButtonText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
 
   headerTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 
   content: {
@@ -517,7 +522,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
     marginBottom: 18,
   },
@@ -537,9 +542,9 @@ const styles = StyleSheet.create({
     minHeight: 52,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#EAEAEA',
+    borderColor: c.border,
     paddingHorizontal: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
@@ -549,14 +554,14 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 14,
-    color: '#111111',
+    color: c.text,
   },
 
   suggestionsBox: {
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#EBEBEB',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     overflow: 'hidden',
     elevation: 5,
     shadowColor: '#000',
@@ -582,7 +587,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -595,7 +600,7 @@ const styles = StyleSheet.create({
   suggestionName: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   suggestionAddress: {
@@ -630,18 +635,18 @@ const styles = StyleSheet.create({
     marginTop: 3,
     fontSize: 12,
     lineHeight: 17,
-    color: '#333333',
+    color: c.text,
   },
 
   coordinates: {
     marginTop: 4,
     fontSize: 10,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   errorText: {
     fontSize: 12,
-    color: '#DC2626',
+    color: c.danger,
     textAlign: 'center',
   },
 
@@ -662,7 +667,7 @@ const styles = StyleSheet.create({
   },
 
   primaryText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontWeight: '700',
     fontSize: 16,
   },

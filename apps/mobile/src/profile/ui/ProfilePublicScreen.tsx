@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -18,11 +18,15 @@ import { UserProfile } from '@wim/shared';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { listHomesByOwner } from 'src/home/infrastructure/home.api';
 import { Home } from '@wim/shared/home/home.type';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'PublicProfile'> 
 
 export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
   const { t } = useTranslation('profile'); 
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { userId } = route.params;
   const [token, setToken] = useState<string | null>(null);
 
@@ -157,7 +161,8 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: '#F7F7F7',
@@ -182,7 +187,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontSize: 16,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
   },
   homesList: {
     gap: 14,
@@ -192,18 +197,18 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
-    color: '#666',
+    color: c.textMuted,
   },
   reportCard: {
     marginTop: 16,
-    backgroundColor: '#FFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     paddingHorizontal: 16,
     paddingVertical: 18,
   },
   reportText: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: c.text,
     fontWeight: '500',
   },
 });

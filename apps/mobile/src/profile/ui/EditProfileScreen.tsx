@@ -20,11 +20,15 @@ import { ENVIRONMENTS } from '@wim/shared/src/utils/travelOption';
 import { LANGUAGES_OPTIONS } from '../../../../../packages/shared/src/utils/languagesOptions';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'EditProfile'>;
 
 export function EditProfileScreen({ route, navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { profile } = route.params;
 
   const initialPreferredEnvironments =
@@ -283,14 +287,15 @@ export function EditProfileScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
   screen: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
   container: {
     padding: 16,
@@ -306,23 +311,23 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerIcon: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
   headerTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   headerSaveText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2DA7F3',
+    color: c.info,
   },
   avatarSection: {
     alignItems: 'center',
@@ -344,14 +349,14 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: '#52D1A6',
+    backgroundColor: c.accent,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: '#FFFFFF',
   },
   avatarEditIcon: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 12,
   },
   changePhotoText: {
@@ -362,7 +367,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
     marginBottom: 10,
     marginTop: 10,
   },
@@ -374,7 +379,7 @@ const styles = StyleSheet.create({
   },
   environmentChip: {
     minWidth: '47%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#DCDCDC',
@@ -390,30 +395,30 @@ const styles = StyleSheet.create({
   environmentChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
   },
   environmentChipTextSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
   formSection: {
     marginBottom: 18,
   },
   input: {
-    backgroundColor: '#F8F8F8',
+    backgroundColor: c.surfaceAlt,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E7E7E7',
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 14,
-    color: '#111111',
+    color: c.text,
     marginBottom: 10,
   },
   bioInput: {
     minHeight: 120,
   },
   searchBox: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 22,
     paddingHorizontal: 16,
     paddingVertical: 4,
@@ -422,7 +427,7 @@ const styles = StyleSheet.create({
   searchInput: {
     height: 46,
     fontSize: 14,
-    color: '#1F1F1F',
+    color: c.text,
   },
   languagesList: {
     flexDirection: 'row',
@@ -431,7 +436,7 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   languageChip: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -439,16 +444,16 @@ const styles = StyleSheet.create({
     borderColor: '#DCDCDC',
   },
   languageChipSelected: {
-    backgroundColor: '#52D1A6',
-    borderColor: '#52D1A6',
+    backgroundColor: c.accent,
+    borderColor: c.accent,
   },
   languageChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
   },
   languageChipTextSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
   saveButtonWrapper: {
     marginTop: 4,
@@ -464,7 +469,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 14,
     fontWeight: '700',
   },

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -24,6 +24,8 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { getRequestsApi } from '../infrastructure/chat.api';
 import { getMyMatchesApi } from '../infrastructure/matches.api';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   navigation: {
@@ -34,6 +36,8 @@ type Props = {
 
 export function RequestsScreen({ navigation }: Props) {
   const { t } = useTranslation('chat');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [requests, setRequests] = useState<MyRequestListItem[]>([]);
   const [onlyRelevant, setOnlyRelevant] = useState(false);
@@ -87,7 +91,7 @@ export function RequestsScreen({ navigation }: Props) {
         <Text style={styles.headerTitle}>{t('requestsTitle')}</Text>
 
         <View style={styles.circleButton}>
-          <SlidersHorizontal size={20} color="#111111" />
+          <SlidersHorizontal size={20} color={themeColors.text} />
         </View>
       </View>
 
@@ -97,13 +101,13 @@ export function RequestsScreen({ navigation }: Props) {
         onPress={() => navigation.navigate('Matches')}
       >
         <View style={styles.matchesLeft}>
-          <Zap size={18} color="#111111" />
+          <Zap size={18} color={themeColors.text} />
           <Text style={styles.matchesLabel}>{t('matches')}</Text>
         </View>
 
         <View style={styles.matchesRight}>
           <Text style={styles.matchesCount}>{newMatches}</Text>
-          <ArrowRight size={18} color="#111111" />
+          <ArrowRight size={18} color={themeColors.text} />
         </View>
       </TouchableOpacity>
 
@@ -173,7 +177,7 @@ export function RequestsScreen({ navigation }: Props) {
           ListEmptyComponent={
             <View style={styles.empty}>
               <View style={styles.emptyIcon}>
-                <Send size={34} color="#111111" />
+                <Send size={34} color={themeColors.text} />
               </View>
 
               <Text style={styles.emptyTitle}>{t('emptyRequestsTitle')}</Text>
@@ -186,10 +190,11 @@ export function RequestsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   header: {
@@ -205,7 +210,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#D1D5DB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -213,7 +218,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   matchesRow: {
@@ -232,7 +237,7 @@ const styles = StyleSheet.create({
 
   matchesLabel: {
     fontSize: 15,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   matchesRight: {
@@ -243,7 +248,7 @@ const styles = StyleSheet.create({
 
   matchesCount: {
     fontSize: 15,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   filterRow: {
@@ -256,23 +261,23 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#FFFFFF',
+    borderColor: c.border,
+    backgroundColor: c.surface,
   },
 
   filterPillActive: {
-    borderColor: '#52D1A6',
-    backgroundColor: '#52D1A6',
+    borderColor: c.accent,
+    backgroundColor: c.accent,
   },
 
   filterLabel: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   filterLabelActive: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 
   loader: {
@@ -295,7 +300,7 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: '#F1F1F1',
+    backgroundColor: c.surfaceAlt,
   },
 
   avatarFallback: {
@@ -306,7 +311,7 @@ const styles = StyleSheet.create({
   avatarInitial: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#087EBE',
+    color: c.primary,
   },
 
   rowContent: {
@@ -317,13 +322,13 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   preview: {
     marginTop: 3,
     fontSize: 13,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   empty: {
@@ -339,7 +344,7 @@ const styles = StyleSheet.create({
     height: 96,
     borderRadius: 48,
     borderWidth: 2,
-    borderColor: '#111111',
+    borderColor: c.contrast,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 22,
@@ -348,7 +353,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 19,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
   },
 
@@ -356,7 +361,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 14,
     lineHeight: 20,
-    color: '#9CA3AF',
+    color: c.textMuted,
     textAlign: 'center',
   },
 });

@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   current: number;
@@ -7,6 +9,8 @@ type Props = {
 };
 
 export const Stepper: React.FC<Props> = ({ current, total }) => {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const steps = Array.from({ length: total }, (_, i) => i + 1);
 
   return (
@@ -38,7 +42,8 @@ export const Stepper: React.FC<Props> = ({ current, total }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -51,7 +56,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -67,6 +72,6 @@ const styles = StyleSheet.create({
   },
 
   textActive: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 });

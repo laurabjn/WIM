@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Review } from '@wim/shared';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 const COLLAPSED_LINES = 5;
 
@@ -19,6 +21,8 @@ export function HomeReviews({
   onPressAuthor,
 }: Props) {
   const { t } = useTranslation('home');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const [expandedReviewIds, setExpandedReviewIds] = useState<string[]>([]);
   const [showAll, setShowAll] = useState(false);
   const [truncatedReviewIds, setTruncatedReviewIds] = useState<string[]>([]);
@@ -188,7 +192,8 @@ function getHostYears(createdAt?: string | null) {
   return Math.max(0, now.getFullYear() - created.getFullYear());
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   section: {
     paddingHorizontal: 18,
     paddingBottom: 28,
@@ -197,12 +202,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 18,
   },
 
   emptyCard: {
-    backgroundColor: '#F8F8F8',
+    backgroundColor: c.surfaceAlt,
     borderRadius: 22,
     padding: 24,
     alignItems: 'center',
@@ -211,7 +216,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -219,12 +224,12 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 14,
     lineHeight: 22,
-    color: '#666666',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     padding: 16,
     marginBottom: 14,
@@ -243,30 +248,30 @@ const styles = StyleSheet.create({
 
   stars: {
     fontSize: 14,
-    color: '#111111',
+    color: c.text,
     fontWeight: '700',
   },
 
   dot: {
     marginHorizontal: 5,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   date: {
     fontSize: 12,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   comment: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#333333',
+    color: c.text,
   },
 
   readMore: {
     marginTop: 2,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     textDecorationLine: 'underline',
   },
 
@@ -286,13 +291,13 @@ const styles = StyleSheet.create({
   authorName: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   authorSince: {
     marginTop: 2,
     fontSize: 11,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   outlineButton: {
@@ -308,6 +313,6 @@ const styles = StyleSheet.create({
   outlineText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 });

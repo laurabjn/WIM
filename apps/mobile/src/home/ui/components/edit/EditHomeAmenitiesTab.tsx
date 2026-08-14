@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { AMENITIES } from '@wim/shared/utils/amenities';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   amenities: string[];
@@ -10,6 +12,8 @@ type Props = {
 
 export function EditHomeAmenitiesTab({ amenities, onChangeAmenities }: Props) {
   const { t } = useTranslation('home');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   function toggleAmenity(amenity: string) {
     if (amenities.includes(amenity)) {
@@ -46,14 +50,15 @@ export function EditHomeAmenitiesTab({ amenities, onChangeAmenities }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   form: {
     paddingHorizontal: 12,
   },
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 12,
   },
   grid: {
@@ -66,10 +71,10 @@ const styles = StyleSheet.create({
     minHeight: 82,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     padding: 12,
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   amenityCardSelected: {
     borderColor: '#58D6B2',
@@ -78,12 +83,12 @@ const styles = StyleSheet.create({
   amenityIcon: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   amenityText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
   amenityTextSelected: {
     color: '#159B76',

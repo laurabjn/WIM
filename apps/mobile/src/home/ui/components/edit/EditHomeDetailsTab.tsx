@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { HOME_CATEGORIES, HOME_TYPES } from '@wim/shared/src/utils/travelOption';
 import type { HomeCategory } from '@wim/shared/home/home.type';
 import { CounterRow } from '../CounterRow';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   capacity: number;
@@ -31,6 +33,8 @@ export function EditHomeDetailsTab({
   onChangeCategory,
 }: Props) {
   const { t } = useTranslation(['home', "profile"]);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   return (
     <View style={styles.form}>
@@ -102,14 +106,15 @@ export function EditHomeDetailsTab({
 
 
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   form: {
     paddingHorizontal: 12,
   },
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
   hint: {
@@ -117,7 +122,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 12,
     lineHeight: 17,
-    color: '#6B7280',
+    color: c.textMuted,
   },
   chipsRow: {
     flexDirection: 'row',
@@ -130,10 +135,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   chipSelected: {
     backgroundColor: '#58D6B2',
@@ -142,9 +147,9 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   chipTextSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 });

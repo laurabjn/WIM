@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Image,
   StyleSheet,
@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import type { Exchange } from '@wim/shared';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   exchange: Exchange;
@@ -21,6 +23,8 @@ export function ExchangeCard({
   onPressMessages,
 }: Props) {
   const { t } = useTranslation("home");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   return (
     <View style={styles.card}>
@@ -99,9 +103,10 @@ function formatDate(date: string) {
   });
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     flexDirection: 'row',
     padding: 8,
@@ -126,7 +131,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
   whose: {
@@ -134,14 +139,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.3,
     textTransform: 'uppercase',
-    color: '#6B7280',
+    color: c.textMuted,
     marginBottom: 2,
   },
   partner: {
     marginTop: 2,
     fontSize: 12,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
   iconDisabled: {
     opacity: 0.3,
@@ -164,12 +169,12 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   icon: {
     fontSize: 15,
-    color: '#111111',
+    color: c.text,
   },
 });

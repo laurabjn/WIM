@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -26,11 +26,15 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Preferences'>;
 
 export function PreferencesScreen({ route, navigation }: Props) {
   const { t } = useTranslation(['profile', 'auth']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const profileRef = useRef(route.params.profile);
   const profile = profileRef.current;
 
@@ -350,14 +354,15 @@ export function PreferencesScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
   },
   screen: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
   },
   container: {
     padding: 16,
@@ -373,7 +378,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -384,17 +389,17 @@ const styles = StyleSheet.create({
   },
   headerIcon: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
   headerTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
     marginTop: 10,
     marginBottom: 6,
   },
@@ -405,7 +410,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   searchBox: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 22,
     paddingHorizontal: 16,
     paddingVertical: 4,
@@ -414,7 +419,7 @@ const styles = StyleSheet.create({
   searchInput: {
     height: 46,
     fontSize: 14,
-    color: '#1F1F1F',
+    color: c.text,
   },
   grid: {
     flexDirection: 'row',
@@ -430,7 +435,7 @@ const styles = StyleSheet.create({
   },
   regionCard: {
     minWidth: '47%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#E2E2E2',
@@ -446,11 +451,11 @@ const styles = StyleSheet.create({
   regionCardTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
     textAlign: 'center',
   },
   regionCardTitleSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
   regionCardSubtitleSelected: {
     fontSize: 11,
@@ -468,7 +473,7 @@ const styles = StyleSheet.create({
   },
   durationCenterLabel: {
     fontSize: 13,
-    color: '#1F1F1F',
+    color: c.text,
     fontWeight: '600',
   },
   slider: {
@@ -496,7 +501,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 15,
     fontWeight: '700',
   },

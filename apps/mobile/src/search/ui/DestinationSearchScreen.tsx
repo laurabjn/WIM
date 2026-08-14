@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -30,6 +30,8 @@ import {
   saveRecentDestination,
 } from '../infrastructure/recentDestination.storage';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<
   SearchStackParamList,
@@ -40,6 +42,8 @@ export const DestinationSearchScreen: React.FC<Props> = ({
   navigation,
   route,
 }) => {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { t } = useTranslation("search")
   const [query, setQuery] = useState(
     route.params?.currentDestination ?? '',
@@ -159,7 +163,7 @@ export const DestinationSearchScreen: React.FC<Props> = ({
         }
       >
         <View style={styles.searchBox}>
-          <Search size={18} color="#111" />
+          <Search size={18} color={themeColors.text} />
 
           <TextInput
             value={query}
@@ -225,12 +229,12 @@ export const DestinationSearchScreen: React.FC<Props> = ({
                   {isSearching ? (
                     <MapPin
                       size={16}
-                      color="#111"
+                      color={themeColors.text}
                     />
                   ) : (
                     <Clock3
                       size={16}
-                      color="#111"
+                      color={themeColors.text}
                     />
                   )}
                 </View>
@@ -263,10 +267,11 @@ export const DestinationSearchScreen: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
   content: {
     flex: 1,
@@ -287,7 +292,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '600',
-    color: '#111',
+    color: c.text,
   },
   sectionHeader: {
     marginTop: 22,
@@ -298,7 +303,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#111',
+    color: c.text,
   },
   clearButton: {
     flexDirection: 'row',
@@ -325,7 +330,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -336,7 +341,7 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#111',
+    color: c.text,
   },
   itemSubtitle: {
     marginTop: 3,

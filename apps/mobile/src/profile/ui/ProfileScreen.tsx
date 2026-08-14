@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -19,6 +19,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { clearSession, getSession } from 'src/auth/infrastructure/authStorage';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { useFocusEffect } from '@react-navigation/native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,6 +28,8 @@ type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
 
 export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated, route }) => {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   
   const [token, setToken] = useState<string | null>(null);
@@ -190,7 +194,8 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: '#F7F7F7',
@@ -220,19 +225,19 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#111111',
+    borderColor: c.contrast,
   },
   addHomeText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   sectionTitle: {
     marginTop: 20,
     marginBottom: 12,
     fontSize: 16,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
   },
   homesList: {
     gap: 14,
@@ -242,6 +247,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
-    color: '#666',
+    color: c.textMuted,
   },
 });

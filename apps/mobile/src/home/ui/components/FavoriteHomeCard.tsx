@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Image,
   StyleSheet,
@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Home } from '@wim/shared/home/home.type';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   home: Home;
@@ -21,6 +23,8 @@ export function FavoriteHomeCard({
   onPressFavorite,
 }: Props) {
   const { t } = useTranslation(['home', 'profile']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
     <TouchableOpacity
       style={styles.card}
@@ -90,9 +94,10 @@ export function FavoriteHomeCard({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 22,
     overflow: 'hidden',
     marginBottom: 18,
@@ -117,7 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   favoriteIcon: {
-    color: '#1F1F1F',
+    color: c.text,
     fontSize: 16,
   },
   ownerAvatar: {
@@ -145,7 +150,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
   dotActive: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   content: {
     padding: 14,
@@ -159,7 +164,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
     flex: 1,
   },
   rating: {
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
   location: {
     marginTop: 4,
     fontSize: 12,
-    color: '#666',
+    color: c.textMuted,
   },
   details: {
     marginTop: 6,
@@ -201,12 +206,12 @@ const styles = StyleSheet.create({
   },
   badgeSeasonText: {
     fontSize: 11,
-    color: '#D88500',
+    color: c.warning,
     fontWeight: '600',
   },
   price: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
   },
 });

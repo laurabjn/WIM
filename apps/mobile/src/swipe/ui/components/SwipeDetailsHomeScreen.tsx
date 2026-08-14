@@ -47,6 +47,8 @@ import { HomeReviews } from 'src/home/ui/components/details/HomeReviews';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { addFavoriteHome, listFavoriteHomes, removeFavoriteHome } from 'src/home/infrastructure/home.api';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -69,6 +71,8 @@ export function SwipeDetailHomeScreen({
   route,
 }: Props) {
   const { t } = useTranslation("swipe");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params;
   const insets = useSafeAreaInsets();
   const cameraRef = useRef<Mapbox.Camera>(null);
@@ -665,6 +669,10 @@ function SectionTitle({
 }: {
   title: string;
 }) {
+  // Ce titre vit hors du composant principal : il lui faut sa propre palette.
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+
   return (
     <Text style={styles.sectionTitle}>
       {title}
@@ -672,10 +680,11 @@ function SectionTitle({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
     
   header: {
@@ -684,7 +693,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     zIndex: 20,
   },
 
@@ -692,7 +701,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 3,
@@ -717,7 +726,7 @@ const styles = StyleSheet.create({
     height: SCREEN_HEIGHT,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     overflow: 'hidden',
     shadowColor: '#000000',
     shadowOpacity: 0.16,
@@ -733,7 +742,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingHorizontal: 18,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   dragHandle: {
@@ -757,7 +766,7 @@ const styles = StyleSheet.create({
   sheetSmallTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   sheetInstruction: {
@@ -770,7 +779,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -817,7 +826,7 @@ const styles = StyleSheet.create({
     width: 9,
     height: 9,
     borderRadius: 4.5,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   photoCounter: {
@@ -835,7 +844,7 @@ const styles = StyleSheet.create({
   },
 
   photoCounterText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 11,
     fontWeight: '800',
   },
@@ -861,7 +870,7 @@ const styles = StyleSheet.create({
     fontSize: 23,
     lineHeight: 29,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   locationRow: {
@@ -881,7 +890,7 @@ const styles = StyleSheet.create({
     minWidth: 65,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: c.surfaceAlt,
     paddingHorizontal: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -892,7 +901,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
   },
 
   reviewText: {
@@ -930,7 +939,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 17,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   summaryLabel: {
@@ -967,7 +976,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontSize: 17,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   hostDescription: {
@@ -980,13 +989,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 21,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   description: {
     fontSize: 15,
     lineHeight: 23,
-    color: '#333333',
+    color: c.text,
   },
 
   homeTypeCard: {
@@ -1002,7 +1011,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1015,7 +1024,7 @@ const styles = StyleSheet.create({
   homeTypeTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   homeTypeSubtitle: {
@@ -1077,7 +1086,7 @@ const styles = StyleSheet.create({
   availabilityTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   availabilitySubtitle: {
@@ -1096,7 +1105,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1109,7 +1118,7 @@ const styles = StyleSheet.create({
   carTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   carSubtitle: {
@@ -1127,7 +1136,7 @@ const styles = StyleSheet.create({
     zIndex: 50,
     borderTopWidth: 1,
     borderTopColor: '#E9E9E9',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     paddingTop: 14,
     paddingHorizontal: 18,
     flexDirection: 'row',
@@ -1147,8 +1156,8 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 27,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    backgroundColor: '#FFFFFF',
+    borderColor: c.border,
+    backgroundColor: c.surface,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1158,7 +1167,7 @@ const styles = StyleSheet.create({
   dislikeButtonText: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#E74C3C',
+    color: c.danger,
   },
 
   likeButton: {
@@ -1175,13 +1184,13 @@ const styles = StyleSheet.create({
   likeButtonText: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 
   emptyContainer: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1189,13 +1198,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   emptyText: {
     marginTop: 8,
     fontSize: 14,
-    color: '#666666',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
@@ -1203,14 +1212,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     height: 46,
     borderRadius: 23,
-    backgroundColor: '#111111',
+    backgroundColor: c.contrast,
     paddingHorizontal: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   emptyButtonText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 14,
     fontWeight: '800',
   },

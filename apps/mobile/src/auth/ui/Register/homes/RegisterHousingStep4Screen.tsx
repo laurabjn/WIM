@@ -20,11 +20,15 @@ import { uploadHomeImage, UploadPhoto } from 'src/auth/infrastructure/upload/upl
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { HomePhoto } from '@wim/shared/home/home.type';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<AuthStackParamList,'RegisterHousingStep4'>;
 
 export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation(['auth', 'common', 'home']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { photos = [], description, location } = route.params;
 
   const [token, setToken] = useState<string | null>(null);
@@ -229,13 +233,14 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   sectionHint: {
     marginTop: -6,
     marginBottom: 12,
     fontSize: 12,
     lineHeight: 17,
-    color: '#6B7280',
+    color: c.textMuted,
   },
   categoriesRow: {
     flexDirection: 'row',
@@ -247,41 +252,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 19,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
-    backgroundColor: '#FFFFFF',
+    borderColor: c.border,
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   categoryChipSelected: {
-    borderColor: '#52D1A6',
-    backgroundColor: '#52D1A6',
+    borderColor: c.accent,
+    backgroundColor: c.accent,
   },
   categoryText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   categoryTextSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
   keyboardContainer: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
   scrollContent: {
     flexGrow: 1,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -298,19 +303,19 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   backButtonText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
   headerTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
   content: {
     flex: 1,
@@ -319,7 +324,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
     marginBottom: 18,
   },
@@ -340,12 +345,12 @@ const styles = StyleSheet.create({
     maxHeight: 100,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#EAEAEA',
+    borderColor: c.border,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 13,
-    color: '#111111',
-    backgroundColor: '#FFFFFF',
+    color: c.text,
+    backgroundColor: c.surface,
   },
   charCount: {
     fontSize: 11,
@@ -367,7 +372,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primaryText: {
-    color: '#FFF',
+    color: c.onContrast,
     fontWeight: '700',
     fontSize: 16,
   },

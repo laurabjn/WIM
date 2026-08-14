@@ -1,7 +1,9 @@
 import { Home } from '@wim/shared/home/home.type';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   home: Home;
@@ -10,6 +12,8 @@ type Props = {
 
 export function HomeAvailabilityBadge({ home, onPressContact }: Props) {
   const { t } = useTranslation("common");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   function getAvailabilityLabel(home: Home) {
     const availabilities = home.availabilities ?? [];
 
@@ -55,14 +59,15 @@ export function HomeAvailabilityBadge({ home, onPressContact }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   availabilityCard: {
     marginHorizontal: 12,
     marginTop: 12,
     paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 18,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: c.surfaceAlt,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -77,12 +82,12 @@ const styles = StyleSheet.create({
   availabilityIcon: {
     fontSize: 16,
     marginRight: 8,
-    color: '#111111',
+    color: c.text,
   },
 
   availabilityText: {
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     fontWeight: '500',
   },
 
@@ -97,7 +102,7 @@ const styles = StyleSheet.create({
   },
 
   contactText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontWeight: '700',
     fontSize: 13,
   },

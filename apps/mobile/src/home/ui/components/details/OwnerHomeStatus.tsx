@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { Exchange, HomeAvailability } from '@wim/shared';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   availabilities: HomeAvailability[];
@@ -28,6 +30,8 @@ function formatPeriod(startDate: string, endDate: string): string {
 // est deja engage.
 export function OwnerHomeStatus({ availabilities, exchanges }: Props) {
   const { t } = useTranslation('home');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const ouvertes = availabilities.filter(
     (availability) => availability.type === 'AVAILABLE',
@@ -95,20 +99,21 @@ export function OwnerHomeStatus({ availabilities, exchanges }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
     marginHorizontal: 12,
     marginTop: 4,
     marginBottom: 12,
     padding: 16,
     borderRadius: 18,
-    backgroundColor: '#F7F7F8',
+    backgroundColor: c.surfaceAlt,
   },
 
   title: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
     marginBottom: 10,
   },
 
@@ -118,7 +123,7 @@ const styles = StyleSheet.create({
 
   empty: {
     fontSize: 13,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   row: {
@@ -135,7 +140,7 @@ const styles = StyleSheet.create({
   },
 
   dotOpen: {
-    backgroundColor: '#52D1A6',
+    backgroundColor: c.accent,
   },
 
   dotBlocked: {
@@ -143,12 +148,12 @@ const styles = StyleSheet.create({
   },
 
   dotExchange: {
-    backgroundColor: '#2DA7F3',
+    backgroundColor: c.info,
   },
 
   rowText: {
     flex: 1,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
   },
 });

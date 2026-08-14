@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Pressable,
@@ -11,11 +11,15 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeAvailability'>;
 
 export function ExchangeAvailabilityScreen({ navigation, route }: any) {
   const { t } = useTranslation(["availability", "common"]);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params;
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<
@@ -85,10 +89,11 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     paddingHorizontal: 8,
   },
   backButton: {
@@ -104,7 +109,7 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 28,
     lineHeight: 28,
-    color: '#111111',
+    color: c.text,
   },
   content: {
     flex: 1,
@@ -116,13 +121,13 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'center',
     marginBottom: 56,
-    color: '#000000',
+    color: c.text,
   },
   option: {
     height: 56,
     borderRadius: 28,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: c.border,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 18,
@@ -134,7 +139,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   button: {
     height: 56,
@@ -148,13 +153,13 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 14,
     fontWeight: '800',
   },
   messageBox: {
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: c.border,
     borderRadius: 14,
     padding: 14,
   },
@@ -162,12 +167,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     marginBottom: 12,
-    color: '#111111',
+    color: c.text,
   },
   input: {
     minHeight: 210,
     fontSize: 13,
-    color: '#555555',
+    color: c.textMuted,
     lineHeight: 20,
   },
 });

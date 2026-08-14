@@ -1,5 +1,5 @@
 import { Home } from '@wim/shared/home/home.type';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dimensions,
   Image,
@@ -15,6 +15,8 @@ import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { Share } from 'react-native';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -36,6 +38,8 @@ export function HomeHero({
   showFavorite = true,
 }: Props) {
   const { t } = useTranslation('home');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const [photoIndex, setPhotoIndex] = useState(0);
 
   const photos = (home.photos ?? [])
@@ -100,7 +104,8 @@ export function HomeHero({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   hero: {
     height: 300,
     position: 'relative',
@@ -112,19 +117,19 @@ const styles = StyleSheet.create({
   emptyHero: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#E5E7EB',
+    backgroundColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyHeroText: {
-    color: '#6B7280',
+    color: c.textMuted,
     fontWeight: '600',
   },
   circleButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -142,7 +147,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 20,
-    color: '#111111',
+    color: c.text,
   },
   favoriteIcon: {
     color: '#F59E0B',
@@ -151,7 +156,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 14,
     bottom: 10,
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontWeight: '600',
   },
 });

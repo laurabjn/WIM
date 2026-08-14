@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -19,6 +19,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { loginUser } from '../../application/loginUser.usecase';
 import { saveSession } from 'src/auth/infrastructure/authStorage';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -34,6 +36,8 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'Login'> & {
 
 export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated }) => {
   const { t } = useTranslation(['auth', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -137,7 +141,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
                       <FontAwesome
                         name="google"
                         size={18}
-                        color="#111111"
+                        color={themeColors.text}
                         style={styles.icon}
                       />
                       <Text style={styles.socialButtonText}>
@@ -155,7 +159,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
                       <FontAwesome
                         name="apple"
                         size={20}
-                        color="#111111"
+                        color={themeColors.text}
                         style={styles.icon}
                       />
                       <Text style={styles.socialButtonText}>
@@ -251,15 +255,16 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
 
   container: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
 
   scrollContent: {
@@ -268,7 +273,7 @@ const styles = StyleSheet.create({
 
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -287,14 +292,14 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   backButtonText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
 
   topSection: {
@@ -313,7 +318,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
   },
 
@@ -333,7 +338,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: '#E4E4E4',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -351,7 +356,7 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 
   formSection: {
@@ -362,12 +367,12 @@ const styles = StyleSheet.create({
     height: 46,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     paddingHorizontal: 16,
     marginBottom: 12,
     fontSize: 14,
-    color: '#111111',
-    backgroundColor: '#FFFFFF',
+    color: c.text,
+    backgroundColor: c.surface,
   },
 
   forgotPasswordWrapper: {
@@ -378,7 +383,7 @@ const styles = StyleSheet.create({
 
   forgotPasswordText: {
     fontSize: 13,
-    color: '#6B7280',
+    color: c.textMuted,
     fontWeight: '500',
     textDecorationLine: 'underline',
   },
@@ -386,7 +391,7 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 10,
     fontSize: 12,
-    color: '#DC2626',
+    color: c.danger,
     textAlign: 'center',
   },
 
@@ -411,7 +416,7 @@ const styles = StyleSheet.create({
   primaryText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 
   passwordWrapper: {
@@ -424,12 +429,12 @@ const styles = StyleSheet.create({
     height: 46,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     paddingHorizontal: 16,
     paddingRight: 46,
     fontSize: 14,
-    color: '#111111',
-    backgroundColor: '#FFFFFF',
+    color: c.text,
+    backgroundColor: c.surface,
   },
 
   eyeButton: {

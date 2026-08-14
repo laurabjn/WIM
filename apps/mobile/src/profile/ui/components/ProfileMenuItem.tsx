@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   label: string;
@@ -8,6 +10,8 @@ type Props = {
 };
 
 export function ProfileMenuItem({ label, icon = '•', onPress }: Props) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
     <TouchableOpacity style={styles.item} onPress={onPress}>
       <View style={styles.left}>
@@ -19,9 +23,10 @@ export function ProfileMenuItem({ label, icon = '•', onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   item: {
-    backgroundColor: '#FFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     paddingHorizontal: 16,
     paddingVertical: 16,
@@ -42,7 +47,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: c.text,
     fontWeight: '500',
   },
   arrow: {

@@ -18,6 +18,7 @@ import {
 } from '../infrastructure/settingsStorage';
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { clearSession } from 'src/auth/infrastructure/authStorage';
+import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
 
@@ -25,7 +26,10 @@ export function SettingsScreen({ route, navigation }: Props) {
   const { t, i18n } = useTranslation(['profile', 'common', 'auth']);
   const { profile } = route.params;
 
-  const [theme, setTheme] = useState<AppTheme>('system');
+  // Le theme vient du fournisseur : ecrire dans le stockage sans le prevenir
+  // enregistrait le choix sans jamais l'appliquer.
+  const { theme, setAppTheme } = useAppTheme();
+  const colors = useThemeColors();
 
   // Rien n'etait charge ni enregistre : chaque reglage revenait a sa valeur par
   // defaut au retour sur l'ecran.
@@ -37,7 +41,6 @@ export function SettingsScreen({ route, navigation }: Props) {
 
       if (cancelled) return;
 
-      setTheme(enregistres.theme);
       setPushNotifications(enregistres.pushNotifications);
       setSmsNotifications(enregistres.smsNotifications);
       setNewMessages(enregistres.newMessages);
@@ -157,15 +160,15 @@ export function SettingsScreen({ route, navigation }: Props) {
     Alert.alert(t('profile:settings.theme'), '', [
       {
         text: t('profile:settings.themeLight', 'Clair'),
-        onPress: () => enregistrerLocal('theme', 'light', setTheme),
+        onPress: () => setAppTheme('light'),
       },
       {
         text: t('profile:settings.themeDark', 'Sombre'),
-        onPress: () => enregistrerLocal('theme', 'dark', setTheme),
+        onPress: () => setAppTheme('dark'),
       },
       {
         text: t('profile:settings.themeSystem', 'Système'),
-        onPress: () => enregistrerLocal('theme', 'system', setTheme),
+        onPress: () => setAppTheme('system'),
       },
       { text: t('common:cancel'), style: 'cancel' },
     ]);
@@ -227,8 +230,14 @@ export function SettingsScreen({ route, navigation }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: colors.screen }]}
+      edges={['top', 'bottom']}
+    >
+      <ScrollView
+        style={[styles.screen, { backgroundColor: colors.screen }]}
+        contentContainerStyle={styles.container}
+      >
         <SettingsSection title={t('profile:settings.account')}>
           <SettingsRow
             icon="◎"

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   carExchangeAccepted: boolean;
@@ -12,6 +14,8 @@ export function EditHomeRulesTab({
   onChangeCarExchangeAccepted,
 }: Props) {
   const { t } = useTranslation('home');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   return (
     <View style={styles.form}>
@@ -38,21 +42,22 @@ export function EditHomeRulesTab({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   form: {
     paddingHorizontal: 12,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 12,
   },
   row: {
     minHeight: 72,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
@@ -65,12 +70,12 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   description: {
     marginTop: 4,
     fontSize: 12,
     lineHeight: 17,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 });

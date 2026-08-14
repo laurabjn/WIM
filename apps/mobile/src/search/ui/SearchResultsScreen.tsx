@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import React, {
   useCallback,
   useEffect,
@@ -22,6 +23,8 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { SearchResultsHeader } from './components/SearchResultsHeader';
 import { SearchResultsSheet } from './components/SearchResultsSheet';
 import { SearchResultsMap } from './components/SearchResultsMap';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<
   SearchStackParamList,
@@ -36,6 +39,8 @@ export const SearchResultsScreen: React.FC<Props> = ({
   navigation,
   route,
 }) => {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { city, capacity, startDate, endDate, category } = route.params ?? {};
 
   const [homes, setHomes] = useState<Home[]>([]);
@@ -195,9 +200,10 @@ export const SearchResultsScreen: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
 });

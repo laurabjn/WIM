@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -16,11 +16,15 @@ import { listMyHomes } from 'src/home/infrastructure/home.api';
 import type { Home } from '@wim/shared/home/home.type';
 import { requestExchangeApi } from 'src/chat/infrastructure/exchange.api';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeMessage'>;
 
 export function ExchangeMessageScreen({ navigation, route }: any) {
   const { t } = useTranslation("contact");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
   const { homeId } = route.params;
     
@@ -170,10 +174,11 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     paddingHorizontal: 8,
   },
   backButton: {
@@ -189,7 +194,7 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 28,
     lineHeight: 28,
-    color: '#111111',
+    color: c.text,
   },
   content: {
     flex: 1,
@@ -201,13 +206,13 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'center',
     marginBottom: 56,
-    color: '#000000',
+    color: c.text,
   },
   option: {
     height: 56,
     borderRadius: 28,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: c.border,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 18,
@@ -219,7 +224,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   button: {
     height: 56,
@@ -233,7 +238,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 14,
     fontWeight: '800',
   },
@@ -245,7 +250,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 12,
     lineHeight: 17,
-    color: '#6B7280',
+    color: c.textMuted,
   },
   offerRow: {
     flexDirection: 'row',
@@ -255,11 +260,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     marginBottom: 8,
   },
   offerRowSelected: {
-    borderColor: '#52D1A6',
+    borderColor: c.accent,
     backgroundColor: '#F2FBF8',
   },
   radio: {
@@ -267,20 +272,20 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: c.border,
   },
   radioSelected: {
-    borderColor: '#52D1A6',
-    backgroundColor: '#52D1A6',
+    borderColor: c.accent,
+    backgroundColor: c.accent,
   },
   offerText: {
     flex: 1,
     fontSize: 14,
-    color: '#111111',
+    color: c.text,
   },
   messageBox: {
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: c.border,
     borderRadius: 14,
     padding: 14,
   },
@@ -288,12 +293,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     marginBottom: 12,
-    color: '#111111',
+    color: c.text,
   },
   input: {
     minHeight: 210,
     fontSize: 13,
-    color: '#555555',
+    color: c.textMuted,
     lineHeight: 20,
   },
 });

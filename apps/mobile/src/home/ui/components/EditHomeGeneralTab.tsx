@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   title: string;
@@ -30,6 +32,8 @@ export function EditHomeGeneralTab({
   onChangeCountry,
 }: Props) {
   const { t } = useTranslation('home');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   return (
     <View style={styles.form}>
@@ -125,35 +129,36 @@ export function EditHomeGeneralTab({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   form: {
     paddingHorizontal: 12,
   },
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
   input: {
     height: 48,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     marginBottom: 18,
   },
   textarea: {
     minHeight: 145,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     marginBottom: 18,
   },
   row: {
@@ -172,7 +177,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 185,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
   },
   smallPhotosColumn: {
     width: 118,
@@ -182,23 +187,23 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 88.5,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
   },
   fullPhoto: {
     width: '100%',
     height: 245,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
   },
   emptyPhotos: {
     height: 180,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyPhotosText: {
-    color: '#6B7280',
+    color: c.textMuted,
     fontSize: 13,
   },
 });

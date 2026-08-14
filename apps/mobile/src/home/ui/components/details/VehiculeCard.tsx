@@ -1,7 +1,9 @@
 import { Vehicule } from '@wim/shared/home/home.type';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   vehicle?: Vehicule | null;
@@ -9,6 +11,8 @@ type Props = {
 
 export const VehicleCard: React.FC<Props> = ({ vehicle }) => {
   const { t } = useTranslation("home");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   if (!vehicle) return null;
 
   const vehicleName = [vehicle.brand, vehicle.model].filter(Boolean).join(' ');
@@ -67,10 +71,11 @@ export const VehicleCard: React.FC<Props> = ({ vehicle }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     padding: 10,
     gap: 12,
@@ -85,7 +90,7 @@ const styles = StyleSheet.create({
     width: 92,
     height: 72,
     borderRadius: 14,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -93,7 +98,7 @@ const styles = StyleSheet.create({
 
   fuelType: {
     fontSize: 12,
-    color: '#6B7280',
+    color: c.textMuted,
     marginTop: 4,
   },
 
@@ -107,7 +112,7 @@ const styles = StyleSheet.create({
     width: 90,
     height: 70,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -125,13 +130,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 6,
   },
 
   text: {
     fontSize: 12,
-    color: '#333333',
+    color: c.text,
     marginBottom: 2,
   },
 });

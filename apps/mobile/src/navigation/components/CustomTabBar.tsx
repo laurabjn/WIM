@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,16 @@ import {
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 export function CustomTabBar({
   state,
   descriptors,
   navigation,
 }: BottomTabBarProps) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const currentRouteName = state.routes[state.index]?.name;
 
   function navigateTo(routeName: string) {
@@ -59,7 +63,7 @@ export function CustomTabBar({
               <Ionicons
                 name={isHomeFocused ? 'home' : 'home-outline'}
                 size={18}
-                color="#1F1F1F"
+                color={themeColors.text}
               />
             </View>
           </TouchableOpacity>
@@ -73,7 +77,7 @@ export function CustomTabBar({
               <Ionicons
                 name={isExchangeFocused ? 'swap-horizontal' : 'swap-horizontal-outline'}
                 size={15}
-                color="#1F1F1F"
+                color={themeColors.text}
               />
             </View>
           </TouchableOpacity>
@@ -86,7 +90,7 @@ export function CustomTabBar({
             <Ionicons
               name={isSearchFocused ? 'search' : 'search-outline'}
               size={16}
-              color="#1F1F1F"
+              color={themeColors.text}
               style={styles.searchIcon}
             />
             <Text style={styles.searchText} numberOfLines={1}>
@@ -103,7 +107,7 @@ export function CustomTabBar({
               <Ionicons
                 name={isMessagesFocused ? 'chatbubbles' : 'chatbubbles-outline'}
                 size={17}
-                color="#1F1F1F"
+                color={themeColors.text}
               />
             </View>
           </TouchableOpacity>
@@ -117,7 +121,7 @@ export function CustomTabBar({
               <Ionicons
                 name={isProfileFocused ? 'person' : 'person-outline'}
                 size={18}
-                color="#1F1F1F"
+                color={themeColors.text}
               />
             </View>
           </TouchableOpacity>
@@ -127,7 +131,8 @@ export function CustomTabBar({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     position: 'absolute',
     left: 0,
@@ -160,7 +165,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -176,7 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: '#E8E8E8',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -194,7 +199,7 @@ const styles = StyleSheet.create({
   searchText: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#1F1F1F',
+    color: c.text,
     maxWidth: 72,
   },
 });

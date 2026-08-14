@@ -20,6 +20,8 @@ import {
 } from '../infrastructure/support.api';
 import { AuthSession, getSession } from 'src/auth/infrastructure/authStorage';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Help'>;
 
@@ -36,6 +38,8 @@ type HelpTopic = SupportTopic;
 
 export function HelpScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [session, setSession] = useState<AuthSession | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -246,14 +250,15 @@ export function HelpScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
   screen: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
   container: {
     padding: 16,
@@ -269,25 +274,25 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerIcon: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
   headerTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   headerPlaceholder: {
     width: 36,
     height: 36,
   },
   introCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 20,
     padding: 16,
     marginBottom: 18,
@@ -295,7 +300,7 @@ const styles = StyleSheet.create({
   introTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 6,
   },
   introText: {
@@ -306,7 +311,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
     marginBottom: 10,
     marginTop: 10,
   },
@@ -318,7 +323,7 @@ const styles = StyleSheet.create({
   },
   topicChip: {
     minWidth: '47%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#DCDCDC',
@@ -334,14 +339,14 @@ const styles = StyleSheet.create({
   topicChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
     textAlign: 'center',
   },
   topicChipTextSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
   contactCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 20,
     padding: 16,
     marginBottom: 18,
@@ -349,7 +354,7 @@ const styles = StyleSheet.create({
   contactTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 10,
   },
   contactRow: {
@@ -362,18 +367,18 @@ const styles = StyleSheet.create({
   },
   contactValue: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: c.text,
     fontWeight: '500',
   },
   input: {
-    backgroundColor: '#F8F8F8',
+    backgroundColor: c.surfaceAlt,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E7E7E7',
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 14,
-    color: '#111111',
+    color: c.text,
     marginBottom: 10,
   },
   textArea: {
@@ -393,7 +398,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   sendButtonText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 14,
     fontWeight: '700',
   },

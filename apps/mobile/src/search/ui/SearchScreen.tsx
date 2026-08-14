@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     ScrollView,
   StyleSheet,
@@ -16,11 +16,15 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<SearchStackParamList, 'Search'>;
 
 export const SearchScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation("search");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -77,7 +81,7 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
                 <Text style={styles.title}>{t("search")}</Text>
 
                 <TouchableOpacity style={styles.iconButton}>
-                <SlidersHorizontal size={18} color="#111" />
+                <SlidersHorizontal size={18} color={themeColors.text} />
                 </TouchableOpacity>
             </View>
 
@@ -185,10 +189,11 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     paddingHorizontal: 8,
   },
   content: {
@@ -198,12 +203,12 @@ const styles = StyleSheet.create({
   },
   inputText: {
     fontSize: 13,
-    color: '#111',
+    color: c.text,
   },
   dateText: {
     flex: 1,
     fontSize: 12,
-    color: '#111',
+    color: c.text,
   },
   placeholderText: {
     color: '#D0D0D0',
@@ -218,7 +223,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 2,
@@ -242,7 +247,7 @@ const styles = StyleSheet.create({
     borderColor: '#EFEFEF',
     paddingHorizontal: 16,
     fontSize: 13,
-    color: '#111',
+    color: c.text,
   },
   row: {
     flexDirection: 'row',
@@ -261,7 +266,7 @@ const styles = StyleSheet.create({
   dateTextInput: {
     flex: 1,
     fontSize: 12,
-    color: '#111',
+    color: c.text,
   },
   searchButton: {
     position: 'absolute',
@@ -275,7 +280,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   searchButtonText: {
-    color: '#fff',
+    color: c.onContrast,
     fontSize: 13,
     fontWeight: '800',
   },

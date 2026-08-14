@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterWelcome'> & {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,6 +21,8 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterWelcome'> & {
 
 export const RegisterWelcomeScreen: React.FC<Props> = ({ navigation, setIsAuthenticated }) => {
   const { t } = useTranslation(['auth', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   function handleGuidedTour() {
     // TODO : plus tard tu feras une vraie visite guidée
@@ -84,10 +88,11 @@ export const RegisterWelcomeScreen: React.FC<Props> = ({ navigation, setIsAuthen
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
 
   scrollContent: {
@@ -96,7 +101,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
 
   stepLabel: {
@@ -110,7 +115,7 @@ const styles = StyleSheet.create({
 
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 40,
@@ -134,7 +139,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
   },
 
@@ -148,7 +153,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: '#E4E4E4',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -156,7 +161,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 
   buttonWrapper: {
@@ -174,6 +179,6 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 });

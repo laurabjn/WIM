@@ -13,11 +13,15 @@ import { useTranslation } from 'react-i18next';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { REGION_DESTINATIONS } from '@wim/shared/src/utils/travelOption';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'RegionDestinations'>;
 
 export function RegionDestinationsScreen({ route, navigation }: Props) {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { profile, region, selectedItems } = route.params;
 
   const [search, setSearch] = useState('');
@@ -136,14 +140,15 @@ export function RegionDestinationsScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
   },
   screen: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
   },
   container: {
     padding: 16,
@@ -159,18 +164,18 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerIcon: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
   headerTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   headerPlaceholder: {
     width: 36,
@@ -179,7 +184,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
     marginBottom: 6,
   },
   sectionSubtitle: {
@@ -189,7 +194,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   searchBox: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 22,
     paddingHorizontal: 16,
     paddingVertical: 4,
@@ -198,7 +203,7 @@ const styles = StyleSheet.create({
   searchInput: {
     height: 46,
     fontSize: 14,
-    color: '#1F1F1F',
+    color: c.text,
   },
   chipsWrapper: {
     flexDirection: 'row',
@@ -206,7 +211,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   destinationChip: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#DCDCDC',
@@ -220,9 +225,9 @@ const styles = StyleSheet.create({
   destinationChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
   },
   destinationChipTextSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 });

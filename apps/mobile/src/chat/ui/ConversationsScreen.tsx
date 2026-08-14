@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -23,6 +23,8 @@ import { getChatsApi } from '../infrastructure/chat.api';
 import { connectChatSocket } from '../infrastructure/chatSocket';
 import { usePresence } from '../hooks/usePresence';
 import { formatRelativeDate } from '../utils/formatRelativeDate';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   navigation: {
@@ -32,6 +34,8 @@ type Props = {
 
 export function ConversationsScreen({ navigation }: Props) {
   const { t } = useTranslation('chat');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [chats, setChats] = useState<MyChatListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -300,16 +304,17 @@ export function ConversationsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
     paddingHorizontal: 18,
     paddingTop: 8,
     paddingBottom: 12,
@@ -322,18 +327,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: c.border,
   },
 
   matchesLabel: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   matchesCount: {
     fontSize: 18,
-    color: '#9CA3AF',
+    color: c.textMuted,
   },
 
   // Un ScrollView naît avec flexGrow: 1 : sans cette bride, celui des statuts
@@ -357,19 +362,19 @@ const styles = StyleSheet.create({
     width: 62,
     height: 62,
     borderRadius: 31,
-    backgroundColor: '#F1F1F1',
+    backgroundColor: c.surfaceAlt,
   },
 
   statusAvatarOwn: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: c.border,
     borderStyle: 'dashed',
   },
 
   statusLabel: {
     marginTop: 6,
     fontSize: 11,
-    color: '#374151',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
@@ -384,13 +389,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   requestsLink: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#087EBE',
+    color: c.primary,
   },
 
   loader: {
@@ -413,7 +418,7 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: '#F1F1F1',
+    backgroundColor: c.surfaceAlt,
   },
 
   onlineDot: {
@@ -423,7 +428,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#22C55E',
+    backgroundColor: c.success,
     borderWidth: 2,
     borderColor: '#FFFFFF',
   },
@@ -436,7 +441,7 @@ const styles = StyleSheet.create({
   avatarInitial: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#087EBE',
+    color: c.primary,
   },
 
   rowContent: {
@@ -454,7 +459,7 @@ const styles = StyleSheet.create({
   name: {
     flex: 1,
     fontSize: 15,
-    color: '#111111',
+    color: c.text,
   },
 
   nameUnread: {
@@ -463,7 +468,7 @@ const styles = StyleSheet.create({
 
   date: {
     fontSize: 12,
-    color: '#8A8A8A',
+    color: c.textMuted,
   },
 
   rowFooter: {
@@ -476,11 +481,11 @@ const styles = StyleSheet.create({
   preview: {
     flex: 1,
     fontSize: 13,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   previewUnread: {
-    color: '#111111',
+    color: c.text,
     fontWeight: '600',
   },
 
@@ -489,13 +494,13 @@ const styles = StyleSheet.create({
     height: 20,
     paddingHorizontal: 6,
     borderRadius: 10,
-    backgroundColor: '#087EBE',
+    backgroundColor: c.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   badgeText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 11,
     fontWeight: '800',
   },
@@ -510,7 +515,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
   },
 
@@ -518,7 +523,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     lineHeight: 21,
-    color: '#6B7280',
+    color: c.textMuted,
     textAlign: 'center',
   },
 });

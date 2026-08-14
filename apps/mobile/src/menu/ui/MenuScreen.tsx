@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -25,11 +25,15 @@ import { searchHomesApi } from 'src/home/infrastructure/searchHome.api';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { SearchToggle } from './components/SearchToggle';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<SearchStackParamList,'Menu'>;
 
 export function MenuScreen({ navigation }: Props) {
   const { t } = useTranslation(['search', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
     
   type CategoryFilter = 'ALL' | 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
 
@@ -229,10 +233,11 @@ export function MenuScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
   content: {
     paddingTop: 8,
@@ -261,7 +266,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
   heroCard: {
     height: 180,
@@ -280,7 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.15)',
   },
   heroTitle: {
-    color: '#fff',
+    color: c.onContrast,
     fontSize: 36,
     fontWeight: '900',
     lineHeight: 36,
@@ -291,12 +296,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   smallLabel: {
-    color: '#fff',
+    color: c.onContrast,
     fontSize: 10,
     fontWeight: '600',
   },
   exchangeCount: {
-    color: '#fff',
+    color: c.onContrast,
     fontSize: 36,
     fontWeight: '900',
   },
@@ -311,11 +316,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   heroButtonText: {
-    color: '#fff',
+    color: c.onContrast,
     fontWeight: '700',
   },
   arrow: {
-    color: '#fff',
+    color: c.onContrast,
     fontSize: 18,
   },
   sectionTitle: {
@@ -331,7 +336,7 @@ const styles = StyleSheet.create({
   recentCard: {
     height: 95,
     borderRadius: 16,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     marginBottom: 12,
     flexDirection: 'row',
     overflow: 'hidden',
@@ -366,7 +371,7 @@ const styles = StyleSheet.create({
     left: 10,
     right: 10,
     height: 58,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     borderRadius: 30,
     flexDirection: 'row',
     alignItems: 'center',
@@ -381,7 +386,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     borderRadius: 24,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -395,7 +400,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   headerTextActive: {
-    color: '#000',
+    color: c.text,
     fontWeight: '700',
   },
   toggleCircleActive: {

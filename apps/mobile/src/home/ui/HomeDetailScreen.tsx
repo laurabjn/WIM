@@ -1,5 +1,5 @@
 import { Home } from '@wim/shared/home/home.type';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ScrollView,
@@ -25,11 +25,15 @@ import { HomeLocationMap } from './components/details/HomeLocationMap';
 import { OwnerHomeStatus } from './components/details/OwnerHomeStatus';
 import { getMyExchanges } from '../infrastructure/exchange.api';
 import type { Exchange } from '@wim/shared';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'HomeDetails'>;
 
 export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { t } = useTranslation(["home", "profile", "common"]);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params;
     
   const [home, setHome] = useState<Home | null>(null);
@@ -254,10 +258,11 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   center: {
     flex: 1,
@@ -282,7 +287,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -300,18 +305,18 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 20,
-    color: '#111111',
+    color: c.text,
   },
   imageCounter: {
     position: 'absolute',
     right: 14,
     bottom: 10,
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontWeight: '600',
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   content: {
     padding: 18,
@@ -319,28 +324,28 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 13,
-    color: '#6B7280',
+    color: c.textMuted,
     marginBottom: 4,
   },
   meta: {
     fontSize: 13,
-    color: '#6B7280',
+    color: c.textMuted,
     marginBottom: 10,
   },
   rating: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
     marginBottom: 12,
   },
   separator: {
     height: 1,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: c.border,
     marginVertical: 28,
   },
   hostRow: {
@@ -359,44 +364,44 @@ const styles = StyleSheet.create({
   hostName: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   hostSince: {
     fontSize: 12,
-    color: '#6B7280',
+    color: c.textMuted,
   },
   hostRating: {
     alignItems: 'center',
   },
   star: {
     fontSize: 18,
-    color: '#111111',
+    color: c.text,
   },
   hostScore: {
     fontSize: 22,
-    color: '#111111',
+    color: c.text,
   },
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 12,
   },
   description: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#333333',
+    color: c.text,
   },
   price: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginTop: 14,
   },
   contactButton: {
     marginTop: 12,
     alignSelf: 'flex-end',
-    backgroundColor: '#52D1A6',
+    backgroundColor: c.accent,
     paddingHorizontal: 28,
     height: 48,
     borderRadius: 24,
@@ -404,13 +409,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   contactText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontWeight: '700',
   },
   carCard: {
     marginTop: 16,
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 16,
     padding: 10,
     gap: 12,
@@ -434,24 +439,24 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 15,
-    color: '#111111',
+    color: c.text,
   },
   outlineButton: {
     marginTop: 16,
     height: 34,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   outlineText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
   reviewCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     padding: 16,
     shadowColor: '#000',
@@ -463,7 +468,7 @@ const styles = StyleSheet.create({
   reviewStars: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
   reviewUser: {
@@ -479,6 +484,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
 });

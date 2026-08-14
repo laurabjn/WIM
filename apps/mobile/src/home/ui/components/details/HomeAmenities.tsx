@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,6 +6,8 @@ import {
   View,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 import {
   Dog,
   Palmtree,
@@ -52,6 +54,8 @@ export function HomeAmenities({
   amenities,
 }: Props) {
   const { t } = useTranslation('home');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 console.log(amenities)
   const [showAll, setShowAll] =
     useState(false);
@@ -101,7 +105,7 @@ console.log(amenities)
                       {Icon ? (
                         <Icon
                           size={26}
-                          color="#111111"
+                          color={themeColors.text}
                         />
                       ) : (
                         <Text
@@ -180,7 +184,8 @@ console.log(amenities)
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   section: {
     paddingHorizontal: 18,
   },
@@ -189,7 +194,7 @@ const styles = StyleSheet.create({
     marginBottom: 22,
     fontSize: 17,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   featuresGrid: {
@@ -209,14 +214,14 @@ const styles = StyleSheet.create({
 
   fallbackIcon: {
     fontSize: 24,
-    color: '#111111',
+    color: c.text,
   },
 
   featureText: {
     flex: 1,
     fontSize: 16,
     fontWeight: '400',
-    color: '#111111',
+    color: c.text,
   },
 
   outlineButton: {
@@ -233,12 +238,12 @@ const styles = StyleSheet.create({
   outlineText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   description: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#333333',
+    color: c.text,
   },
 });

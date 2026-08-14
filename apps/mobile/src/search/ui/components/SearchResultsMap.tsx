@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import { Home } from '@wim/shared/home/home.type';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   homes: Home[];
@@ -27,6 +29,8 @@ export function SearchResultsMap({
   onSelectHome,
   onClearSelection,
 }: Props) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const homesWithCoordinates = useMemo(
     () =>
       homes.filter(
@@ -207,7 +211,8 @@ export function SearchResultsMap({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   mapContainer: {
     flex: 1,
     position: 'relative',
@@ -250,12 +255,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#087EBE',
+    backgroundColor: c.primary,
     borderWidth: 4,
   },
 
   markerNumber: {
-    color: '#fff',
+    color: c.onContrast,
     fontSize: 12,
     fontWeight: '900',
   },
@@ -280,6 +285,6 @@ const styles = StyleSheet.create({
     borderLeftWidth: 7,
     borderRightWidth: 7,
     borderTopWidth: 11,
-    borderTopColor: '#087EBE',
+    borderTopColor: c.primary,
   },
 });

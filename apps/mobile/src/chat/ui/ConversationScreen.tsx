@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -59,6 +59,8 @@ import {
 } from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 import {
   formatMessageDay,
   formatMessageTime,
@@ -86,6 +88,8 @@ type Props = {
 
 export function ConversationScreen({ route, navigation }: Props) {
   const { t } = useTranslation('chat');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
   const { chatId } = route.params;
 
@@ -621,7 +625,7 @@ export function ConversationScreen({ route, navigation }: Props) {
           activeOpacity={0.7}
           onPress={() => setMenuOpen(true)}
         >
-          <Info size={22} color="#111111" />
+          <Info size={22} color={themeColors.text} />
         </TouchableOpacity>
       </View>
 
@@ -732,7 +736,7 @@ export function ConversationScreen({ route, navigation }: Props) {
                   onPress={() => Alert.alert('', t('voiceSoon'))}
                   activeOpacity={0.7}
                 >
-                  <Mic size={21} color="#111111" />
+                  <Mic size={21} color={themeColors.text} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -741,7 +745,7 @@ export function ConversationScreen({ route, navigation }: Props) {
                   disabled={uploading}
                   activeOpacity={0.7}
                 >
-                  <ImageIcon size={21} color="#111111" />
+                  <ImageIcon size={21} color={themeColors.text} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -814,10 +818,11 @@ export function ConversationScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   flex: {
@@ -831,7 +836,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     gap: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: c.border,
   },
 
 menuBackdrop: {
@@ -841,7 +846,7 @@ menuBackdrop: {
   },
 
   menuSheet: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     paddingTop: 8,
@@ -854,18 +859,18 @@ menuBackdrop: {
 
   menuText: {
     fontSize: 15,
-    color: '#111111',
+    color: c.text,
   },
 
   menuDanger: {
     fontSize: 15,
-    color: '#DC2626',
+    color: c.danger,
   },
 
   menuCancel: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   headerIdentity: {
@@ -886,7 +891,7 @@ menuBackdrop: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#F1F1F1',
+    backgroundColor: c.surfaceAlt,
   },
 
   headerAvatarFallback: {
@@ -897,14 +902,14 @@ menuBackdrop: {
   headerInitial: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#087EBE',
+    color: c.primary,
   },
 
   headerName: {
     flex: 1,
     fontSize: 17,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   loader: {
@@ -928,7 +933,7 @@ menuBackdrop: {
 
   dayText: {
     fontSize: 12,
-    color: '#8A8A8A',
+    color: c.textMuted,
     textTransform: 'capitalize',
   },
 
@@ -958,11 +963,11 @@ menuBackdrop: {
   },
 
   bubbleMine: {
-    backgroundColor: '#111111',
+    backgroundColor: c.contrast,
   },
 
   bubbleTheirs: {
-    backgroundColor: '#F1F1F1',
+    backgroundColor: c.surfaceAlt,
   },
 
   bubbleMineTail: {
@@ -979,11 +984,11 @@ menuBackdrop: {
   },
 
   bubbleTextMine: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 
   bubbleTextTheirs: {
-    color: '#111111',
+    color: c.text,
   },
 
   bubbleTime: {
@@ -997,7 +1002,7 @@ menuBackdrop: {
   },
 
   bubbleTimeTheirs: {
-    color: '#9CA3AF',
+    color: c.textMuted,
   },
 
   seen: {
@@ -1006,7 +1011,7 @@ menuBackdrop: {
     marginBottom: 10,
     marginRight: 4,
     fontSize: 11,
-    color: '#9CA3AF',
+    color: c.textMuted,
   },
 
   // Rendu hors de la liste inversee : a l'interieur, il heritait du
@@ -1021,7 +1026,7 @@ menuBackdrop: {
   emptyTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
   },
 
@@ -1029,7 +1034,7 @@ menuBackdrop: {
     marginTop: 8,
     fontSize: 14,
     lineHeight: 21,
-    color: '#6B7280',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
@@ -1037,7 +1042,7 @@ menuBackdrop: {
     paddingHorizontal: 18,
     paddingBottom: 6,
     fontSize: 12,
-    color: '#DC2626',
+    color: c.danger,
   },
 
   composerArea: {
@@ -1046,7 +1051,7 @@ menuBackdrop: {
   },
 
   composerCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 30,
     paddingHorizontal: 8,
     paddingVertical: 8,
@@ -1079,7 +1084,7 @@ menuBackdrop: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#111111',
+    backgroundColor: c.contrast,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1092,7 +1097,7 @@ menuBackdrop: {
     paddingBottom: 10,
     fontSize: 15,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 
   iconButton: {
@@ -1126,7 +1131,7 @@ menuBackdrop: {
     width: 210,
     height: 210,
     borderRadius: 18,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: c.border,
   },
 
   bubbleTimeOnImage: {

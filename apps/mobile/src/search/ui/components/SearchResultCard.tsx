@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dimensions,
   Image,
@@ -14,6 +14,8 @@ import { Star } from 'lucide-react-native';
 import { Home } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
 import { getSession } from 'src/auth/infrastructure/authStorage';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 import {
   addFavoriteHome,
   removeFavoriteHome,
@@ -35,6 +37,8 @@ export function SearchResultCard({
   onPress,
 }: Props) {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(
     home.isFavorite ?? false,
@@ -171,7 +175,7 @@ export function SearchResultCard({
           <View style={styles.rating}>
             <Star
               size={13}
-              color="#111"
+              color={themeColors.text}
               fill="#111"
             />
 
@@ -192,9 +196,10 @@ export function SearchResultCard({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
 
   carouselContainer: {
@@ -202,7 +207,7 @@ const styles = StyleSheet.create({
     height: 360,
     borderRadius: 14,
     overflow: 'hidden',
-    backgroundColor: '#F1F1F1',
+    backgroundColor: c.surfaceAlt,
   },
 
   image: {
@@ -232,7 +237,7 @@ const styles = StyleSheet.create({
   favorite: {
     fontSize: 22,
     lineHeight: 24,
-    color: '#087EBE',
+    color: c.primary,
     fontWeight: '400',
   },
 
@@ -259,7 +264,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
 
   photoCounter: {
@@ -277,7 +282,7 @@ const styles = StyleSheet.create({
   },
 
   photoCounterText: {
-    color: '#fff',
+    color: c.onContrast,
     fontSize: 10,
     fontWeight: '800',
   },
@@ -299,13 +304,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#111',
+    color: c.text,
   },
 
   location: {
     marginTop: 2,
     fontSize: 11,
-    color: '#555',
+    color: c.textMuted,
   },
 
   meta: {
@@ -334,7 +339,7 @@ const styles = StyleSheet.create({
 
   available: {
     backgroundColor: '#41D086',
-    color: '#fff',
+    color: c.onContrast,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,

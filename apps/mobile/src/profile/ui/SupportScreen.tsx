@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -18,6 +18,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { getSession } from 'src/auth/infrastructure/authStorage';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 import {
   sendSupportRequest,
   SupportTopic,
@@ -38,6 +40,8 @@ const SUJETS: SupportTopic[] = [
 // seul le sujet propose par defaut change.
 export function SupportScreen({ navigation, route }: Props) {
   const { t } = useTranslation(['profile', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const signalement = route.params?.mode === 'report';
 
@@ -172,10 +176,11 @@ export function SupportScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   flex: {
@@ -193,7 +198,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 17,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
   },
 
   headerSpacer: {
@@ -210,7 +215,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   topics: {
@@ -224,57 +229,57 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
   },
 
   chipSelected: {
-    borderColor: '#111111',
-    backgroundColor: '#111111',
+    borderColor: c.contrast,
+    backgroundColor: c.contrast,
   },
 
   chipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 
   chipTextSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 
   input: {
     height: 48,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     fontSize: 14,
-    color: '#111111',
+    color: c.text,
   },
 
   textarea: {
     minHeight: 160,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 14,
-    color: '#111111',
+    color: c.text,
   },
 
   hint: {
     marginTop: 12,
     fontSize: 12,
     lineHeight: 17,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 
   button: {
     marginTop: 22,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#111111',
+    backgroundColor: c.contrast,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -286,6 +291,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 });

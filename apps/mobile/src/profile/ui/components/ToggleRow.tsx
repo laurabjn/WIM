@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 import { TouchableOpacity, StyleSheet, Text } from "react-native";
 
 type ToggleRowProps = {
@@ -7,6 +10,8 @@ type ToggleRowProps = {
 };
 
 export function ToggleRow({ label, value, onPress }: ToggleRowProps) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
     <TouchableOpacity
       style={[styles.toggleRow, value && styles.toggleRowSelected]}
@@ -20,9 +25,10 @@ export function ToggleRow({ label, value, onPress }: ToggleRowProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   toggleRow: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#E2E2E2',
@@ -36,10 +42,10 @@ const styles = StyleSheet.create({
   },
   toggleRowText: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: c.text,
     fontWeight: '500',
   },
   toggleRowTextSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 });

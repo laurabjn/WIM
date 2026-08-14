@@ -1,3 +1,6 @@
+import { useMemo } from 'react';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 import { TouchableOpacity, StyleSheet, Text } from "react-native";
 
 type ChoiceChipProps = {
@@ -8,6 +11,8 @@ type ChoiceChipProps = {
 };
 
 export function ChoiceChip({ label, subtitle, selected, onPress }: ChoiceChipProps) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
     <TouchableOpacity
       style={[styles.choiceChip, selected && styles.choiceChipSelected]}
@@ -31,10 +36,11 @@ export function ChoiceChip({ label, subtitle, selected, onPress }: ChoiceChipPro
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   choiceChip: {
     minWidth: '47%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: '#E2E2E2',
@@ -50,11 +56,11 @@ const styles = StyleSheet.create({
   choiceChipLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
     textAlign: 'center',
   },
   choiceChipLabelSelected: {
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
   choiceChipSubtitle: {
     fontSize: 11,

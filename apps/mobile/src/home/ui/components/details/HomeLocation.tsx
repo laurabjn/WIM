@@ -1,7 +1,9 @@
 import { Home } from '@wim/shared/home/home.type';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   home: Home;
@@ -9,6 +11,8 @@ type Props = {
 
 export function HomeLocation({ home }: Props) {
   const { t } = useTranslation('home');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   return (
     <View style={styles.section}>
@@ -35,35 +39,36 @@ export function HomeLocation({ home }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   section: {
     paddingHorizontal: 18,
   },
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 12,
   },
   locationBox: {
     borderRadius: 16,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: c.surfaceAlt,
     padding: 16,
   },
   locationTitle: {
     marginBottom: 8,
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   description: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#333333',
+    color: c.text,
   },
   coordinates: {
     marginTop: 8,
     fontSize: 12,
-    color: '#6B7280',
+    color: c.textMuted,
   },
 });
