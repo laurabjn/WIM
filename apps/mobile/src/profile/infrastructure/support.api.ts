@@ -34,11 +34,24 @@ export async function sendSupportRequest(
   });
 
   const rawText = await response.text();
-  console.log('SUPPORT STATUS:', response.status);
-  console.log('SUPPORT RAW RESPONSE:', rawText);
 
   if (!response.ok) {
-    throw new Error(`Support API error ${response.status}: ${rawText}`);
+    // On remonte le message de l'API : l'ecran n'a que celui-la a montrer.
+    let message = 'Votre demande n a pas pu etre envoyee.';
+
+    try {
+      const body = rawText ? JSON.parse(rawText) : null;
+
+      if (body?.message) {
+        message = Array.isArray(body.message)
+          ? body.message.join(', ')
+          : body.message;
+      }
+    } catch {
+      // Corps illisible : on garde le message generique.
+    }
+
+    throw new Error(message);
   }
 
   try {

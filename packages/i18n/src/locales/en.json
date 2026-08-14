@@ -227,7 +227,8 @@
       "preciseLocation": "Show my precise location on my profile",
       "customize": "Customize",
       "kilometers": "Kilometers",
-      "miles": "Miles"
+      "miles": "Miles",
+      "saveError": "This setting could not be saved."
     },
     "preferencesTravel": {
       "title": "Travel preferences",
@@ -523,7 +524,27 @@
       }
     },
     "loadHomesError": "Could not load the homes.",
-    "addHome": "Add a home"
+    "addHome": "Add a home",
+    "support": {
+      "topic": "Topic",
+      "subject": "Subject",
+      "subjectPlaceholder": "Sum up your request in one line",
+      "message": "Message",
+      "messagePlaceholder": "Describe your request as precisely as possible.",
+      "reportPlaceholder": "Describe the problem: what you were doing, what happened, and what you expected.",
+      "answerDelay": "We reply within 48 working hours to your account address.",
+      "send": "Send",
+      "sent": "Your request has been sent.",
+      "error": "Your request could not be sent.",
+      "topics": {
+        "account": "Account",
+        "exchange": "Exchange",
+        "booking": "Booking",
+        "payment": "Payment",
+        "technical": "Technical",
+        "other": "Other"
+      }
+    }
   },
   "home": {
     "notFound": "Home not found",

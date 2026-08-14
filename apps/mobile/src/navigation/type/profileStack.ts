@@ -19,6 +19,7 @@ export type ProfileStackParamList = {
   Settings: { profile: UserProfile };
   PublicProfile: { userId: string };
   Help: undefined;
+  Support: { mode?: 'report' } | undefined;
   HomeDetails: { homeId: string };
   EditHome: { homeId?: string } | undefined;
   ExchangeAvailability: { homeId: string };

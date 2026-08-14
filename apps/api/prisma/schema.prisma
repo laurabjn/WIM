@@ -28,6 +28,12 @@ model User {
   preferredLocale   String         @default("fr")
   travelPreferences Json?
 
+  // Reglages de confidentialite. Ils vivent en base et non sur l'appareil :
+  // c'est le serveur qui doit les faire respecter, pas l'affichage.
+  profileVisible Boolean @default(true) @map("profile_visible")
+  showAge        Boolean @default(true) @map("show_age")
+  dataSharing    Boolean @default(false) @map("data_sharing")
+
   homes     Home[]
   favorites Favorite[]
 

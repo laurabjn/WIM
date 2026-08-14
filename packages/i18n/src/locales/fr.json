@@ -125,7 +125,8 @@
       "preciseLocation": "Afficher une localisation précise",
       "customize": "Personnaliser",
       "kilometers": "Kilomètres",
-      "miles": "Miles"
+      "miles": "Miles",
+      "saveError": "Ce reglage n a pas pu etre enregistre."
     },
     "preferencesTravel": {
       "title": "Préférences de voyage",
@@ -420,7 +421,27 @@
       }
     },
     "loadHomesError": "Impossible de charger les logements.",
-    "addHome": "Ajouter un logement"
+    "addHome": "Ajouter un logement",
+    "support": {
+      "topic": "Sujet",
+      "subject": "Objet",
+      "subjectPlaceholder": "Resumez votre demande en une phrase",
+      "message": "Message",
+      "messagePlaceholder": "Decrivez votre demande le plus precisement possible.",
+      "reportPlaceholder": "Decrivez le probleme : ce que vous faisiez, ce qui s'est passe, et ce que vous attendiez.",
+      "answerDelay": "Nous repondons sous 48 heures ouvrees a l adresse de votre compte.",
+      "send": "Envoyer",
+      "sent": "Votre demande a bien ete envoyee.",
+      "error": "Votre demande n a pas pu etre envoyee.",
+      "topics": {
+        "account": "Compte",
+        "exchange": "Echange",
+        "booking": "Reservation",
+        "payment": "Paiement",
+        "technical": "Technique",
+        "other": "Autre"
+      }
+    }
   },
   "auth": {
     "welcomeTitle": "Bienvenue sur Wim !",

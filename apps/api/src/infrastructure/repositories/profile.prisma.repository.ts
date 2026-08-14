@@ -37,6 +37,9 @@ export class PrismaProfileRepository implements ProfileRepository {
 
     return {
       ...this.mapUserToProfile(user),
+      profileVisible: user.profileVisible,
+      showAge: user.showAge,
+      dataSharing: user.dataSharing,
       homesCount,
       exchangesCount,
       reviewsCount: reviewStats._count._all,
@@ -69,11 +72,15 @@ export class PrismaProfileRepository implements ProfileRepository {
       }),
     ]);
 
+    // Un reglage de confidentialite ne vaut que si le serveur l'applique :
+    // laisser le tri a l'affichage reviendrait a envoyer la donnee quand meme.
+    const masque = !user.profileVisible;
+
     return {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
-      age: calculateAge(user.birthDate),
+      age: user.showAge ? calculateAge(user.birthDate) : null,
       homesCount,
       exchangesCount,
       reviewsCount: reviewStats._count._all,
@@ -82,14 +89,22 @@ export class PrismaProfileRepository implements ProfileRepository {
           ? Math.round(reviewStats._avg.score * 10) / 10
           : null,
       avatarUrl: user.avatarUrl,
-      bio: user.bio,
-      country: user.country,
-      nationality: user.nationality,
-      phone: user.phone,
-      birthDate: user.birthDate ? user.birthDate.toISOString() : null,
-      languages: Array.isArray(user.languages)
-        ? user.languages.filter((lang): lang is string => typeof lang === 'string')
-        : [],
+      bio: masque ? null : user.bio,
+      country: masque ? null : user.country,
+      nationality: masque ? null : user.nationality,
+      // Le telephone n'a jamais a sortir d'un profil public.
+      phone: null,
+      birthDate: user.showAge && !masque && user.birthDate
+        ? user.birthDate.toISOString()
+        : null,
+      languages: masque
+        ? []
+        : Array.isArray(user.languages)
+          ? user.languages.filter(
+              (lang): lang is string => typeof lang === 'string',
+            )
+          : [],
+      profileVisible: user.profileVisible,
     };
   }
 
@@ -107,6 +122,9 @@ export class PrismaProfileRepository implements ProfileRepository {
         languages: input.languages,
         preferredLocale: input.preferredLocale,
         travelPreferences: input.travelPreferences,
+        profileVisible: input.profileVisible,
+        showAge: input.showAge,
+        dataSharing: input.dataSharing,
       },
     });
 

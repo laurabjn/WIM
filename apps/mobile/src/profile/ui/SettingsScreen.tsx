@@ -10,6 +10,14 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { IdentityStatus } from 'src/auth/dtos/identityStatus';
+import {
+  AppTheme,
+  DistanceUnit,
+  getAllSettings,
+  saveSetting,
+} from '../infrastructure/settingsStorage';
+import { updateMyProfile } from '../infrastructure/profile.api';
+import { clearSession } from 'src/auth/infrastructure/authStorage';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
 
@@ -17,7 +25,79 @@ export function SettingsScreen({ route, navigation }: Props) {
   const { t, i18n } = useTranslation(['profile', 'common', 'auth']);
   const { profile } = route.params;
 
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+  const [theme, setTheme] = useState<AppTheme>('system');
+
+  // Rien n'etait charge ni enregistre : chaque reglage revenait a sa valeur par
+  // defaut au retour sur l'ecran.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function charger() {
+      const enregistres = await getAllSettings();
+
+      if (cancelled) return;
+
+      setTheme(enregistres.theme);
+      setPushNotifications(enregistres.pushNotifications);
+      setSmsNotifications(enregistres.smsNotifications);
+      setNewMessages(enregistres.newMessages);
+      setNewExchangeDays(enregistres.newExchangeDays);
+      setMarketingEmails(enregistres.marketingEmails);
+      setShowPreciseLocation(enregistres.showPreciseLocation);
+      setAllowMessages(enregistres.allowMessages);
+      setCurrency(enregistres.currency);
+      setDistanceUnit(enregistres.distanceUnit);
+    }
+
+    charger();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Les reglages de confidentialite viennent du serveur : lui seul peut les
+  // faire respecter aupres des autres utilisateurs.
+  const [profileVisibleServeur, setProfileVisibleServeur] = useState(
+    profile.profileVisible ?? true,
+  );
+  const [showAgeServeur, setShowAgeServeur] = useState(profile.showAge ?? true);
+  const [dataSharing, setDataSharing] = useState(profile.dataSharing ?? false);
+
+  async function enregistrerLocal<T>(
+    cle: Parameters<typeof saveSetting>[0],
+    valeur: T,
+    appliquer: (valeur: T) => void,
+  ) {
+    appliquer(valeur);
+
+    try {
+      await saveSetting(cle, valeur);
+    } catch (error) {
+      console.log('Save setting error:', error);
+    }
+  }
+
+  async function enregistrerProfil(
+    champs: Parameters<typeof updateMyProfile>[1],
+    revenir: () => void,
+  ) {
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      await updateMyProfile(session.accessToken, champs);
+    } catch (error) {
+      console.log('Update settings error:', error);
+
+      // On remet le commutateur ou il etait : le montrer actif alors que le
+      // serveur l'ignore serait pire que l'echec lui-meme.
+      revenir();
+
+      Alert.alert('', t('profile:settings.saveError'));
+    }
+  }
 
   const [pushNotifications, setPushNotifications] = useState(false);
   const [smsNotifications, setSmsNotifications] = useState(false);
@@ -56,7 +136,13 @@ export function SettingsScreen({ route, navigation }: Props) {
   function confirmDisconnect() {
     Alert.alert('Déconnexion', 'Veux-tu vraiment te déconnecter ?', [
       { text: 'Annuler', style: 'cancel' },
-      { text: 'Se déconnecter', style: 'destructive', onPress: () => notImplemented('Déconnexion') },
+      {
+        text: 'Se déconnecter',
+        style: 'destructive',
+        onPress: async () => {
+          await clearSession();
+        },
+      },
     ]);
   }
 
@@ -71,15 +157,15 @@ export function SettingsScreen({ route, navigation }: Props) {
     Alert.alert(t('profile:settings.theme'), '', [
       {
         text: t('profile:settings.themeLight', 'Clair'),
-        onPress: () => setTheme('light'),
+        onPress: () => enregistrerLocal('theme', 'light', setTheme),
       },
       {
         text: t('profile:settings.themeDark', 'Sombre'),
-        onPress: () => setTheme('dark'),
+        onPress: () => enregistrerLocal('theme', 'dark', setTheme),
       },
       {
         text: t('profile:settings.themeSystem', 'Système'),
-        onPress: () => setTheme('system'),
+        onPress: () => enregistrerLocal('theme', 'system', setTheme),
       },
       { text: t('common:cancel'), style: 'cancel' },
     ]);
@@ -112,10 +198,30 @@ export function SettingsScreen({ route, navigation }: Props) {
     ]);
   }
 
+  function openLanguageSelector() {
+    Alert.alert(t('profile:settings.language'), '', [
+      { text: 'Français', onPress: () => changerLangue('fr') },
+      { text: 'English', onPress: () => changerLangue('en') },
+      { text: t('common:cancel'), style: 'cancel' },
+    ]);
+  }
+
+  async function changerLangue(locale: 'fr' | 'en') {
+    const precedente = i18n.language;
+
+    // On bascule l'affichage aussitot, puis on enregistre : le serveur en a
+    // besoin pour les mails, qui partent dans la langue du compte.
+    await i18n.changeLanguage(locale);
+
+    await enregistrerProfil({ preferredLocale: locale }, () => {
+      i18n.changeLanguage(precedente);
+    });
+  }
+
   function openDistanceUnitSelector() {
     Alert.alert(t('profile:settings.distanceUnit'), '', [
-      { text: t('profile:settings.kilometers', 'Kilomètres'), onPress: () => setDistanceUnit('km') },
-      { text: t('profile:settings.miles', 'Miles'), onPress: () => setDistanceUnit('mi') },
+      { text: t('profile:settings.kilometers', 'Kilomètres'), onPress: () => enregistrerLocal('distanceUnit', 'km', setDistanceUnit) },
+      { text: t('profile:settings.miles', 'Miles'), onPress: () => enregistrerLocal('distanceUnit', 'mi', setDistanceUnit) },
       { text: t('common:cancel'), style: 'cancel' },
     ]);
   }
@@ -221,31 +327,31 @@ export function SettingsScreen({ route, navigation }: Props) {
             icon="⌂"
             label={t('profile:settings.pushNotifications')}
             value={pushNotifications}
-            onValueChange={setPushNotifications}
+            onValueChange={(valeur) => enregistrerLocal('pushNotifications', valeur, setPushNotifications)}
           />
           <SettingsSwitchRow
             icon="⌕"
             label={t('profile:settings.smsNotifications')}
             value={smsNotifications}
-            onValueChange={setSmsNotifications}
+            onValueChange={(valeur) => enregistrerLocal('smsNotifications', valeur, setSmsNotifications)}
           />
           <SettingsSwitchRow
             icon="✉"
             label={t('profile:settings.newMessages')}
             value={newMessages}
-            onValueChange={setNewMessages}
+            onValueChange={(valeur) => enregistrerLocal('newMessages', valeur, setNewMessages)}
           />
           <SettingsSwitchRow
             icon="◎"
             label={t('profile:settings.updateMessages')}
             value={newExchangeDays}
-            onValueChange={setNewExchangeDays}
+            onValueChange={(valeur) => enregistrerLocal('newExchangeDays', valeur, setNewExchangeDays)}
           />
           <SettingsSwitchRow
             icon="✉"
             label={t('profile:settings.emailMarketing')}
             value={marketingEmails}
-            onValueChange={setMarketingEmails}
+            onValueChange={(valeur) => enregistrerLocal('marketingEmails', valeur, setMarketingEmails)}
           />
         </SettingsSection>
 
@@ -253,35 +359,51 @@ export function SettingsScreen({ route, navigation }: Props) {
           <SettingsSwitchRow
             icon="◉"
             label={t('profile:settings.profileVisibility')}
-            value={profileVisible}
-            onValueChange={setProfileVisible}
+            value={profileVisibleServeur}
+            onValueChange={(valeur) => {
+              setProfileVisibleServeur(valeur);
+              enregistrerProfil({ profileVisible: valeur }, () =>
+                setProfileVisibleServeur(!valeur),
+              );
+            }}
           />
 
           <SettingsSwitchRow
             icon="⌖"
             label={t('profile:settings.preciseLocation')}
             value={showPreciseLocation}
-            onValueChange={setShowPreciseLocation}
+            onValueChange={(valeur) => enregistrerLocal('showPreciseLocation', valeur, setShowPreciseLocation)}
           />
 
           <SettingsSwitchRow
             icon="◌"
             label={t('profile:settings.yearSharing')}
-            value={showAge}
-            onValueChange={setShowAge}
+            value={showAgeServeur}
+            onValueChange={(valeur) => {
+              setShowAgeServeur(valeur);
+              enregistrerProfil({ showAge: valeur }, () =>
+                setShowAgeServeur(!valeur),
+              );
+            }}
           />
 
           <SettingsSwitchRow
             icon="✉"
             label={t('profile:settings.allowMessage')}
             value={allowMessages}
-            onValueChange={setAllowMessages}
+            onValueChange={(valeur) => enregistrerLocal('allowMessages', valeur, setAllowMessages)}
           />
 
-          <SettingsRow
+          <SettingsSwitchRow
             icon="◧"
             label={t('profile:settings.dataSharing')}
-            onPress={() => notImplemented('Partage de données')}
+            value={dataSharing}
+            onValueChange={(valeur) => {
+              setDataSharing(valeur);
+              enregistrerProfil({ dataSharing: valeur }, () =>
+                setDataSharing(!valeur),
+              );
+            }}
           />
         </SettingsSection>
 
@@ -297,7 +419,7 @@ export function SettingsScreen({ route, navigation }: Props) {
             icon="⌘"
             label={t('profile:settings.language')}
             value={displayedLocale}
-            onPress={() => notImplemented('Langue')}
+            onPress={openLanguageSelector}
           />
 
           <SettingsRow
@@ -323,17 +445,17 @@ export function SettingsScreen({ route, navigation }: Props) {
           <SettingsRow
             icon="?"
             label={t('profile:settings.helpCenter')}
-            onPress={() => notImplemented('Centre d’aide')}
+            onPress={() => navigation.navigate('Help')}
           />
           <SettingsRow
             icon="◌"
             label={t('profile:settings.contactSupport')}
-            onPress={() => notImplemented('Contacter le support')}
+            onPress={() => navigation.navigate('Support', {})}
           />
           <SettingsRow
             icon="▲"
             label={t('profile:settings.problemReport')}
-            onPress={() => notImplemented('Signaler un problème')}
+            onPress={() => navigation.navigate('Support', { mode: 'report' })}
           />
         </SettingsSection>
 

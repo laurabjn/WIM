@@ -12,6 +12,7 @@ import { HelpScreen } from 'src/profile/ui/HelpScreen';
 import { RegionDestinationsScreen } from 'src/profile/ui/RegionDestinationsScreen';
 import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
 import { EditHomeScreen } from 'src/home/ui/EditHomeScreen';
+import { SupportScreen } from 'src/profile/ui/SupportScreen';
 import { ExchangeAvailabilityScreen } from 'src/home/ui/ExchangeAvailabilityScreen';
 import { ExchangeMessageScreen } from 'src/home/ui/ExchangeMessageScreen';
 
@@ -63,6 +64,11 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       <Stack.Screen
         name="Help"
         component={HelpScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Support"
+        component={SupportScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
