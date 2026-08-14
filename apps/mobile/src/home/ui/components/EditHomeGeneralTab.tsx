@@ -5,17 +5,29 @@ import { useTranslation } from 'react-i18next';
 type Props = {
   title: string;
   description: string;
+  address: string;
+  city: string;
+  country: string;
   photos: string[];
   onChangeTitle: (value: string) => void;
   onChangeDescription: (value: string) => void;
+  onChangeAddress: (value: string) => void;
+  onChangeCity: (value: string) => void;
+  onChangeCountry: (value: string) => void;
 };
 
 export function EditHomeGeneralTab({
   title,
   description,
+  address,
+  city,
+  country,
   photos,
   onChangeTitle,
   onChangeDescription,
+  onChangeAddress,
+  onChangeCity,
+  onChangeCountry,
 }: Props) {
   const { t } = useTranslation('home');
 
@@ -41,6 +53,42 @@ export function EditHomeGeneralTab({
         textAlignVertical="top"
         style={styles.textarea}
       />
+
+      <Text style={styles.label}>{t('address')}</Text>
+
+      <TextInput
+        value={address}
+        onChangeText={onChangeAddress}
+        placeholder={t('address')}
+        placeholderTextColor="#C9C9C9"
+        style={styles.input}
+      />
+
+      <View style={styles.row}>
+        <View style={styles.rowItem}>
+          <Text style={styles.label}>{t('city')}</Text>
+
+          <TextInput
+            value={city}
+            onChangeText={onChangeCity}
+            placeholder={t('city')}
+            placeholderTextColor="#C9C9C9"
+            style={styles.input}
+          />
+        </View>
+
+        <View style={styles.rowItem}>
+          <Text style={styles.label}>{t('country')}</Text>
+
+          <TextInput
+            value={country}
+            onChangeText={onChangeCountry}
+            placeholder={t('country')}
+            placeholderTextColor="#C9C9C9"
+            style={styles.input}
+          />
+        </View>
+      </View>
 
       <Text style={styles.label}>{t('homePhoto')}</Text>
 
@@ -107,6 +155,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#111111',
     marginBottom: 18,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  rowItem: {
+    flex: 1,
   },
   photosGrid: {
     flexDirection: 'row',

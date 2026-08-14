@@ -47,6 +47,9 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [country, setCountry] = useState('');
   const [capacity, setCapacity] = useState(1);
   const [beds, setBeds] = useState(1);
   const [bathrooms, setBathrooms] = useState(1);
@@ -86,6 +89,9 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         setHome(data);
         setTitle(data.title ?? '');
         setDescription(data.description ?? '');
+        setAddress(data.address ?? '');
+        setCity(data.city ?? '');
+        setCountry(data.country ?? '');
         setCapacity(data.capacity ?? 1);
         setBeds(data.beds ?? 1);
         setBathrooms(data.bathrooms ?? 1);
@@ -123,6 +129,9 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
       const payload = {
         title: title.trim(),
         description: description.trim(),
+        address: address.trim(),
+        city: city.trim(),
+        country: country.trim(),
         capacity,
         beds,
         bathrooms,
@@ -135,13 +144,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
       };
 
       if (isCreating) {
-        const created = await createHome(token, {
-          ...payload,
-          bedrooms: 1,
-          address: '',
-          city: '',
-          country: '',
-        });
+        const created = await createHome(token, { ...payload, bedrooms: 1 });
 
         navigation.replace('EditHome', { homeId: created.id });
         return;
@@ -152,6 +155,9 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
       setHome(updatedHome);
       setTitle(updatedHome.title ?? '');
       setDescription(updatedHome.description ?? '');
+      setAddress(updatedHome.address ?? '');
+      setCity(updatedHome.city ?? '');
+      setCountry(updatedHome.country ?? '');
       setCapacity(updatedHome.capacity ?? 1);
       setBeds(updatedHome.beds ?? 1);
       setBathrooms(updatedHome.bathrooms ?? 1);
@@ -180,6 +186,9 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     isSaving,
     title,
     description,
+    address,
+    city,
+    country,
     capacity,
     beds,
     bathrooms,
@@ -196,7 +205,9 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
       if (!token || isSaving) return;
       if (!isCreating && !home) return;
       // Quitter un formulaire de creation reste vide ne doit rien creer.
-      if (isCreating && !title.trim()) return;
+      if (isCreating && (!title.trim() || !city.trim() || !country.trim())) {
+        return;
+      }
 
       event.preventDefault();
 
@@ -206,7 +217,17 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     });
 
     return unsubscribe;
-  }, [navigation, home, token, isSaving, isCreating, title, handleSave]);
+  }, [
+    navigation,
+    home,
+    token,
+    isSaving,
+    isCreating,
+    title,
+    city,
+    country,
+    handleSave,
+  ]);
  
   if (isLoading) {
     return (
@@ -248,9 +269,15 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
           <EditHomeGeneralTab
             title={title}
             description={description}
+            address={address}
+            city={city}
+            country={country}
             photos={photos}
             onChangeTitle={setTitle}
             onChangeDescription={setDescription}
+            onChangeAddress={setAddress}
+            onChangeCity={setCity}
+            onChangeCountry={setCountry}
           />
         )}
 
