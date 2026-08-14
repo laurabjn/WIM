@@ -648,7 +648,10 @@
       "CURRENT": "ongoing"
     },
     "myHome": "My home",
-    "theirHome": "At my host's"
+    "theirHome": "At my host's",
+    "iGo": "I stay at theirs",
+    "theyCome": "They stay at mine",
+    "noHomeOffered": "No home offered"
   },
   "availability": {
     "when": "When are you available for exchange ?",
@@ -662,7 +665,9 @@
     "messagePlaceholder": "Write a message",
     "send": "Send",
     "defaultMessage": "Default message",
-    "defaultMessageContent": "I am interested in your accommodation for an upcoming exchange. It seems to fit what I'm looking for, and I would like to know if it would be available on the dates I'm considering. I am happy to discuss this further if you would like more information about my accommodation or my living arrangements. Please feel free to let me know your availability or if you have any questions. I look forward to hearing from you!"
+    "defaultMessageContent": "I am interested in your accommodation for an upcoming exchange. It seems to fit what I'm looking for, and I would like to know if it would be available on the dates I'm considering. I am happy to discuss this further if you would like more information about my accommodation or my living arrangements. Please feel free to let me know your availability or if you have any questions. I look forward to hearing from you!",
+    "offeredHome": "The home you offer",
+    "offeredHomeHint": "An exchange involves two homes. Pick the one you offer in return, or leave it for later."
   },
   "exchange": {
     "currentExchanges": "Current exchanges",
@@ -769,6 +774,9 @@
     "cancelExchangeError": "The exchange could not be cancelled.",
     "noHomeToExchange": "This person has no home to exchange.",
     "bannerMyHome": "My home",
-    "bannerTheirHome": "At my host's"
+    "bannerTheirHome": "At my host's",
+    "bannerYouGo": "You go to:",
+    "bannerTheyCome": "They come to:",
+    "bannerNoHome": "no home offered"
   }
 }

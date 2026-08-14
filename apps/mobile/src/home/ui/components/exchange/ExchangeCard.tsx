@@ -35,11 +35,23 @@ export function ExchangeCard({
 
       <View style={styles.content}>
         <Text style={styles.whose}>
-          {exchange.isHost ? t('myHome') : t('theirHome')}
+          {exchange.isHost ? t('theyCome') : t('iGo')}
         </Text>
 
         <Text style={styles.title} numberOfLines={1}>
-          {exchange.homeTitle}
+          {exchange.isHost
+            ? exchange.guestHomeTitle ?? exchange.homeTitle
+            : exchange.homeTitle}
+        </Text>
+
+        <Text style={styles.whose}>
+          {exchange.isHost ? t('iGo') : t('theyCome')}
+        </Text>
+
+        <Text style={styles.title} numberOfLines={1}>
+          {exchange.isHost
+            ? exchange.homeTitle
+            : exchange.guestHomeTitle ?? t('noHomeOffered')}
         </Text>
 
         {exchange.partner ? (

@@ -19,6 +19,10 @@ export type PendingExchange = {
   hostId: string;
   guestId: string;
   isHost: boolean;
+  // Le logement propose en retour par l'invite. Nul tant qu'il n'en propose pas.
+  guestHomeId: string | null;
+  guestHomeTitle: string | null;
+  guestHomeImageUrl: string | null;
 };
 
 export type ExchangePartner = {
@@ -43,4 +47,7 @@ export type Exchange = {
   partner: ExchangePartner | null;
   isHost: boolean;
   chatId: string | null;
+  guestHomeId: string | null;
+  guestHomeTitle: string | null;
+  guestHomeImageUrl: string | null;
 };

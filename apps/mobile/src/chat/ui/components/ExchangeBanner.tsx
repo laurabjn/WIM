@@ -78,8 +78,17 @@ export function ExchangeBanner({
       <Text style={styles.title}>{t('exchangePending')}</Text>
 
       <Text style={styles.home} numberOfLines={1}>
-        {exchange.isHost ? t('bannerMyHome') : t('bannerTheirHome')} ·{' '}
-        {exchange.homeTitle}
+        {t('bannerYouGo')}{' '}
+        {exchange.isHost
+          ? exchange.guestHomeTitle ?? t('bannerNoHome')
+          : exchange.homeTitle}
+      </Text>
+
+      <Text style={styles.home} numberOfLines={1}>
+        {t('bannerTheyCome')}{' '}
+        {exchange.isHost
+          ? exchange.homeTitle
+          : exchange.guestHomeTitle ?? t('bannerNoHome')}
       </Text>
 
       <Text style={styles.dates}>

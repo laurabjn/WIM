@@ -1038,11 +1038,20 @@ async function main() {
       orderBy: { createdAt: 'asc' },
     });
 
+    // Un echange porte deux logements : celui ou l'invite se rend, et celui
+    // qu'il offre en retour.
+    const guestHome = await prisma.home.findFirst({
+      where: { ownerId: guest.id },
+      select: { id: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
     if (!hostHome) continue;
 
     await prisma.exchange.create({
       data: {
         homeId: hostHome.id,
+        guestHomeId: guestHome ? guestHome.id : null,
         hostId: host.id,
         guestId: guest.id,
         startDate: daysFromNow(planned.from),

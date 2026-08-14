@@ -83,7 +83,8 @@ model Home {
   photos         HomePhoto[]
   favorites      Favorite[]
   availabilities HomeAvailability[]
-  exchanges      Exchange[]
+  exchanges      Exchange[]         @relation("ExchangeHostHome")
+  guestExchanges Exchange[]         @relation("ExchangeGuestHome")
 
   vehicle Vehicle?
   swipes  Swipe[]
@@ -186,9 +187,16 @@ enum ExchangeStatus {
 }
 
 model Exchange {
-  id     String @id @default(uuid())
+  id String @id @default(uuid())
+
+  // Un echange de maison porte deux logements : celui de l'hote, ou l'invite se
+  // rend, et celui de l'invite, ou l'hote sejourne en retour. Le second reste
+  // facultatif : on peut demander un echange sans encore proposer de logement.
   homeId String @map("home_id")
-  home   Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  home   Home   @relation("ExchangeHostHome", fields: [homeId], references: [id], onDelete: Cascade)
+
+  guestHomeId String? @map("guest_home_id")
+  guestHome   Home?   @relation("ExchangeGuestHome", fields: [guestHomeId], references: [id], onDelete: SetNull)
 
   hostId  String @map("host_id")
   guestId String @map("guest_id")

@@ -647,7 +647,10 @@
       "CURRENT": "en cours"
     },
     "myHome": "Mon logement",
-    "theirHome": "Chez mon hote"
+    "theirHome": "Chez mon hote",
+    "iGo": "Je vais chez lui",
+    "theyCome": "Il vient chez moi",
+    "noHomeOffered": "Aucun logement propose"
   },
   "availability": {
     "when": "Quand êtes-vous disponible pour échanger ?",
@@ -661,7 +664,9 @@
     "messagePlaceholder": "Écrivez un message",
     "send": "Envoyer le message",
     "defaultMessage": "Message par defaut",
-    "defaultMessageContent": "Je suis intéressé par votre logement pour un échange prochain. Il semble correspondre à ce que je recherche et j’aimerais savoir s’il serait disponible aux dates que j’envisage.  Je suis ouvert à la discussion si vous souhaitez plus d’informations sur mon logement ou sur mes conditions de séjour. N’hésitez pas à me faire savoir vos disponibilités ou si vous avez des questions. Au plaisir d’échanger avec vous !"
+    "defaultMessageContent": "Je suis intéressé par votre logement pour un échange prochain. Il semble correspondre à ce que je recherche et j’aimerais savoir s’il serait disponible aux dates que j’envisage.  Je suis ouvert à la discussion si vous souhaitez plus d’informations sur mon logement ou sur mes conditions de séjour. N’hésitez pas à me faire savoir vos disponibilités ou si vous avez des questions. Au plaisir d’échanger avec vous !",
+    "offeredHome": "Le logement que vous proposez",
+    "offeredHomeHint": "L'echange porte sur deux logements. Choisissez celui que vous offrez en retour, ou laissez vide pour en decider plus tard."
   },
   "exchange": {
     "currentExchanges": "Échanges actuel",
@@ -768,6 +773,9 @@
     "cancelExchangeError": "L'echange n'a pas pu etre annule.",
     "noHomeToExchange": "Cette personne n'a aucun logement a echanger.",
     "bannerMyHome": "Mon logement",
-    "bannerTheirHome": "Chez mon hote"
+    "bannerTheirHome": "Chez mon hote",
+    "bannerYouGo": "Vous allez a :",
+    "bannerTheyCome": "Cette personne vient a :",
+    "bannerNoHome": "aucun logement propose"
   }
 }

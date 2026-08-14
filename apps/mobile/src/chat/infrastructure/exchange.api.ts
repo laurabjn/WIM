@@ -75,6 +75,7 @@ export async function requestExchangeApi(
   token: string,
   input: {
     homeId: string;
+    guestHomeId?: string;
     message: string;
     startDate?: string;
     endDate?: string;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -12,6 +12,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getSession } from 'src/auth/infrastructure/authStorage';
+import { listMyHomes } from 'src/home/infrastructure/home.api';
+import type { Home } from '@wim/shared/home/home.type';
 import { requestExchangeApi } from 'src/chat/infrastructure/exchange.api';
 import { BackButton } from 'src/shared/ui/BackButton';
 
@@ -28,6 +30,39 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
 
   const [sending, setSending] = useState(false);
 
+  // Un echange porte deux logements : celui qu'on demande, et celui qu'on
+  // propose en retour. Un seul logement est choisi d'office.
+  const [myHomes, setMyHomes] = useState<Home[]>([]);
+  const [offeredHomeId, setOfferedHomeId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMyHomes() {
+      try {
+        const session = await getSession();
+
+        if (!session?.accessToken || cancelled) return;
+
+        const homes = await listMyHomes(session.accessToken);
+
+        if (cancelled) return;
+
+        setMyHomes(homes);
+
+        if (homes.length === 1) setOfferedHomeId(homes[0].id);
+      } catch (loadError) {
+        console.log('Load my homes error:', loadError);
+      }
+    }
+
+    loadMyHomes();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   async function sendMessage() {
     if (sending || !message.trim()) return;
 
@@ -40,6 +75,7 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
 
       const result = await requestExchangeApi(session.accessToken, {
         homeId,
+        guestHomeId: offeredHomeId ?? undefined,
         message: message.trim(),
       });
 
@@ -74,6 +110,37 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
 
       <View style={styles.content}>
         <Text style={styles.title}>{t("messagePlaceholder")}</Text>
+
+        {myHomes.length > 0 ? (
+          <View style={styles.offerBox}>
+            <Text style={styles.label}>{t('offeredHome')}</Text>
+
+            <Text style={styles.offerHint}>{t('offeredHomeHint')}</Text>
+
+            {myHomes.map((home) => {
+              const selected = offeredHomeId === home.id;
+
+              return (
+                <TouchableOpacity
+                  key={home.id}
+                  style={[styles.offerRow, selected && styles.offerRowSelected]}
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    setOfferedHomeId(selected ? null : home.id)
+                  }
+                >
+                  <View
+                    style={[styles.radio, selected && styles.radioSelected]}
+                  />
+
+                  <Text style={styles.offerText} numberOfLines={1}>
+                    {home.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        ) : null}
 
         <View style={styles.messageBox}>
           <Text style={styles.label}>{t("defaultMessage")}</Text>
@@ -169,6 +236,47 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '800',
+  },
+  offerBox: {
+    marginBottom: 18,
+  },
+  offerHint: {
+    marginTop: -4,
+    marginBottom: 10,
+    fontSize: 12,
+    lineHeight: 17,
+    color: '#6B7280',
+  },
+  offerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 11,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E6E6E6',
+    marginBottom: 8,
+  },
+  offerRowSelected: {
+    borderColor: '#52D1A6',
+    backgroundColor: '#F2FBF8',
+  },
+  radio: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+  },
+  radioSelected: {
+    borderColor: '#52D1A6',
+    backgroundColor: '#52D1A6',
+  },
+  offerText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#111111',
   },
   messageBox: {
     borderWidth: 1,

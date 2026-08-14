@@ -23,6 +23,14 @@ export class ExchangeRepositoryPrisma {
             },
           },
         },
+        guestHome: {
+          include: {
+            photos: {
+              orderBy: { position: 'asc' },
+              take: 1,
+            },
+          },
+        },
       },
       orderBy: {
         startDate: 'asc',
@@ -86,6 +94,9 @@ export class ExchangeRepositoryPrisma {
         chatByPartnerId.get(
           exchange.hostId === userId ? exchange.guestId : exchange.hostId,
         ) ?? null,
+      guestHomeId: exchange.guestHomeId ?? null,
+      guestHomeTitle: exchange.guestHome?.title ?? null,
+      guestHomeImageUrl: exchange.guestHome?.photos?.[0]?.url ?? null,
     }));
   }
 
@@ -119,6 +130,11 @@ export class ExchangeRepositoryPrisma {
         photos: { orderBy: { position: 'asc' }, take: 1 },
       },
     },
+    guestHome: {
+      include: {
+        photos: { orderBy: { position: 'asc' }, take: 1 },
+      },
+    },
   } as const;
 
   private mapPending(exchange: any, viewerId?: string): PendingExchange {
@@ -135,6 +151,9 @@ export class ExchangeRepositoryPrisma {
       hostId: exchange.hostId,
       guestId: exchange.guestId,
       isHost: viewerId ? exchange.hostId === viewerId : false,
+      guestHomeId: exchange.guestHomeId ?? null,
+      guestHomeTitle: exchange.guestHome?.title ?? null,
+      guestHomeImageUrl: exchange.guestHome?.photos?.[0]?.url ?? null,
     };
   }
 

@@ -10,6 +10,9 @@ import { BlockedUsersService } from 'src/application/moderation/blocked-users.se
 export type RequestExchangeInput = {
   requesterId: string;
   homeId: string;
+  // Le logement que le demandeur propose en retour. Facultatif : on peut
+  // ecrire sans encore avoir de logement a offrir.
+  guestHomeId?: string;
   message: string;
   startDate?: string;
   endDate?: string;
@@ -75,6 +78,23 @@ export class RequestExchangeUseCase {
       );
     }
 
+    if (input.guestHomeId) {
+      const offered = await this.prisma.home.findUnique({
+        where: { id: input.guestHomeId },
+        select: { ownerId: true },
+      });
+
+      if (!offered) {
+        throw new NotFoundException('Logement propose introuvable.');
+      }
+
+      if (offered.ownerId !== input.requesterId) {
+        throw new BadRequestException(
+          'Vous ne pouvez proposer qu un de vos propres logements.',
+        );
+      }
+    }
+
     const startDate = input.startDate
       ? new Date(input.startDate)
       : defaultStart();
@@ -113,6 +133,7 @@ export class RequestExchangeUseCase {
           guestId: input.requesterId,
           startDate,
           endDate,
+          guestHomeId: input.guestHomeId ?? null,
           travelersCount: input.travelersCount ?? 1,
           status: 'PENDING',
         },
