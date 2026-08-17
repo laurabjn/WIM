@@ -144,7 +144,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   dotBlocked: {
-    backgroundColor: '#9CA3AF',
+    backgroundColor: c.border,
   },
 
   dotExchange: {

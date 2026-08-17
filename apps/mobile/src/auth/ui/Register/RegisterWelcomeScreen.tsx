@@ -109,7 +109,7 @@ const createStyles = (c: ThemeColors) =>
     marginLeft: 6,
     marginBottom: 8,
     fontSize: 14,
-    color: '#B0B0B0',
+    color: c.textFaint,
     fontWeight: '500',
   },
 
@@ -152,7 +152,7 @@ const createStyles = (c: ThemeColors) =>
     height: 48,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#E4E4E4',
+    borderColor: c.border,
     backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',

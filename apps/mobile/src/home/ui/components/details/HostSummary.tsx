@@ -76,7 +76,7 @@ const createStyles = (c: ThemeColors) =>
   hostSince: {
     marginTop: 3,
     fontSize: 13,
-    color: '#6B6B6B',
+    color: c.textMuted,
   },
 
   ratingWrapper: {

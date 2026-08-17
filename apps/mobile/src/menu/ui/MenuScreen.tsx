@@ -285,7 +285,8 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: 'rgba(0,0,0,0.15)',
   },
   heroTitle: {
-    color: c.onContrast,
+    // Pose sur la photo : toujours blanc, quel que soit le theme.
+    color: '#FFFFFF',
     fontSize: 36,
     fontWeight: '900',
     lineHeight: 36,
@@ -296,12 +297,12 @@ const createStyles = (c: ThemeColors) =>
     alignItems: 'flex-end',
   },
   smallLabel: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '600',
   },
   exchangeCount: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 36,
     fontWeight: '900',
   },
@@ -316,11 +317,11 @@ const createStyles = (c: ThemeColors) =>
     gap: 8,
   },
   heroButtonText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   arrow: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 18,
   },
   sectionTitle: {
@@ -362,7 +363,7 @@ const createStyles = (c: ThemeColors) =>
   },
   recentText: {
     fontSize: 12,
-    color: '#444',
+    color: c.text,
     marginBottom: 4,
   },
   bottomNav: {

@@ -117,7 +117,7 @@ const createStyles = (c: ThemeColors) =>
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   identityBlock: {
     marginLeft: 12,
@@ -130,12 +130,12 @@ const createStyles = (c: ThemeColors) =>
   },
   age: {
     fontSize: 12,
-    color: '#6B6B6B',
+    color: c.textMuted,
     marginTop: 2,
   },
   rating: {
     fontSize: 12,
-    color: '#3D3D3D',
+    color: c.text,
     marginTop: 6,
   },
   editButton: {
@@ -154,6 +154,6 @@ const createStyles = (c: ThemeColors) =>
     marginTop: 14,
     fontSize: 13,
     lineHeight: 19,
-    color: '#454545',
+    color: c.text,
   },
 });

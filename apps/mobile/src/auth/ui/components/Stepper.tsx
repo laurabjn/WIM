@@ -68,7 +68,7 @@ const createStyles = (c: ThemeColors) =>
   text: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#7C7C7C',
+    color: c.textMuted,
   },
 
   textActive: {

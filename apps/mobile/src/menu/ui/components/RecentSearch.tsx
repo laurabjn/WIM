@@ -66,7 +66,7 @@ const createStyles = (c: ThemeColors) =>
   },
   recentText: {
     fontSize: 12,
-    color: '#444',
+    color: c.text,
     marginBottom: 4,
   },
 });

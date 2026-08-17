@@ -405,7 +405,7 @@ const createStyles = (c: ThemeColors) =>
   },
   sectionSubtitle: {
     fontSize: 12,
-    color: '#6B6B6B',
+    color: c.textMuted,
     marginBottom: 14,
     lineHeight: 18,
   },
@@ -438,7 +438,7 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E2E2E2',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 14,
     alignItems: 'center',
@@ -469,7 +469,7 @@ const createStyles = (c: ThemeColors) =>
   },
   durationEdgeLabel: {
     fontSize: 11,
-    color: '#A1A1A1',
+    color: c.textMuted,
   },
   durationCenterLabel: {
     fontSize: 13,

@@ -185,13 +185,13 @@ const createStyles = (c: ThemeColors) =>
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 15,
-    color: '#111827',
+    color: c.text,
     backgroundColor: c.surface,
   },
 
   charCount: {
     fontSize: 11,
-    color: '#7C7C7C',
+    color: c.textMuted,
     textAlign: 'right',
     marginTop: 4,
     marginBottom: 8,

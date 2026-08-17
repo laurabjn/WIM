@@ -750,7 +750,7 @@ const createStyles = (c: ThemeColors) =>
     width: 46,
     height: 5,
     borderRadius: 3,
-    backgroundColor: '#D2D2D2',
+    backgroundColor: c.border,
   },
 
   sheetHeaderRow: {
@@ -772,7 +772,7 @@ const createStyles = (c: ThemeColors) =>
   sheetInstruction: {
     marginTop: 2,
     fontSize: 11,
-    color: '#777777',
+    color: c.textMuted,
   },
 
   favoriteButton: {
@@ -794,7 +794,7 @@ const createStyles = (c: ThemeColors) =>
     marginHorizontal: 18,
     borderRadius: 22,
     overflow: 'hidden',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: c.surfaceAlt,
   },
 
   carouselImage: {
@@ -844,7 +844,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   photoCounterText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '800',
   },
@@ -883,7 +883,7 @@ const createStyles = (c: ThemeColors) =>
   location: {
     flex: 1,
     fontSize: 14,
-    color: '#5F5F5F',
+    color: c.textMuted,
   },
 
   rating: {
@@ -907,14 +907,14 @@ const createStyles = (c: ThemeColors) =>
   reviewText: {
     marginTop: 8,
     fontSize: 14,
-    color: '#686868',
+    color: c.textMuted,
     textDecorationLine:
       'underline',
   },
 
   separator: {
     height: 1,
-    backgroundColor: '#ECECEC',
+    backgroundColor: c.surfaceAlt,
     marginVertical: 24,
   },
 
@@ -946,7 +946,7 @@ const createStyles = (c: ThemeColors) =>
     marginTop: 2,
     fontSize: 11,
     lineHeight: 15,
-    color: '#696969',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
@@ -959,7 +959,7 @@ const createStyles = (c: ThemeColors) =>
     width: 62,
     height: 62,
     borderRadius: 31,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: c.surfaceAlt,
   },
 
   hostInfo: {
@@ -969,7 +969,7 @@ const createStyles = (c: ThemeColors) =>
 
   hostLabel: {
     fontSize: 13,
-    color: '#6B6B6B',
+    color: c.textMuted,
   },
 
   hostName: {
@@ -982,7 +982,7 @@ const createStyles = (c: ThemeColors) =>
   hostDescription: {
     marginTop: 3,
     fontSize: 13,
-    color: '#737373',
+    color: c.textMuted,
   },
 
   sectionTitle: {
@@ -1001,7 +1001,7 @@ const createStyles = (c: ThemeColors) =>
   homeTypeCard: {
     marginTop: 20,
     borderRadius: 18,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: c.surfaceAlt,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -1031,7 +1031,7 @@ const createStyles = (c: ThemeColors) =>
     marginTop: 4,
     fontSize: 13,
     lineHeight: 18,
-    color: '#696969',
+    color: c.textMuted,
   },
 
   amenitiesContainer: {
@@ -1052,18 +1052,18 @@ const createStyles = (c: ThemeColors) =>
   amenityText: {
     flex: 1,
     fontSize: 15,
-    color: '#222222',
+    color: c.text,
   },
 
   emptySectionText: {
     fontSize: 14,
-    color: '#777777',
+    color: c.textMuted,
   },
 
   availabilityCard: {
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E7E7E7',
+    borderColor: c.border,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -1073,7 +1073,7 @@ const createStyles = (c: ThemeColors) =>
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#EAF9F2',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1093,7 +1093,7 @@ const createStyles = (c: ThemeColors) =>
     marginTop: 4,
     fontSize: 13,
     lineHeight: 18,
-    color: '#696969',
+    color: c.textMuted,
   },
 
   carRow: {
@@ -1125,7 +1125,7 @@ const createStyles = (c: ThemeColors) =>
     marginTop: 5,
     fontSize: 13,
     lineHeight: 19,
-    color: '#696969',
+    color: c.textMuted,
   },
 
   bottomBar: {
@@ -1135,7 +1135,7 @@ const createStyles = (c: ThemeColors) =>
     bottom: 0,
     zIndex: 50,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
+    borderTopColor: c.border,
     backgroundColor: c.surface,
     paddingTop: 14,
     paddingHorizontal: 18,

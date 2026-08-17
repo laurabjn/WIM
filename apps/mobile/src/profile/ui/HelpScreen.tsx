@@ -306,7 +306,7 @@ const createStyles = (c: ThemeColors) =>
   introText: {
     fontSize: 13,
     lineHeight: 19,
-    color: '#5F5F5F',
+    color: c.textMuted,
   },
   sectionTitle: {
     fontSize: 14,
@@ -326,7 +326,7 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#DCDCDC',
+    borderColor: c.border,
     paddingVertical: 14,
     paddingHorizontal: 12,
     alignItems: 'center',
@@ -362,7 +362,7 @@ const createStyles = (c: ThemeColors) =>
   },
   contactLabel: {
     fontSize: 12,
-    color: '#7A7A7A',
+    color: c.textMuted,
     marginBottom: 2,
   },
   contactValue: {
@@ -374,7 +374,7 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surfaceAlt,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E7E7E7',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 14,

@@ -78,7 +78,7 @@ const createStyles = (c: ThemeColors) =>
   },
   amenityCardSelected: {
     borderColor: '#58D6B2',
-    backgroundColor: '#EFFFF9',
+    backgroundColor: c.surfaceAlt,
   },
   amenityIcon: {
     fontSize: 18,

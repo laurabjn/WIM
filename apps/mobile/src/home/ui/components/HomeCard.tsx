@@ -73,20 +73,20 @@ const createStyles = (c: ThemeColors) =>
   location: {
     fontSize: 20,
     fontWeight: '500',
-    color: '#2A2A2A',
+    color: c.text,
     marginBottom: 10,
   },
 
   dateRange: {
     fontSize: 20,
     fontWeight: '400',
-    color: '#2A2A2A',
+    color: c.text,
     marginBottom: 10,
   },
 
   travelers: {
     fontSize: 18,
     fontWeight: '400',
-    color: '#7A7A7A',
+    color: c.textMuted,
   },
 });

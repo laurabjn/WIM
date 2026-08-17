@@ -43,7 +43,7 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E2E2E2',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 14,
     alignItems: 'center',
@@ -64,7 +64,7 @@ const createStyles = (c: ThemeColors) =>
   },
   choiceChipSubtitle: {
     fontSize: 11,
-    color: '#7A7A7A',
+    color: c.textMuted,
     marginTop: 4,
   },
   choiceChipSubtitleSelected: {

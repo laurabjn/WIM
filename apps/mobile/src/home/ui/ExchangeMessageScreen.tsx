@@ -186,7 +186,7 @@ const createStyles = (c: ThemeColors) =>
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#EEEEEE',
+    borderColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
@@ -219,7 +219,7 @@ const createStyles = (c: ThemeColors) =>
   },
   optionSelected: {
     borderColor: '#25A9E0',
-    backgroundColor: '#EEF9FD',
+    backgroundColor: c.surfaceAlt,
   },
   optionText: {
     fontSize: 13,
@@ -265,7 +265,7 @@ const createStyles = (c: ThemeColors) =>
   },
   offerRowSelected: {
     borderColor: c.accent,
-    backgroundColor: '#F2FBF8',
+    backgroundColor: c.surfaceAlt,
   },
   radio: {
     width: 18,

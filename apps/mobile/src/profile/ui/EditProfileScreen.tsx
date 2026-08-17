@@ -340,7 +340,7 @@ const createStyles = (c: ThemeColors) =>
     width: 86,
     height: 86,
     borderRadius: 43,
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   avatarEditBadge: {
     position: 'absolute',
@@ -362,7 +362,7 @@ const createStyles = (c: ThemeColors) =>
   changePhotoText: {
     marginTop: 8,
     fontSize: 12,
-    color: '#7A7A7A',
+    color: c.textMuted,
   },
   sectionTitle: {
     fontSize: 14,
@@ -382,7 +382,7 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#DCDCDC',
+    borderColor: c.border,
     paddingVertical: 14,
     paddingHorizontal: 12,
     alignItems: 'center',
@@ -407,7 +407,7 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surfaceAlt,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E7E7E7',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 14,
@@ -441,7 +441,7 @@ const createStyles = (c: ThemeColors) =>
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#DCDCDC',
+    borderColor: c.border,
   },
   languageChipSelected: {
     backgroundColor: c.accent,

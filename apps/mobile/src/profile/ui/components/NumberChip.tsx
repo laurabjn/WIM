@@ -32,7 +32,7 @@ const createStyles = (c: ThemeColors) =>
     borderRadius: 18,
     backgroundColor: c.surface,
     borderWidth: 1,
-    borderColor: '#E2E2E2',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },

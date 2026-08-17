@@ -311,7 +311,7 @@ const createStyles = (c: ThemeColors) =>
     position: 'absolute',
     right: 14,
     bottom: 10,
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   container: {

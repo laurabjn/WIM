@@ -108,7 +108,7 @@ const createStyles = (c: ThemeColors) =>
   image: {
     width: '100%',
     height: 250,
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   favoriteButton: {
     position: 'absolute',
@@ -117,7 +117,7 @@ const createStyles = (c: ThemeColors) =>
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#FFFFFFE6',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -134,7 +134,7 @@ const createStyles = (c: ThemeColors) =>
     borderRadius: 18,
     borderWidth: 2,
     borderColor: '#FFFFFF',
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   dotsRow: {
     position: 'absolute',
@@ -147,7 +147,7 @@ const createStyles = (c: ThemeColors) =>
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: c.surfaceAlt,
   },
   dotActive: {
     backgroundColor: c.surface,
@@ -169,7 +169,7 @@ const createStyles = (c: ThemeColors) =>
   },
   rating: {
     fontSize: 12,
-    color: '#444',
+    color: c.text,
   },
   location: {
     marginTop: 4,
@@ -179,7 +179,7 @@ const createStyles = (c: ThemeColors) =>
   details: {
     marginTop: 6,
     fontSize: 12,
-    color: '#444',
+    color: c.text,
   },
   bottomRow: {
     marginTop: 10,

@@ -79,7 +79,9 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
             </View>
           ) : (
             <View style={[styles.badge, styles.badgeUnavailable]}>
-              <Text style={styles.badgeText}>{t('unavailable')}</Text>
+              <Text style={[styles.badgeText, styles.badgeTextUnavailable]}>
+                {t('unavailable')}
+              </Text>
             </View>
           )}
         </View>
@@ -102,7 +104,7 @@ const createStyles = (c: ThemeColors) =>
   image: {
     width: '100%',
     height: 210,
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   editButton: {
     position: 'absolute',
@@ -111,7 +113,7 @@ const createStyles = (c: ThemeColors) =>
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#FFFFFFEE',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -135,7 +137,7 @@ const createStyles = (c: ThemeColors) =>
   },
   rating: {
     fontSize: 12,
-    color: '#444',
+    color: c.text,
   },
   location: {
     marginTop: 4,
@@ -145,7 +147,7 @@ const createStyles = (c: ThemeColors) =>
   details: {
     marginTop: 6,
     fontSize: 12,
-    color: '#444',
+    color: c.text,
   },
   bottomRow: {
     marginTop: 10,
@@ -161,6 +163,10 @@ const createStyles = (c: ThemeColors) =>
   },
   badgeUnavailable: {
     backgroundColor: '#F5D8D8',
+  },
+  // Le vert de la pastille disponible s'appliquait aussi a l'indisponible.
+  badgeTextUnavailable: {
+    color: '#A32020',
   },
   badgeText: {
     fontSize: 11,

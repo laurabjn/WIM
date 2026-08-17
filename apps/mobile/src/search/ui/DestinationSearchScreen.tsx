@@ -282,7 +282,7 @@ const createStyles = (c: ThemeColors) =>
     height: 52,
     borderRadius: 26,
     borderWidth: 1,
-    borderColor: '#E8E8E8',
+    borderColor: c.border,
     paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -314,7 +314,7 @@ const createStyles = (c: ThemeColors) =>
   clearText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#777',
+    color: c.textMuted,
   },
   list: {
     flex: 1,
@@ -346,7 +346,7 @@ const createStyles = (c: ThemeColors) =>
   itemSubtitle: {
     marginTop: 3,
     fontSize: 12,
-    color: '#666',
+    color: c.textMuted,
   },
   recentLoader: {
     marginTop: 20,
@@ -359,6 +359,6 @@ const createStyles = (c: ThemeColors) =>
   emptyText: {
     marginTop: 12,
     fontSize: 13,
-    color: '#777',
+    color: c.textMuted,
   },
 });

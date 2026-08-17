@@ -121,7 +121,7 @@ const createStyles = (c: ThemeColors) =>
     width: 96,
     height: 86,
     borderRadius: 14,
-    backgroundColor: '#EDEDED',
+    backgroundColor: c.surfaceAlt,
   },
   content: {
     flex: 1,
@@ -153,12 +153,12 @@ const createStyles = (c: ThemeColors) =>
   },
   dates: {
     fontSize: 12,
-    color: '#222222',
+    color: c.text,
     marginBottom: 8,
   },
   travelers: {
     fontSize: 12,
-    color: '#444444',
+    color: c.text,
   },
   actions: {
     justifyContent: 'center',

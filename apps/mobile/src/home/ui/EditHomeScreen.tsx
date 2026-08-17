@@ -383,7 +383,7 @@ const createStyles = (c: ThemeColors) =>
     height: 34,
     borderRadius: 17,
     borderWidth: 1,
-    borderColor: '#E8E8E8',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },

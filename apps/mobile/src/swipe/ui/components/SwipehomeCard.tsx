@@ -337,7 +337,7 @@ const createStyles = (c: ThemeColors) =>
     height: 370,
     borderRadius: 22,
     overflow: 'hidden',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: c.surfaceAlt,
   },
   carouselImage: {
     width: CAROUSEL_WIDTH,
@@ -381,7 +381,7 @@ const createStyles = (c: ThemeColors) =>
     justifyContent: 'center',
   },
   photoCounterText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '800',
   },
@@ -395,7 +395,7 @@ const createStyles = (c: ThemeColors) =>
     borderWidth: 4,
     borderColor: '#FFFFFF',
     overflow: 'hidden',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: c.surfaceAlt,
   },
   avatarImage: {
     width: '100%',

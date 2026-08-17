@@ -189,7 +189,7 @@ const createStyles = (c: ThemeColors) =>
   },
   sectionSubtitle: {
     fontSize: 12,
-    color: '#6B6B6B',
+    color: c.textMuted,
     marginBottom: 14,
     lineHeight: 18,
   },
@@ -214,7 +214,7 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#DCDCDC',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },

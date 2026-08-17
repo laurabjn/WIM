@@ -84,7 +84,7 @@ const createStyles = (c: ThemeColors) =>
     paddingBottom: 16,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#E7E7E7',
+    borderColor: c.border,
   },
 
   sliderTopRow: {
@@ -96,12 +96,12 @@ const createStyles = (c: ThemeColors) =>
 
   minLabel: {
     fontSize: 11,
-    color: '#9B9B9B',
+    color: c.textMuted,
   },
 
   maxLabel: {
     fontSize: 11,
-    color: '#9B9B9B',
+    color: c.textMuted,
   },
 
   badge: {
@@ -137,7 +137,7 @@ const createStyles = (c: ThemeColors) =>
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#D9D9D9',
+    backgroundColor: c.border,
     marginBottom: 6,
   },
 
@@ -147,7 +147,7 @@ const createStyles = (c: ThemeColors) =>
 
   tickLabel: {
     fontSize: 9,
-    color: '#9B9B9B',
+    color: c.textMuted,
     textAlign: 'center',
   },
 

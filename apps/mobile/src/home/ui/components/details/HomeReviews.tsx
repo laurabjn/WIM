@@ -305,7 +305,7 @@ const createStyles = (c: ThemeColors) =>
     height: 34,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#D6D6D6',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },

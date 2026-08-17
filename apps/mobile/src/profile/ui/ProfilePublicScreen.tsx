@@ -165,11 +165,11 @@ const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: c.surfaceAlt,
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: c.surfaceAlt,
   },
   container: {
     padding: 16,
@@ -180,7 +180,7 @@ const createStyles = (c: ThemeColors) =>
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: c.surfaceAlt,
   },
   sectionTitle: {
     marginTop: 20,

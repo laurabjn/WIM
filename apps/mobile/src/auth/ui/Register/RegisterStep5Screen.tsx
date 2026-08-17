@@ -370,7 +370,7 @@ const createStyles = (c: ThemeColors) =>
 
   charCount: {
     fontSize: 11,
-    color: '#7C7C7C',
+    color: c.textMuted,
     textAlign: 'right',
     marginTop: 4,
     marginBottom: 8,

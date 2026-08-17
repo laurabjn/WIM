@@ -96,7 +96,7 @@ const createStyles = (c: ThemeColors) =>
     color: c.textMuted,
   },
   headerTextActive: {
-    color: '#000',
+    color: c.text,
     fontWeight: '800',
   },
   toggle: {

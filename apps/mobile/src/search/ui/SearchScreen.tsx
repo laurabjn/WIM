@@ -211,7 +211,7 @@ const createStyles = (c: ThemeColors) =>
     color: c.text,
   },
   placeholderText: {
-    color: '#D0D0D0',
+    color: c.textFaint,
   },
   header: {
     height: 56,

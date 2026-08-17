@@ -163,7 +163,7 @@ const createStyles = (c: ThemeColors) =>
   home: {
     marginTop: 4,
     fontSize: 12,
-    color: '#4B5563',
+    color: c.textMuted,
     textAlign: 'center',
   },
 

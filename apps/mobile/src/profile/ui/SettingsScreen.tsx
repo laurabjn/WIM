@@ -512,11 +512,11 @@ export function SettingsScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: 'transparent',
   },
   screen: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: 'transparent',
   },
   container: {
     padding: 16,

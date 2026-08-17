@@ -282,7 +282,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   photoCounterText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '800',
   },
@@ -316,7 +316,7 @@ const createStyles = (c: ThemeColors) =>
   meta: {
     marginTop: 2,
     fontSize: 11,
-    color: '#444',
+    color: c.text,
   },
 
   rating: {

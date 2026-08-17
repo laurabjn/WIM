@@ -31,7 +31,7 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E2E2E2',
+    borderColor: c.border,
     paddingHorizontal: 16,
     paddingVertical: 16,
     marginBottom: 10,

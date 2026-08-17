@@ -52,6 +52,6 @@ const createStyles = (c: ThemeColors) =>
   },
   arrow: {
     fontSize: 20,
-    color: '#999',
+    color: c.textMuted,
   },
 });

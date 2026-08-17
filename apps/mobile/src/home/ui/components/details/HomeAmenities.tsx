@@ -229,7 +229,7 @@ const createStyles = (c: ThemeColors) =>
     minHeight: 40,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#D6D6D6',
+    borderColor: c.border,
     paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',

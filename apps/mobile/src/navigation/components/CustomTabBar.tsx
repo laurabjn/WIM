@@ -171,7 +171,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   iconBubbleActive: {
-    backgroundColor: '#ECECEC',
+    backgroundColor: c.surfaceAlt,
   },
 
   searchPill: {
@@ -180,7 +180,7 @@ const createStyles = (c: ThemeColors) =>
     maxWidth: 128,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#E8E8E8',
+    borderColor: c.border,
     backgroundColor: c.surface,
     flexDirection: 'row',
     alignItems: 'center',
@@ -189,7 +189,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   searchPillActive: {
-    backgroundColor: '#FAFAFA',
+    backgroundColor: c.surfaceAlt,
   },
 
   searchIcon: {

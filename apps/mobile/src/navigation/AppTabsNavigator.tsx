@@ -102,7 +102,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
 const styles = StyleSheet.create({
   testScreen: {
     flex: 1,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },

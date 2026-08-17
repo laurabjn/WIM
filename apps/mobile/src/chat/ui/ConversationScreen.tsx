@@ -1066,12 +1066,12 @@ menuBackdrop: {
     paddingTop: 4,
     paddingBottom: 10,
     fontSize: 11,
-    color: '#8A8A8E',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
   translationLink: {
-    color: '#8A8A8E',
+    color: c.textMuted,
     textDecorationLine: 'underline',
   },
 

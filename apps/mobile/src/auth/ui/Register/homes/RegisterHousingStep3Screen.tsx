@@ -529,7 +529,7 @@ const createStyles = (c: ThemeColors) =>
 
   sectionDescription: {
     fontSize: 12,
-    color: '#7C7C7C',
+    color: c.textMuted,
     textAlign: 'center',
     marginBottom: 18,
   },
@@ -560,7 +560,7 @@ const createStyles = (c: ThemeColors) =>
   suggestionsBox: {
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#EBEBEB',
+    borderColor: c.border,
     backgroundColor: c.surface,
     overflow: 'hidden',
     elevation: 5,
@@ -607,12 +607,12 @@ const createStyles = (c: ThemeColors) =>
     marginTop: 3,
     fontSize: 11,
     lineHeight: 16,
-    color: '#777777',
+    color: c.textMuted,
   },
 
   selectedAddressCard: {
     borderRadius: 14,
-    backgroundColor: '#EDFBF6',
+    backgroundColor: c.surfaceAlt,
     borderWidth: 1,
     borderColor: '#B7EAD7',
     padding: 13,

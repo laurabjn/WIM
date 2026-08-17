@@ -219,7 +219,7 @@ const createStyles = (c: ThemeColors) =>
     height: 240,
     borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: '#E8EEF3',
+    backgroundColor: c.surfaceAlt,
   },
   map: {
     flex: 1,

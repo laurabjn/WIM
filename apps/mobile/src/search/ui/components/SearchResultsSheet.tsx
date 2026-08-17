@@ -239,7 +239,7 @@ const createStyles = (c: ThemeColors) =>
     marginBottom: 4,
     textAlign: 'center',
     fontSize: 12,
-    color: '#666',
+    color: c.textMuted,
   },
 
   loader: {
@@ -263,7 +263,7 @@ const createStyles = (c: ThemeColors) =>
 
   resultWrapperSelected: {
     borderColor: '#25AEEB',
-    backgroundColor: '#F4FBFF',
+    backgroundColor: c.surfaceAlt,
   },
 
   numberBadge: {

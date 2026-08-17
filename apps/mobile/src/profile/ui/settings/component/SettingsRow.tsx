@@ -80,6 +80,6 @@ const createStyles = (c: ThemeColors) =>
   },
   arrow: {
     fontSize: 16,
-    color: '#7A7A7A',
+    color: c.textMuted,
   },
 });
