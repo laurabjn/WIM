@@ -124,6 +124,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [participantLastReadAt, setParticipantLastReadAt] = useState<string | null>(null);
 
   const translatedRef = useRef(true);
+  const [translationEpoch, setTranslationEpoch] = useState(0);
 
   const cursorRef = useRef<string | null>(null);
   const hasMoreRef = useRef(false);
@@ -195,7 +196,7 @@ export function ConversationScreen({ route, navigation }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [chatId, t]);
+  }, [chatId, t, translationEpoch]);
 
   // Revenir sur une conversation deja montee ne relance pas le chargement
   // initial : sans ce rafraichissement, un message ecrit ailleurs (une demande
@@ -338,12 +339,22 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
-  async function disableTranslation() {
-    translatedRef.current = false;
+  async function applyTranslation(next: boolean) {
+    translatedRef.current = next;
 
-    setTranslated(false);
+    setTranslated(next);
 
-    await AsyncStorage.setItem(translationKey(chatId), 'off');
+    await AsyncStorage.setItem(translationKey(chatId), next ? 'on' : 'off');
+
+    // Couper n'a rien a recharger, l'original accompagne toujours la
+    // traduction ; remettre en route, si.
+    if (next) setTranslationEpoch((epoch) => epoch + 1);
+  }
+
+  function toggleTranslation() {
+    setMenuOpen(false);
+
+    applyTranslation(!translated);
   }
 
   async function sendPhoto(uri: string) {
@@ -702,7 +713,7 @@ export function ConversationScreen({ route, navigation }: Props) {
                 {t('autoTranslated')}{' '}
                 <Text
                   style={styles.translationLink}
-                  onPress={disableTranslation}
+                  onPress={() => applyTranslation(false)}
                 >
                   {t('removeTranslation')}
                 </Text>
@@ -805,6 +816,12 @@ export function ConversationScreen({ route, navigation }: Props) {
                 <Text style={styles.menuText}>{t('proposeExchange')}</Text>
               </TouchableOpacity>
             )}
+
+            <TouchableOpacity style={styles.menuItem} onPress={toggleTranslation}>
+              <Text style={styles.menuText}>
+                {translated ? t('stopTranslation') : t('restoreTranslation')}
+              </Text>
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={reportParticipant}>
               <Text style={styles.menuText}>{t('report')}</Text>
