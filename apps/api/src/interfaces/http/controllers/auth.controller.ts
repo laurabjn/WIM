@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.usecase';
@@ -118,6 +119,40 @@ export class AuthController {
 
       throw error;
     }
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Body() body: { refreshToken?: string }) {
+    if (!body?.refreshToken) {
+      throw new UnauthorizedException('Jeton de rafraîchissement manquant.');
+    }
+
+    let payload: { sub: string; email: string };
+
+    try {
+      payload = await this.jwtService.verifyAsync(body.refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',
+      });
+    } catch {
+      throw new UnauthorizedException('Session expirée, reconnectez-vous.');
+    }
+
+    const charge = { sub: payload.sub, email: payload.email };
+
+    const accessToken = await this.jwtService.signAsync(charge, {
+      expiresIn: '15m',
+      secret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret',
+    });
+
+    // Le jeton de rafraichissement est reconduit a chaque passage : une
+    // application ouverte regulierement ne demande jamais de se reconnecter.
+    const refreshToken = await this.jwtService.signAsync(charge, {
+      expiresIn: '30d',
+      secret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',
+    });
+
+    return { accessToken, refreshToken };
   }
 
   @Post('login')
