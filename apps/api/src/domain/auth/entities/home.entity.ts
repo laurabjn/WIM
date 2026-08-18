@@ -80,6 +80,7 @@ export interface HomeEntity {
   category: HomeCategory | null;
   amenities: string[];
   isAvailableForExchange: boolean;
+  occupiedByExchange?: boolean;
   pricePerNight?: number | null;
   averageRating?: number | null;
   reviewsCount: number;

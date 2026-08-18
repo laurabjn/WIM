@@ -544,7 +544,8 @@
         "technical": "Technical",
         "other": "Other"
       }
-    }
+    },
+    "occupied": "Occupied"
   },
   "home": {
     "notFound": "Home not found",
@@ -672,7 +673,11 @@
     "theirHome": "At my host's",
     "iGo": "I stay at theirs",
     "theyCome": "They stay at mine",
-    "noHomeOffered": "No home offered"
+    "noHomeOffered": "No home offered",
+    "availabilityPeriods": "Your available periods",
+    "availabilityPeriodsHint": "The dates your home can be exchanged. Without a period, it appears in no date search.",
+    "availabilityNone": "No period opened yet.",
+    "availabilityAdd": "Add a period"
   },
   "availability": {
     "when": "When are you available for exchange ?",

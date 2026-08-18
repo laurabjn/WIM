@@ -25,6 +25,8 @@ export interface Home {
   vehicle?: Vehicule | null;
   availabilities?: HomeAvailability[];
   isAvailableForExchange: boolean;
+  // Un sejour en cours occupe ce logement precis, sans toucher au reglage.
+  occupiedByExchange?: boolean;
   pricePerNight?: number | null;
   isFavorite?: boolean;
   averageRating?: number | null;

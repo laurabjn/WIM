@@ -28,6 +28,11 @@ import { EditHomeDetailsTab } from './components/edit/EditHomeDetailsTab';
 import { EditHomeAmenitiesTab } from './components/edit/EditHomeAmenitiesTab';
 import { EditHomeRulesTab } from './components/edit/EditHomeRulesTab';
 import { EditHomeAvailabilityTab } from './components/edit/EditHomeAvailabilityTab';
+import {
+  createHomeAvailability,
+  deleteHomeAvailability,
+} from '../infrastructure/homeAvailability.api';
+import type { HomeAvailability } from '@wim/shared';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
@@ -54,6 +59,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
+  const [availabilities, setAvailabilities] = useState<HomeAvailability[]>([]);
   const [capacity, setCapacity] = useState(1);
   const [beds, setBeds] = useState(1);
   const [bathrooms, setBathrooms] = useState(1);
@@ -96,6 +102,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         setAddress(data.address ?? '');
         setCity(data.city ?? '');
         setCountry(data.country ?? '');
+        setAvailabilities(data.availabilities ?? []);
         setCapacity(data.capacity ?? 1);
         setBeds(data.beds ?? 1);
         setBathrooms(data.bathrooms ?? 1);
@@ -316,6 +323,27 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
         {activeTab === 'Disponibilité' && (
           <EditHomeAvailabilityTab
+            availabilities={availabilities}
+            onAddAvailability={async (start, end) => {
+              if (!token || !home) return;
+
+              const creee = await createHomeAvailability(token, home.id, {
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
+                type: 'AVAILABLE',
+              });
+
+              setAvailabilities((current) => [...current, creee]);
+            }}
+            onRemoveAvailability={async (availabilityId) => {
+              if (!token || !home) return;
+
+              await deleteHomeAvailability(token, home.id, availabilityId);
+
+              setAvailabilities((current) =>
+                current.filter((periode) => periode.id !== availabilityId),
+              );
+            }}
             isAvailableForExchange={isAvailableForExchange}
             pricePerNight={pricePerNight}
             onChangeIsAvailableForExchange={setIsAvailableForExchange}

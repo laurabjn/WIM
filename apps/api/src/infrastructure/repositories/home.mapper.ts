@@ -42,7 +42,14 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
   },
   // Un sejour en cours occupe le logement : sa disponibilite affichee doit le
   // refleter, quel que soit le reglage du proprietaire.
+  // Un echange occupe le logement de l'hote et celui de l'invite, tous deux
+  // nommes. Interroger les deux cotes evite de condamner les autres logements
+  // du meme proprietaire.
   exchanges: {
+    where: { status: 'CURRENT' },
+    select: { id: true },
+  },
+  guestExchanges: {
     where: { status: 'CURRENT' },
     select: { id: true },
   },
@@ -140,8 +147,11 @@ export function mapHome(home: PrismaHomeWithRelations): HomeEntity {
     homeType: home.homeType,
     category: home.category ?? null,
     amenities: Array.isArray(home.amenities) ? (home.amenities as string[]) : [],
-    isAvailableForExchange:
-      (home.isAvailableForExchange ?? false) && home.exchanges.length === 0,
+    // Le reglage du proprietaire reste intact : l'ecran d'edition le relit, et
+    // le confondre avec l'occupation le ferait reenregistrer a faux.
+    isAvailableForExchange: home.isAvailableForExchange ?? false,
+    occupiedByExchange:
+      home.exchanges.length > 0 || home.guestExchanges.length > 0,
     pricePerNight: home.pricePerNight ?? null,
     averageRating: home.averageRating ?? null,
     reviewsCount: home.reviewsCount ?? 0,

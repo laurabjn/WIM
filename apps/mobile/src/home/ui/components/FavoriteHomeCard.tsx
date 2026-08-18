@@ -83,7 +83,7 @@ export function FavoriteHomeCard({
         </Text>
 
         <View style={styles.bottomRow}>
-          {home.isAvailableForExchange ? (
+          {home.isAvailableForExchange && !home.occupiedByExchange ? (
             <View style={styles.badgeAvailable}>
               <Text style={styles.badgeAvailableText}>{t('available')}</Text>
             </View>

@@ -73,14 +73,14 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
         </Text>
 
         <View style={styles.bottomRow}>
-          {home.isAvailableForExchange ? (
+          {home.isAvailableForExchange && !home.occupiedByExchange ? (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{t('available')}</Text>
             </View>
           ) : (
             <View style={[styles.badge, styles.badgeUnavailable]}>
               <Text style={[styles.badgeText, styles.badgeTextUnavailable]}>
-                {t('unavailable')}
+                {home.occupiedByExchange ? t('occupied') : t('unavailable')}
               </Text>
             </View>
           )}

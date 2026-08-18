@@ -123,8 +123,10 @@ export function SettingsScreen({ route, navigation }: Props) {
 
   const displayedEmail = profile.email || t('common:notProvided');
   const displayedPhone = profile.phone || t('common:notProvided');
+  // La langue affichee suivait le profil recu en parametre, jamais rafraichi :
+  // elle restait sur l'ancienne apres le changement. i18n, lui, est a jour.
   const displayedLocale =
-    profile.preferredLocale === 'fr' ? 'Français' : 'English';
+    i18n.language?.startsWith('en') ? 'English' : 'Français';
 
   const displayedNationality = profile.nationality || t('common:notProvided');
 

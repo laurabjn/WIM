@@ -441,7 +441,8 @@
         "technical": "Technique",
         "other": "Autre"
       }
-    }
+    },
+    "occupied": "Occupe"
   },
   "auth": {
     "welcomeTitle": "Bienvenue sur Wim !",
@@ -671,7 +672,11 @@
     "theirHome": "Chez mon hote",
     "iGo": "Je vais chez lui",
     "theyCome": "Il vient chez moi",
-    "noHomeOffered": "Aucun logement propose"
+    "noHomeOffered": "Aucun logement propose",
+    "availabilityPeriods": "Vos periodes de disponibilite",
+    "availabilityPeriodsHint": "Les dates ou votre logement peut etre echange. Sans periode, il n'apparait dans aucune recherche par dates.",
+    "availabilityNone": "Aucune periode ouverte pour le moment.",
+    "availabilityAdd": "Ajouter une periode"
   },
   "availability": {
     "when": "Quand êtes-vous disponible pour échanger ?",
