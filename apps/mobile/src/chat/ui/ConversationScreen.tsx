@@ -1070,6 +1070,8 @@ export function ConversationScreen({ route, navigation }: Props) {
         visible={menuOpen}
         transparent
         animationType="fade"
+        statusBarTranslucent
+        navigationBarTranslucent
         onRequestClose={() => setMenuOpen(false)}
       >
         <TouchableOpacity
