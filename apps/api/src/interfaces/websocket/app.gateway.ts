@@ -17,7 +17,11 @@ import type {
 } from '@wim/shared';
 
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
-import { CHAT_REPOSITORY } from 'src/interfaces/http/tokens/token';
+import { UserRepository } from 'src/domain/auth/repositories/user.repository';
+import {
+  CHAT_REPOSITORY,
+  USER_REPOSITORY,
+} from 'src/interfaces/http/tokens/token';
 
 const wsCorsOrigin = process.env.WS_CORS_ORIGIN
   ? process.env.WS_CORS_ORIGIN.split(',').map((origin) => origin.trim())
@@ -48,6 +52,8 @@ export class AppGateway {
     private readonly jwtService: JwtService,
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: ChatRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: UserRepository,
   ) {}
 
   private readonly logger = new Logger(AppGateway.name);
@@ -82,7 +88,7 @@ export class AppGateway {
   }
 
   handleDisconnect(client: AuthenticatedSocket) {
-    if (client.userId) this.markOffline(client.userId);
+    if (client.userId) void this.markOffline(client.userId);
   }
 
   private markOnline(userId: string) {
@@ -93,12 +99,32 @@ export class AppGateway {
     if (next === 1) this.server.emit('presence:changed', { userId, isOnline: true });
   }
 
-  private markOffline(userId: string) {
+  private async markOffline(userId: string) {
     const next = (this.onlineUsers.get(userId) ?? 1) - 1;
 
     if (next <= 0) {
       this.onlineUsers.delete(userId);
-      this.server.emit('presence:changed', { userId, isOnline: false });
+
+      const lastSeenAt = new Date().toISOString();
+
+      // Une base indisponible ne doit pas empecher l'annonce du depart : le
+      // statut compte plus que l'horodatage.
+      try {
+        await this.userRepository.touchLastSeen(userId);
+      } catch (error) {
+        this.logger.warn(
+          `Derniere presence non enregistree pour ${userId} : ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+
+      this.server.emit('presence:changed', {
+        userId,
+        isOnline: false,
+        lastSeenAt,
+      });
+
       return;
     }
 
@@ -110,10 +136,50 @@ export class AppGateway {
   }
 
   @SubscribeMessage('presence:list')
-  listPresence(@MessageBody() body: { userIds?: string[] }) {
+  async listPresence(@MessageBody() body: { userIds?: string[] }) {
     const userIds = body?.userIds ?? [];
 
-    return userIds.filter((userId) => this.onlineUsers.has(userId));
+    if (userIds.length === 0) return [];
+
+    const absents = userIds.filter((userId) => !this.onlineUsers.has(userId));
+
+    let dernieres: Record<string, string | null> = {};
+
+    try {
+      dernieres = await this.userRepository.findLastSeen(absents);
+    } catch (error) {
+      this.logger.warn(
+        `Dernieres presences illisibles : ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+
+    return userIds.map((userId) => ({
+      userId,
+      isOnline: this.onlineUsers.has(userId),
+      lastSeenAt: dernieres[userId] ?? null,
+    }));
+  }
+
+  // La frappe ne laisse aucune trace : elle ne vaut que pour les sockets
+  // presents dans le salon, et le client la laisse expirer d'elle-meme.
+  @SubscribeMessage('typing')
+  typing(
+    @MessageBody() body: { chatId?: string; isTyping?: boolean },
+    @ConnectedSocket() client: AuthenticatedSocket,
+  ) {
+    if (!body?.chatId || !client.userId) return { sent: false };
+
+    if (!client.rooms.has(chatRoom(body.chatId))) return { sent: false };
+
+    client.to(chatRoom(body.chatId)).emit('typing:changed', {
+      chatId: body.chatId,
+      userId: client.userId,
+      isTyping: Boolean(body.isTyping),
+    });
+
+    return { sent: true };
   }
 
   @SubscribeMessage('chat:join')

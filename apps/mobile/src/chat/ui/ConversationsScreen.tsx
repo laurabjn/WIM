@@ -116,7 +116,7 @@ export function ConversationsScreen({ navigation }: Props) {
     };
   }, [loadChats]);
 
-  const onlineUsers = usePresence(
+  const presence = usePresence(
     chats.map((chat) => chat.participant?.id).filter(Boolean) as string[],
   );
 
@@ -133,7 +133,7 @@ export function ConversationsScreen({ navigation }: Props) {
     const participant = chat.participant;
     const hasUnread = chat.unreadCount > 0;
     const isOnline = participant?.id
-      ? onlineUsers.has(participant.id)
+      ? presence.online.has(participant.id)
       : false;
 
     return (

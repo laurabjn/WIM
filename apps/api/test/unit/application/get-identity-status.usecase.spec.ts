@@ -32,6 +32,8 @@ describe('GetIdentityStatusUseCase', () => {
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
       updateIdentityStatus: jest.fn(),
+      touchLastSeen: jest.fn(),
+      findLastSeen: jest.fn(),
     };
 
     useCase = new GetIdentityStatusUseCase(userRepository);

@@ -66,4 +66,28 @@ export class UserPrismaRepository implements UserRepository {
       data: { identityStatus: status as any },
     });
   }
+
+  // updateMany plutot que update : une deconnexion peut suivre la suppression
+  // du compte, et une ligne absente ferait alors lever une erreur.
+  async touchLastSeen(userId: string): Promise<void> {
+    await this.prisma.user.updateMany({
+      where: { id: userId },
+      data: { lastSeenAt: new Date() },
+    });
+  }
+
+  async findLastSeen(
+    userIds: string[],
+  ): Promise<Record<string, string | null>> {
+    if (userIds.length === 0) return {};
+
+    const rows = await this.prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, lastSeenAt: true },
+    });
+
+    return Object.fromEntries(
+      rows.map((row) => [row.id, row.lastSeenAt?.toISOString() ?? null]),
+    );
+  }
 }

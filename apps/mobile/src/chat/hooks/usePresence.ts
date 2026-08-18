@@ -6,10 +6,20 @@ import { connectChatSocket } from '../infrastructure/chatSocket';
 type PresenceChange = {
   userId: string;
   isOnline: boolean;
+  lastSeenAt?: string | null;
 };
 
-export function usePresence(userIds: string[]): Set<string> {
-  const [online, setOnline] = useState<Set<string>>(new Set());
+export type Presence = {
+  /** Identifiants actuellement connectes. */
+  online: Set<string>;
+  /** Derniere presence connue des autres, en ISO. */
+  lastSeen: Map<string, string>;
+};
+
+const VIDE: Presence = { online: new Set(), lastSeen: new Map() };
+
+export function usePresence(userIds: string[]): Presence {
+  const [presence, setPresence] = useState<Presence>(VIDE);
 
   const key = userIds.slice().sort().join(',');
 
@@ -28,20 +38,40 @@ export function usePresence(userIds: string[]): Set<string> {
         socket.emit(
           'presence:list',
           { userIds: key ? key.split(',') : [] },
-          (connected: string[]) => {
-            if (!cancelled) setOnline(new Set(connected ?? []));
+          (statuts: PresenceChange[]) => {
+            if (cancelled) return;
+
+            const online = new Set<string>();
+            const lastSeen = new Map<string, string>();
+
+            for (const statut of statuts ?? []) {
+              if (statut.isOnline) online.add(statut.userId);
+              else if (statut.lastSeenAt)
+                lastSeen.set(statut.userId, statut.lastSeenAt);
+            }
+
+            setPresence({ online, lastSeen });
           },
         );
       }
 
       function handleChange(change: PresenceChange) {
-        setOnline((current) => {
-          const next = new Set(current);
+        setPresence((current) => {
+          const online = new Set(current.online);
+          const lastSeen = new Map(current.lastSeen);
 
-          if (change.isOnline) next.add(change.userId);
-          else next.delete(change.userId);
+          if (change.isOnline) {
+            online.add(change.userId);
+            // Une personne revenue en ligne n'a plus de "vu il y a" a montrer.
+            lastSeen.delete(change.userId);
+          } else {
+            online.delete(change.userId);
 
-          return next;
+            if (change.lastSeenAt)
+              lastSeen.set(change.userId, change.lastSeenAt);
+          }
+
+          return { online, lastSeen };
         });
       }
 
@@ -64,5 +94,5 @@ export function usePresence(userIds: string[]): Set<string> {
     };
   }, [key]);
 
-  return online;
+  return presence;
 }

@@ -52,6 +52,8 @@ import {
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { useChatSocket } from '../hooks/useChatSocket';
 import { usePresence } from '../hooks/usePresence';
+import { formatLastSeen } from '../utils/formatLastSeen';
+import { getChatSocket } from '../infrastructure/chatSocket';
 import {
   cancelExchangeApi,
   getChatExchangeApi,
@@ -78,6 +80,11 @@ const PAGE_SIZE = 30;
 
 // Un enregistrement plus court est un appui malencontreux ; plus long, il
 // depasserait la taille acceptee par le serveur.
+// Delai sans frappe avant d'annoncer l'arret, et duree au bout de laquelle
+// le destinataire oublie une frappe dont l'arret ne lui est jamais parvenu.
+const TYPING_STOP_MS = 2500;
+const TYPING_EXPIRY_MS = 4000;
+
 const MIN_RECORDING_MS = 800;
 // La reconnaissance enregistre en PCM non compresse (~32 ko/s a 16 kHz) : au
 // dela de trois minutes, l'envoi depasserait la taille acceptee.
@@ -132,11 +139,15 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   // La presence circule deja sur la passerelle : la liste des conversations
   // l'affichait, la conversation elle-meme l'ignorait.
-  const onlineUsers = usePresence(participantId ? [participantId] : []);
+  const presence = usePresence(participantId ? [participantId] : []);
 
   const participantOnline = participantId
-    ? onlineUsers.has(participantId)
+    ? presence.online.has(participantId)
     : false;
+
+  const participantLastSeen = participantId
+    ? presence.lastSeen.get(participantId)
+    : undefined;
   const participantName = participant.firstName;
   const participantAvatar = participant.avatarUrl;
 
@@ -159,6 +170,10 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [recording, setRecording] = useState(false);
   const [recordingMs, setRecordingMs] = useState(0);
   const [transcript, setTranscript] = useState('');
+  const [participantTyping, setParticipantTyping] = useState(false);
+  const typingSentAtRef = useRef(0);
+  const typingStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typingClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recordingStartedAt = useRef(0);
   const transcriptRef = useRef('');
   const finalPartsRef = useRef<string[]>([]);
@@ -311,11 +326,68 @@ export function ConversationScreen({ route, navigation }: Props) {
     [currentUserId],
   );
 
+  const handleTyping = useCallback(
+    (payload: { chatId: string; userId: string; isTyping: boolean }) => {
+      if (payload.userId === currentUserId) return;
+
+      setParticipantTyping(payload.isTyping);
+
+      if (typingClearRef.current) clearTimeout(typingClearRef.current);
+
+      // Un "j'arrete" perdu en route laisserait la mention affichee pour
+      // toujours : elle expire d'elle-meme.
+      if (payload.isTyping) {
+        typingClearRef.current = setTimeout(
+          () => setParticipantTyping(false),
+          TYPING_EXPIRY_MS,
+        );
+      }
+    },
+    [currentUserId],
+  );
+
   useChatSocket({
     chatId,
     onMessage: handleIncomingMessage,
     onRead: handleRead,
+    onTyping: handleTyping,
   });
+
+  useEffect(
+    () => () => {
+      if (typingStopRef.current) clearTimeout(typingStopRef.current);
+      if (typingClearRef.current) clearTimeout(typingClearRef.current);
+
+      getChatSocket()?.emit('typing', { chatId, isTyping: false });
+    },
+    [chatId],
+  );
+
+  function emitTyping(isTyping: boolean) {
+    getChatSocket()?.emit('typing', { chatId, isTyping });
+  }
+
+  function handleDraftChange(texte: string) {
+    setDraft(texte);
+
+    // Un evenement par seconde suffit : le destinataire fait expirer l'etat
+    // tout seul, inutile d'en emettre a chaque touche.
+    const maintenant = Date.now();
+
+    if (maintenant - typingSentAtRef.current > 1000) {
+      typingSentAtRef.current = maintenant;
+
+      emitTyping(true);
+    }
+
+    if (typingStopRef.current) clearTimeout(typingStopRef.current);
+
+    typingStopRef.current = setTimeout(() => {
+      typingSentAtRef.current = 0;
+
+      emitTyping(false);
+    }, TYPING_STOP_MS);
+  }
 
   const loadEarlier = useCallback(async () => {
     if (!hasMoreRef.current || loadingMore || !cursorRef.current) return;
@@ -350,6 +422,12 @@ export function ConversationScreen({ route, navigation }: Props) {
 
     setSending(true);
     setDraft('');
+
+    if (typingStopRef.current) clearTimeout(typingStopRef.current);
+
+    typingSentAtRef.current = 0;
+
+    emitTyping(false);
 
     try {
       const session = await getSession();
@@ -897,8 +975,14 @@ export function ConversationScreen({ route, navigation }: Props) {
               {participantName}
             </Text>
 
-            {participantOnline ? (
+            {participantTyping ? (
+              <Text style={styles.headerPresence}>{t('typing')}</Text>
+            ) : participantOnline ? (
               <Text style={styles.headerPresence}>{t('online')}</Text>
+            ) : participantLastSeen ? (
+              <Text style={styles.headerLastSeen}>
+                {formatLastSeen(participantLastSeen, t)}
+              </Text>
             ) : null}
           </View>
         </TouchableOpacity>
@@ -1057,7 +1141,7 @@ export function ConversationScreen({ route, navigation }: Props) {
                 <TextInput
                   style={styles.input}
                   value={draft}
-                  onChangeText={setDraft}
+                  onChangeText={handleDraftChange}
                   placeholder={t('messagePlaceholder')}
                   placeholderTextColor={themeColors.textFaint}
                   multiline
@@ -1262,6 +1346,13 @@ menuBackdrop: {
     fontSize: 12,
     fontWeight: '600',
     color: c.success,
+  },
+
+  headerLastSeen: {
+    marginTop: 1,
+    fontSize: 12,
+    fontWeight: '600',
+    color: c.textMuted,
   },
 
   loader: {

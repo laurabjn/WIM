@@ -30,6 +30,10 @@ model User {
 
   // Reglages de confidentialite. Ils vivent en base et non sur l'appareil :
   // c'est le serveur qui doit les faire respecter, pas l'affichage.
+  // Ecrite a la deconnexion : elle seule permet d'afficher "vu il y a ..."
+  // quand la personne n'est plus connectee.
+  lastSeenAt DateTime? @map("last_seen_at")
+
   profileVisible Boolean @default(true) @map("profile_visible")
   showAge        Boolean @default(true) @map("show_age")
   dataSharing    Boolean @default(false) @map("data_sharing")
