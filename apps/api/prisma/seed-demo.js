@@ -124,6 +124,10 @@ const CONVERSATIONS = [
   },
 ];
 
+// Un statut se perime au bout d'un jour : les poser dans les dernieres heures
+// est la seule facon qu'ils soient visibles apres le seed.
+const hoursAgo = (hours) => new Date(Date.now() - hours * 3600 * 1000);
+
 const daysFromNow = (days) => {
   const d = new Date();
   d.setUTCHours(0, 0, 0, 0);
@@ -147,7 +151,8 @@ const OWNERS = [
     rating: 5,
   },
   {
-    key: 'thomas',
+    key: "thomas",
+    status: { text: 'Cherche Lyon en août', hoursAgo: 2 },
     memberSince: new Date('2021-09-16T00:00:00.000Z'),
     birthDate: new Date('1990-07-22T00:00:00.000Z'),
     email: `thomas${DEMO_DOMAIN}`,
@@ -161,7 +166,8 @@ const OWNERS = [
     rating: 4,
   },
   {
-    key: 'elena',
+    key: "elena",
+    status: { text: 'Dispo en septembre', hoursAgo: 5 },
     memberSince: new Date('2018-06-02T00:00:00.000Z'),
     birthDate: new Date('1982-11-03T00:00:00.000Z'),
     email: `elena${DEMO_DOMAIN}`,
@@ -189,7 +195,8 @@ const OWNERS = [
     rating: 4,
   },
   {
-    key: 'lucia',
+    key: "lucia",
+    status: { text: 'Valence en novembre', hoursAgo: 9 },
     memberSince: new Date('2022-02-11T00:00:00.000Z'),
     birthDate: new Date('1993-05-30T00:00:00.000Z'),
     email: `lucia${DEMO_DOMAIN}`,
@@ -203,7 +210,8 @@ const OWNERS = [
     rating: 5,
   },
   {
-    key: 'hugo',
+    key: "hugo",
+    status: { text: 'Nouveau sur Wim', hoursAgo: 20 },
     memberSince: new Date('2023-02-11T00:00:00.000Z'),
     birthDate: new Date('1990-07-22T00:00:00.000Z'),
     email: `hugo${DEMO_DOMAIN}`,
@@ -287,7 +295,8 @@ const OWNERS = [
     rating: 5,
   },
   {
-    key: 'yara',
+    key: "yara",
+    status: { text: 'Envie de montagne', hoursAgo: 14 },
     memberSince: new Date('2021-11-05T00:00:00.000Z'),
     birthDate: new Date('1988-02-17T00:00:00.000Z'),
     email: `yara${DEMO_DOMAIN}`,
@@ -301,7 +310,8 @@ const OWNERS = [
     rating: 4,
   },
   {
-    key: 'tom',
+    key: "tom",
+    status: { text: 'Studio libre cet automne', hoursAgo: 1 },
     memberSince: new Date('2023-08-21T00:00:00.000Z'),
     birthDate: new Date('1995-12-03T00:00:00.000Z'),
     email: `tom${DEMO_DOMAIN}`,
@@ -780,6 +790,8 @@ async function main() {
       preferredLocale: 'fr',
       identityStatus: 'VERIFIED',
       passwordHash,
+      statusText: owner.status ? owner.status.text : null,
+      statusUpdatedAt: owner.status ? hoursAgo(owner.status.hoursAgo) : null,
     };
 
     ownersByKey[owner.key] = await prisma.user.upsert({
