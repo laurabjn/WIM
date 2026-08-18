@@ -38,6 +38,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
 
   return (
     <Tab.Navigator
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,

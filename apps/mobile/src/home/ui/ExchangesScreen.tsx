@@ -44,25 +44,14 @@ export function ExchangesScreen({ navigation }: any) {
   function goToMessages(exchange: Exchange) {
     if (!exchange.chatId) return;
 
-    // La conversation vit dans l'onglet Messages : depuis la pile des
-    // echanges, il faut passer par le navigateur parent.
-    const parent = navigation.getParent?.();
-
-    if (parent) {
-      parent.navigate('MessagesTab', {
-        screen: 'Conversation',
-        params: {
-          chatId: exchange.chatId,
-          participantId: exchange.partner?.id,
-          participantName: exchange.partner?.firstName ?? '',
-          participantAvatar: exchange.partner?.avatarUrl ?? null,
-        },
-      });
-
-      return;
-    }
-
-    navigation.navigate('Conversation', { chatId: exchange.chatId });
+    // La conversation s'ouvre dans la pile des echanges : sauter dans l'onglet
+    // Messages faisait revenir ailleurs, le retour d'onglet ramenant au premier.
+    navigation.navigate('Conversation', {
+      chatId: exchange.chatId,
+      participantId: exchange.partner?.id,
+      participantName: exchange.partner?.firstName ?? '',
+      participantAvatar: exchange.partner?.avatarUrl ?? null,
+    });
   }
 
   if (loading) {
