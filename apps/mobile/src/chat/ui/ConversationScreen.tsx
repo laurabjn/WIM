@@ -51,6 +51,7 @@ import {
 } from '../infrastructure/chat.api';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { useChatSocket } from '../hooks/useChatSocket';
+import { usePresence } from '../hooks/usePresence';
 import {
   cancelExchangeApi,
   getChatExchangeApi,
@@ -128,6 +129,14 @@ export function ConversationScreen({ route, navigation }: Props) {
   });
 
   const participantId = participant.id;
+
+  // La presence circule deja sur la passerelle : la liste des conversations
+  // l'affichait, la conversation elle-meme l'ignorait.
+  const onlineUsers = usePresence(participantId ? [participantId] : []);
+
+  const participantOnline = participantId
+    ? onlineUsers.has(participantId)
+    : false;
   const participantName = participant.firstName;
   const participantAvatar = participant.avatarUrl;
 
@@ -883,9 +892,15 @@ export function ConversationScreen({ route, navigation }: Props) {
             </View>
           )}
 
-          <Text style={styles.headerName} numberOfLines={1}>
-            {participantName}
-          </Text>
+          <View style={styles.headerText}>
+            <Text style={styles.headerName} numberOfLines={1}>
+              {participantName}
+            </Text>
+
+            {participantOnline ? (
+              <Text style={styles.headerPresence}>{t('online')}</Text>
+            ) : null}
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -1232,11 +1247,21 @@ menuBackdrop: {
     color: c.primary,
   },
 
-  headerName: {
+  headerText: {
     flex: 1,
+  },
+
+  headerName: {
     fontSize: 17,
     fontWeight: '700',
     color: c.text,
+  },
+
+  headerPresence: {
+    marginTop: 1,
+    fontSize: 12,
+    fontWeight: '600',
+    color: c.success,
   },
 
   loader: {

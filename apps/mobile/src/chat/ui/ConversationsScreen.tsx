@@ -432,7 +432,7 @@ const createStyles = (c: ThemeColors) =>
     borderRadius: 7,
     backgroundColor: c.success,
     borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: c.surface,
   },
 
   avatarFallback: {

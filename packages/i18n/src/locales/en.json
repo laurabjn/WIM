@@ -793,6 +793,7 @@
     "photoError": "The photo could not be sent.",
     "cameraDenied": "Camera access is denied.",
     "galleryDenied": "Photo access is denied.",
+    "online": "Online",
     "voicePreview": "Voice message",
     "microphoneDenied": "Microphone access is denied.",
     "voiceTooShort": "Hold longer to record.",

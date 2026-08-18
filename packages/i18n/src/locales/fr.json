@@ -792,6 +792,7 @@
     "photoError": "La photo n'a pas pu être envoyée.",
     "cameraDenied": "L'accès à l'appareil photo est refusé.",
     "galleryDenied": "L'accès aux photos est refusé.",
+    "online": "En ligne",
     "voicePreview": "Message vocal",
     "microphoneDenied": "L'accès au micro est refusé.",
     "voiceTooShort": "Maintenez plus longtemps pour enregistrer.",
