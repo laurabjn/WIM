@@ -490,11 +490,12 @@ const createStyles = (c: ThemeColors) =>
   statusRow: {
     paddingHorizontal: 14,
     paddingBottom: 14,
-    gap: 14,
+    gap: 6,
   },
 
   statusItem: {
-    width: 96,
+    minWidth: 72,
+    maxWidth: 124,
     alignItems: 'center',
   },
 
