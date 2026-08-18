@@ -858,7 +858,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <BackButton onPress={navigation.goBack} style={styles.headerButton} />
 
@@ -1290,11 +1290,11 @@ menuBackdrop: {
   },
 
   bubbleMine: {
-    backgroundColor: c.contrast,
+    backgroundColor: c.bubbleMine,
   },
 
   bubbleTheirs: {
-    backgroundColor: c.surfaceAlt,
+    backgroundColor: c.bubbleTheirs,
   },
 
   bubbleMineTail: {
@@ -1311,11 +1311,11 @@ menuBackdrop: {
   },
 
   bubbleTextMine: {
-    color: c.onContrast,
+    color: c.onBubbleMine,
   },
 
   bubbleTextTheirs: {
-    color: c.text,
+    color: c.onBubbleTheirs,
   },
 
   bubbleTime: {
