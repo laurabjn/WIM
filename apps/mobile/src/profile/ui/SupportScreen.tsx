@@ -165,7 +165,7 @@ export function SupportScreen({ navigation, route }: Props) {
             onPress={envoyer}
           >
             {sending ? (
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={themeColors.onContrast} />
             ) : (
               <Text style={styles.buttonText}>{t('profile:support.send')}</Text>
             )}

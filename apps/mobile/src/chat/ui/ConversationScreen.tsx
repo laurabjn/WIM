@@ -694,20 +694,22 @@ export function ConversationScreen({ route, navigation }: Props) {
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
-          <View style={styles.composerArea}>
-            <View style={styles.composerCard}>
-              {showTranslationNotice ? (
-                <Text style={styles.translationNotice}>
-                  {t('autoTranslated')}{' '}
-                  <Text
-                    style={styles.translationLink}
-                    onPress={disableTranslation}
-                  >
-                    {t('removeTranslation')}
-                  </Text>
+          <View
+            style={[styles.composerArea, { paddingBottom: 10 + insets.bottom }]}
+          >
+            {showTranslationNotice ? (
+              <Text style={styles.translationNotice}>
+                {t('autoTranslated')}{' '}
+                <Text
+                  style={styles.translationLink}
+                  onPress={disableTranslation}
+                >
+                  {t('removeTranslation')}
                 </Text>
-              ) : null}
+              </Text>
+            ) : null}
 
+            <View style={styles.composerCard}>
               <View style={styles.composerRow}>
                 <TouchableOpacity
                   style={styles.cameraButton}
@@ -716,9 +718,12 @@ export function ConversationScreen({ route, navigation }: Props) {
                   activeOpacity={0.8}
                 >
                   {uploading ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    <ActivityIndicator
+                      size="small"
+                      color={themeColors.onContrast}
+                    />
                   ) : (
-                    <Camera size={19} color="#FFFFFF" />
+                    <Camera size={19} color={themeColors.onContrast} />
                   )}
                 </TouchableOpacity>
 
@@ -727,7 +732,7 @@ export function ConversationScreen({ route, navigation }: Props) {
                   value={draft}
                   onChangeText={setDraft}
                   placeholder={t('messagePlaceholder')}
-                  placeholderTextColor="#B4B4B8"
+                  placeholderTextColor={themeColors.textFaint}
                   multiline
                 />
 
@@ -1046,8 +1051,9 @@ menuBackdrop: {
   },
 
   composerArea: {
+    backgroundColor: c.screen,
     paddingHorizontal: 10,
-    paddingBottom: 6,
+    paddingTop: 10,
   },
 
   composerCard: {
@@ -1063,7 +1069,6 @@ menuBackdrop: {
   },
 
   translationNotice: {
-    paddingTop: 4,
     paddingBottom: 10,
     fontSize: 11,
     color: c.textMuted,
