@@ -68,11 +68,11 @@ export class CancelExchangeUseCase {
     const exchange = await this.exchangeRepository.findById(exchangeId, userId);
 
     if (!exchange) {
-      throw new NotFoundException('Echange introuvable.');
+      throw new NotFoundException('Échange introuvable.');
     }
 
     if (exchange.hostId !== userId && exchange.guestId !== userId) {
-      throw new ForbiddenException('Cet echange ne vous concerne pas.');
+      throw new ForbiddenException('Cet échange ne vous concerne pas.');
     }
 
     // Un sejour passe appartient a l'historique des deux personnes : l'annuler
@@ -82,7 +82,7 @@ export class CancelExchangeUseCase {
 
     if (!annulable.includes(exchange.status)) {
       throw new BadRequestException(
-        'Cet echange ne peut plus etre annule.',
+        'Cet échange ne peut plus être annulé.',
       );
     }
 

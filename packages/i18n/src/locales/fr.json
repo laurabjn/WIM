@@ -27,7 +27,7 @@
     "available": "Disponiblité libre",
     "availableWithBlockDates": "Disponiblité avec dates bloquées",
     "specificDates": "Dates précises",
-    "retry": "Reessayer"
+    "retry": "Réessayer"
   },
   "profile": {
     "exchange": "Échange",
@@ -59,7 +59,7 @@
     "logOutCancel": "Annuler",
     "report": "Signaler cet échangeur",
     "editProfile": {
-      "title": "Editer mon profil",
+      "title": "Éditer mon profil",
       "changePhoto": "Modifier la photo",
       "favoriteEnvironment": "Environnement favoris",
       "presentation": "Présentation",
@@ -126,7 +126,7 @@
       "customize": "Personnaliser",
       "kilometers": "Kilomètres",
       "miles": "Miles",
-      "saveError": "Ce reglage n a pas pu etre enregistre."
+      "saveError": "Ce réglage n'a pas pu être enregistré."
     },
     "preferencesTravel": {
       "title": "Préférences de voyage",
@@ -425,24 +425,24 @@
     "support": {
       "topic": "Sujet",
       "subject": "Objet",
-      "subjectPlaceholder": "Resumez votre demande en une phrase",
+      "subjectPlaceholder": "Résumez votre demande en une phrase",
       "message": "Message",
-      "messagePlaceholder": "Decrivez votre demande le plus precisement possible.",
-      "reportPlaceholder": "Decrivez le probleme : ce que vous faisiez, ce qui s'est passe, et ce que vous attendiez.",
-      "answerDelay": "Nous repondons sous 48 heures ouvrees a l adresse de votre compte.",
+      "messagePlaceholder": "Décrivez votre demande le plus précisément possible.",
+      "reportPlaceholder": "Décrivez le problème : ce que vous faisiez, ce qui s'est passé, et ce que vous attendiez.",
+      "answerDelay": "Nous répondons sous 48 heures ouvrées à l'adresse de votre compte.",
       "send": "Envoyer",
-      "sent": "Votre demande a bien ete envoyee.",
-      "error": "Votre demande n a pas pu etre envoyee.",
+      "sent": "Votre demande a bien été envoyée.",
+      "error": "Votre demande n'a pas pu être envoyée.",
       "topics": {
         "account": "Compte",
-        "exchange": "Echange",
-        "booking": "Reservation",
+        "exchange": "Échange",
+        "booking": "Réservation",
         "payment": "Paiement",
         "technical": "Technique",
         "other": "Autre"
       }
     },
-    "occupied": "Occupe"
+    "occupied": "Occupé"
   },
   "auth": {
     "welcomeTitle": "Bienvenue sur Wim !",
@@ -554,7 +554,7 @@
     "permissionDescription": "Il faut autoriser l'accès à la galerie.",
     "homePhoto": "Photos du logement",
     "title": "Nom du logement",
-    "homeDescription": "A quoi ressemble votre logement ?",
+    "homeDescription": "À quoi ressemble votre logement ?",
     "description": "Description",
     "descriptionPlaceholder": "Décrivez votre logement en quelques lignes...",
     "descriptionTitle": "Présentez votre logement",
@@ -637,7 +637,7 @@
     "available": "Disponible",
     "unavailable": "Indisponible",
     "from": "à partir de",
-    "category": "Theme du sejour",
+    "category": "Thème du séjour",
     "reviews": {
       "reviewsCount": "commentaires",
       "showLess": "Voir moins",
@@ -658,25 +658,25 @@
       "CITY": "Ville",
       "CULTURE": "Culture"
     },
-    "guest": "Invite",
-    "ownerAvailability": "Vos periodes de disponibilite",
-    "ownerNoAvailability": "Vous n'avez ouvert aucune periode.",
-    "ownerBlocked": "bloquee",
-    "ownerExchanges": "Echanges sur ce logement",
+    "guest": "Invité",
+    "ownerAvailability": "Vos périodes de disponibilité",
+    "ownerNoAvailability": "Vous n'avez ouvert aucune période.",
+    "ownerBlocked": "bloquée",
+    "ownerExchanges": "Échanges sur ce logement",
     "ownerStatus": {
       "PENDING": "en attente",
-      "FUTURE": "a venir",
+      "FUTURE": "à venir",
       "CURRENT": "en cours"
     },
     "myHome": "Mon logement",
-    "theirHome": "Chez mon hote",
+    "theirHome": "Chez mon hôte",
     "iGo": "Je vais chez lui",
     "theyCome": "Il vient chez moi",
-    "noHomeOffered": "Aucun logement propose",
-    "availabilityPeriods": "Vos periodes de disponibilite",
-    "availabilityPeriodsHint": "Les dates ou votre logement peut etre echange. Sans periode, il n'apparait dans aucune recherche par dates.",
-    "availabilityNone": "Aucune periode ouverte pour le moment.",
-    "availabilityAdd": "Ajouter une periode"
+    "noHomeOffered": "Aucun logement proposé",
+    "availabilityPeriods": "Vos périodes de disponibilité",
+    "availabilityPeriodsHint": "Les dates où votre logement peut être échangé. Sans période, il n'apparaît dans aucune recherche par dates.",
+    "availabilityNone": "Aucune période ouverte pour le moment.",
+    "availabilityAdd": "Ajouter une période"
   },
   "availability": {
     "when": "Quand êtes-vous disponible pour échanger ?",
@@ -689,10 +689,10 @@
     "message": "Message",
     "messagePlaceholder": "Écrivez un message",
     "send": "Envoyer le message",
-    "defaultMessage": "Message par defaut",
+    "defaultMessage": "Message par défaut",
     "defaultMessageContent": "Je suis intéressé par votre logement pour un échange prochain. Il semble correspondre à ce que je recherche et j’aimerais savoir s’il serait disponible aux dates que j’envisage.  Je suis ouvert à la discussion si vous souhaitez plus d’informations sur mon logement ou sur mes conditions de séjour. N’hésitez pas à me faire savoir vos disponibilités ou si vous avez des questions. Au plaisir d’échanger avec vous !",
     "offeredHome": "Le logement que vous proposez",
-    "offeredHomeHint": "L'echange porte sur deux logements. Choisissez celui que vous offrez en retour, ou laissez vide pour en decider plus tard."
+    "offeredHomeHint": "L'échange porte sur deux logements. Choisissez celui que vous offrez en retour, ou laissez vide pour en décider plus tard."
   },
   "exchange": {
     "currentExchanges": "Échanges actuel",
@@ -700,8 +700,8 @@
     "upcomingExchanges": "Échanges à venir",
     "noExchanges": "Aucun échange pour le moment.",
     "noExchangesDescription": "Vos échanges apparaîtront ici lorsqu’ils seront confirmés.",
-    "host": "Hote",
-    "guest": "Invite"
+    "host": "Hôte",
+    "guest": "Invité"
   },
   "admin": {
     "adminTitle": "Tableau de bord administrateur",
@@ -725,7 +725,7 @@
     "destination": "Destination",
     "startDate": "Date de début",
     "endDate": "Date maximale",
-    "travelers": "Nombre de voyageur",
+    "travelers": "Nombre de voyageurs",
     "noDestination": "Aucune destination trouvée",
     "noRecentDestination": "Aucune destination récente",
     "results": "Résultats"
@@ -736,9 +736,9 @@
     "homenotAvailable": "Ce logement n'est plus disponible",
     "match": "C’est un match 🎉",
     "matchText": "Vous et {{firstName}} vous êtes likés mutuellement.",
-    "notSignedIn": "Vous devez etre connecte.",
+    "notSignedIn": "Vous devez être connecté.",
     "loadError": "Impossible de charger les logements.",
-    "swipeError": "Votre choix n'a pas pu etre enregistre.",
+    "swipeError": "Votre choix n'a pas pu être enregistré.",
     "openConversation": "Ouvrir la conversation"
   },
   "chat": {
@@ -787,21 +787,21 @@
     "allRequests": "Toutes les demandes",
     "autoTranslated": "Cette discussion est traduite automatiquement,",
     "removeTranslation": "retirer la traduction",
-    "photoError": "La photo n'a pas pu etre envoyee.",
-    "cameraDenied": "L'acces a l'appareil photo est refuse.",
-    "galleryDenied": "L'acces aux photos est refuse.",
-    "voiceSoon": "Les messages vocaux arrivent bientot.",
+    "photoError": "La photo n'a pas pu être envoyée.",
+    "cameraDenied": "L'accès à l'appareil photo est refusé.",
+    "galleryDenied": "L'accès aux photos est refusé.",
+    "voiceSoon": "Les messages vocaux arrivent bientôt.",
     "photoPreview": "Photo",
-    "cancelExchange": "Annuler l'echange",
-    "proposeExchange": "Proposer un echange",
-    "cancelExchangeConfirm": "Voulez-vous vraiment annuler cet echange ?",
-    "cancelExchangeConfirmed": "Annuler l'echange",
-    "cancelExchangeError": "L'echange n'a pas pu etre annule.",
-    "noHomeToExchange": "Cette personne n'a aucun logement a echanger.",
+    "cancelExchange": "Annuler l'échange",
+    "proposeExchange": "Proposer un échange",
+    "cancelExchangeConfirm": "Voulez-vous vraiment annuler cet échange ?",
+    "cancelExchangeConfirmed": "Annuler l'échange",
+    "cancelExchangeError": "L'échange n'a pas pu être annulé.",
+    "noHomeToExchange": "Cette personne n'a aucun logement à échanger.",
     "bannerMyHome": "Mon logement",
-    "bannerTheirHome": "Chez mon hote",
-    "bannerYouGo": "Vous allez a :",
-    "bannerTheyCome": "Cette personne vient a :",
-    "bannerNoHome": "aucun logement propose"
+    "bannerTheirHome": "Chez mon hôte",
+    "bannerYouGo": "Vous allez à :",
+    "bannerTheyCome": "Cette personne vient à :",
+    "bannerNoHome": "aucun logement proposé"
   }
 }

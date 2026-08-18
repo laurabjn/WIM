@@ -46,7 +46,7 @@ function imageFileFilter(
 ) {
   if (!file.mimetype.match(/\/(jpg|jpeg|png|webp|heic)$/)) {
     return callback(
-      new BadRequestException('Seules les images sont acceptees.'),
+      new BadRequestException('Seules les images sont acceptées.'),
       false,
     );
   }
@@ -189,7 +189,7 @@ export class ChatController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (!file) {
-      throw new BadRequestException('Aucun fichier image recu');
+      throw new BadRequestException('Aucun fichier image reçu.');
     }
 
     const message = await this.sendMessage.execute({

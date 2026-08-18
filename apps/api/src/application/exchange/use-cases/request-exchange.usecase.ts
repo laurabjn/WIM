@@ -77,8 +77,8 @@ export class RequestExchangeUseCase {
     if (active) {
       throw new BadRequestException(
         active.status === 'PENDING'
-          ? 'Une demande d echange est deja en attente avec cette personne.'
-          : 'Un echange est deja en cours avec cette personne.',
+          ? "Une demande d'échange est déjà en attente avec cette personne."
+          : 'Un échange est déjà en cours avec cette personne.',
       );
     }
 

@@ -37,7 +37,7 @@ export async function sendSupportRequest(
 
   if (!response.ok) {
     // On remonte le message de l'API : l'ecran n'a que celui-la a montrer.
-    let message = 'Votre demande n a pas pu etre envoyee.';
+    let message = "Votre demande n'a pas pu être envoyée.";
 
     try {
       const body = rawText ? JSON.parse(rawText) : null;

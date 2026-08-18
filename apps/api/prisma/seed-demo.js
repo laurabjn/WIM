@@ -72,33 +72,33 @@ const CONVERSATIONS = [
   {
     between: ['sophie', 'thomas'],
     messages: [
-      { from: 'thomas', content: 'Bonjour Sophie ! Votre appartement a Lyon me plait beaucoup. Seriez-vous interessee par un echange fin aout ?', daysAgo: 6 },
-      { from: 'sophie', content: 'Bonjour Thomas, avec plaisir ! Bordeaux nous tente depuis longtemps. Vous seriez la sur quelles dates exactement ?', daysAgo: 6 },
-      { from: 'thomas', content: 'Du 15 au 25 aout de preference. La maison est libre et le jardin est parfait si vous venez en famille.', daysAgo: 5 },
+      { from: 'thomas', content: 'Bonjour Sophie ! Votre appartement à Lyon me plaît beaucoup. Seriez-vous intéressée par un échange fin août ?', daysAgo: 6 },
+      { from: 'sophie', content: 'Bonjour Thomas, avec plaisir ! Bordeaux nous tente depuis longtemps. Vous seriez là sur quelles dates exactement ?', daysAgo: 6 },
+      { from: 'thomas', content: 'Du 15 au 25 août de préférence. La maison est libre et le jardin est parfait si vous venez en famille.', daysAgo: 5 },
       { from: 'sophie', content: 'Ces dates nous conviennent. Je regarde les trains et je reviens vers vous rapidement.', daysAgo: 2 },
     ],
   },
   {
     between: ['sophie', 'elena'],
     messages: [
-      { from: 'elena', content: 'Ciao Sophie ! Votre studio pres du Parc de la Tete d Or a l air parfait pour un sejour de travail.', daysAgo: 3 },
-      { from: 'sophie', content: 'Merci Elena ! Il y a un vrai bureau et la fibre, c est ideal pour teletravailler. Florence me fait beaucoup envie de mon cote.', daysAgo: 3 },
-      { from: 'elena', content: 'Alors on devrait pouvoir s entendre. Je vous envoie mes disponibilites de septembre ce week-end.', daysAgo: 1 },
+      { from: 'elena', content: 'Ciao Sophie ! Votre studio près du Parc de la Tête d\'Or a l\'air parfait pour un séjour de travail.', daysAgo: 3 },
+      { from: 'sophie', content: 'Merci Elena ! Il y a un vrai bureau et la fibre, c\'est idéal pour télétravailler. Florence me fait beaucoup envie de mon côté.', daysAgo: 3 },
+      { from: 'elena', content: 'Alors on devrait pouvoir s\'entendre. Je vous envoie mes disponibilités de septembre ce week-end.', daysAgo: 1 },
     ],
   },
   {
     // Marc ecrit, Sophie ne repond pas : la conversation reste une demande.
     between: ['sophie', 'marc'],
     messages: [
-      { from: 'marc', content: 'Bonjour Sophie, je serais interesse par un echange avec votre studio a Lyon en octobre. Mon chalet est libre a ces dates.', daysAgo: 2 },
+      { from: 'marc', content: 'Bonjour Sophie, je serais intéressé par un échange avec votre studio à Lyon en octobre. Mon chalet est libre à ces dates.', daysAgo: 2 },
     ],
   },
   {
     between: ['sophie', 'lucia'],
     messages: [
-      { from: 'lucia', content: 'Bonjour Sophie ! Valence en novembre, cela vous dirait ? Ma maison est a dix minutes du centre historique.', daysAgo: 12 },
-      { from: 'sophie', content: 'Avec grand plaisir Lucia, novembre me convient tres bien. Je bloque les dates de mon cote.', daysAgo: 11 },
-      { from: 'lucia', content: 'Parfait, je valide. A tres vite !', daysAgo: 10 },
+      { from: 'lucia', content: 'Bonjour Sophie ! Valence en novembre, cela vous dirait ? Ma maison est à dix minutes du centre historique.', daysAgo: 12 },
+      { from: 'sophie', content: 'Avec grand plaisir Lucia, novembre me convient très bien. Je bloque les dates de mon côté.', daysAgo: 11 },
+      { from: 'lucia', content: 'Parfait, je valide. À très vite !', daysAgo: 10 },
     ],
   },
   {
@@ -112,14 +112,14 @@ const CONVERSATIONS = [
   {
     between: ['sophie', 'tom'],
     messages: [
-      { from: 'tom', content: 'Salut ! Un echange Nantes-Lyon te dirait ? Mon studio est libre presque tout l automne.', daysAgo: 1 },
+      { from: 'tom', content: 'Salut ! Un échange Nantes-Lyon te dirait ? Mon studio est libre presque tout l\'automne.', daysAgo: 1 },
     ],
   },
   {
     between: ['marc', 'lucia'],
     messages: [
-      { from: 'lucia', content: 'Bonjour Marc, votre chalet a Chamonix est magnifique. Est-il accessible en hiver sans equipement particulier ?', daysAgo: 9 },
-      { from: 'marc', content: 'Bonjour Lucia ! La route est deneigee tous les matins, des pneus hiver suffisent largement.', daysAgo: 8 },
+      { from: 'lucia', content: 'Bonjour Marc, votre chalet à Chamonix est magnifique. Est-il accessible en hiver sans équipement particulier ?', daysAgo: 9 },
+      { from: 'marc', content: 'Bonjour Lucia ! La route est déneigée tous les matins, des pneus hiver suffisent largement.', daysAgo: 8 },
     ],
   },
 ];
@@ -212,7 +212,7 @@ const OWNERS = [
     avatar: avatar(12),
     country: 'Portugal',
     nationality: 'portugaise',
-    bio: "Developpeur a Porto, je cherche des sejours au calme pour ecrire.",
+    bio: "Développeur à Porto, je cherche des séjours au calme pour écrire.",
     languages: ['portuguese', 'french', 'english'],
     rating: 4,
   },
@@ -296,7 +296,7 @@ const OWNERS = [
     avatar: avatar(31),
     country: 'Belgique',
     nationality: 'belge',
-    bio: "Architecte d'interieur a Gand, je pars souvent en week-end prolonge.",
+    bio: "Architecte d'intérieur à Gand, je pars souvent en week-end prolongé.",
     languages: ['dutch', 'french', 'english'],
     rating: 4,
   },
@@ -310,7 +310,7 @@ const OWNERS = [
     avatar: avatar(52),
     country: 'France',
     nationality: 'francaise',
-    bio: 'Cuisinier a Nantes, je cherche des echanges hors saison.',
+    bio: 'Cuisinier à Nantes, je cherche des échanges hors saison.',
     languages: ['french'],
     rating: 3,
   },
@@ -529,9 +529,9 @@ const HOMES = [
   },
   {
     owner: 'hugo',
-    title: 'Maison de pecheur renovee',
+    title: 'Maison de pêcheur rénovée',
     description:
-      "Petite maison en pierre a deux rues de la plage, renovee avec soin. Patio ombrage, cuisine ouverte et velos a disposition pour longer le front de mer.",
+      "Petite maison en pierre à deux rues de la plage, rénovée avec soin. Patio ombragé, cuisine ouverte et vélos à disposition pour longer le front de mer.",
     address: 'Rua das Redes 8',
     city: 'Porto',
     country: 'Portugal',
@@ -580,7 +580,7 @@ const HOMES = [
     owner: 'chloe',
     title: "Chalet face au lac d'Annecy",
     description:
-      "Chalet en bois clair a cinq minutes du lac, avec un grand balcon plein sud. Depart de randonnees juste derriere la maison.",
+      "Chalet en bois clair à cinq minutes du lac, avec un grand balcon plein sud. Départ de randonnées juste derrière la maison.",
     address: '3 chemin des Cretes',
     city: 'Annecy',
     country: 'France',
@@ -606,7 +606,7 @@ const HOMES = [
     owner: 'karim',
     title: "Riad avec patio et fontaine",
     description:
-      "Riad traditionnel au coeur de la medina, organise autour d'un patio frais. Terrasse sur le toit pour les soirees.",
+      "Riad traditionnel au cœur de la médina, organisé autour d'un patio frais. Terrasse sur le toit pour les soirées.",
     address: 'Derb Sidi Bouloukat 21',
     city: 'Marrakech',
     country: 'Maroc',
@@ -630,9 +630,9 @@ const HOMES = [
   },
   {
     owner: 'ines',
-    title: "Appartement azulejos a l'Alfama",
+    title: "Appartement azulejos à l'Alfama",
     description:
-      "Deux-pieces renove dans le plus vieux quartier de Lisbonne, azulejos d'origine au mur. Tram a trente metres.",
+      "Deux-pièces rénové dans le plus vieux quartier de Lisbonne, azulejos d'origine au mur. Tram à trente mètres.",
     address: 'Rua dos Remedios 44',
     city: 'Lisbonne',
     country: 'Portugal',
@@ -658,7 +658,7 @@ const HOMES = [
     owner: 'bruno',
     title: "Refuge au pied de la Jungfrau",
     description:
-      "Ancien refuge de berger entierement isole, vue directe sur les glaciers. Poele a bois et silence complet.",
+      "Ancien refuge de berger entièrement isolé, vue directe sur les glaciers. Poêle à bois et silence complet.",
     address: 'Alpenweg 7',
     city: 'Interlaken',
     country: 'Suisse',
@@ -682,9 +682,9 @@ const HOMES = [
   },
   {
     owner: 'mila',
-    title: "Maison de pierre face a l'Adriatique",
+    title: "Maison de pierre face à l'Adriatique",
     description:
-      "Maison en pierre blanche a dix metres de l'eau, terrasse ombragee par une vigne. Palmes et masques fournis.",
+      "Maison en pierre blanche à dix mètres de l'eau, terrasse ombragée par une vigne. Palmes et masques fournis.",
     address: 'Ulica Obala 12',
     city: 'Split',
     country: 'Croatie',
@@ -709,9 +709,9 @@ const HOMES = [
 
   {
     owner: 'yara',
-    title: "Maison de maitre pres des quais",
+    title: "Maison de maître près des quais",
     description:
-      "Maison de ville sur trois niveaux, moulures et parquet d'origine, a cinq minutes a pied du chateau des comtes. Jardin clos a l'arriere.",
+      "Maison de ville sur trois niveaux, moulures et parquet d'origine, à cinq minutes à pied du château des comtes. Jardin clos à l'arrière.",
     address: 'Sint-Baafsplein 14',
     city: 'Gand',
     country: 'Belgique',
@@ -737,7 +737,7 @@ const HOMES = [
     owner: 'tom',
     title: "Studio au bord de l'Erdre",
     description:
-      "Petit studio calme donnant sur la riviere, ideal pour deux. Velos fournis et arret de tram devant la porte.",
+      "Petit studio calme donnant sur la rivière, idéal pour deux. Vélos fournis et arrêt de tram devant la porte.",
     address: 'Quai de Versailles 3',
     city: 'Nantes',
     country: 'France',
