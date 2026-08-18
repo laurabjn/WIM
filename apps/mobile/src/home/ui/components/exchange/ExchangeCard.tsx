@@ -38,26 +38,6 @@ export function ExchangeCard({
       />
 
       <View style={styles.content}>
-        <Text style={styles.whose}>
-          {exchange.isHost ? t('theyCome') : t('iGo')}
-        </Text>
-
-        <Text style={styles.title} numberOfLines={1}>
-          {exchange.isHost
-            ? exchange.guestHomeTitle ?? exchange.homeTitle
-            : exchange.homeTitle}
-        </Text>
-
-        <Text style={styles.whose}>
-          {exchange.isHost ? t('iGo') : t('theyCome')}
-        </Text>
-
-        <Text style={styles.title} numberOfLines={1}>
-          {exchange.isHost
-            ? exchange.homeTitle
-            : exchange.guestHomeTitle ?? t('noHomeOffered')}
-        </Text>
-
         {exchange.partner ? (
           <Text style={styles.partner} numberOfLines={1}>
             {exchange.isHost ? t('guest') : t('host')} ·{' '}
@@ -127,20 +107,6 @@ const createStyles = (c: ThemeColors) =>
     flex: 1,
     paddingHorizontal: 10,
     justifyContent: 'center',
-  },
-  title: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: c.text,
-    marginBottom: 8,
-  },
-  whose: {
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
-    color: c.textMuted,
-    marginBottom: 2,
   },
   partner: {
     marginTop: 2,
