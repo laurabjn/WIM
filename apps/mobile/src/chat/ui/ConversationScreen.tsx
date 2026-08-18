@@ -427,6 +427,22 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   useSpeechRecognitionEvent('error', (event) => {
     console.log('Speech recognition error:', event.error, event.message);
+
+    // "no-speech" survient sur un silence et la session s'arrete la aussi :
+    // sans ce retour a l'etat normal, la barre restait figee a l'ecran.
+    if (!recording || stoppingRef.current) return;
+
+    stoppingRef.current = true;
+
+    setRecording(false);
+    setError(t('voiceError'));
+
+    // L'attente d'un fichier qui n'arrivera plus doit etre relachee.
+    const resoudre = audioEndRef.current;
+
+    audioEndRef.current = null;
+
+    resoudre?.(null);
   });
 
   // Le compteur affiche pendant l'enregistrement, et la coupure automatique
@@ -446,8 +462,15 @@ export function ConversationScreen({ route, navigation }: Props) {
   }, [recording]);
 
   async function startRecording() {
-    const permission =
-      await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+    let permission: { granted: boolean };
+
+    try {
+      permission = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+    } catch (permissionError) {
+      console.log('Microphone permission error:', permissionError);
+      setError(t('voiceError'));
+      return;
+    }
 
     if (!permission.granted) {
       Alert.alert('', t('microphoneDenied'));
