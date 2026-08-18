@@ -19,11 +19,9 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import {
-  AudioModule,
-  RecordingPresets,
-  setAudioModeAsync,
-  useAudioRecorder,
-} from 'expo-audio';
+  ExpoSpeechRecognitionModule,
+  useSpeechRecognitionEvent,
+} from '@jamsch/expo-speech-recognition';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
@@ -80,7 +78,11 @@ const PAGE_SIZE = 30;
 // Un enregistrement plus court est un appui malencontreux ; plus long, il
 // depasserait la taille acceptee par le serveur.
 const MIN_RECORDING_MS = 800;
-const MAX_RECORDING_MS = 5 * 60 * 1000;
+// La reconnaissance enregistre en PCM non compresse (~32 ko/s a 16 kHz) : au
+// dela de trois minutes, l'envoi depasserait la taille acceptee.
+const MAX_RECORDING_MS = 3 * 60 * 1000;
+// Une session qui ne rend jamais son fichier bloquerait l'envoi sans ce delai.
+const AUDIO_FILE_TIMEOUT_MS = 8000;
 
 const translationKey = (chatId: string) => `chat:translate:${chatId}`;
 
@@ -106,7 +108,7 @@ type Props = {
 };
 
 export function ConversationScreen({ route, navigation }: Props) {
-  const { t } = useTranslation('chat');
+  const { t, i18n } = useTranslation('chat');
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
@@ -145,10 +147,13 @@ export function ConversationScreen({ route, navigation }: Props) {
   const translatedRef = useRef(true);
   const [translationEpoch, setTranslationEpoch] = useState(0);
 
-  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const [recording, setRecording] = useState(false);
   const [recordingMs, setRecordingMs] = useState(0);
+  const [transcript, setTranscript] = useState('');
   const recordingStartedAt = useRef(0);
+  const transcriptRef = useRef('');
+  const finalPartsRef = useRef<string[]>([]);
+  const audioEndRef = useRef<((uri: string | null) => void) | null>(null);
   // La coupure automatique peut se declencher deux fois avant que l'etat ne
   // se propage : sans ce verrou, le vocal partirait en double.
   const stoppingRef = useRef(false);
@@ -384,6 +389,46 @@ export function ConversationScreen({ route, navigation }: Props) {
     applyTranslation(!translated);
   }
 
+  // La reconnaissance rend le texte au fil de la parole. iOS renvoie un
+  // resultat cumulatif pour la session, Android un segment par prise de
+  // parole : les concatener partout dupliquerait la phrase sur iOS.
+  useSpeechRecognitionEvent('result', (event) => {
+    const texte = event.results?.[0]?.transcript?.trim() ?? '';
+
+    if (!texte) return;
+
+    if (Platform.OS === 'ios') {
+      finalPartsRef.current = [texte];
+    } else if (event.isFinal) {
+      finalPartsRef.current = [...finalPartsRef.current, texte];
+    }
+
+    const complet = (
+      event.isFinal || Platform.OS === 'ios'
+        ? finalPartsRef.current
+        : [...finalPartsRef.current, texte]
+    )
+      .join(' ')
+      .trim();
+
+    transcriptRef.current = complet;
+
+    setTranscript(complet);
+  });
+
+  // Le fichier n'est utilisable qu'a partir de cet evenement.
+  useSpeechRecognitionEvent('audioend', (event) => {
+    const resoudre = audioEndRef.current;
+
+    audioEndRef.current = null;
+
+    resoudre?.(event.uri ?? null);
+  });
+
+  useSpeechRecognitionEvent('error', (event) => {
+    console.log('Speech recognition error:', event.error, event.message);
+  });
+
   // Le compteur affiche pendant l'enregistrement, et la coupure automatique
   // avant que le fichier ne depasse la taille acceptee.
   useEffect(() => {
@@ -401,22 +446,52 @@ export function ConversationScreen({ route, navigation }: Props) {
   }, [recording]);
 
   async function startRecording() {
-    const permission = await AudioModule.requestRecordingPermissionsAsync();
+    const permission =
+      await ExpoSpeechRecognitionModule.requestPermissionsAsync();
 
     if (!permission.granted) {
       Alert.alert('', t('microphoneDenied'));
       return;
     }
 
+    const langue = i18n.language?.startsWith('en') ? 'en-US' : 'fr-FR';
+
+    // Sans modele installe, exiger le hors-ligne ferait echouer la
+    // reconnaissance : on ne l'impose que si la langue est bien sur l'appareil.
+    let surAppareil = false;
+
     try {
-      await setAudioModeAsync({
-        allowsRecording: true,
-        playsInSilentMode: true,
+      const { installedLocales } =
+        await ExpoSpeechRecognitionModule.getSupportedLocales({});
+
+      surAppareil = installedLocales.some((locale) =>
+        locale.toLowerCase().startsWith(langue.slice(0, 2)),
+      );
+    } catch (localesError) {
+      console.log('Supported locales error:', localesError);
+    }
+
+    try {
+      finalPartsRef.current = [];
+      transcriptRef.current = '';
+      audioEndRef.current = null;
+
+      setTranscript('');
+
+      ExpoSpeechRecognitionModule.start({
+        lang: langue,
+        interimResults: true,
+        continuous: true,
+        addsPunctuation: true,
+        requiresOnDeviceRecognition: surAppareil,
+        recordingOptions: {
+          persist: true,
+          // iOS enregistrerait sinon en 44,1 kHz flottant : quatre fois plus
+          // lourd pour une parole qui n'y gagne rien.
+          outputSampleRate: 16000,
+          outputEncoding: 'pcmFormatInt16',
+        },
       });
-
-      await recorder.prepareToRecordAsync();
-
-      recorder.record();
 
       recordingStartedAt.current = Date.now();
       stoppingRef.current = false;
@@ -429,6 +504,20 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
+  function attendreFichier(): Promise<string | null> {
+    return new Promise((resolve) => {
+      audioEndRef.current = resolve;
+
+      setTimeout(() => {
+        if (audioEndRef.current !== resolve) return;
+
+        audioEndRef.current = null;
+
+        resolve(null);
+      }, AUDIO_FILE_TIMEOUT_MS);
+    });
+  }
+
   async function stopRecording(envoyer: boolean) {
     if (stoppingRef.current) return;
 
@@ -438,21 +527,23 @@ export function ConversationScreen({ route, navigation }: Props) {
 
     setRecording(false);
 
-    let uri: string | null = null;
-
-    try {
-      await recorder.stop();
-
-      uri = recorder.uri;
-    } catch (stopError) {
-      console.log('Stop recording error:', stopError);
+    if (!envoyer) {
+      ExpoSpeechRecognitionModule.abort();
+      return;
     }
 
-    // Sans ce retour en arriere, iOS garderait la sortie sur l'ecouteur et la
-    // lecture des vocaux serait a peine audible.
-    await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
+    // L'attente est armee avant l'arret : l'evenement porte l'unique adresse
+    // du fichier enregistre.
+    const attente = attendreFichier();
 
-    if (!envoyer || !uri) return;
+    ExpoSpeechRecognitionModule.stop();
+
+    const uri = await attente;
+
+    if (!uri) {
+      setError(t('voiceError'));
+      return;
+    }
 
     if (duree < MIN_RECORDING_MS) {
       Alert.alert('', t('voiceTooShort'));
@@ -471,6 +562,7 @@ export function ConversationScreen({ route, navigation }: Props) {
         chatId,
         uri,
         duree,
+        transcriptRef.current,
       );
 
       setMessages((current) =>
@@ -696,6 +788,11 @@ export function ConversationScreen({ route, navigation }: Props) {
                 uri={resolveImageUrl(message.attachmentUrl) ?? ''}
                 durationMs={message.attachmentDurationMs}
                 mine={isMine}
+                transcript={
+                  translated && message.translatedContent
+                    ? message.translatedContent
+                    : message.content
+                }
               />
             ) : (
               <Text
@@ -859,7 +956,14 @@ export function ConversationScreen({ route, navigation }: Props) {
 
             <View style={styles.composerCard}>
               {recording ? (
-                <View style={styles.composerRow}>
+                <View>
+                  {transcript ? (
+                    <Text style={styles.recordTranscript} numberOfLines={2}>
+                      {transcript}
+                    </Text>
+                  ) : null}
+
+                  <View style={styles.composerRow}>
                   <View style={styles.recordDot} />
 
                   <Text style={styles.recordTimer}>
@@ -892,6 +996,7 @@ export function ConversationScreen({ route, navigation }: Props) {
                       )}
                     </LinearGradient>
                   </TouchableOpacity>
+                  </View>
                 </View>
               ) : (
               <View style={styles.composerRow}>
@@ -1330,6 +1435,13 @@ menuBackdrop: {
   recordCancelText: {
     fontSize: 13,
     fontWeight: '700',
+    color: c.textMuted,
+  },
+
+  recordTranscript: {
+    paddingHorizontal: 10,
+    paddingBottom: 8,
+    fontSize: 13,
     color: c.textMuted,
   },
 

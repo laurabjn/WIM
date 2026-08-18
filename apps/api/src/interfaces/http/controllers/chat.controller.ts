@@ -14,7 +14,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { extname } from 'path';
+import { basename, extname } from 'path';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { JwtAuthGuard } from '../jwt-auth.guard';
@@ -28,6 +28,7 @@ import { MarkChatAsReadUseCase } from 'src/application/message/use-cases/mark-ch
 import { GetUnreadCountUseCase } from 'src/application/message/use-cases/get-unread-count.usecase';
 import { AppGateway } from 'src/interfaces/websocket/app.gateway';
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
+import { transcodeToM4a } from 'src/infrastructure/media/audio-transcoder';
 import { CHAT_REPOSITORY } from '../tokens/token';
 
 function editFileName(
@@ -230,14 +231,16 @@ export class ChatController {
         filename: editFileName,
       }),
       fileFilter: audioFileFilter,
-      limits: { fileSize: 12 * 1024 * 1024 },
+      // Le PCM de la reconnaissance vocale pese ~32 ko/s : trois minutes en
+      // font une vingtaine. La conversion en m4a n'intervient qu'apres.
+      limits: { fileSize: 25 * 1024 * 1024 },
     }),
   )
   async createVoiceMessage(
     @Req() request: AuthenticatedRequest,
     @Param('chatId')
     chatId: string,
-    @Body() dto: { durationMs?: string },
+    @Body() dto: { durationMs?: string; transcript?: string },
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (!file) {
@@ -248,12 +251,18 @@ export class ChatController {
     // pas faire echouer l'envoi, la bulle sait se passer d'elle.
     const duration = Number.parseInt(dto?.durationMs ?? '', 10);
 
+    const { chemin } = await transcodeToM4a(file.path);
+
+    const nomFinal = basename(chemin);
+
+    // La transcription faite sur l'appareil devient le contenu du message :
+    // elle passe des lors par la traduction comme n'importe quel texte.
     const message = await this.sendMessage.execute({
       chatId,
       senderId: this.getUserId(request),
-      content: '',
+      content: dto?.transcript?.slice(0, 5000) ?? '',
       type: 'AUDIO',
-      attachmentUrl: `/uploads/messages/${file.filename}`,
+      attachmentUrl: `/uploads/messages/${nomFinal}`,
       attachmentDurationMs:
         Number.isFinite(duration) && duration > 0 ? duration : null,
     });

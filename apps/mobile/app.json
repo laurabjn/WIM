@@ -36,10 +36,12 @@
       "expo-secure-store",
       "@react-native-community/datetimepicker",
       "@rnmapbox/maps",
+      "expo-audio",
       [
-        "expo-audio",
+        "@jamsch/expo-speech-recognition",
         {
-          "microphonePermission": "Wim utilise le micro pour enregistrer vos messages vocaux."
+          "microphonePermission": "Wim utilise le micro pour enregistrer vos messages vocaux.",
+          "speechRecognitionPermission": "Wim transcrit vos messages vocaux directement sur votre téléphone."
         }
       ]
     ],

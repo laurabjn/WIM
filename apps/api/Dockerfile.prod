@@ -45,7 +45,9 @@ RUN npx nest build
 # ---------------------------------------------------------------------------
 FROM node:20-slim AS runner
 
-RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+# ffmpeg convertit les vocaux : la reconnaissance vocale rend un wav sur
+# Android et un caf sur iOS, que l'autre plateforme ne sait pas lire.
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production

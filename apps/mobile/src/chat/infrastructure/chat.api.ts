@@ -64,20 +64,25 @@ export async function sendVoiceMessageApi(
   chatId: string,
   uri: string,
   durationMs: number,
+  transcript: string,
 ): Promise<ChatMessages> {
-  const extension = uri.split('.').pop()?.toLowerCase() ?? 'm4a';
+  const extension = uri.split('.').pop()?.toLowerCase() ?? 'wav';
 
   const form = new FormData();
 
   form.append('file', {
     uri,
     name: `message.${extension}`,
-    // Android enregistre en 3gp, iOS en m4a : declarer le mauvais type ferait
-    // rejeter le fichier par le filtre du serveur.
-    type: extension === '3gp' ? 'audio/3gpp' : 'audio/m4a',
+    // La reconnaissance rend un wav sur Android et un caf sur iOS : declarer
+    // le mauvais type ferait rejeter le fichier par le filtre du serveur.
+    type: extension === 'caf' ? 'audio/x-caf' : 'audio/wav',
   } as unknown as Blob);
 
   form.append('durationMs', String(Math.round(durationMs)));
+
+  // Le texte reconnu sur l'appareil : le serveur le pose dans le message, ce
+  // qui le rend traduisible comme n'importe quel texte.
+  form.append('transcript', transcript);
 
   const response = await fetch(`${API_URL}/chats/${chatId}/voice`, {
     method: 'POST',

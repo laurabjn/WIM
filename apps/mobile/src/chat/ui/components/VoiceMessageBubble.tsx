@@ -9,9 +9,16 @@ type Props = {
   uri: string;
   durationMs?: number | null;
   mine: boolean;
+  /** Transcription faite sur l'appareil, traduite si la discussion l'est. */
+  transcript?: string | null;
 };
 
-export function VoiceMessageBubble({ uri, durationMs, mine }: Props) {
+export function VoiceMessageBubble({
+  uri,
+  durationMs,
+  mine,
+  transcript,
+}: Props) {
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
@@ -54,33 +61,41 @@ export function VoiceMessageBubble({ uri, durationMs, mine }: Props) {
     player.play();
   }
 
-  return (
-    <View style={styles.rangee}>
-      <TouchableOpacity
-        onPress={basculer}
-        activeOpacity={0.7}
-        style={[styles.bouton, { borderColor: teinte }]}
-      >
-        {status.playing ? (
-          <Pause size={15} color={teinte} fill={teinte} />
-        ) : (
-          <Play size={15} color={teinte} fill={teinte} />
-        )}
-      </TouchableOpacity>
+  const texte = transcript?.trim();
 
-      <View style={styles.piste}>
-        <View style={[styles.pisteFond, { backgroundColor: teinte }]} />
-        <View
-          style={[
-            styles.pisteRemplie,
-            { backgroundColor: teinte, width: `${progression * 100}%` },
-          ]}
-        />
+  return (
+    <View>
+      <View style={styles.rangee}>
+        <TouchableOpacity
+          onPress={basculer}
+          activeOpacity={0.7}
+          style={[styles.bouton, { borderColor: teinte }]}
+        >
+          {status.playing ? (
+            <Pause size={15} color={teinte} fill={teinte} />
+          ) : (
+            <Play size={15} color={teinte} fill={teinte} />
+          )}
+        </TouchableOpacity>
+
+        <View style={styles.piste}>
+          <View style={[styles.pisteFond, { backgroundColor: teinte }]} />
+          <View
+            style={[
+              styles.pisteRemplie,
+              { backgroundColor: teinte, width: `${progression * 100}%` },
+            ]}
+          />
+        </View>
+
+        <Text style={[styles.duree, { color: teinte }]}>
+          {formaterDuree(progression > 0 ? ecoulees : totalSecondes)}
+        </Text>
       </View>
 
-      <Text style={[styles.duree, { color: teinte }]}>
-        {formaterDuree(progression > 0 ? ecoulees : totalSecondes)}
-      </Text>
+      {texte ? (
+        <Text style={[styles.transcription, { color: teinte }]}>{texte}</Text>
+      ) : null}
     </View>
   );
 }
@@ -128,5 +143,11 @@ const createStyles = (_c: ThemeColors) =>
       fontSize: 12,
       fontWeight: '600',
       fontVariant: ['tabular-nums'],
+    },
+    transcription: {
+      marginTop: 8,
+      fontSize: 14,
+      lineHeight: 19,
+      opacity: 0.85,
     },
   });

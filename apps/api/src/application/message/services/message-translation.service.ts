@@ -31,7 +31,7 @@ export class MessageTranslationService {
 
     const translatable = messages.filter(
       (message) =>
-        message.type === 'TEXT' &&
+        (message.type === 'TEXT' || message.type === 'AUDIO') &&
         message.senderId !== readerId &&
         message.content.trim().length > 0,
     );
