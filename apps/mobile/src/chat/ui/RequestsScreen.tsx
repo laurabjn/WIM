@@ -277,7 +277,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   filterLabelActive: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
 
   loader: {

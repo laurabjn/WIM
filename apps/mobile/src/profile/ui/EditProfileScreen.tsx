@@ -356,7 +356,7 @@ const createStyles = (c: ThemeColors) =>
     borderColor: '#FFFFFF',
   },
   avatarEditIcon: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 12,
   },
   changePhotoText: {
@@ -398,7 +398,7 @@ const createStyles = (c: ThemeColors) =>
     color: c.text,
   },
   environmentChipTextSelected: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
   formSection: {
     marginBottom: 18,
@@ -453,7 +453,7 @@ const createStyles = (c: ThemeColors) =>
     color: c.text,
   },
   languageChipTextSelected: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
   saveButtonWrapper: {
     marginTop: 4,
@@ -469,7 +469,7 @@ const createStyles = (c: ThemeColors) =>
     opacity: 0.6,
   },
   saveButtonText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '700',
   },

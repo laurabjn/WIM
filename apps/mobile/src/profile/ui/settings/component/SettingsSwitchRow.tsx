@@ -49,6 +49,7 @@ const createStyles = (c: ThemeColors) =>
     paddingRight: 8,
   },
   icon: {
+    color: c.text,
     width: 18,
     textAlign: 'center',
     fontSize: 15,

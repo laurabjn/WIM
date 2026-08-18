@@ -46,6 +46,6 @@ const createStyles = (c: ThemeColors) =>
     fontWeight: '500',
   },
   toggleRowTextSelected: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
 });

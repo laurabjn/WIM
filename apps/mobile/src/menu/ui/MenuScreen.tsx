@@ -325,6 +325,7 @@ const createStyles = (c: ThemeColors) =>
     fontSize: 18,
   },
   sectionTitle: {
+    color: c.text,
     fontSize: 13,
     fontWeight: '800',
     marginBottom: 8,

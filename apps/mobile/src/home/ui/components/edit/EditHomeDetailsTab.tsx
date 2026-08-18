@@ -150,6 +150,6 @@ const createStyles = (c: ThemeColors) =>
     color: c.text,
   },
   chipTextSelected: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
 });

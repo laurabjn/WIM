@@ -46,6 +46,6 @@ const createStyles = (c: ThemeColors) =>
     fontWeight: '600',
   },
   numberChipTextSelected: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
 });

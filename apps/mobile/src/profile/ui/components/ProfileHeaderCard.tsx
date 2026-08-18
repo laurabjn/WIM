@@ -148,6 +148,7 @@ const createStyles = (c: ThemeColors) =>
     justifyContent: 'center',
   },
   editIcon: {
+    color: c.text,
     fontSize: 14,
   },
   bio: {

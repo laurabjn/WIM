@@ -260,7 +260,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   markerNumber: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '900',
   },

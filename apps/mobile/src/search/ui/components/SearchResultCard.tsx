@@ -326,6 +326,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   ratingText: {
+    color: c.text,
     fontSize: 11,
     fontWeight: '700',
   },
@@ -339,7 +340,7 @@ const createStyles = (c: ThemeColors) =>
 
   available: {
     backgroundColor: '#41D086',
-    color: c.onContrast,
+    color: '#FFFFFF',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,

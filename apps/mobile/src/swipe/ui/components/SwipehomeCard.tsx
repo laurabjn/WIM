@@ -444,7 +444,7 @@ const createStyles = (c: ThemeColors) =>
   },
   available: {
     backgroundColor: '#41D086',
-    color: c.onContrast,
+    color: '#FFFFFF',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 10,

@@ -455,7 +455,7 @@ const createStyles = (c: ThemeColors) =>
     textAlign: 'center',
   },
   regionCardTitleSelected: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
   regionCardSubtitleSelected: {
     fontSize: 11,
@@ -501,7 +501,7 @@ const createStyles = (c: ThemeColors) =>
     opacity: 0.6,
   },
   saveButtonText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
   },

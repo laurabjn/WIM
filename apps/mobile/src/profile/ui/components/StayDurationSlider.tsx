@@ -112,7 +112,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   badgeText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '700',
   },

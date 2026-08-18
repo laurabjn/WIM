@@ -416,7 +416,7 @@ const createStyles = (c: ThemeColors) =>
   primaryText: {
     fontSize: 14,
     fontWeight: '700',
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
 
   passwordWrapper: {

@@ -264,7 +264,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   primaryText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 16,
   },

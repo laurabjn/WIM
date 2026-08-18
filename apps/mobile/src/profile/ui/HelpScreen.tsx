@@ -343,7 +343,7 @@ const createStyles = (c: ThemeColors) =>
     textAlign: 'center',
   },
   topicChipTextSelected: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
   contactCard: {
     backgroundColor: c.surface,
@@ -398,7 +398,7 @@ const createStyles = (c: ThemeColors) =>
     opacity: 0.6,
   },
   sendButtonText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '700',
   },

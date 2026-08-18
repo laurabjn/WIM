@@ -60,7 +60,7 @@ const createStyles = (c: ThemeColors) =>
     textAlign: 'center',
   },
   choiceChipLabelSelected: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
   choiceChipSubtitle: {
     fontSize: 11,

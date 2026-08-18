@@ -179,6 +179,6 @@ const createStyles = (c: ThemeColors) =>
   primaryButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
 });

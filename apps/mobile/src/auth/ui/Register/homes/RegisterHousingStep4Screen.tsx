@@ -267,7 +267,7 @@ const createStyles = (c: ThemeColors) =>
     color: c.text,
   },
   categoryTextSelected: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
   safeArea: {
     flex: 1,
@@ -372,7 +372,7 @@ const createStyles = (c: ThemeColors) =>
     justifyContent: 'center',
   },
   primaryText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 16,
   },

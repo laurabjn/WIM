@@ -102,7 +102,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   contactText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 13,
   },

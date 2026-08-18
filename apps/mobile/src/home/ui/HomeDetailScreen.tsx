@@ -409,7 +409,7 @@ const createStyles = (c: ThemeColors) =>
     justifyContent: 'center',
   },
   contactText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   carCard: {

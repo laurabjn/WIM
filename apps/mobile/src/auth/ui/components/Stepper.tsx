@@ -72,6 +72,6 @@ const createStyles = (c: ThemeColors) =>
   },
 
   textActive: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
 });

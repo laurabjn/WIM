@@ -89,6 +89,7 @@ const createStyles = (c: ThemeColors) =>
     marginBottom: 2,
   },
   flag: {
+    color: c.text,
     fontSize: 14,
   },
   flagSmall: {

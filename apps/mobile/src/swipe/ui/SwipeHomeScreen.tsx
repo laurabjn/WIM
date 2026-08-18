@@ -357,6 +357,7 @@ const createStyles = (c: ThemeColors) =>
     alignItems: 'center',
   },
   matchTitle: {
+    color: c.text,
     fontSize: 24,
     fontWeight: '900',
     marginBottom: 10,
@@ -376,7 +377,7 @@ const createStyles = (c: ThemeColors) =>
     justifyContent: 'center',
   },
   matchButtonText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontWeight: '800',
   },
 });

@@ -457,7 +457,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   activeTabText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
   },
 
   form: {

@@ -233,6 +233,7 @@ const createStyles = (c: ThemeColors) =>
     shadowOffset: { width: 0, height: 2 },
   },
   title: {
+    color: c.text,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -280,7 +281,7 @@ const createStyles = (c: ThemeColors) =>
     justifyContent: 'center',
   },
   searchButtonText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '800',
   },

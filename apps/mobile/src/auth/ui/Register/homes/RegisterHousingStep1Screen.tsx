@@ -198,7 +198,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   removeButtonText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
     lineHeight: 18,
@@ -340,7 +340,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   primaryText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 16,
   },

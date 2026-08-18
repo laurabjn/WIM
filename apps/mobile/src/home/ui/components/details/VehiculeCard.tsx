@@ -118,6 +118,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   image: {
+    color: c.text,
     width: 82,
     height: 56,
   },

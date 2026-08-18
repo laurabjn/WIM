@@ -60,6 +60,7 @@ const createStyles = (c: ThemeColors) =>
     paddingHorizontal: 14,
   },
   recentTitle: {
+    color: c.text,
     fontSize: 14,
     fontWeight: '800',
     marginBottom: 8,

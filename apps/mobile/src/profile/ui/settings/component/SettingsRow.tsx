@@ -66,6 +66,7 @@ const createStyles = (c: ThemeColors) =>
     gap: 8,
   },
   icon: {
+    color: c.text,
     width: 18,
     textAlign: 'center',
     fontSize: 15,

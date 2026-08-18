@@ -153,7 +153,7 @@ const createStyles = (c: ThemeColors) =>
     opacity: 0.5,
   },
   buttonText: {
-    color: c.onContrast,
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '800',
   },
