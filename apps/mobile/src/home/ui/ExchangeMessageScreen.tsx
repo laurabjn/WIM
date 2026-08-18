@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -109,10 +113,20 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <BackButton onPress={navigation.goBack} style={styles.backButton} />
 
-      <View style={styles.content}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={[
+            styles.content,
+            { paddingBottom: insets.bottom + 110 },
+          ]}
+          keyboardShouldPersistTaps="handled"
+        >
         <Text style={styles.title}>{t("messagePlaceholder")}</Text>
 
         {myHomes.length > 0 ? (
@@ -157,19 +171,21 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
             style={styles.input}
           />
         </View>
-      </View>
 
-      <TouchableOpacity
-        style={[
-          styles.button,
-          {
-            bottom: insets.bottom + 90,
-          }
-        ]}
+        <TouchableOpacity
+          style={[styles.button, sending && styles.buttonDisabled]}
+          activeOpacity={0.85}
+          disabled={sending || !message.trim()}
           onPress={sendMessage}
-      >
-        <Text style={styles.buttonText}>{t("send")}</Text>
-      </TouchableOpacity>
+        >
+          {sending ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.buttonText}>{t("send")}</Text>
+          )}
+        </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -197,15 +213,14 @@ const createStyles = (c: ThemeColors) =>
     color: c.text,
   },
   content: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingBottom: 80,
+    paddingHorizontal: 10,
+    paddingTop: 8,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '800',
     textAlign: 'center',
-    marginBottom: 56,
+    marginBottom: 28,
     color: c.text,
   },
   option: {
@@ -227,18 +242,19 @@ const createStyles = (c: ThemeColors) =>
     color: c.text,
   },
   button: {
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#25A9E0',
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: c.info,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginTop: 20,
   },
   buttonDisabled: {
     opacity: 0.5,
   },
   buttonText: {
-    color: c.onContrast,
+    // Pose sur un aplat bleu, ce libelle reste blanc dans les deux themes.
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '800',
   },
@@ -283,6 +299,9 @@ const createStyles = (c: ThemeColors) =>
     fontSize: 14,
     color: c.text,
   },
+  flex: {
+    flex: 1,
+  },
   messageBox: {
     borderWidth: 1,
     borderColor: c.border,
@@ -296,9 +315,11 @@ const createStyles = (c: ThemeColors) =>
     color: c.text,
   },
   input: {
-    minHeight: 210,
-    fontSize: 13,
-    color: c.textMuted,
+    minHeight: 180,
+    fontSize: 14,
+    // Un texte que l'on modifie n'est pas un texte secondaire : il etait
+    // devenu gris lors du passage au theme.
+    color: c.text,
     lineHeight: 20,
   },
 });
