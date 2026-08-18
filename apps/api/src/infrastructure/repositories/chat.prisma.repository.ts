@@ -46,6 +46,8 @@ export class ChatPrismaRepository implements ChatRepository {
                 firstName: true,
                 lastName: true,
                 avatarUrl: true,
+                statusText: true,
+                statusUpdatedAt: true,
               },
             },
           },

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Alert, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
@@ -19,6 +20,10 @@ import type {
 } from '@wim/shared';
 
 import { getSession } from 'src/auth/infrastructure/authStorage';
+import {
+  getMyProfile,
+  updateMyProfile,
+} from 'src/profile/infrastructure/profile.api';
 import { getChatsApi } from '../infrastructure/chat.api';
 import { connectChatSocket } from '../infrastructure/chatSocket';
 import { usePresence } from '../hooks/usePresence';
@@ -38,6 +43,11 @@ export function ConversationsScreen({ navigation }: Props) {
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [chats, setChats] = useState<MyChatListItem[]>([]);
+  const [myStatus, setMyStatus] = useState<string | null>(null);
+  const [myAvatar, setMyAvatar] = useState<string | null>(null);
+  const [statusDraft, setStatusDraft] = useState('');
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [savingStatus, setSavingStatus] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +65,17 @@ export function ConversationsScreen({ navigation }: Props) {
       }
 
       setChats(await getChatsApi(session.accessToken));
+
+      // Le statut et l'avatar de l'utilisateur alimentent la premiere vignette
+      // de la rangee : un echec ici ne doit pas priver de conversations.
+      try {
+        const profil = await getMyProfile(session.accessToken);
+
+        setMyStatus(profil.status ?? null);
+        setMyAvatar(profil.avatarUrl ?? null);
+      } catch (profilError) {
+        console.log('Load own status error:', profilError);
+      }
     } catch (loadError) {
       console.log('Load chats error:', loadError);
       setError(t('loadError'));
@@ -127,6 +148,33 @@ export function ConversationsScreen({ navigation }: Props) {
   function handleRefresh() {
     setRefreshing(true);
     loadChats();
+  }
+
+  async function saveStatus(texte: string) {
+    setSavingStatus(true);
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      const profil = await updateMyProfile(session.accessToken, {
+        statusText: texte,
+      });
+
+      setMyStatus(profil.status ?? null);
+      setStatusOpen(false);
+    } catch (statusError) {
+      console.log('Save status error:', statusError);
+      Alert.alert('', t('statusError'));
+    } finally {
+      setSavingStatus(false);
+    }
+  }
+
+  function openStatusEditor() {
+    setStatusDraft(myStatus ?? '');
+    setStatusOpen(true);
   }
 
   function renderChat(chat: MyChatListItem) {
@@ -217,12 +265,23 @@ export function ConversationsScreen({ navigation }: Props) {
         style={styles.statusScroll}
         contentContainerStyle={styles.statusRow}
       >
-        <View style={styles.statusItem}>
-          <View style={[styles.statusAvatar, styles.statusAvatarOwn]} />
-          <Text style={styles.statusLabel} numberOfLines={2}>
-            {t('shareStatus')}
-          </Text>
-        </View>
+        <TouchableOpacity
+          style={styles.statusItem}
+          activeOpacity={0.8}
+          onPress={openStatusEditor}
+        >
+          <View style={styles.statusBubble}>
+            <Text style={styles.statusBubbleText} numberOfLines={2}>
+              {myStatus ?? t('shareStatus')}
+            </Text>
+          </View>
+
+          {myAvatar ? (
+            <Image source={{ uri: myAvatar }} style={styles.statusAvatar} />
+          ) : (
+            <View style={[styles.statusAvatar, styles.statusAvatarOwn]} />
+          )}
+        </TouchableOpacity>
 
         {conversations.slice(0, 8).map((chat) => (
           <TouchableOpacity
@@ -238,6 +297,22 @@ export function ConversationsScreen({ navigation }: Props) {
               })
             }
           >
+            {chat.participant?.status ? (
+              <View style={styles.statusBubble}>
+                <Text style={styles.statusBubbleText} numberOfLines={2}>
+                  {chat.participant.status}
+                </Text>
+              </View>
+            ) : (
+              // Sans bulle, la vignette remonterait et casserait l'alignement
+              // de la rangee.
+              <View style={styles.statusBubblePlaceholder}>
+                <Text style={styles.statusLabel} numberOfLines={1}>
+                  {chat.participant?.firstName}
+                </Text>
+              </View>
+            )}
+
             {chat.participant?.avatarUrl ? (
               <Image
                 source={{ uri: chat.participant.avatarUrl }}
@@ -250,10 +325,6 @@ export function ConversationsScreen({ navigation }: Props) {
                 </Text>
               </View>
             )}
-
-            <Text style={styles.statusLabel} numberOfLines={1}>
-              {chat.participant?.firstName}
-            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -302,6 +373,73 @@ export function ConversationsScreen({ navigation }: Props) {
           }
         />
       )}
+
+      <Modal
+        visible={statusOpen}
+        transparent
+        animationType="slide"
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setStatusOpen(false)}
+      >
+        <View style={styles.statusModalBackdrop}>
+          <View style={styles.statusSheet}>
+            <Text style={styles.statusSheetTitle}>{t('statusTitle')}</Text>
+
+            <TextInput
+              style={styles.statusInput}
+              value={statusDraft}
+              onChangeText={setStatusDraft}
+              placeholder={t('statusPlaceholder')}
+              placeholderTextColor={themeColors.textFaint}
+              maxLength={80}
+              multiline
+            />
+
+            <View style={styles.statusActions}>
+              {myStatus ? (
+                <TouchableOpacity
+                  style={styles.statusAction}
+                  disabled={savingStatus}
+                  onPress={() => saveStatus('')}
+                >
+                  <Text style={styles.statusActionText}>{t('statusClear')}</Text>
+                </TouchableOpacity>
+              ) : null}
+
+              <TouchableOpacity
+                style={styles.statusAction}
+                disabled={savingStatus}
+                onPress={() => setStatusOpen(false)}
+              >
+                <Text style={styles.statusActionText}>{t('cancel')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.statusAction, styles.statusActionPrimary]}
+                disabled={savingStatus || !statusDraft.trim()}
+                onPress={() => saveStatus(statusDraft)}
+              >
+                {savingStatus ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={themeColors.onContrast}
+                  />
+                ) : (
+                  <Text
+                    style={[
+                      styles.statusActionText,
+                      styles.statusActionPrimaryText,
+                    ]}
+                  >
+                    {t('statusSave')}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -356,8 +494,33 @@ const createStyles = (c: ThemeColors) =>
   },
 
   statusItem: {
-    width: 72,
+    width: 96,
     alignItems: 'center',
+  },
+
+  statusBubble: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: c.border,
+    backgroundColor: c.surface,
+  },
+
+  statusBubblePlaceholder: {
+    minHeight: 44,
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+
+  statusBubbleText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: c.text,
+    textAlign: 'center',
   },
 
   statusAvatar: {
@@ -371,6 +534,65 @@ const createStyles = (c: ThemeColors) =>
     borderWidth: 1,
     borderColor: c.border,
     borderStyle: 'dashed',
+  },
+
+  statusModalBackdrop: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: c.overlay,
+  },
+
+  statusSheet: {
+    padding: 20,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    backgroundColor: c.surface,
+  },
+
+  statusSheetTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: c.text,
+  },
+
+  statusInput: {
+    marginTop: 14,
+    padding: 12,
+    minHeight: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: c.border,
+    fontSize: 15,
+    color: c.text,
+  },
+
+  statusActions: {
+    marginTop: 16,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+
+  statusAction: {
+    height: 42,
+    paddingHorizontal: 16,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  statusActionPrimary: {
+    backgroundColor: c.contrast,
+  },
+
+  statusActionText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: c.text,
+  },
+
+  statusActionPrimaryText: {
+    color: c.onContrast,
   },
 
   statusLabel: {

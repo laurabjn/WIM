@@ -3,6 +3,9 @@ export type ChatUser = {
   firstName: string
   lastName: string
   avatarUrl: string | null
+  // Statut brut : c'est la couche application qui decide s'il est perime.
+  statusText?: string | null
+  statusUpdatedAt?: Date | null
 }
 
 export type ChatParticipant = {

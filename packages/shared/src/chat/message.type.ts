@@ -3,6 +3,8 @@ export type MessageSender = {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  /** Statut court du moment, null passe un jour. */
+  status?: string | null;
 };
 
 export type MessageKind = 'TEXT' | 'IMAGE' | 'AUDIO';

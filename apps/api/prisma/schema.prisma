@@ -34,6 +34,11 @@ model User {
   // quand la personne n'est plus connectee.
   lastSeenAt DateTime? @map("last_seen_at")
 
+  // Statut court, affiche au-dessus de l'avatar. Il se perime au bout d'un
+  // jour : c'est une humeur du moment, pas une seconde biographie.
+  statusText      String?   @map("status_text")
+  statusUpdatedAt DateTime? @map("status_updated_at")
+
   profileVisible Boolean @default(true) @map("profile_visible")
   showAge        Boolean @default(true) @map("show_age")
   dataSharing    Boolean @default(false) @map("data_sharing")

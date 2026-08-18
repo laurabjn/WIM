@@ -53,6 +53,8 @@ export interface UserProfile {
   profileVisible?: boolean;
   showAge?: boolean;
   dataSharing?: boolean;
+  /** Statut court du moment, null passe un jour. */
+  status?: string | null;
 }
 
 export interface MyHome {

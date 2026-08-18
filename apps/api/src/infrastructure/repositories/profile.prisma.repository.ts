@@ -6,6 +6,7 @@ import type {
 import { PrismaService } from '../database/prisma/prisma.service';
 import { UpdateProfileInput } from 'src/application/profile/dto/update-my-profile.dto';
 import { calculateAge } from 'src/shared/utils/calculated-age';
+import { currentStatus } from 'src/application/profile/status';
 
 @Injectable()
 export class PrismaProfileRepository implements ProfileRepository {
@@ -125,6 +126,14 @@ export class PrismaProfileRepository implements ProfileRepository {
         profileVisible: input.profileVisible,
         showAge: input.showAge,
         dataSharing: input.dataSharing,
+        // Retirer son statut et l'ecrire passent par le meme champ : une
+        // chaine vide vaut effacement, et l'horodatage suit.
+        ...(input.statusText === undefined
+          ? {}
+          : {
+              statusText: input.statusText?.trim() ? input.statusText.trim() : null,
+              statusUpdatedAt: input.statusText?.trim() ? new Date() : null,
+            }),
       },
     });
 
@@ -157,6 +166,7 @@ export class PrismaProfileRepository implements ProfileRepository {
         ? user.languages
         : [],
       preferredLocale: (user.preferredLocale ?? 'fr') as SupportedLocale,
+      status: currentStatus(user.statusText, user.statusUpdatedAt),
       travelPreferences: user.travelPreferences ?? {
         preferredCountries: [],
         preferredHomeTypes: [],

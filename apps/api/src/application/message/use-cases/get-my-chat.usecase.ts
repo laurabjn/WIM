@@ -7,6 +7,7 @@ import { CHAT_REPOSITORY } from 'src/interfaces/http/tokens/token';
 import { mapMessage } from '../message.mapper';
 import { MyChatListItem } from '@wim/shared';
 import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
+import { currentStatus } from 'src/application/profile/status';
 
 @Injectable()
 export class GetMyChatsUseCase {
@@ -60,6 +61,10 @@ export class GetMyChatsUseCase {
                   otherParticipant.user.lastName,
                 avatarUrl:
                   otherParticipant.user.avatarUrl,
+                status: currentStatus(
+                  otherParticipant.user.statusText,
+                  otherParticipant.user.statusUpdatedAt,
+                ),
               }
             : {
                 id: '',
