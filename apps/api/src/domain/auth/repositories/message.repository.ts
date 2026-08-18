@@ -5,8 +5,9 @@ export type CreateMessageData = {
   chatId: string
   senderId: string
   content: string
-  type?: 'TEXT' | 'IMAGE'
+  type?: 'TEXT' | 'IMAGE' | 'AUDIO'
   attachmentUrl?: string | null
+  attachmentDurationMs?: number | null
 }
 
 export type FindMessagesOptions = {

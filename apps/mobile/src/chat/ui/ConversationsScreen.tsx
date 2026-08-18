@@ -190,7 +190,9 @@ export function ConversationsScreen({ navigation }: Props) {
               {chat.lastMessage
                 ? chat.lastMessage.type === 'IMAGE'
                   ? t('photoPreview')
-                  : chat.lastMessage.content
+                  : chat.lastMessage.type === 'AUDIO'
+                    ? t('voicePreview')
+                    : chat.lastMessage.content
                 : t('startConversation')}
             </Text>
 

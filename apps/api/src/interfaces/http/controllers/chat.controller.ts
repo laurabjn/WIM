@@ -53,6 +53,22 @@ function imageFileFilter(
   callback(null, true);
 }
 
+function audioFileFilter(
+  _req: unknown,
+  file: Express.Multer.File,
+  callback: (error: Error | null, acceptFile: boolean) => void,
+) {
+  // iOS enregistre en m4a, Android en aac ou 3gp : les deux plateformes
+  // annoncent des types varies pour ces memes conteneurs.
+  if (!file.mimetype.match(/^audio\/|^video\/(mp4|3gpp)$/)) {
+    return callback(
+      new BadRequestException('Seuls les enregistrements audio sont acceptés.'),
+      false,
+    );
+  }
+  callback(null, true);
+}
+
 type AuthenticatedRequest = {
   user?: {
     sub?: string;
@@ -198,6 +214,48 @@ export class ChatController {
       content: '',
       type: 'IMAGE',
       attachmentUrl: `/uploads/messages/${file.filename}`,
+    });
+
+    this.gateway.emitMessageCreated(chatId, message);
+    await this.notifyChatUpdated(chatId, message);
+
+    return message;
+  }
+
+  @Post(':chatId/voice')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/messages',
+        filename: editFileName,
+      }),
+      fileFilter: audioFileFilter,
+      limits: { fileSize: 12 * 1024 * 1024 },
+    }),
+  )
+  async createVoiceMessage(
+    @Req() request: AuthenticatedRequest,
+    @Param('chatId')
+    chatId: string,
+    @Body() dto: { durationMs?: string },
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('Aucun enregistrement reçu.');
+    }
+
+    // Le multipart ne transporte que du texte : une duree illisible ne doit
+    // pas faire echouer l'envoi, la bulle sait se passer d'elle.
+    const duration = Number.parseInt(dto?.durationMs ?? '', 10);
+
+    const message = await this.sendMessage.execute({
+      chatId,
+      senderId: this.getUserId(request),
+      content: '',
+      type: 'AUDIO',
+      attachmentUrl: `/uploads/messages/${file.filename}`,
+      attachmentDurationMs:
+        Number.isFinite(duration) && duration > 0 ? duration : null,
     });
 
     this.gateway.emitMessageCreated(chatId, message);

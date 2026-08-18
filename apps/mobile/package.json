@@ -24,6 +24,7 @@
     "@rnmapbox/maps": "^10.3.2",
     "@wim/i18n": "*",
     "expo": "~54.0.33",
+    "expo-audio": "~1.1.1",
     "expo-dev-client": "~6.0.21",
     "expo-image-picker": "~17.0.10",
     "expo-linear-gradient": "~15.0.8",

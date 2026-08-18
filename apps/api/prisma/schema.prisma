@@ -336,6 +336,7 @@ model ChatParticipant {
 enum MessageType {
   TEXT
   IMAGE
+  AUDIO
 }
 
 model Message {
@@ -347,6 +348,10 @@ model Message {
 
   type          MessageType @default(TEXT)
   attachmentUrl String?     @map("attachment_url")
+
+  // La duree accompagne le vocal : sans elle, la bulle devrait charger chaque
+  // enregistrement de la liste pour afficher ne serait-ce que sa longueur.
+  attachmentDurationMs Int? @map("attachment_duration_ms")
 
   chat               Chat                 @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender             User                 @relation(fields: [senderId], references: [id], onDelete: Cascade)

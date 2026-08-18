@@ -14,7 +14,7 @@ export type ChatParticipant = {
   user: ChatUser
 }
 
-export type MessageKind = 'TEXT' | 'IMAGE'
+export type MessageKind = 'TEXT' | 'IMAGE' | 'AUDIO'
 
 export type ChatMessage = {
   id: string
@@ -23,6 +23,7 @@ export type ChatMessage = {
   content: string
   type: MessageKind
   attachmentUrl: string | null
+  attachmentDurationMs: number | null
   createdAt: Date
   updatedAt: Date
   sender: ChatUser
@@ -56,7 +57,7 @@ export interface ChatRepository {
   countUnreadMessages(chatId: string, userId: string): Promise<number>
   countAllUnreadMessages(userId: string): Promise<number>
   touchChat(chatId: string): Promise<void>
-  createMessage(input: {chatId: string, senderId: string, content: string, type?: MessageKind, attachmentUrl?: string | null}): Promise<ChatMessage>;
+  createMessage(input: {chatId: string, senderId: string, content: string, type?: MessageKind, attachmentUrl?: string | null, attachmentDurationMs?: number | null}): Promise<ChatMessage>;
   isParticipant(chatId: string, userId: string): Promise<boolean>
   hasUserReplied(chatId: string, userId: string): Promise<boolean>
 }

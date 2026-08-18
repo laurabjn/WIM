@@ -59,6 +59,35 @@ export async function sendPhotoMessageApi(
   return parseResponse(response);
 }
 
+export async function sendVoiceMessageApi(
+  token: string,
+  chatId: string,
+  uri: string,
+  durationMs: number,
+): Promise<ChatMessages> {
+  const extension = uri.split('.').pop()?.toLowerCase() ?? 'm4a';
+
+  const form = new FormData();
+
+  form.append('file', {
+    uri,
+    name: `message.${extension}`,
+    // Android enregistre en 3gp, iOS en m4a : declarer le mauvais type ferait
+    // rejeter le fichier par le filtre du serveur.
+    type: extension === '3gp' ? 'audio/3gpp' : 'audio/m4a',
+  } as unknown as Blob);
+
+  form.append('durationMs', String(Math.round(durationMs)));
+
+  const response = await fetch(`${API_URL}/chats/${chatId}/voice`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: form,
+  });
+
+  return parseResponse(response);
+}
+
 export async function getRequestsApi(
   token: string,
 ): Promise<MyRequestListItem[]> {

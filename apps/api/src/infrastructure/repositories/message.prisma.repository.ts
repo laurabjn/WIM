@@ -18,6 +18,7 @@ export class PrismaMessageRepository implements MessageRepository {
         content: data.content,
         type: data.type ?? 'TEXT',
         attachmentUrl: data.attachmentUrl ?? null,
+        attachmentDurationMs: data.attachmentDurationMs ?? null,
       },
       include: {
         sender: {

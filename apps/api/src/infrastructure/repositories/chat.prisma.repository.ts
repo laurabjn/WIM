@@ -70,6 +70,7 @@ export class ChatPrismaRepository implements ChatRepository {
             content: true,
             type: true,
             attachmentUrl: true,
+            attachmentDurationMs: true,
             createdAt: true,
             updatedAt: true,
 
@@ -392,8 +393,9 @@ export class ChatPrismaRepository implements ChatRepository {
     chatId: string;
     senderId: string;
     content: string;
-    type?: 'TEXT' | 'IMAGE';
+    type?: 'TEXT' | 'IMAGE' | 'AUDIO';
     attachmentUrl?: string | null;
+    attachmentDurationMs?: number | null;
   }): Promise<ChatMessage> {
     return this.prisma.message.create({
       data: {
@@ -402,6 +404,7 @@ export class ChatPrismaRepository implements ChatRepository {
         content: input.content,
         type: input.type ?? 'TEXT',
         attachmentUrl: input.attachmentUrl ?? null,
+        attachmentDurationMs: input.attachmentDurationMs ?? null,
       },
 
       include: {

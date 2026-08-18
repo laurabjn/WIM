@@ -18,6 +18,12 @@ import {
 } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
+import {
+  AudioModule,
+  RecordingPresets,
+  setAudioModeAsync,
+  useAudioRecorder,
+} from 'expo-audio';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
@@ -43,6 +49,7 @@ import {
   markChatAsReadApi,
   sendMessageApi,
   sendPhotoMessageApi,
+  sendVoiceMessageApi,
 } from '../infrastructure/chat.api';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { useChatSocket } from '../hooks/useChatSocket';
@@ -58,6 +65,7 @@ import {
   reportUserApi,
 } from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
+import { VoiceMessageBubble } from './components/VoiceMessageBubble';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
@@ -69,7 +77,18 @@ import {
 
 const PAGE_SIZE = 30;
 
+// Un enregistrement plus court est un appui malencontreux ; plus long, il
+// depasserait la taille acceptee par le serveur.
+const MIN_RECORDING_MS = 800;
+const MAX_RECORDING_MS = 5 * 60 * 1000;
+
 const translationKey = (chatId: string) => `chat:translate:${chatId}`;
+
+function formatRecordingTime(millisecondes: number) {
+  const secondes = Math.floor(millisecondes / 1000);
+
+  return `${Math.floor(secondes / 60)}:${String(secondes % 60).padStart(2, '0')}`;
+}
 
 type Props = {
   route: {
@@ -125,6 +144,14 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   const translatedRef = useRef(true);
   const [translationEpoch, setTranslationEpoch] = useState(0);
+
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const [recording, setRecording] = useState(false);
+  const [recordingMs, setRecordingMs] = useState(0);
+  const recordingStartedAt = useRef(0);
+  // La coupure automatique peut se declencher deux fois avant que l'etat ne
+  // se propage : sans ce verrou, le vocal partirait en double.
+  const stoppingRef = useRef(false);
 
   const cursorRef = useRef<string | null>(null);
   const hasMoreRef = useRef(false);
@@ -357,6 +384,110 @@ export function ConversationScreen({ route, navigation }: Props) {
     applyTranslation(!translated);
   }
 
+  // Le compteur affiche pendant l'enregistrement, et la coupure automatique
+  // avant que le fichier ne depasse la taille acceptee.
+  useEffect(() => {
+    if (!recording) return;
+
+    const timer = setInterval(() => {
+      const ecoule = Date.now() - recordingStartedAt.current;
+
+      setRecordingMs(ecoule);
+
+      if (ecoule >= MAX_RECORDING_MS) stopRecording(true);
+    }, 200);
+
+    return () => clearInterval(timer);
+  }, [recording]);
+
+  async function startRecording() {
+    const permission = await AudioModule.requestRecordingPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert('', t('microphoneDenied'));
+      return;
+    }
+
+    try {
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
+      });
+
+      await recorder.prepareToRecordAsync();
+
+      recorder.record();
+
+      recordingStartedAt.current = Date.now();
+      stoppingRef.current = false;
+
+      setRecordingMs(0);
+      setRecording(true);
+    } catch (recordError) {
+      console.log('Start recording error:', recordError);
+      setError(t('voiceError'));
+    }
+  }
+
+  async function stopRecording(envoyer: boolean) {
+    if (stoppingRef.current) return;
+
+    stoppingRef.current = true;
+
+    const duree = Date.now() - recordingStartedAt.current;
+
+    setRecording(false);
+
+    let uri: string | null = null;
+
+    try {
+      await recorder.stop();
+
+      uri = recorder.uri;
+    } catch (stopError) {
+      console.log('Stop recording error:', stopError);
+    }
+
+    // Sans ce retour en arriere, iOS garderait la sortie sur l'ecouteur et la
+    // lecture des vocaux serait a peine audible.
+    await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
+
+    if (!envoyer || !uri) return;
+
+    if (duree < MIN_RECORDING_MS) {
+      Alert.alert('', t('voiceTooShort'));
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      const message = await sendVoiceMessageApi(
+        session.accessToken,
+        chatId,
+        uri,
+        duree,
+      );
+
+      setMessages((current) =>
+        current.some((item) => item.id === message.id)
+          ? current
+          : [message, ...current],
+      );
+
+      setError(null);
+    } catch (voiceError) {
+      console.log('Send voice error:', voiceError);
+      setError(t('voiceError'));
+    } finally {
+      setUploading(false);
+    }
+  }
+
   async function sendPhoto(uri: string) {
     setUploading(true);
 
@@ -560,6 +691,12 @@ export function ConversationScreen({ route, navigation }: Props) {
                 style={styles.attachment}
                 resizeMode="cover"
               />
+            ) : message.type === 'AUDIO' && message.attachmentUrl ? (
+              <VoiceMessageBubble
+                uri={resolveImageUrl(message.attachmentUrl) ?? ''}
+                durationMs={message.attachmentDurationMs}
+                mine={isMine}
+              />
             ) : (
               <Text
                 style={[
@@ -721,6 +858,42 @@ export function ConversationScreen({ route, navigation }: Props) {
             ) : null}
 
             <View style={styles.composerCard}>
+              {recording ? (
+                <View style={styles.composerRow}>
+                  <View style={styles.recordDot} />
+
+                  <Text style={styles.recordTimer}>
+                    {formatRecordingTime(recordingMs)}
+                  </Text>
+
+                  <TouchableOpacity
+                    style={styles.recordCancel}
+                    onPress={() => stopRecording(false)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.recordCancelText}>{t('cancel')}</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => stopRecording(true)}
+                    disabled={uploading}
+                    activeOpacity={0.85}
+                  >
+                    <LinearGradient
+                      colors={['#2DA7F3', '#52D1A6']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.sendButton}
+                    >
+                      {uploading ? (
+                        <ActivityIndicator size="small" color="#FFFFFF" />
+                      ) : (
+                        <Send size={19} color="#FFFFFF" />
+                      )}
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              ) : (
               <View style={styles.composerRow}>
                 <TouchableOpacity
                   style={styles.cameraButton}
@@ -749,7 +922,8 @@ export function ConversationScreen({ route, navigation }: Props) {
 
                 <TouchableOpacity
                   style={styles.iconButton}
-                  onPress={() => Alert.alert('', t('voiceSoon'))}
+                  onPress={startRecording}
+                  disabled={uploading}
                   activeOpacity={0.7}
                 >
                   <Mic size={21} color={themeColors.text} />
@@ -782,6 +956,7 @@ export function ConversationScreen({ route, navigation }: Props) {
                   </LinearGradient>
                 </TouchableOpacity>
               </View>
+              )}
             </View>
           </View>
         </KeyboardAvoidingView>
@@ -1127,6 +1302,35 @@ menuBackdrop: {
     height: 42,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  recordDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginLeft: 8,
+    backgroundColor: c.danger,
+  },
+
+  recordTimer: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 15,
+    fontWeight: '700',
+    color: c.text,
+    fontVariant: ['tabular-nums'],
+  },
+
+  recordCancel: {
+    height: 42,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+  },
+
+  recordCancelText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: c.textMuted,
   },
 
   sendButton: {

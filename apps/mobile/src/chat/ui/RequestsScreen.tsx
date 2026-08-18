@@ -169,7 +169,11 @@ export function RequestsScreen({ navigation }: Props) {
                 </Text>
 
                 <Text style={styles.preview} numberOfLines={1}>
-                  {item.lastMessage?.content ?? ''}
+                  {item.lastMessage?.type === 'IMAGE'
+                    ? t('photoPreview')
+                    : item.lastMessage?.type === 'AUDIO'
+                      ? t('voicePreview')
+                      : item.lastMessage?.content ?? ''}
                 </Text>
               </View>
             </TouchableOpacity>

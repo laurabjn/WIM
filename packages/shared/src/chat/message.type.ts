@@ -5,7 +5,7 @@ export type MessageSender = {
   avatarUrl: string | null;
 };
 
-export type MessageKind = 'TEXT' | 'IMAGE';
+export type MessageKind = 'TEXT' | 'IMAGE' | 'AUDIO';
 
 export type ChatMessages = {
   id: string;
@@ -14,6 +14,9 @@ export type ChatMessages = {
   content: string;
   type: MessageKind;
   attachmentUrl: string | null;
+  // Renseignee pour les vocaux uniquement : la bulle affiche la duree sans
+  // avoir a charger l'enregistrement.
+  attachmentDurationMs?: number | null;
   translatedContent?: string | null;
   sender: MessageSender;
   createdAt: string;

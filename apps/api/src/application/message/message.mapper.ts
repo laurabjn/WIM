@@ -9,6 +9,7 @@ export function mapMessage(message: ChatMessage): ChatMessages {
     content: message.content,
     type: message.type,
     attachmentUrl: message.attachmentUrl,
+    attachmentDurationMs: message.attachmentDurationMs,
     sender: {
       id: message.sender.id,
       firstName: message.sender.firstName,
