@@ -92,11 +92,16 @@ async function renouveler(
     });
 
     if (!response.ok) {
-      // Un refus franc du serveur signifie que la session est morte : la
-      // garder ferait echouer chaque ecran en silence.
-      if (response.status === 401) await clearSession();
+      if (response.status === 401) {
+        await clearSession();
 
-      return null;
+        return null;
+      }
+
+      // Toute autre reponse ne prouve rien sur la session : un serveur plus
+      // ancien que l'application ne connait pas cette route et repondrait 404.
+      // Rendre null ferait paraitre l'utilisateur deconnecte partout.
+      return session;
     }
 
     const data = await response.json();
