@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Alert, Modal } from 'react-native';
+import { Alert, Modal, Pressable } from 'react-native';
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -1536,54 +1536,70 @@ export function ConversationScreen({ route, navigation }: Props) {
         navigationBarTranslucent
         onRequestClose={() => setActionsFor(null)}
       >
-        <TouchableOpacity
-          style={styles.menuBackdrop}
-          activeOpacity={1}
-          onPress={() => setActionsFor(null)}
-        >
-          <View style={[styles.menuSheet, { paddingBottom: 20 + insets.bottom }]}>
+        <View style={styles.actionsBackdrop}>
+          {/* Sous la carte et non autour : un appui sur la carte ne doit pas
+              la refermer. */}
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setActionsFor(null)}
+          />
+
+          <View style={styles.actionsCard}>
             {actionsFor ? (
               <>
-                <Text style={styles.actionsExtract} numberOfLines={2}>
-                  {apercuMessage(actionsFor)}
-                </Text>
+                <View style={styles.actionsHeader}>
+                  <Text style={styles.actionsExtract} numberOfLines={2}>
+                    {apercuMessage(actionsFor)}
+                  </Text>
+                </View>
 
                 <TouchableOpacity
-                  style={styles.menuItem}
+                  style={styles.actionsRow}
+                  activeOpacity={0.6}
                   onPress={() => repondreA(actionsFor)}
                 >
-                  <Text style={styles.menuText}>{t('replyMessage')}</Text>
+                  <Text style={styles.actionsIcon}>↩</Text>
+                  <Text style={styles.actionsLabel}>{t('replyMessage')}</Text>
                 </TouchableOpacity>
 
                 {actionsFor.senderId === currentUserId &&
                 actionsFor.type === 'TEXT' ? (
                   <TouchableOpacity
-                    style={styles.menuItem}
+                    style={styles.actionsRow}
+                    activeOpacity={0.6}
                     onPress={() => modifier(actionsFor)}
                   >
-                    <Text style={styles.menuText}>{t('editMessage')}</Text>
+                    <Text style={styles.actionsIcon}>✎</Text>
+                    <Text style={styles.actionsLabel}>{t('editMessage')}</Text>
                   </TouchableOpacity>
                 ) : null}
 
                 {actionsFor.senderId === currentUserId ? (
                   <TouchableOpacity
-                    style={styles.menuItem}
+                    style={styles.actionsRow}
+                    activeOpacity={0.6}
                     onPress={() => confirmerSuppression(actionsFor)}
                   >
-                    <Text style={styles.menuDanger}>{t('deleteMessage')}</Text>
+                    <Text style={[styles.actionsIcon, styles.actionsDanger]}>
+                      ⌫
+                    </Text>
+                    <Text style={[styles.actionsLabel, styles.actionsDanger]}>
+                      {t('deleteMessage')}
+                    </Text>
                   </TouchableOpacity>
                 ) : null}
               </>
             ) : null}
 
             <TouchableOpacity
-              style={styles.menuItem}
+              style={[styles.actionsRow, styles.actionsCancelRow]}
+              activeOpacity={0.6}
               onPress={() => setActionsFor(null)}
             >
-              <Text style={styles.menuCancel}>{t('cancel')}</Text>
+              <Text style={styles.actionsCancel}>{t('cancel')}</Text>
             </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
 
       <Modal
@@ -1770,13 +1786,68 @@ menuBackdrop: {
     color: c.textMuted,
   },
 
-  // Rappelle de quel message il s'agit : la feuille masque la conversation.
-  actionsExtract: {
-    paddingHorizontal: 20,
-    paddingTop: 4,
+  actionsBackdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 36,
+    backgroundColor: c.overlay,
+  },
+
+  actionsCard: {
+    borderRadius: 20,
+    backgroundColor: c.surface,
+    // Les rangees vont jusqu'au bord : sans cela leurs coins depasseraient de
+    // la carte.
+    overflow: 'hidden',
+  },
+
+  actionsHeader: {
+    paddingHorizontal: 18,
+    paddingTop: 16,
     paddingBottom: 12,
+  },
+
+  // Rappelle de quel message il s'agit : la carte masque la conversation.
+  actionsExtract: {
     fontSize: 13,
     fontStyle: 'italic',
+    color: c.textMuted,
+  },
+
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 15,
+    borderTopWidth: 1,
+    borderTopColor: c.border,
+  },
+
+  actionsIcon: {
+    width: 20,
+    fontSize: 16,
+    textAlign: 'center',
+    color: c.text,
+  },
+
+  actionsLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: c.text,
+  },
+
+  actionsDanger: {
+    color: c.danger,
+  },
+
+  actionsCancelRow: {
+    justifyContent: 'center',
+  },
+
+  actionsCancel: {
+    fontSize: 15,
+    fontWeight: '700',
     color: c.textMuted,
   },
 
