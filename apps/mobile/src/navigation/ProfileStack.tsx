@@ -16,7 +16,6 @@ import { SupportScreen } from 'src/profile/ui/SupportScreen';
 import { BlockedUsersScreen } from 'src/profile/ui/BlockedUsersScreen';
 import { ExchangeAvailabilityScreen } from 'src/home/ui/ExchangeAvailabilityScreen';
 import { ExchangeMessageScreen } from 'src/home/ui/ExchangeMessageScreen';
-import { AdminScreen } from 'src/admin/ui/AdminScreen';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -66,11 +65,6 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       <Stack.Screen
         name="BlockedUsers"
         component={BlockedUsersScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Admin"
-        component={AdminScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

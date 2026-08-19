@@ -18,7 +18,6 @@ export type ProfileStackParamList = {
   Favorites: undefined;
   Settings: { profile: UserProfile };
   BlockedUsers: undefined;
-  Admin: undefined;
   PublicProfile: { userId: string };
   Help: undefined;
   Support: { mode?: 'report' } | undefined;
