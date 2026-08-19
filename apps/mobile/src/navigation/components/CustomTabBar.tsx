@@ -11,11 +11,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
+// Le compte vient du navigateur : l'appeler ici aussi lancerait un second
+// sondage pour la meme information.
+type Props = BottomTabBarProps & { unreadCount?: number };
+
 export function CustomTabBar({
   state,
   descriptors,
   navigation,
-}: BottomTabBarProps) {
+  unreadCount = 0,
+}: Props) {
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const currentRouteName = state.routes[state.index]?.name;
@@ -109,6 +114,14 @@ export function CustomTabBar({
                 size={17}
                 color={themeColors.text}
               />
+
+              {unreadCount > 0 ? (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </Text>
+                </View>
+              ) : null}
             </View>
           </TouchableOpacity>
 
@@ -168,6 +181,28 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -6,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 4,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: c.danger,
+    // L'anneau detache la pastille de l'icone, quel que soit le theme.
+    borderWidth: 2,
+    borderColor: c.surface,
+  },
+
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
 
   iconBubbleActive: {

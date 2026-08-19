@@ -61,7 +61,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
           return null;
         }
 
-        return <CustomTabBar {...props} />;
+        return <CustomTabBar {...props} unreadCount={unreadCount} />;
       }}
     >
       <Tab.Screen
@@ -91,7 +91,6 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
         component={MessagesStackNavigator}
         options={{
           title: t('messages'),
-          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
         }}
       />
       <Tab.Screen
