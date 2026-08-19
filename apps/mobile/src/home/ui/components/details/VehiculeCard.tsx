@@ -17,22 +17,29 @@ export const VehicleCard: React.FC<Props> = ({ vehicle }) => {
 
   const vehicleName = [vehicle.brand, vehicle.model].filter(Boolean).join(' ');
 
-  function getFuelTypeLabel(fuelType?: string | null) {
-    switch (fuelType) {
-      case 'GASOLINE':
-        return 'Essence';
-      case 'HYBRID':
-        return 'Hybride';
-      case 'DIESEL':
-        return 'Diesel';
-      case 'ELECTRIC':
-        return 'Électrique';
-      default:
-        return null;
-    }
-  }
+  const CARBURANTS = ['GASOLINE', 'HYBRID', 'DIESEL', 'ELECTRIC'];
 
-  const fuelLabel = getFuelTypeLabel(vehicle.fuelType);
+  const fuelLabel = vehicle.fuelType && CARBURANTS.includes(vehicle.fuelType)
+    ? t(`vehicule.fuelType.${vehicle.fuelType}`)
+    : null;
+
+  // Le type etait affiche tel qu'il est stocke : la carte annoncait "city".
+  // Un type inconnu vaut mieux tu que rendu brut.
+  const TYPES = ['city', 'suv', 'break', 'van', 'utility'];
+
+  const typeLabel = vehicle.type && TYPES.includes(vehicle.type)
+    ? t(`vehicule.type.${vehicle.type}`)
+    : null;
+
+  // Chaque mention est posee dans une liste, puis jointe : c'est l'absence de
+  // separateur qui collait "city" a "Électrique".
+  const details = [
+    vehicle.seats
+      ? `${vehicle.seats} ${t('vehicule.places')}`
+      : t('vehicule.numberOfPlaces'),
+    typeLabel,
+    fuelLabel,
+  ].filter(Boolean);
 
   return (
     <View style={styles.card}>
@@ -53,15 +60,7 @@ export const VehicleCard: React.FC<Props> = ({ vehicle }) => {
       <View style={styles.content}>
         <Text style={styles.title}>{t('vehicule.exchangeAccepted')}</Text>
 
-        <Text style={styles.text}>
-          {vehicle.seats ? `${vehicle.seats} ${t('vehicule.places')}` : t('vehicule.numberOfPlaces')}
-          {vehicle.type ? ` · ${vehicle.type}` : ''}
-          {fuelLabel ? (
-            <Text style={styles.fuelType}>
-              {fuelLabel}
-            </Text>
-          ) : null}
-        </Text>
+        <Text style={styles.text}>{details.join(' · ')}</Text>
 
         <Text style={styles.text}>
           {vehicleName || t('vehicule.notProvided')}

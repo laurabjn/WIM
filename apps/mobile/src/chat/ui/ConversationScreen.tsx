@@ -189,6 +189,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [reporting, setReporting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<ChatMessages | null>(null);
+  const [actionsFor, setActionsFor] = useState<ChatMessages | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<ChatMessages[]>([]);
@@ -782,48 +783,25 @@ export function ConversationScreen({ route, navigation }: Props) {
   }
 
   function ouvrirActions(message: ChatMessages) {
-    const actions: {
-      text: string;
-      style?: 'cancel' | 'destructive';
-      onPress?: () => void;
-    }[] = [];
+    setActionsFor(message);
+  }
 
-    actions.push({
-      text: t('replyMessage'),
-      onPress: () => {
-        setEditingId(null);
-        setReplyTo(message);
-      },
-    });
+  function repondreA(message: ChatMessages) {
+    setActionsFor(null);
+    setEditingId(null);
+    setReplyTo(message);
+  }
 
-    const estLeMien = message.senderId === currentUserId;
-
-    // Une photo ou un vocal n'a pas de texte a corriger.
-    if (estLeMien && message.type === 'TEXT') {
-      actions.push({
-        text: t('editMessage'),
-        onPress: () => {
-          setReplyTo(null);
-          setEditingId(message.id);
-          setDraft(message.content);
-        },
-      });
-    }
-
-    if (estLeMien) {
-      actions.push({
-        text: t('deleteMessage'),
-        style: 'destructive',
-        onPress: () => confirmerSuppression(message),
-      });
-    }
-
-    actions.push({ text: t('cancel'), style: 'cancel' });
-
-    Alert.alert('', '', actions);
+  function modifier(message: ChatMessages) {
+    setActionsFor(null);
+    setReplyTo(null);
+    setEditingId(message.id);
+    setDraft(message.content);
   }
 
   function confirmerSuppression(message: ChatMessages) {
+    setActionsFor(null);
+
     Alert.alert(t('deleteMessageTitle'), t('deleteMessageConfirm'), [
       { text: t('cancel'), style: 'cancel' },
       {
@@ -1551,6 +1529,64 @@ export function ConversationScreen({ route, navigation }: Props) {
       </Modal>
 
       <Modal
+        visible={actionsFor !== null}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setActionsFor(null)}
+      >
+        <TouchableOpacity
+          style={styles.menuBackdrop}
+          activeOpacity={1}
+          onPress={() => setActionsFor(null)}
+        >
+          <View style={[styles.menuSheet, { paddingBottom: 20 + insets.bottom }]}>
+            {actionsFor ? (
+              <>
+                <Text style={styles.actionsExtract} numberOfLines={2}>
+                  {apercuMessage(actionsFor)}
+                </Text>
+
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => repondreA(actionsFor)}
+                >
+                  <Text style={styles.menuText}>{t('replyMessage')}</Text>
+                </TouchableOpacity>
+
+                {actionsFor.senderId === currentUserId &&
+                actionsFor.type === 'TEXT' ? (
+                  <TouchableOpacity
+                    style={styles.menuItem}
+                    onPress={() => modifier(actionsFor)}
+                  >
+                    <Text style={styles.menuText}>{t('editMessage')}</Text>
+                  </TouchableOpacity>
+                ) : null}
+
+                {actionsFor.senderId === currentUserId ? (
+                  <TouchableOpacity
+                    style={styles.menuItem}
+                    onPress={() => confirmerSuppression(actionsFor)}
+                  >
+                    <Text style={styles.menuDanger}>{t('deleteMessage')}</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </>
+            ) : null}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setActionsFor(null)}
+            >
+              <Text style={styles.menuCancel}>{t('cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      <Modal
         visible={searchOpen}
         animationType="slide"
         statusBarTranslucent
@@ -1731,6 +1767,16 @@ menuBackdrop: {
     marginTop: 32,
     textAlign: 'center',
     fontSize: 14,
+    color: c.textMuted,
+  },
+
+  // Rappelle de quel message il s'agit : la feuille masque la conversation.
+  actionsExtract: {
+    paddingHorizontal: 20,
+    paddingTop: 4,
+    paddingBottom: 12,
+    fontSize: 13,
+    fontStyle: 'italic',
     color: c.textMuted,
   },
 

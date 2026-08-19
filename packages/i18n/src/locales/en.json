@@ -623,6 +623,13 @@
         "DIESEL": "Diesel",
         "ELECTRIC": "Electric",
         "notProvided": "Fuel type not provided"
+      },
+      "type": {
+        "city": "City car",
+        "suv": "SUV",
+        "break": "Estate",
+        "van": "Van",
+        "utility": "Utility"
       }
     },
     "homeType": "Home type",

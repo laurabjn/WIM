@@ -622,6 +622,13 @@
         "DIESEL": "Diesel",
         "ELECTRIC": "Électrique",
         "notProvided": "Type de carburant non renseigné"
+      },
+      "type": {
+        "city": "Citadine",
+        "suv": "SUV",
+        "break": "Break",
+        "van": "Monospace",
+        "utility": "Utilitaire"
       }
     },
     "homeType": "Type de logement",
