@@ -5,6 +5,9 @@ import { API_URL } from 'src/config/api';
 const ACCESS_TOKEN_KEY = 'wim.accessToken';
 const REFRESH_TOKEN_KEY = 'wim.refreshToken';
 const USER_KEY = 'wim.user';
+// L'adresse de la derniere connexion, pour reremplir le formulaire. Elle
+// survit a la deconnexion : c'est tout son interet.
+const LAST_EMAIL_KEY = 'wim.lastEmail';
 
 export interface StoredUser {
   id: string;
@@ -158,6 +161,14 @@ export async function getSession(): Promise<AuthSession | null> {
   }
 
   return renouvellementEnCours;
+}
+
+export async function rememberEmail(email: string): Promise<void> {
+  await SecureStore.setItemAsync(LAST_EMAIL_KEY, email.trim());
+}
+
+export async function getRememberedEmail(): Promise<string | null> {
+  return SecureStore.getItemAsync(LAST_EMAIL_KEY);
 }
 
 export async function clearSession(): Promise<void> {

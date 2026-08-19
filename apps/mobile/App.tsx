@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 
 import 'src/search/infrastructure/map/mapbox.config';
+import { getSession } from 'src/auth/infrastructure/authStorage';
 
 enableScreens();
 
@@ -25,7 +26,7 @@ function Coquille({
   setIsAuthenticated,
 }: {
   isAuthenticated: boolean;
-  setIsAuthenticated: (value: boolean) => void;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { isDark, colors } = useAppTheme();
 
@@ -60,6 +61,19 @@ export default function App() {
   useEffect(() => {
     async function setup() {
       await initI18n();
+
+      // Une session valide dormait dans le stockage sans que personne ne la
+      // lise : les identifiants etaient redemandes a chaque ouverture. La
+      // lecture renouvelle le jeton au passage, et rend null si la session est
+      // reellement morte.
+      try {
+        const session = await getSession();
+
+        setIsAuthenticated(Boolean(session?.accessToken));
+      } catch (error) {
+        console.log('Session restore error:', error);
+      }
+
       setReady(true);
     }
     setup();

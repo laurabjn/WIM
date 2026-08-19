@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -17,7 +17,11 @@ import { AuthStackParamList } from '../../../navigation/authStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesome } from '@expo/vector-icons';
 import { loginUser } from '../../application/loginUser.usecase';
-import { saveSession } from 'src/auth/infrastructure/authStorage';
+import {
+  getRememberedEmail,
+  rememberEmail,
+  saveSession,
+} from 'src/auth/infrastructure/authStorage';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
@@ -83,6 +87,10 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
       });
       // Le jeton d'appareil est rattache au compte qui vient d'ouvrir : sans
       // attendre, sinon la premiere notification pourrait partir dans le vide.
+      // L'adresse sert a reremplir le formulaire la prochaine fois ; le mot
+      // de passe, lui, reste au trousseau du telephone.
+      await rememberEmail(email);
+
       await registerPushToken();
 
       setIsAuthenticated(true);
@@ -181,6 +189,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
                     placeholderTextColor="#B4B4B4"
                     autoCapitalize="none"
                     autoComplete="email"
+                    textContentType="emailAddress"
                     keyboardType="email-address"
                     value={email}
                     onChangeText={setEmail}
@@ -194,6 +203,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
                       placeholderTextColor="#B4B4B4"
                       secureTextEntry={!showPassword}
                       autoComplete="password"
+                      textContentType="password"
                       value={password}
                       onChangeText={setPassword}
                     />
