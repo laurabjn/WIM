@@ -39,6 +39,10 @@ model User {
   statusText      String?   @map("status_text")
   statusUpdatedAt DateTime? @map("status_updated_at")
 
+  // Le reglage vit sur le serveur : c'est lui qui envoie, il doit donc
+  // pouvoir le consulter. Range dans le telephone, il n'aurait aucun effet.
+  notifyNewMessages Boolean @default(true) @map("notify_new_messages")
+
   pushTokens PushToken[]
 
   profileVisible Boolean @default(true) @map("profile_visible")

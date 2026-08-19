@@ -41,6 +41,7 @@ export class PrismaProfileRepository implements ProfileRepository {
       profileVisible: user.profileVisible,
       showAge: user.showAge,
       dataSharing: user.dataSharing,
+      notifyNewMessages: user.notifyNewMessages,
       homesCount,
       exchangesCount,
       reviewsCount: reviewStats._count._all,
@@ -126,6 +127,7 @@ export class PrismaProfileRepository implements ProfileRepository {
         profileVisible: input.profileVisible,
         showAge: input.showAge,
         dataSharing: input.dataSharing,
+        notifyNewMessages: input.notifyNewMessages,
         // Retirer son statut et l'ecrire passent par le meme champ : une
         // chaine vide vaut effacement, et l'horodatage suit.
         ...(input.statusText === undefined

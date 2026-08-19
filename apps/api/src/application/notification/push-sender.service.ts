@@ -43,6 +43,13 @@ export class PushSenderService {
    * l'appelant : un message doit partir meme si la notification se perd.
    */
   async sendToUser(userId: string, notification: Notification): Promise<void> {
+    const destinataire = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { notifyNewMessages: true },
+    });
+
+    if (destinataire?.notifyNewMessages === false) return;
+
     const tokens = await this.prisma.pushToken.findMany({
       where: { userId },
       select: { token: true },

@@ -23,4 +23,5 @@ export type UpdateProfileInput = {
   dataSharing?: boolean;
   /** Chaine vide ou null pour retirer le statut. */
   statusText?: string | null;
+  notifyNewMessages?: boolean;
 };

@@ -55,6 +55,7 @@ export interface UserProfile {
   dataSharing?: boolean;
   /** Statut court du moment, null passe un jour. */
   status?: string | null;
+  notifyNewMessages?: boolean;
 }
 
 export interface MyHome {

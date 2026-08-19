@@ -43,7 +43,6 @@ export function SettingsScreen({ route, navigation }: Props) {
 
       setPushNotifications(enregistres.pushNotifications);
       setSmsNotifications(enregistres.smsNotifications);
-      setNewMessages(enregistres.newMessages);
       setNewExchangeDays(enregistres.newExchangeDays);
       setMarketingEmails(enregistres.marketingEmails);
       setShowPreciseLocation(enregistres.showPreciseLocation);
@@ -104,7 +103,9 @@ export function SettingsScreen({ route, navigation }: Props) {
 
   const [pushNotifications, setPushNotifications] = useState(false);
   const [smsNotifications, setSmsNotifications] = useState(false);
-  const [newMessages, setNewMessages] = useState(true);
+  const [newMessages, setNewMessages] = useState(
+    profile.notifyNewMessages ?? true,
+  );
   const [newExchangeDays, setNewExchangeDays] = useState(true);
   const [marketingEmails, setMarketingEmails] = useState(false);
 
@@ -350,7 +351,12 @@ export function SettingsScreen({ route, navigation }: Props) {
             icon="✉"
             label={t('profile:settings.newMessages')}
             value={newMessages}
-            onValueChange={(valeur) => enregistrerLocal('newMessages', valeur, setNewMessages)}
+            onValueChange={(valeur) => {
+              setNewMessages(valeur);
+              enregistrerProfil({ notifyNewMessages: valeur }, () =>
+                setNewMessages(!valeur),
+              );
+            }}
           />
           <SettingsSwitchRow
             icon="◎"
