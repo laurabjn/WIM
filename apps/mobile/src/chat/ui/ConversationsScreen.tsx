@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -44,6 +50,10 @@ type Props = {
   };
 };
 
+// Duree au bout de laquelle on oublie une frappe dont l'arret n'est jamais
+// parvenu.
+const TYPING_EXPIRY_MS = 4000;
+
 export function ConversationsScreen({ navigation }: Props) {
   const { t } = useTranslation('chat');
   const themeColors = useThemeColors();
@@ -55,6 +65,12 @@ export function ConversationsScreen({ navigation }: Props) {
   const [statusDraft, setStatusDraft] = useState('');
   const [statusOpen, setStatusOpen] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
+  // Conversations ou l'autre est en train d'ecrire, avec leur minuteur
+  // d'oubli : un "j'arrete" perdu figerait la mention pour toujours.
+  const [typingChats, setTypingChats] = useState<Set<string>>(new Set());
+  const typingTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map(),
+  );
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -131,9 +147,59 @@ export function ConversationsScreen({ navigation }: Props) {
         });
       }
 
-      socket.on('chat:updated', handleChatUpdated);
+      function handleTyping(payload: {
+        chatId: string;
+        isTyping: boolean;
+      }) {
+        const minuteurs = typingTimers.current;
 
-      cleanup = () => socket.off('chat:updated', handleChatUpdated);
+        const precedent = minuteurs.get(payload.chatId);
+
+        if (precedent) clearTimeout(precedent);
+
+        setTypingChats((actuelles) => {
+          const suivantes = new Set(actuelles);
+
+          if (payload.isTyping) suivantes.add(payload.chatId);
+          else suivantes.delete(payload.chatId);
+
+          return suivantes;
+        });
+
+        if (!payload.isTyping) {
+          minuteurs.delete(payload.chatId);
+          return;
+        }
+
+        minuteurs.set(
+          payload.chatId,
+          setTimeout(() => {
+            minuteurs.delete(payload.chatId);
+
+            setTypingChats((actuelles) => {
+              const suivantes = new Set(actuelles);
+
+              suivantes.delete(payload.chatId);
+
+              return suivantes;
+            });
+          }, TYPING_EXPIRY_MS),
+        );
+      }
+
+      socket.on('chat:updated', handleChatUpdated);
+      socket.on('typing:changed', handleTyping);
+
+      cleanup = () => {
+        socket.off('chat:updated', handleChatUpdated);
+        socket.off('typing:changed', handleTyping);
+
+        for (const minuteur of typingTimers.current.values()) {
+          clearTimeout(minuteur);
+        }
+
+        typingTimers.current.clear();
+      };
     }
 
     listen();
@@ -273,13 +339,15 @@ export function ConversationsScreen({ navigation }: Props) {
               style={[styles.preview, hasUnread && styles.previewUnread]}
               numberOfLines={1}
             >
-              {chat.lastMessage
-                ? chat.lastMessage.type === 'IMAGE'
-                  ? t('photoPreview')
-                  : chat.lastMessage.type === 'AUDIO'
-                    ? t('voicePreview')
-                    : chat.lastMessage.content
-                : t('startConversation')}
+              {typingChats.has(chat.id)
+                ? t('typing')
+                : chat.lastMessage
+                  ? chat.lastMessage.type === 'IMAGE'
+                    ? t('photoPreview')
+                    : chat.lastMessage.type === 'AUDIO'
+                      ? t('voicePreview')
+                      : chat.lastMessage.content
+                  : t('startConversation')}
             </Text>
 
             {hasUnread ? (

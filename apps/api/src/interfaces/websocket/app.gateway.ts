@@ -173,22 +173,33 @@ export class AppGateway {
     }));
   }
 
-  // La frappe ne laisse aucune trace : elle ne vaut que pour les sockets
-  // presents dans le salon, et le client la laisse expirer d'elle-meme.
+  // La frappe ne laisse aucune trace en base et le client la laisse expirer
+  // d'elle-meme.
   @SubscribeMessage('typing')
-  typing(
+  async typing(
     @MessageBody() body: { chatId?: string; isTyping?: boolean },
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     if (!body?.chatId || !client.userId) return { sent: false };
 
+    // Seul quelqu'un ayant rejoint la conversation peut y taper.
     if (!client.rooms.has(chatRoom(body.chatId))) return { sent: false };
 
-    client.to(chatRoom(body.chatId)).emit('typing:changed', {
+    const chat = await this.chatRepository.findById(body.chatId);
+
+    if (!chat) return { sent: false };
+
+    const payload = {
       chatId: body.chatId,
       userId: client.userId,
       isTyping: Boolean(body.isTyping),
-    });
+    };
+
+    for (const participant of chat.participants) {
+      if (participant.userId === client.userId) continue;
+
+      this.server.to(userRoom(participant.userId)).emit('typing:changed', payload);
+    }
 
     return { sent: true };
   }
