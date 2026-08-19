@@ -306,11 +306,9 @@ export function ConversationsScreen({ navigation }: Props) {
             ) : (
               // Sans bulle, la vignette remonterait et casserait l'alignement
               // de la rangee.
-              <View style={styles.statusBubblePlaceholder}>
-                <Text style={styles.statusLabel} numberOfLines={1}>
-                  {chat.participant?.firstName}
-                </Text>
-              </View>
+              // Le vide garde l'alignement : sans lui, les visages sans
+              // statut remonteraient au-dessus des autres.
+              <View style={styles.statusBubblePlaceholder} />
             )}
 
             {chat.participant?.avatarUrl ? (
@@ -494,8 +492,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   statusItem: {
-    minWidth: 64,
-    maxWidth: 92,
+    maxWidth: 104,
     alignItems: 'center',
   },
 
@@ -594,13 +591,6 @@ const createStyles = (c: ThemeColors) =>
 
   statusActionPrimaryText: {
     color: c.onContrast,
-  },
-
-  statusLabel: {
-    marginTop: 6,
-    fontSize: 11,
-    color: c.textMuted,
-    textAlign: 'center',
   },
 
   listHeader: {
