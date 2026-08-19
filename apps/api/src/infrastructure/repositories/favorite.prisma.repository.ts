@@ -24,7 +24,10 @@ export class FavoriteRepositoryPrisma implements FavoriteRepository {
 
   async listByUser(userId: string): Promise<HomeEntity[]> {
     const favorites = await this.prisma.favorite.findMany({
-      where: { userId },
+      where: {
+        userId,
+        home: { ownerId: { notIn: await this.hiddenOwnerIds(userId) } },
+      },
       include: {
         home: {
           include: HOME_WITH_RELATIONS_INCLUDE,
@@ -33,5 +36,20 @@ export class FavoriteRepositoryPrisma implements FavoriteRepository {
     });
 
     return favorites.map((favorite) => mapHome(favorite.home));
+  }
+
+  /**
+   * Un blocage vaut dans les deux sens. Le favori lui-meme n'est pas
+   * supprime : debloquer la personne le fait revenir.
+   */
+  private async hiddenOwnerIds(userId: string): Promise<string[]> {
+    const relations = await this.prisma.blockedUser.findMany({
+      where: { OR: [{ blockerId: userId }, { blockedId: userId }] },
+      select: { blockerId: true, blockedId: true },
+    });
+
+    return relations.map((relation) =>
+      relation.blockerId === userId ? relation.blockedId : relation.blockerId,
+    );
   }
 }
