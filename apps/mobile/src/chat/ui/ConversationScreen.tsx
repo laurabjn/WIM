@@ -78,6 +78,16 @@ import {
 
 const PAGE_SIZE = 30;
 
+// Un signalement sans motif n'apprend rien a qui devra le traiter.
+const REPORT_REASONS = [
+  'harassment',
+  'inappropriate',
+  'scam',
+  'fakeProfile',
+  'spam',
+  'other',
+] as const;
+
 // Un enregistrement plus court est un appui malencontreux ; plus long, il
 // depasserait la taille acceptee par le serveur.
 // Delai sans frappe avant d'annoncer l'arret, et duree au bout de laquelle
@@ -160,6 +170,8 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reporting, setReporting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [translated, setTranslated] = useState(true);
   const [participantLastReadAt, setParticipantLastReadAt] = useState<string | null>(null);
@@ -828,18 +840,39 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
-  async function reportParticipant() {
+  function reportParticipant() {
     setMenuOpen(false);
 
     if (!participantId) return;
 
-    const session = await getSession();
+    setReportOpen(true);
+  }
 
-    if (!session?.accessToken) return;
+  async function envoyerSignalement(motif: string) {
+    if (!participantId) return;
 
-    await reportUserApi(session.accessToken, participantId, t('reportReason'));
+    setReporting(true);
 
-    Alert.alert('', t('reported'));
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      await reportUserApi(
+        session.accessToken,
+        participantId,
+        t(`reportReasons.${motif}`),
+      );
+
+      setReportOpen(false);
+
+      Alert.alert('', t('reported'));
+    } catch (reportError) {
+      console.log('Report error:', reportError);
+      Alert.alert('', t('reportError'));
+    } finally {
+      setReporting(false);
+    }
   }
 
   const showTranslationNotice =
@@ -1240,6 +1273,45 @@ export function ConversationScreen({ route, navigation }: Props) {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      <Modal
+        visible={reportOpen}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setReportOpen(false)}
+      >
+        <TouchableOpacity
+          style={styles.menuBackdrop}
+          activeOpacity={1}
+          onPress={() => setReportOpen(false)}
+        >
+          <View style={[styles.menuSheet, { paddingBottom: 20 + insets.bottom }]}>
+            <Text style={styles.reportTitle}>{t('reportTitle')}</Text>
+
+            {REPORT_REASONS.map((motif) => (
+              <TouchableOpacity
+                key={motif}
+                style={styles.menuItem}
+                disabled={reporting}
+                onPress={() => envoyerSignalement(motif)}
+              >
+                <Text style={styles.menuText}>
+                  {t(`reportReasons.${motif}`)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setReportOpen(false)}
+            >
+              <Text style={styles.menuCancel}>{t('cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -1276,6 +1348,15 @@ menuBackdrop: {
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     paddingTop: 8,
+  },
+
+  reportTitle: {
+    paddingHorizontal: 20,
+    paddingTop: 4,
+    paddingBottom: 10,
+    fontSize: 16,
+    fontWeight: '800',
+    color: c.text,
   },
 
   menuItem: {

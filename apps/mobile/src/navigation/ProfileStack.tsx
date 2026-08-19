@@ -13,6 +13,7 @@ import { RegionDestinationsScreen } from 'src/profile/ui/RegionDestinationsScree
 import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
 import { EditHomeScreen } from 'src/home/ui/EditHomeScreen';
 import { SupportScreen } from 'src/profile/ui/SupportScreen';
+import { BlockedUsersScreen } from 'src/profile/ui/BlockedUsersScreen';
 import { ExchangeAvailabilityScreen } from 'src/home/ui/ExchangeAvailabilityScreen';
 import { ExchangeMessageScreen } from 'src/home/ui/ExchangeMessageScreen';
 
@@ -59,6 +60,11 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BlockedUsers"
+        component={BlockedUsersScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

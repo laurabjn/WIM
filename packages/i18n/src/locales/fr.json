@@ -442,7 +442,18 @@
         "other": "Autre"
       }
     },
-    "occupied": "Occupé"
+    "occupied": "Occupé",
+    "blocked": {
+      "title": "Comptes bloqués",
+      "manage": "Gérer",
+      "unblock": "Débloquer",
+      "cancel": "Annuler",
+      "confirmTitle": "Débloquer ce compte ?",
+      "confirmMessage": "Vous pourrez de nouveau échanger des messages avec {{name}}.",
+      "emptyTitle": "Aucun compte bloqué",
+      "emptyText": "Les personnes que vous bloquez depuis une conversation apparaissent ici.",
+      "error": "Le déblocage n'a pas fonctionné."
+    }
   },
   "auth": {
     "welcomeTitle": "Bienvenue sur Wim !",
@@ -820,6 +831,16 @@
     "bannerTheirHome": "Chez mon hôte",
     "bannerYouGo": "Vous allez à :",
     "bannerTheyCome": "Cette personne vient à :",
-    "bannerNoHome": "aucun logement proposé"
+    "bannerNoHome": "aucun logement proposé",
+    "reportTitle": "Signaler ce compte",
+    "reportError": "Le signalement n'a pas pu être envoyé.",
+    "reportReasons": {
+      "harassment": "Harcèlement ou menaces",
+      "inappropriate": "Propos ou contenu inappropriés",
+      "scam": "Tentative d’arnaque",
+      "fakeProfile": "Faux profil",
+      "spam": "Spam ou publicité",
+      "other": "Autre motif"
+    }
   }
 }

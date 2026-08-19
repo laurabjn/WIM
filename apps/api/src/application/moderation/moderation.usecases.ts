@@ -84,16 +84,41 @@ export class ReportUserUseCase {
   }
 }
 
+export type BlockedUserSummary = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  blockedAt: string;
+};
+
 @Injectable()
 export class ListBlockedUsersUseCase {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute(userId: string): Promise<string[]> {
+  async execute(userId: string): Promise<BlockedUserSummary[]> {
     const blocked = await this.prisma.blockedUser.findMany({
       where: { blockerId: userId },
-      select: { blockedId: true },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        createdAt: true,
+        blocked: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
     });
 
-    return blocked.map((entry) => entry.blockedId);
+    return blocked.map((entry) => ({
+      id: entry.blocked.id,
+      firstName: entry.blocked.firstName,
+      lastName: entry.blocked.lastName,
+      avatarUrl: entry.blocked.avatarUrl,
+      blockedAt: entry.createdAt.toISOString(),
+    }));
   }
 }

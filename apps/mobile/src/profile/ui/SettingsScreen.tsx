@@ -416,6 +416,13 @@ export function SettingsScreen({ route, navigation }: Props) {
               );
             }}
           />
+
+          <SettingsRow
+            icon="⊘"
+            label={t('profile:blocked.title')}
+            value={t('profile:blocked.manage')}
+            onPress={() => navigation.navigate('BlockedUsers')}
+          />
         </SettingsSection>
 
         <SettingsSection title={t('profile:settings.preferences')}>

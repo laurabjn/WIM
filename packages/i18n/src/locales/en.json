@@ -545,7 +545,18 @@
         "other": "Other"
       }
     },
-    "occupied": "Occupied"
+    "occupied": "Occupied",
+    "blocked": {
+      "title": "Blocked accounts",
+      "manage": "Manage",
+      "unblock": "Unblock",
+      "cancel": "Cancel",
+      "confirmTitle": "Unblock this account?",
+      "confirmMessage": "You will be able to exchange messages with {{name}} again.",
+      "emptyTitle": "No blocked accounts",
+      "emptyText": "People you block from a conversation appear here.",
+      "error": "Unblocking failed."
+    }
   },
   "home": {
     "notFound": "Home not found",
@@ -821,6 +832,16 @@
     "bannerTheirHome": "At my host's",
     "bannerYouGo": "You go to:",
     "bannerTheyCome": "They come to:",
-    "bannerNoHome": "no home offered"
+    "bannerNoHome": "no home offered",
+    "reportTitle": "Report this account",
+    "reportError": "Your report could not be sent.",
+    "reportReasons": {
+      "harassment": "Harassment or threats",
+      "inappropriate": "Inappropriate language or content",
+      "scam": "Attempted scam",
+      "fakeProfile": "Fake profile",
+      "spam": "Spam or advertising",
+      "other": "Other reason"
+    }
   }
 }

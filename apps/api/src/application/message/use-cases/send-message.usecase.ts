@@ -10,6 +10,7 @@ import { MessageRepository } from 'src/domain/auth/repositories/message.reposito
 import { CHAT_REPOSITORY, MESSAGE_REPOSITORY } from 'src/interfaces/http/tokens/token';
 import { mapMessage } from '../message.mapper';
 import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
+import { isOffensive } from 'src/application/moderation/offensive-language';
 import type { ChatMessages } from '@wim/shared';
 
 type Input = {
@@ -45,6 +46,16 @@ export class SendMessageUseCase {
     if (!cleanedContent && !attachmentUrl) {
       throw new BadRequestException(
         'Le message ne peut pas être vide.',
+      );
+    }
+
+    // Seuls les messages ecrits sont filtres. Un vocal porte lui aussi sa
+    // transcription, mais elle est faite par la reconnaissance de l'appareil :
+    // refuser un enregistrement sur un mot peut-etre mal entendu obligerait a
+    // tout refaire, sans moyen de corriger.
+    if (type === 'TEXT' && isOffensive(cleanedContent)) {
+      throw new BadRequestException(
+        'Ce message contient des propos injurieux. Reformulez-le pour l’envoyer.',
       );
     }
 
