@@ -14,6 +14,10 @@ import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 
 import 'src/search/infrastructure/map/mapbox.config';
 import { getSession } from 'src/auth/infrastructure/authStorage';
+import {
+  navigationRef,
+  useNotificationNavigation,
+} from 'src/notifications/useNotificationNavigation';
 
 enableScreens();
 
@@ -30,6 +34,10 @@ function Coquille({
 }) {
   const { isDark, colors } = useAppTheme();
 
+  // Toucher une notification doit ouvrir la conversation visee, pas seulement
+  // l'application. La navigation n'est tentee qu'une fois connecte.
+  useNotificationNavigation(isAuthenticated);
+
   const navigationTheme = {
     ...(isDark ? DarkTheme : DefaultTheme),
     colors: {
@@ -43,7 +51,7 @@ function Coquille({
   };
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
       <StatusBar style={isDark ? 'light' : 'dark'} />
 
       <RootNavigator
