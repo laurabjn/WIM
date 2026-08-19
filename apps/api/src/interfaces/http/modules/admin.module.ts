@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import {
+  GetAdminStatsUseCase,
   ListReportsUseCase,
   MarkReportHandledUseCase,
   SuspendUserUseCase,
@@ -12,6 +13,7 @@ import { AdminController } from '../controllers/admin.controller';
   controllers: [AdminController],
   providers: [
     PrismaService,
+    GetAdminStatsUseCase,
     ListReportsUseCase,
     MarkReportHandledUseCase,
     SuspendUserUseCase,

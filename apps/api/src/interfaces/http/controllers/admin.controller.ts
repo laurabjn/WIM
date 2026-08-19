@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 
 import {
+  GetAdminStatsUseCase,
   ListReportsUseCase,
   MarkReportHandledUseCase,
   SuspendUserUseCase,
@@ -23,10 +24,16 @@ type AuthenticatedRequest = { user?: { sub?: string } };
 @UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
   constructor(
+    private readonly stats: GetAdminStatsUseCase,
     private readonly listReports: ListReportsUseCase,
     private readonly markHandled: MarkReportHandledUseCase,
     private readonly suspendUser: SuspendUserUseCase,
   ) {}
+
+  @Get('stats')
+  async statistiques() {
+    return this.stats.execute();
+  }
 
   @Get('reports')
   async reports(@Query('pending') pending?: string) {

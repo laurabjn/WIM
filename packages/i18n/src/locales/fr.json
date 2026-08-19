@@ -749,7 +749,20 @@
     "loadError": "Les signalements n'ont pas pu être chargés.",
     "actionError": "L'action n'a pas pu être appliquée.",
     "cancel": "Annuler",
-    "manage": "Modération"
+    "manage": "Modération",
+    "dashboardTitle": "Administration",
+    "dashboardSubtitle": "Gestion de la plateforme Wim.",
+    "openReports": "Ouvrir les signalements",
+    "sectionVolume": "Activité",
+    "statPendingReports": "Signalements à traiter",
+    "statSuspended": "Comptes suspendus",
+    "statUsers": "Utilisateurs",
+    "statNewUsers": "Inscrits (7 jours)",
+    "statHomes": "Logements",
+    "statCurrentExchanges": "Échanges en cours",
+    "statPendingExchanges": "Échanges en attente",
+    "statMessages": "Messages",
+    "logout": "Se déconnecter"
   },
   "search": {
     "search": "Recherche",

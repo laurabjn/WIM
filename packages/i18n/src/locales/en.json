@@ -750,7 +750,20 @@
     "loadError": "Reports could not be loaded.",
     "actionError": "The action could not be applied.",
     "cancel": "Cancel",
-    "manage": "Moderation"
+    "manage": "Moderation",
+    "dashboardTitle": "Administration",
+    "dashboardSubtitle": "Wim platform management.",
+    "openReports": "Open reports",
+    "sectionVolume": "Activity",
+    "statPendingReports": "Reports to handle",
+    "statSuspended": "Suspended accounts",
+    "statUsers": "Users",
+    "statNewUsers": "Signed up (7 days)",
+    "statHomes": "Homes",
+    "statCurrentExchanges": "Current exchanges",
+    "statPendingExchanges": "Pending exchanges",
+    "statMessages": "Messages",
+    "logout": "Sign out"
   },
   "search": {
     "search": "Search",

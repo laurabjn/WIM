@@ -26,6 +26,27 @@ function authHeaders(token: string) {
   };
 }
 
+export type AdminStats = {
+  signalementsEnAttente: number;
+  comptesSuspendus: number;
+  utilisateurs: number;
+  nouveauxUtilisateurs: number;
+  logements: number;
+  echangesEnCours: number;
+  echangesEnAttente: number;
+  messages: number;
+};
+
+export async function getAdminStatsApi(token: string): Promise<AdminStats> {
+  const response = await fetch(`${API_URL}/admin/stats`, {
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) throw new Error('Le chargement des chiffres a échoué');
+
+  return response.json();
+}
+
 export async function getReportsApi(
   token: string,
   seulementEnAttente = false,

@@ -27,9 +27,11 @@ const Stack = createNativeStackNavigator();
 // transitions entre ecrans reste blanc dans le mode sombre.
 function Coquille({
   isAuthenticated,
+  isAdmin,
   setIsAuthenticated,
 }: {
   isAuthenticated: boolean;
+  isAdmin: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { isDark, colors } = useAppTheme();
@@ -56,6 +58,7 @@ function Coquille({
 
       <RootNavigator
         isAuthenticated={isAuthenticated}
+        isAdmin={isAdmin}
         setIsAuthenticated={setIsAuthenticated}
       />
     </NavigationContainer>
@@ -64,6 +67,7 @@ function Coquille({
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -78,6 +82,7 @@ export default function App() {
         const session = await getSession();
 
         setIsAuthenticated(Boolean(session?.accessToken));
+        setIsAdmin(session?.user.isAdmin === true);
       } catch (error) {
         console.log('Session restore error:', error);
       }
@@ -87,6 +92,20 @@ export default function App() {
     setup();
   }, []);
 
+  // Une connexion qui vient d'aboutir change de compte : le drapeau doit etre
+  // relu, sinon un administrateur atterrirait dans l'application ordinaire
+  // jusqu'au prochain demarrage.
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsAdmin(false);
+      return;
+    }
+
+    getSession()
+      .then((session) => setIsAdmin(session?.user.isAdmin === true))
+      .catch(() => setIsAdmin(false));
+  }, [isAuthenticated]);
+
   if (!ready) return null;
 
   return (
@@ -95,6 +114,7 @@ export default function App() {
         <ThemeProvider>
           <Coquille
             isAuthenticated={isAuthenticated}
+            isAdmin={isAdmin}
             setIsAuthenticated={setIsAuthenticated}
           />
         </ThemeProvider>

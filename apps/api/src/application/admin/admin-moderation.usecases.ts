@@ -106,3 +106,51 @@ export class SuspendUserUseCase {
     });
   }
 }
+
+@Injectable()
+export class GetAdminStatsUseCase {
+  constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * Les chiffres qui disent si la plateforme va bien : ce qui reste a traiter
+   * d'abord, puis le volume.
+   */
+  async execute() {
+    const [
+      signalementsEnAttente,
+      comptesSuspendus,
+      utilisateurs,
+      nouveauxUtilisateurs,
+      logements,
+      echangesEnCours,
+      echangesEnAttente,
+      messages,
+    ] = await Promise.all([
+      this.prisma.userReport.count({ where: { handledAt: null } }),
+      this.prisma.user.count({ where: { suspendedAt: { not: null } } }),
+      this.prisma.user.count(),
+      this.prisma.user.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+          },
+        },
+      }),
+      this.prisma.home.count(),
+      this.prisma.exchange.count({ where: { status: 'CURRENT' } }),
+      this.prisma.exchange.count({ where: { status: 'PENDING' } }),
+      this.prisma.message.count(),
+    ]);
+
+    return {
+      signalementsEnAttente,
+      comptesSuspendus,
+      utilisateurs,
+      nouveauxUtilisateurs,
+      logements,
+      echangesEnCours,
+      echangesEnAttente,
+      messages,
+    };
+  }
+}
