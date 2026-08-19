@@ -10,8 +10,17 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Alert, Modal, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  TextInput,
+} from 'react-native';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
 import type {
@@ -40,6 +49,7 @@ type Props = {
 export function ConversationsScreen({ navigation }: Props) {
   const { t } = useTranslation('chat');
   const themeColors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [chats, setChats] = useState<MyChatListItem[]>([]);
@@ -380,8 +390,13 @@ export function ConversationsScreen({ navigation }: Props) {
         navigationBarTranslucent
         onRequestClose={() => setStatusOpen(false)}
       >
-        <View style={styles.statusModalBackdrop}>
-          <View style={styles.statusSheet}>
+        <KeyboardAvoidingView
+          style={styles.statusModalBackdrop}
+          behavior="padding"
+        >
+          <View
+            style={[styles.statusSheet, { paddingBottom: 20 + insets.bottom }]}
+          >
             <Text style={styles.statusSheetTitle}>{t('statusTitle')}</Text>
 
             <TextInput
@@ -436,7 +451,7 @@ export function ConversationsScreen({ navigation }: Props) {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );
