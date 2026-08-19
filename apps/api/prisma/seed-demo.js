@@ -81,9 +81,9 @@ const CONVERSATIONS = [
   {
     between: ['sophie', 'elena'],
     messages: [
-      { from: 'elena', content: 'Ciao Sophie ! Votre studio près du Parc de la Tête d\'Or a l\'air parfait pour un séjour de travail.', daysAgo: 3 },
+      { from: 'elena', content: "Ciao Sophie! Il tuo monolocale vicino al Parc de la Tête d'Or sembra perfetto per un soggiorno di lavoro.", daysAgo: 3 },
       { from: 'sophie', content: 'Merci Elena ! Il y a un vrai bureau et la fibre, c\'est idéal pour télétravailler. Florence me fait beaucoup envie de mon côté.', daysAgo: 3 },
-      { from: 'elena', content: 'Alors on devrait pouvoir s\'entendre. Je vous envoie mes disponibilités de septembre ce week-end.', daysAgo: 1 },
+      { from: 'elena', content: "Allora dovremmo intenderci. Ti mando le mie disponibilità di settembre questo fine settimana.", daysAgo: 1 },
     ],
   },
   {
