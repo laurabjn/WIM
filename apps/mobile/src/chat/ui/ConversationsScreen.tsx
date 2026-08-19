@@ -15,12 +15,10 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  Pressable,
   TextInput,
 } from 'react-native';
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
 import type {
@@ -49,7 +47,6 @@ type Props = {
 export function ConversationsScreen({ navigation }: Props) {
   const { t } = useTranslation('chat');
   const themeColors = useThemeColors();
-  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [chats, setChats] = useState<MyChatListItem[]>([]);
@@ -394,9 +391,14 @@ export function ConversationsScreen({ navigation }: Props) {
           style={styles.statusModalBackdrop}
           behavior="padding"
         >
-          <View
-            style={[styles.statusSheet, { paddingBottom: 20 + insets.bottom }]}
-          >
+          {/* Pose sous la feuille et non autour : un appui sur la feuille
+              elle-meme ne doit pas la refermer. */}
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setStatusOpen(false)}
+          />
+
+          <View style={styles.statusSheet}>
             <Text style={styles.statusSheetTitle}>{t('statusTitle')}</Text>
 
             <TextInput
@@ -551,14 +553,16 @@ const createStyles = (c: ThemeColors) =>
 
   statusModalBackdrop: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
     backgroundColor: c.overlay,
   },
 
   statusSheet: {
     padding: 20,
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
+    // Au centre de l'ecran, la feuille est arrondie sur ses quatre coins :
+    // collee en bas, les deux du bas ne se voyaient pas.
+    borderRadius: 22,
     backgroundColor: c.surface,
   },
 
