@@ -490,19 +490,19 @@ const createStyles = (c: ThemeColors) =>
   statusRow: {
     paddingHorizontal: 14,
     paddingBottom: 14,
-    gap: 6,
+    gap: 4,
   },
 
   statusItem: {
-    minWidth: 72,
-    maxWidth: 124,
+    minWidth: 64,
+    maxWidth: 92,
     alignItems: 'center',
   },
 
   statusBubble: {
     minHeight: 44,
     justifyContent: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 6,
     marginBottom: 8,
     borderRadius: 14,
@@ -525,9 +525,9 @@ const createStyles = (c: ThemeColors) =>
   },
 
   statusAvatar: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     backgroundColor: c.surfaceAlt,
   },
 
