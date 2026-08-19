@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
   ActivityIndicator,
   FlatList,
   Image,
-  KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
@@ -1270,7 +1270,7 @@ export function ConversationScreen({ route, navigation }: Props) {
       ) : (
         <KeyboardAvoidingView
           style={styles.flex}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior="padding"
           keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
         >
           {messages.length === 0 && !loadingMore ? (

@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Alert,
   Image,
-  KeyboardAvoidingView,
   ScrollView,
   Platform,
 } from 'react-native';
@@ -25,6 +24,7 @@ import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 import { registerPushToken } from 'src/notifications/pushRegistration';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep5'>;
 
@@ -137,7 +137,7 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}

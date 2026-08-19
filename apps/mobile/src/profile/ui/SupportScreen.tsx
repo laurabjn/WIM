@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -99,7 +99,7 @@ export function SupportScreen({ navigation, route }: Props) {
 
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
       >
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.label}>{t('profile:support.topic')}</Text>

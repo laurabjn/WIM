@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -32,6 +31,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<
   SearchStackParamList,
@@ -156,11 +156,7 @@ export const DestinationSearchScreen: React.FC<Props> = ({
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.content}
-        behavior={
-          Platform.OS === 'ios'
-            ? 'padding'
-            : undefined
-        }
+        behavior="padding"
       >
         <View style={styles.searchBox}>
           <Search size={18} color={themeColors.text} />

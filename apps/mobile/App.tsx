@@ -12,6 +12,8 @@ import { ThemeProvider, useAppTheme } from 'src/theme/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
 import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+
 import 'src/search/infrastructure/map/mapbox.config';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import {
@@ -110,15 +112,17 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
+      <KeyboardProvider>
+        <SafeAreaProvider>
         <ThemeProvider>
           <Coquille
             isAuthenticated={isAuthenticated}
             isAdmin={isAdmin}
             setIsAuthenticated={setIsAuthenticated}
           />
-        </ThemeProvider>
-      </SafeAreaProvider>
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

@@ -6,7 +6,6 @@ import React, {
 } from 'react';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -27,6 +26,7 @@ import { SelectedAddress, AddressSuggestion, suggestAddressesApi, retrieveAddres
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<
   AuthStackParamList,
@@ -227,9 +227,7 @@ export const RegisterHousingStep3Screen: React.FC<Props> = ({
     >
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
-        behavior={
-          Platform.OS === 'ios' ? 'padding' : undefined
-        }
+        behavior="padding"
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}

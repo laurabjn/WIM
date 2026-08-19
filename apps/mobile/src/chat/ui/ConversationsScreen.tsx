@@ -18,7 +18,6 @@ import {
 } from 'react-native';
 import {
   Alert,
-  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -43,6 +42,7 @@ import { usePresence } from '../hooks/usePresence';
 import { formatRelativeDate } from '../utils/formatRelativeDate';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 type Props = {
   navigation: {
@@ -488,7 +488,7 @@ export function ConversationsScreen({ navigation }: Props) {
       >
         <KeyboardAvoidingView
           style={styles.statusModalBackdrop}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior="padding"
         >
           {/* Pose sous la feuille et non autour : un appui sur la feuille
               elle-meme ne doit pas la refermer. */}
