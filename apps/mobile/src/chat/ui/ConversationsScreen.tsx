@@ -271,7 +271,7 @@ export function ConversationsScreen({ navigation }: Props) {
           onPress={openStatusEditor}
         >
           <View style={styles.statusBubble}>
-            <Text style={styles.statusBubbleText} numberOfLines={2}>
+            <Text style={styles.statusBubbleText} numberOfLines={3}>
               {myStatus ?? t('shareStatus')}
             </Text>
           </View>
@@ -299,7 +299,7 @@ export function ConversationsScreen({ navigation }: Props) {
           >
             {chat.participant?.status ? (
               <View style={styles.statusBubble}>
-                <Text style={styles.statusBubbleText} numberOfLines={2}>
+                <Text style={styles.statusBubbleText} numberOfLines={3}>
                   {chat.participant.status}
                 </Text>
               </View>
@@ -497,25 +497,25 @@ const createStyles = (c: ThemeColors) =>
   },
 
   statusBubble: {
-    minHeight: 44,
+    height: 56,
     justifyContent: 'center',
     paddingHorizontal: 8,
     paddingVertical: 6,
     marginBottom: 8,
-    borderRadius: 14,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: c.border,
     backgroundColor: c.surface,
   },
 
   statusBubblePlaceholder: {
-    minHeight: 44,
-    justifyContent: 'center',
+    height: 56,
     marginBottom: 8,
   },
 
   statusBubbleText: {
     fontSize: 11,
+    lineHeight: 14,
     fontWeight: '600',
     color: c.text,
     textAlign: 'center',
