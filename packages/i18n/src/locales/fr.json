@@ -852,6 +852,8 @@
     "deleteChat": "Supprimer",
     "deleteChatTitle": "Supprimer cette conversation ?",
     "deleteChatConfirm": "Elle disparaît de votre liste. Votre correspondant garde la sienne, et elle revient s'il vous écrit.",
-    "deleteChatError": "La conversation n'a pas pu être supprimée."
+    "deleteChatError": "La conversation n'a pas pu être supprimée.",
+    "reportedAndBlocked": "Signalement envoyé. Cette personne est aussi bloquée, vous ne la verrez plus.",
+    "ok": "D'accord"
   }
 }

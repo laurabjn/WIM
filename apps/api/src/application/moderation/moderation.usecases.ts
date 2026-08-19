@@ -80,6 +80,16 @@ export class ReportUserUseCase {
       select: { id: true },
     });
 
+    // Signaler quelqu'un, c'est ne plus vouloir le croiser : le blocage suit.
+    // Il reste retirable depuis les reglages, le signalement non.
+    await this.prisma.blockedUser.upsert({
+      where: {
+        blockerId_blockedId: { blockerId: reporterId, blockedId: reportedId },
+      },
+      update: {},
+      create: { blockerId: reporterId, blockedId: reportedId },
+    });
+
     return report;
   }
 }

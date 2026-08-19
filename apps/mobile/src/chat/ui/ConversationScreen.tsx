@@ -994,7 +994,9 @@ export function ConversationScreen({ route, navigation }: Props) {
 
       setReportOpen(false);
 
-      Alert.alert('', t('reported'));
+      Alert.alert('', t('reportedAndBlocked'), [
+        { text: t('ok'), onPress: () => navigation.goBack() },
+      ]);
     } catch (reportError) {
       console.log('Report error:', reportError);
       Alert.alert('', t('reportError'));
