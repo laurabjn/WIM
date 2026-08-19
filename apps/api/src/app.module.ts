@@ -15,6 +15,7 @@ import { ChatModule } from './interfaces/http/modules/chat.module';
 import { HealthModule } from './interfaces/http/modules/health.module';
 import { ModerationModule } from './interfaces/http/modules/moderation.module';
 import { NotificationModule } from './interfaces/http/modules/notification.module';
+import { AdminModule } from './interfaces/http/modules/admin.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { NotificationModule } from './interfaces/http/modules/notification.modul
     LocationModule,
     ChatModule,
     NotificationModule,
+    AdminModule,
     HealthModule,
     ModerationModule
   ],

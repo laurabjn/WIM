@@ -19,6 +19,10 @@ model User {
   languages         Json?
   rating            Int            @default(0)
   isAdmin           Boolean        @default(false) @map("is_admin")
+
+  // Un compte suspendu ne peut plus se connecter. La date sert autant de
+  // marqueur que de trace : on saura quand la decision a ete prise.
+  suspendedAt DateTime? @map("suspended_at")
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @updatedAt @map("updated_at")
   identityStatus    IdentityStatus @default(NOT_VERIFIED)
@@ -468,8 +472,11 @@ model UserReport {
   reason  String
   message String?
 
+  handledAt DateTime? @map("handled_at")
+
   createdAt DateTime @default(now()) @map("created_at")
 
   @@index([reportedId])
+  @@index([handledAt])
   @@map("user_reports")
 }

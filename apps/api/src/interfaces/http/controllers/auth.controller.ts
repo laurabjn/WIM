@@ -128,7 +128,7 @@ export class AuthController {
       throw new UnauthorizedException('Jeton de rafraîchissement manquant.');
     }
 
-    let payload: { sub: string; email: string };
+    let payload: { sub: string; email: string; isAdmin?: boolean };
 
     try {
       payload = await this.jwtService.verifyAsync(body.refreshToken, {
@@ -138,7 +138,11 @@ export class AuthController {
       throw new UnauthorizedException('Session expirée, reconnectez-vous.');
     }
 
-    const charge = { sub: payload.sub, email: payload.email };
+    const charge = {
+      sub: payload.sub,
+      email: payload.email,
+      isAdmin: payload.isAdmin === true,
+    };
 
     const accessToken = await this.jwtService.signAsync(charge, {
       expiresIn: '15m',
@@ -167,6 +171,7 @@ export class AuthController {
       const payload = {
         sub: user.id,
         email: user.email,
+        isAdmin: user.isAdmin === true,
       };
 
       const accessToken = await this.jwtService.signAsync(payload, {

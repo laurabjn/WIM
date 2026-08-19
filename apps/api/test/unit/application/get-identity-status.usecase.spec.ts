@@ -23,6 +23,7 @@ describe('GetIdentityStatusUseCase', () => {
     identityStatus: IdentityStatus.IN_PROGRESS,
     createdAt: new Date(),
     updatedAt: new Date(),
+    suspendedAt: null,
   };
 
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { ForbiddenException, Injectable, Inject } from '@nestjs/common';
 import { PasswordHasher } from '../../../shared/utils/password-hasher';
 import { TOKENS } from '../tokens/tokens';
 import { LoginUserInput } from '../dto/login-user.dto';
@@ -30,12 +30,21 @@ export class LoginUserUseCase {
       throw new InvalidCredentialsError();
     }
 
+    // Verifie apres le mot de passe : annoncer la suspension avant reviendrait
+    // a confirmer l'existence du compte a n'importe qui.
+    if (user.suspendedAt) {
+      throw new ForbiddenException(
+        'Ce compte a été suspendu. Contactez le support.',
+      );
+    }
+
     return {
       id: user.id,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
       identityStatus: user.identityStatus,
+      isAdmin: user.isAdmin,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

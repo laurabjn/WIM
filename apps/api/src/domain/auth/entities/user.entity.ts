@@ -39,6 +39,7 @@ export class User {
     public readonly identityStatus: IdentityStatus = IdentityStatus.NOT_VERIFIED,
     public readonly createdAt: Date = new Date(),
     public readonly updatedAt: Date = new Date(),
+    public readonly suspendedAt: Date | null = null,
   ) {}
 
   static create(params: CreateUserPayload): User {
@@ -82,6 +83,7 @@ export class User {
       prismaUser.identityStatus as IdentityStatus,
       prismaUser.createdAt,
       prismaUser.updatedAt,
+      prismaUser.suspendedAt ?? null,
     );
   }
 }

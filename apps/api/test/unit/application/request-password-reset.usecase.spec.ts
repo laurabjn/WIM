@@ -56,6 +56,7 @@ describe('RequestPasswordResetUseCase', () => {
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
+      suspendedAt: null,
     });
 
     tokenRepository.sign.mockResolvedValue('jwt-reset-token');

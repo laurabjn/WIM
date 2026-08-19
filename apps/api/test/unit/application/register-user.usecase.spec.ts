@@ -48,6 +48,7 @@ describe('RegisterUserUseCase', () => {
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
+      suspendedAt: null,
     });
 
     const result = await useCase.execute({
@@ -101,6 +102,7 @@ describe('RegisterUserUseCase', () => {
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
+      suspendedAt: null,
     });
 
     await expect(

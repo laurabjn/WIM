@@ -45,6 +45,7 @@ describe('LoginUserUseCase', () => {
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
+      suspendedAt: null,
     });
 
     passwordHasher.compare.mockResolvedValue(true);
@@ -91,6 +92,7 @@ describe('LoginUserUseCase', () => {
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
+      suspendedAt: null,
     });
 
     passwordHasher.compare.mockResolvedValue(false);

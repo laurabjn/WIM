@@ -25,6 +25,7 @@ describe('StartIdentityVerificationUseCase', () => {
     identityStatus: IdentityStatus.NOT_VERIFIED,
     createdAt: new Date(),
     updatedAt: new Date(),
+    suspendedAt: null,
   };
 
   beforeEach(() => {

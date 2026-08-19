@@ -1,6 +1,12 @@
 import { Module } from '@nestjs/common';
 
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { ConsoleEmailSender } from 'src/infrastructure/notifications/console-email.sender';
+import {
+  NodemailerEmailSender,
+  isSmtpConfigured,
+} from 'src/infrastructure/notifications/nodemailer-email.sender';
+import { EMAIL_SENDER } from '../tokens/token';
 import { ModerationController } from '../controllers/moderation.controller';
 import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
 import {
@@ -14,6 +20,18 @@ import {
   controllers: [ModerationController],
   providers: [
     PrismaService,
+    ConsoleEmailSender,
+    NodemailerEmailSender,
+    {
+      // Meme arbitrage qu'a l'authentification : sans SMTP configure, le mail
+      // s'affiche dans la console plutot que de disparaitre.
+      provide: EMAIL_SENDER,
+      useFactory: (
+        nodemailer: NodemailerEmailSender,
+        console_: ConsoleEmailSender,
+      ) => (isSmtpConfigured() ? nodemailer : console_),
+      inject: [NodemailerEmailSender, ConsoleEmailSender],
+    },
     BlockUserUseCase,
     UnblockUserUseCase,
     ReportUserUseCase,
