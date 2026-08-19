@@ -107,6 +107,17 @@ const AUDIO_FILE_TIMEOUT_MS = 8000;
 
 const translationKey = (chatId: string) => `chat:translate:${chatId}`;
 
+/** Une citation ne montre pas une photo : elle la nomme. */
+function apercuMessage(message: {
+  type: string;
+  content: string;
+}): string {
+  if (message.type === 'IMAGE') return 'Photo';
+  if (message.type === 'AUDIO' && !message.content) return 'Message vocal';
+
+  return message.content;
+}
+
 function formatRecordingTime(millisecondes: number) {
   const secondes = Math.floor(millisecondes / 1000);
 
@@ -176,6 +187,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [reportOpen, setReportOpen] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [replyTo, setReplyTo] = useState<ChatMessages | null>(null);
   const [uploading, setUploading] = useState(false);
   const [translated, setTranslated] = useState(true);
   const [participantLastReadAt, setParticipantLastReadAt] = useState<string | null>(null);
@@ -478,7 +490,10 @@ export function ConversationScreen({ route, navigation }: Props) {
         session.accessToken,
         chatId,
         content,
+        replyTo?.id ?? null,
       );
+
+      setReplyTo(null);
 
       // Le serveur renvoie aussi le message par websocket : sans ce garde-fou,
       // l'echo arrive avant la reponse HTTP et le message s'affiche deux fois.
@@ -737,22 +752,35 @@ export function ConversationScreen({ route, navigation }: Props) {
       onPress?: () => void;
     }[] = [];
 
+    actions.push({
+      text: t('replyMessage'),
+      onPress: () => {
+        setEditingId(null);
+        setReplyTo(message);
+      },
+    });
+
+    const estLeMien = message.senderId === currentUserId;
+
     // Une photo ou un vocal n'a pas de texte a corriger.
-    if (message.type === 'TEXT') {
+    if (estLeMien && message.type === 'TEXT') {
       actions.push({
         text: t('editMessage'),
         onPress: () => {
+          setReplyTo(null);
           setEditingId(message.id);
           setDraft(message.content);
         },
       });
     }
 
-    actions.push({
-      text: t('deleteMessage'),
-      style: 'destructive',
-      onPress: () => confirmerSuppression(message),
-    });
+    if (estLeMien) {
+      actions.push({
+        text: t('deleteMessage'),
+        style: 'destructive',
+        onPress: () => confirmerSuppression(message),
+      });
+    }
 
     actions.push({ text: t('cancel'), style: 'cancel' });
 
@@ -1040,7 +1068,7 @@ export function ConversationScreen({ route, navigation }: Props) {
         >
           <TouchableOpacity
             activeOpacity={0.85}
-            onLongPress={isMine ? () => ouvrirActions(message) : undefined}
+            onLongPress={() => ouvrirActions(message)}
             delayLongPress={300}
             style={[
               styles.bubble,
@@ -1053,6 +1081,35 @@ export function ConversationScreen({ route, navigation }: Props) {
               message.type === 'IMAGE' ? styles.bubbleImage : null,
             ]}
           >
+            {message.replyTo ? (
+              <View
+                style={[
+                  styles.quote,
+                  isMine ? styles.quoteMine : styles.quoteTheirs,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.quoteAuthor,
+                    isMine ? styles.bubbleTextMine : styles.bubbleTextTheirs,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {message.replyTo.senderFirstName}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.quoteText,
+                    isMine ? styles.bubbleTextMine : styles.bubbleTextTheirs,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {apercuMessage(message.replyTo)}
+                </Text>
+              </View>
+            ) : null}
+
             {message.type === 'IMAGE' && message.attachmentUrl ? (
               <Image
                 source={{ uri: resolveImageUrl(message.attachmentUrl) ?? '' }}
@@ -1230,6 +1287,29 @@ export function ConversationScreen({ route, navigation }: Props) {
           <View
             style={[styles.composerArea, { paddingBottom: 10 + insets.bottom }]}
           >
+            {replyTo ? (
+              <View style={styles.editingBar}>
+                <View style={styles.replyPreview}>
+                  <Text style={styles.replyAuthor} numberOfLines={1}>
+                    {replyTo.senderId === currentUserId
+                      ? t('replyToYou')
+                      : participantName}
+                  </Text>
+
+                  <Text style={styles.replyExtract} numberOfLines={1}>
+                    {apercuMessage(replyTo)}
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => setReplyTo(null)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.editingCancel}>{t('cancel')}</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
+
             {editingId ? (
               <View style={styles.editingBar}>
                 <Text style={styles.editingLabel} numberOfLines={1}>
@@ -1743,6 +1823,51 @@ menuBackdrop: {
     justifyContent: 'space-between',
     paddingHorizontal: 6,
     paddingBottom: 8,
+  },
+
+  replyPreview: {
+    flex: 1,
+    borderLeftWidth: 3,
+    borderLeftColor: c.primary,
+    paddingLeft: 8,
+  },
+
+  replyAuthor: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: c.primary,
+  },
+
+  replyExtract: {
+    fontSize: 12,
+    color: c.textMuted,
+  },
+
+  quote: {
+    marginBottom: 6,
+    paddingLeft: 8,
+    paddingVertical: 2,
+    borderLeftWidth: 3,
+    borderRadius: 2,
+  },
+
+  quoteMine: {
+    borderLeftColor: 'rgba(255,255,255,0.6)',
+  },
+
+  quoteTheirs: {
+    borderLeftColor: c.primary,
+  },
+
+  quoteAuthor: {
+    fontSize: 12,
+    fontWeight: '700',
+    opacity: 0.9,
+  },
+
+  quoteText: {
+    fontSize: 12,
+    opacity: 0.75,
   },
 
   editingLabel: {

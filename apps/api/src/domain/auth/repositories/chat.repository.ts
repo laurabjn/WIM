@@ -29,6 +29,14 @@ export type ChatMessage = {
   attachmentUrl: string | null
   attachmentDurationMs: number | null
   editedAt?: Date | null
+  replyToId?: string | null
+  replyTo?: {
+    id: string
+    content: string
+    type: MessageKind
+    senderId: string
+    sender: { firstName: string }
+  } | null
   createdAt: Date
   updatedAt: Date
   sender: ChatUser

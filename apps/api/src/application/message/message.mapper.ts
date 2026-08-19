@@ -11,6 +11,15 @@ export function mapMessage(message: ChatMessage): ChatMessages {
     attachmentUrl: message.attachmentUrl,
     attachmentDurationMs: message.attachmentDurationMs,
     editedAt: message.editedAt ? message.editedAt.toISOString() : null,
+    replyTo: message.replyTo
+      ? {
+          id: message.replyTo.id,
+          content: message.replyTo.content,
+          type: message.replyTo.type,
+          senderId: message.replyTo.senderId,
+          senderFirstName: message.replyTo.sender.firstName,
+        }
+      : null,
     sender: {
       id: message.sender.id,
       firstName: message.sender.firstName,

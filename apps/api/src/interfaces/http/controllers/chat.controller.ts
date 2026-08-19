@@ -192,6 +192,7 @@ export class ChatController {
       chatId,
       senderId: this.getUserId(request),
       content: dto.content,
+      replyToId: dto.replyToId ?? null,
     });
 
     this.gateway.emitMessageCreated(chatId, message);

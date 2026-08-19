@@ -874,6 +874,8 @@
     "deleteChatConfirm": "It disappears from your list. The other person keeps theirs, and it comes back if they write to you.",
     "deleteChatError": "The conversation could not be deleted.",
     "reportedAndBlocked": "Report sent. This person is also blocked, you will not see them again.",
-    "ok": "OK"
+    "ok": "OK",
+    "replyMessage": "Reply",
+    "replyToYou": "You"
   }
 }

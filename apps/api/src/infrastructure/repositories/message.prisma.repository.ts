@@ -4,6 +4,27 @@ import { PrismaService } from '../database/prisma/prisma.service';
 import { ChatMessage } from 'src/domain/auth/repositories/chat.repository';
 
 
+// L'expediteur, et le message cite reduit a ce que la citation affiche.
+const AVEC_EXPEDITEUR_ET_CITATION = {
+  sender: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      avatarUrl: true,
+    },
+  },
+  replyTo: {
+    select: {
+      id: true,
+      content: true,
+      type: true,
+      senderId: true,
+      sender: { select: { firstName: true } },
+    },
+  },
+};
+
 @Injectable()
 export class PrismaMessageRepository implements MessageRepository {
   constructor(
@@ -19,17 +40,9 @@ export class PrismaMessageRepository implements MessageRepository {
         type: data.type ?? 'TEXT',
         attachmentUrl: data.attachmentUrl ?? null,
         attachmentDurationMs: data.attachmentDurationMs ?? null,
+        replyToId: data.replyToId ?? null,
       },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-          },
-        },
-      },
+      include: AVEC_EXPEDITEUR_ET_CITATION,
     });
   }
 
@@ -38,16 +51,7 @@ export class PrismaMessageRepository implements MessageRepository {
       where: {
         id: messageId,
       },
-      include: {
-        sender: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-          },
-        },
-      },
+      include: AVEC_EXPEDITEUR_ET_CITATION,
     });
   }
 
@@ -64,16 +68,7 @@ export class PrismaMessageRepository implements MessageRepository {
           id: 'desc',
         },
       ],
-      include: {
-        sender: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-          },
-        },
-      },
+      include: AVEC_EXPEDITEUR_ET_CITATION,
     });
   }
 

@@ -380,6 +380,12 @@ model Message {
   // le texte changer sous ses yeux sans savoir pourquoi.
   editedAt DateTime? @map("edited_at")
 
+  // Reponse a un message precis. SetNull plutot que Cascade : supprimer le
+  // message cite ne doit pas emporter la reponse avec lui.
+  replyToId String?  @map("reply_to_id")
+  replyTo   Message? @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   Message[] @relation("MessageReply")
+
   chat               Chat                 @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender             User                 @relation(fields: [senderId], references: [id], onDelete: Cascade)
   readByParticipants ChatParticipant[]    @relation("LastReadMessage")

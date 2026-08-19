@@ -20,6 +20,7 @@ type Input = {
   type?: 'TEXT' | 'IMAGE' | 'AUDIO';
   attachmentUrl?: string | null;
   attachmentDurationMs?: number | null;
+  replyToId?: string | null;
 };
 
 @Injectable()
@@ -39,6 +40,7 @@ export class SendMessageUseCase {
     type = 'TEXT',
     attachmentUrl = null,
     attachmentDurationMs = null,
+    replyToId = null,
   }: Input): Promise<ChatMessages> {
     const cleanedContent =
       content.trim();
@@ -95,6 +97,7 @@ export class SendMessageUseCase {
         type,
         attachmentUrl,
         attachmentDurationMs,
+        replyToId,
       });
 
     await this.chatRepository.touchChat(chatId);

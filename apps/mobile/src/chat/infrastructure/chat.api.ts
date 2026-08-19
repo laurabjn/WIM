@@ -172,6 +172,7 @@ export async function sendMessageApi(
   token: string,
   chatId: string,
   content: string,
+  replyToId?: string | null,
 ): Promise<ChatMessages> {
   const response = await fetch(`${API_URL}/chats/${chatId}/messages`, {
     method: 'POST',
@@ -179,7 +180,9 @@ export async function sendMessageApi(
       'Content-Type': 'application/json',
       ...authHeaders(token),
     },
-    body: JSON.stringify({ content }),
+    // Le champ n'est envoye que s'il existe : le filtre du serveur refuse un
+    // champ declare mais vide.
+    body: JSON.stringify(replyToId ? { content, replyToId } : { content }),
   });
 
   return parseResponse(response);

@@ -8,6 +8,7 @@ export type CreateMessageData = {
   type?: 'TEXT' | 'IMAGE' | 'AUDIO'
   attachmentUrl?: string | null
   attachmentDurationMs?: number | null
+  replyToId?: string | null
 }
 
 export type FindMessagesOptions = {

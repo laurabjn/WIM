@@ -22,6 +22,14 @@ export type ChatMessages = {
   translatedContent?: string | null;
   /** Date de la derniere correction, absente si le message est d'origine. */
   editedAt?: string | null;
+  /** Apercu du message cite, null si la citation a ete supprimee depuis. */
+  replyTo?: {
+    id: string;
+    content: string;
+    type: MessageKind;
+    senderId: string;
+    senderFirstName: string;
+  } | null;
   sender: MessageSender;
   createdAt: string;
   updatedAt: string;
