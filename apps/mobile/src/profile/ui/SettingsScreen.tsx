@@ -19,6 +19,7 @@ import {
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { clearSession } from 'src/auth/infrastructure/authStorage';
 import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
+import { getIsAdmin } from 'src/auth/infrastructure/authStorage';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
 
@@ -103,6 +104,12 @@ export function SettingsScreen({ route, navigation }: Props) {
 
   const [pushNotifications, setPushNotifications] = useState(false);
   const [smsNotifications, setSmsNotifications] = useState(false);
+  const [estAdmin, setEstAdmin] = useState(false);
+
+  useEffect(() => {
+    getIsAdmin().then(setEstAdmin);
+  }, []);
+
   const [newMessages, setNewMessages] = useState(
     profile.notifyNewMessages ?? true,
   );
@@ -430,6 +437,19 @@ export function SettingsScreen({ route, navigation }: Props) {
             onPress={() => navigation.navigate('BlockedUsers')}
           />
         </SettingsSection>
+
+        {/* Reservee aux administrateurs : le serveur refuse de toute facon les
+            requetes des autres, mais afficher l'entree serait trompeur. */}
+        {estAdmin ? (
+          <SettingsSection title={t('admin:reportsTitle')}>
+            <SettingsRow
+              icon="⚑"
+              label={t('admin:reportsTitle')}
+              value={t('admin:manage')}
+              onPress={() => navigation.navigate('Admin')}
+            />
+          </SettingsSection>
+        ) : null}
 
         <SettingsSection title={t('profile:settings.preferences')}>
           <SettingsRow
