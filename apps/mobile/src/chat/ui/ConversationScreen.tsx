@@ -1270,7 +1270,7 @@ export function ConversationScreen({ route, navigation }: Props) {
       ) : (
         <KeyboardAvoidingView
           style={styles.flex}
-          behavior="padding"
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
         >
           {messages.length === 0 && !loadingMore ? (

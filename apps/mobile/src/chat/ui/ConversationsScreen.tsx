@@ -488,7 +488,7 @@ export function ConversationsScreen({ navigation }: Props) {
       >
         <KeyboardAvoidingView
           style={styles.statusModalBackdrop}
-          behavior="padding"
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           {/* Pose sous la feuille et non autour : un appui sur la feuille
               elle-meme ne doit pas la refermer. */}

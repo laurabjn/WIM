@@ -79,7 +79,7 @@ export const RegisterStep1Screen: React.FC<Props> = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.card}>
           <View style={styles.header}>
