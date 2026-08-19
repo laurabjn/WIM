@@ -80,6 +80,7 @@ export class AppGateway {
       });
 
       client.userId = payload.sub;
+      client.data.userId = payload.sub;
       await client.join(userRoom(payload.sub));
       this.markOnline(payload.sub);
     } catch {
@@ -133,6 +134,16 @@ export class AppGateway {
 
   isOnline(userId: string): boolean {
     return this.onlineUsers.has(userId);
+  }
+
+  /**
+   * Quelqu'un qui a la conversation sous les yeux n'a pas besoin d'etre
+   * notifie : le message arrive deja devant lui.
+   */
+  async isViewingChat(userId: string, chatId: string): Promise<boolean> {
+    const sockets = await this.server.in(chatRoom(chatId)).fetchSockets();
+
+    return sockets.some((socket) => socket.data?.userId === userId);
   }
 
   @SubscribeMessage('presence:list')

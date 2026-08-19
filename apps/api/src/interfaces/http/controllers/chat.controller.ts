@@ -29,7 +29,9 @@ import { GetUnreadCountUseCase } from 'src/application/message/use-cases/get-unr
 import { AppGateway } from 'src/interfaces/websocket/app.gateway';
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
 import { transcodeToM4a } from 'src/infrastructure/media/audio-transcoder';
+import { PushSenderService } from 'src/application/notification/push-sender.service';
 import { CHAT_REPOSITORY } from '../tokens/token';
+import type { ChatMessages } from '@wim/shared';
 
 function editFileName(
   _req: unknown,
@@ -89,6 +91,7 @@ export class ChatController {
     private readonly markChatAsRead: MarkChatAsReadUseCase,
     private readonly getUnreadCount: GetUnreadCountUseCase,
     private readonly gateway: AppGateway,
+    private readonly pushSender: PushSenderService,
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: ChatRepository,
   ) {}
@@ -294,6 +297,39 @@ export class ChatController {
         participant.userId,
         await this.chatRepository.countAllUnreadMessages(participant.userId),
       );
+
+      await this.notifierParPush(chatId, lastMessage, participant.userId);
     }
+  }
+
+  /**
+   * La notification ne part que vers l'autre personne, et seulement si elle n'a
+   * pas la conversation ouverte : le message y arrive deja sous ses yeux.
+   */
+  private async notifierParPush(
+    chatId: string,
+    lastMessage: ChatMessages,
+    destinataireId: string,
+  ): Promise<void> {
+    if (destinataireId === lastMessage.senderId) return;
+
+    if (await this.gateway.isViewingChat(destinataireId, chatId)) return;
+
+    const apercu =
+      lastMessage.type === 'IMAGE'
+        ? 'Photo'
+        : lastMessage.type === 'AUDIO'
+          ? 'Message vocal'
+          : lastMessage.content;
+
+    // L'envoi ne doit jamais faire echouer la requete qui l'a declenche : le
+    // message est deja enregistre et diffuse.
+    await this.pushSender
+      .sendToUser(destinataireId, {
+        title: lastMessage.sender.firstName,
+        body: apercu.slice(0, 140),
+        data: { chatId },
+      })
+      .catch(() => undefined);
   }
 }

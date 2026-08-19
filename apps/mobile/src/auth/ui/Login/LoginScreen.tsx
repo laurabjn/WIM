@@ -21,6 +21,7 @@ import { saveSession } from 'src/auth/infrastructure/authStorage';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { registerPushToken } from 'src/notifications/pushRegistration';
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -80,7 +81,10 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
       });
-      console.log('Session saved successfully');
+      // Le jeton d'appareil est rattache au compte qui vient d'ouvrir : sans
+      // attendre, sinon la premiere notification pourrait partir dans le vide.
+      await registerPushToken();
+
       setIsAuthenticated(true);
     } catch (err: any) {
       console.log('Login error:', err);

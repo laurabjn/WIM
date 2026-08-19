@@ -14,6 +14,7 @@ import { LocationModule } from './interfaces/http/modules/location.module';
 import { ChatModule } from './interfaces/http/modules/chat.module';
 import { HealthModule } from './interfaces/http/modules/health.module';
 import { ModerationModule } from './interfaces/http/modules/moderation.module';
+import { NotificationModule } from './interfaces/http/modules/notification.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ModerationModule } from './interfaces/http/modules/moderation.module';
     SwipeModule,
     LocationModule,
     ChatModule,
+    NotificationModule,
     HealthModule,
     ModerationModule
   ],

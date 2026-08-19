@@ -26,6 +26,7 @@
     "@wim/i18n": "*",
     "expo": "~54.0.33",
     "expo-audio": "~1.1.1",
+    "expo-constants": "~18.0.14",
     "expo-dev-client": "~6.0.21",
     "expo-image-picker": "~17.0.10",
     "expo-linear-gradient": "~15.0.8",

@@ -24,6 +24,7 @@ import { clearSession, saveSession } from 'src/auth/infrastructure/authStorage';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { registerPushToken } from 'src/notifications/pushRegistration';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep5'>;
 
@@ -117,6 +118,10 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
             isAdmin: session.user.isAdmin ?? false,
           },
       });
+
+      // Une inscription vaut une connexion : sans cela, un compte tout neuf ne
+      // recevrait aucune notification avant sa premiere reconnexion.
+      await registerPushToken();
 
       navigation.navigate('RegisterIdentity', {
         identityRedirectUrl: session.identityRedirectUrl,

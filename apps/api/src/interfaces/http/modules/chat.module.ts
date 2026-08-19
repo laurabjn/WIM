@@ -22,9 +22,10 @@ import {
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { MessageTranslationService } from 'src/application/message/services/message-translation.service';
 import { DeeplTranslator } from 'src/infrastructure/translation/deepl.translator';
+import { NotificationModule } from './notification.module';
 
 @Module({
-  imports: [WebsocketModule, ModerationModule],
+  imports: [NotificationModule, WebsocketModule, ModerationModule],
   controllers: [
     ChatController,
   ],

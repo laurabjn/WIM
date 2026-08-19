@@ -39,6 +39,8 @@ model User {
   statusText      String?   @map("status_text")
   statusUpdatedAt DateTime? @map("status_updated_at")
 
+  pushTokens PushToken[]
+
   profileVisible Boolean @default(true) @map("profile_visible")
   showAge        Boolean @default(true) @map("show_age")
   dataSharing    Boolean @default(false) @map("data_sharing")
@@ -406,6 +408,24 @@ model Review {
   @@unique([homeId, authorId])
   @@index([homeId])
   @@map("reviews")
+}
+
+// Un compte peut etre ouvert sur plusieurs appareils : chacun a son jeton, et
+// c'est le jeton, pas l'utilisateur, qui est unique.
+model PushToken {
+  id String @id @default(uuid())
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token    String @unique
+  platform String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("push_tokens")
 }
 
 model BlockedUser {

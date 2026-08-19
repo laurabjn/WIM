@@ -21,6 +21,7 @@ import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { useFocusEffect } from '@react-navigation/native';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { unregisterPushToken } from 'src/notifications/pushRegistration';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -69,6 +70,9 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
 
   async function handleLogout() {
     try {
+      // Avant d'effacer la session : le retrait du jeton s'authentifie encore.
+      await unregisterPushToken();
+
       await clearSession();
 
       setToken(null);
