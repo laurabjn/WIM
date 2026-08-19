@@ -876,6 +876,9 @@
     "reportedAndBlocked": "Report sent. This person is also blocked, you will not see them again.",
     "ok": "OK",
     "replyMessage": "Reply",
-    "replyToYou": "You"
+    "replyToYou": "You",
+    "searchMessages": "Search in conversation",
+    "searchPlaceholder": "Search a message…",
+    "searchNoResult": "No message matches."
   }
 }

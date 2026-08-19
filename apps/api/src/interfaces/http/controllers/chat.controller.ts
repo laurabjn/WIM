@@ -37,6 +37,7 @@ import {
   DeleteMessageUseCase,
   EditMessageUseCase,
   HideChatUseCase,
+  SearchMessagesUseCase,
 } from 'src/application/message/use-cases/edit-message.usecase';
 
 function editFileName(
@@ -101,6 +102,7 @@ export class ChatController {
     private readonly editMessage: EditMessageUseCase,
     private readonly deleteMessage: DeleteMessageUseCase,
     private readonly hideChat: HideChatUseCase,
+    private readonly searchInChat: SearchMessagesUseCase,
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: ChatRepository,
   ) {}
@@ -284,6 +286,19 @@ export class ChatController {
     await this.notifyChatUpdated(chatId, message);
 
     return message;
+  }
+
+  @Get(':chatId/messages/search')
+  async searchMessages(
+    @Req() request: AuthenticatedRequest,
+    @Param('chatId') chatId: string,
+    @Query('q') query?: string,
+  ) {
+    return this.searchInChat.execute(
+      chatId,
+      this.getUserId(request),
+      query ?? '',
+    );
   }
 
   @Patch(':chatId/messages/:messageId')

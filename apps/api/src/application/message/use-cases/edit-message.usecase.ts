@@ -116,3 +116,43 @@ export class HideChatUseCase {
     });
   }
 }
+
+@Injectable()
+export class SearchMessagesUseCase {
+  constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * Cherche dans une conversation, cote serveur : le telephone n'a en memoire
+   * que les dernieres pages, y chercher ne trouverait que le recent.
+   */
+  async execute(
+    chatId: string,
+    userId: string,
+    query: string,
+  ): Promise<ChatMessages[]> {
+    const terme = query.trim();
+
+    if (terme.length < 2) return [];
+
+    const participant = await this.prisma.chatParticipant.findFirst({
+      where: { chatId, userId },
+      select: { id: true },
+    });
+
+    if (!participant) {
+      throw new ForbiddenException("Cette conversation n'est pas la vôtre.");
+    }
+
+    const messages = await this.prisma.message.findMany({
+      where: {
+        chatId,
+        content: { contains: terme, mode: 'insensitive' },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      include: AVEC_EXPEDITEUR,
+    });
+
+    return messages.map(mapMessage);
+  }
+}

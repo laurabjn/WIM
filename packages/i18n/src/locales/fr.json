@@ -875,6 +875,9 @@
     "reportedAndBlocked": "Signalement envoyé. Cette personne est aussi bloquée, vous ne la verrez plus.",
     "ok": "D'accord",
     "replyMessage": "Répondre",
-    "replyToYou": "Vous"
+    "replyToYou": "Vous",
+    "searchMessages": "Rechercher dans la discussion",
+    "searchPlaceholder": "Rechercher un message…",
+    "searchNoResult": "Aucun message ne correspond."
   }
 }

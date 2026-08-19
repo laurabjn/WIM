@@ -27,6 +27,7 @@ import {
   DeleteMessageUseCase,
   EditMessageUseCase,
   HideChatUseCase,
+  SearchMessagesUseCase,
 } from 'src/application/message/use-cases/edit-message.usecase';
 
 @Module({
@@ -47,6 +48,7 @@ import {
       EditMessageUseCase,
       DeleteMessageUseCase,
       HideChatUseCase,
+      SearchMessagesUseCase,
       MessageTranslationService,
       {
         provide: TRANSLATOR,

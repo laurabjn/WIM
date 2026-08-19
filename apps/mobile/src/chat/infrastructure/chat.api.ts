@@ -93,6 +93,19 @@ export async function sendVoiceMessageApi(
   return parseResponse(response);
 }
 
+export async function searchMessagesApi(
+  token: string,
+  chatId: string,
+  query: string,
+): Promise<ChatMessages[]> {
+  const response = await fetch(
+    `${API_URL}/chats/${chatId}/messages/search?q=${encodeURIComponent(query)}`,
+    { headers: authHeaders(token) },
+  );
+
+  return parseResponse(response);
+}
+
 export async function editMessageApi(
   token: string,
   chatId: string,

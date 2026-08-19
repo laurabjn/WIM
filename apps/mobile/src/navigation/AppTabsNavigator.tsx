@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { SearchStackNavigator } from './SearchStack';
 import { SearchOnlyStackNavigator } from './SearchOnlyStack';
 import { MessagesStackNavigator } from './MessagesStack';
 import { useUnreadMessages } from 'src/chat/hooks/useUnreadMessages';
+import * as Notifications from 'expo-notifications';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
@@ -35,6 +36,13 @@ type Props = {
 export function AppTabsNavigator({ setIsAuthenticated }: Props) {
   const { t } = useTranslation('common');
   const unreadCount = useUnreadMessages();
+
+  // Le total non lu est deja connu et tenu a jour par la passerelle : le poser
+  // sur l'icone ne coute qu'un appel, et evite d'ouvrir l'application pour
+  // savoir s'il s'est passe quelque chose.
+  useEffect(() => {
+    Notifications.setBadgeCountAsync(unreadCount).catch(() => undefined);
+  }, [unreadCount]);
 
   return (
     <Tab.Navigator

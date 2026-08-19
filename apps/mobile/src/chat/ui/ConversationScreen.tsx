@@ -50,6 +50,7 @@ import {
   sendVoiceMessageApi,
   editMessageApi,
   deleteMessageApi,
+  searchMessagesApi,
 } from '../infrastructure/chat.api';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { useChatSocket } from '../hooks/useChatSocket';
@@ -188,6 +189,10 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [reporting, setReporting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<ChatMessages | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<ChatMessages[]>([]);
+  const [searching, setSearching] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [translated, setTranslated] = useState(true);
   const [participantLastReadAt, setParticipantLastReadAt] = useState<string | null>(null);
@@ -743,6 +748,37 @@ export function ConversationScreen({ route, navigation }: Props) {
     } finally {
       setUploading(false);
     }
+  }
+
+  async function lancerRecherche(terme: string) {
+    setSearchQuery(terme);
+
+    if (terme.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    setSearching(true);
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      setSearchResults(
+        await searchMessagesApi(session.accessToken, chatId, terme),
+      );
+    } catch (searchError) {
+      console.log('Search messages error:', searchError);
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  function fermerRecherche() {
+    setSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
   }
 
   function ouvrirActions(message: ChatMessages) {
@@ -1490,6 +1526,16 @@ export function ConversationScreen({ route, navigation }: Props) {
               </TouchableOpacity>
             ) : null}
 
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setMenuOpen(false);
+                setSearchOpen(true);
+              }}
+            >
+              <Text style={styles.menuText}>{t('searchMessages')}</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.menuItem} onPress={reportParticipant}>
               <Text style={styles.menuText}>{t('report')}</Text>
             </TouchableOpacity>
@@ -1504,6 +1550,62 @@ export function ConversationScreen({ route, navigation }: Props) {
         </TouchableOpacity>
       </Modal>
 
+      <Modal
+        visible={searchOpen}
+        animationType="slide"
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={fermerRecherche}
+      >
+        <SafeAreaView style={styles.container} edges={['top']}>
+          <View style={styles.searchHeader}>
+            <BackButton onPress={fermerRecherche} style={styles.headerButton} />
+
+            <TextInput
+              style={styles.searchInput}
+              value={searchQuery}
+              onChangeText={lancerRecherche}
+              placeholder={t('searchPlaceholder')}
+              placeholderTextColor={themeColors.textFaint}
+              autoFocus
+            />
+          </View>
+
+          {searching ? (
+            <ActivityIndicator
+              style={styles.searchLoader}
+              color={themeColors.primary}
+            />
+          ) : (
+            <FlatList
+              data={searchResults}
+              keyExtractor={(message) => message.id}
+              contentContainerStyle={styles.searchList}
+              keyboardShouldPersistTaps="handled"
+              ListEmptyComponent={
+                searchQuery.trim().length >= 2 ? (
+                  <Text style={styles.searchEmpty}>{t('searchNoResult')}</Text>
+                ) : null
+              }
+              renderItem={({ item }) => (
+                <View style={styles.searchRow}>
+                  <Text style={styles.searchAuthor}>
+                    {item.senderId === currentUserId
+                      ? t('replyToYou')
+                      : participantName}
+                    {' · '}
+                    {formatMessageDay(item.createdAt, t)}
+                  </Text>
+
+                  <Text style={styles.searchExtract} numberOfLines={2}>
+                    {apercuMessage(item)}
+                  </Text>
+                </View>
+              )}
+            />
+          )}
+        </SafeAreaView>
+      </Modal>
       <Modal
         visible={reportOpen}
         transparent
@@ -1578,6 +1680,58 @@ menuBackdrop: {
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     paddingTop: 8,
+  },
+
+  searchHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 4,
+  },
+
+  searchInput: {
+    flex: 1,
+    height: 42,
+    paddingHorizontal: 12,
+    borderRadius: 21,
+    backgroundColor: c.surfaceAlt,
+    fontSize: 15,
+    color: c.text,
+  },
+
+  searchLoader: {
+    marginTop: 32,
+  },
+
+  searchList: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+
+  searchRow: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: c.border,
+  },
+
+  searchAuthor: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: c.textMuted,
+  },
+
+  searchExtract: {
+    marginTop: 3,
+    fontSize: 14,
+    color: c.text,
+  },
+
+  searchEmpty: {
+    marginTop: 32,
+    textAlign: 'center',
+    fontSize: 14,
+    color: c.textMuted,
   },
 
   reportTitle: {
