@@ -38,7 +38,6 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() dto: RegisterDto) {
     try {
-      console.log('REGISTER step A - dto received', dto);
 
       const user = await this.registerUserUseCase.execute({
         email: dto.email,
@@ -53,8 +52,6 @@ export class AuthController {
         avatarUrl: dto.avatarUrl,
       });
 
-      console.log('REGISTER step B - user created', user);
-
       const payload = {
         sub: user.id,
         email: user.email,
@@ -67,29 +64,21 @@ export class AuthController {
         avatarUrl: user.avatarUrl,
       };
 
-      console.log('REGISTER step C - payload built', payload);
-
       const accessToken = await this.jwtService.signAsync(payload, {
         secret: process.env.JWT_ACCESS_SECRET,
         expiresIn: '15m',
       });
-
-      console.log('REGISTER step D - access token ok');
 
       const refreshToken = await this.jwtService.signAsync(payload, {
         secret: process.env.JWT_REFRESH_SECRET,
         expiresIn: '7d',
       });
 
-      console.log('REGISTER step E - refresh token ok');
-
       /*const { redirectUrl } =
         await this.startIdentityVerificationUseCase.execute({
           userId: user.id,
         });*/
       const redirectUrl = 'https://example.com/identity/mock';
-
-      console.log('REGISTER step F - identity verification ok', redirectUrl);
 
       return {
         accessToken,
@@ -114,7 +103,9 @@ export class AuthController {
       console.error('REGISTER ERROR FULL =', error);
 
       if (error instanceof UserAlreadyExistsError) {
-        throw new BadRequestException('Email already in use');
+        throw new BadRequestException(
+          'Un compte existe déjà avec cette adresse.',
+        );
       }
 
       throw error;

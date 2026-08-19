@@ -33,7 +33,6 @@ export class ProfileController {
   @UseGuards(JwtAuthGuard)
   @Get('me/profile')
   async getMyProfile(@Req() req: any) {
-  console.log('REQ.USER in /users/me/profile:', req.user);
     return this.getMyProfileUseCase.execute(req.user.sub);
   }
 
