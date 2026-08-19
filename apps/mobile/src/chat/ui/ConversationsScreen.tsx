@@ -31,7 +31,7 @@ import {
   getMyProfile,
   updateMyProfile,
 } from 'src/profile/infrastructure/profile.api';
-import { getChatsApi } from '../infrastructure/chat.api';
+import { getChatsApi, hideChatApi } from '../infrastructure/chat.api';
 import { connectChatSocket } from '../infrastructure/chatSocket';
 import { usePresence } from '../hooks/usePresence';
 import { formatRelativeDate } from '../utils/formatRelativeDate';
@@ -184,6 +184,35 @@ export function ConversationsScreen({ navigation }: Props) {
     setStatusOpen(true);
   }
 
+  function confirmerSuppressionChat(chat: MyChatListItem) {
+    Alert.alert(t('deleteChatTitle'), t('deleteChatConfirm'), [
+      { text: t('cancel'), style: 'cancel' },
+      {
+        text: t('deleteChat'),
+        style: 'destructive',
+        onPress: () => supprimerChat(chat.id),
+      },
+    ]);
+  }
+
+  async function supprimerChat(chatId: string) {
+    setChats((actuelles) => actuelles.filter((chat) => chat.id !== chatId));
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      await hideChatApi(session.accessToken, chatId);
+    } catch (deleteError) {
+      console.log('Delete chat error:', deleteError);
+      // La conversation est deja retiree de l'ecran : on la remet plutot que
+      // de laisser croire a une suppression qui n'a pas eu lieu.
+      loadChats();
+      Alert.alert('', t('deleteChatError'));
+    }
+  }
+
   function renderChat(chat: MyChatListItem) {
     const participant = chat.participant;
     const hasUnread = chat.unreadCount > 0;
@@ -195,6 +224,8 @@ export function ConversationsScreen({ navigation }: Props) {
       <TouchableOpacity
         style={styles.row}
         activeOpacity={0.7}
+        onLongPress={() => confirmerSuppressionChat(chat)}
+        delayLongPress={350}
         onPress={() =>
           navigation.navigate('Conversation', {
             chatId: chat.id,

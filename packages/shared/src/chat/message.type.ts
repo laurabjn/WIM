@@ -20,6 +20,8 @@ export type ChatMessages = {
   // avoir a charger l'enregistrement.
   attachmentDurationMs?: number | null;
   translatedContent?: string | null;
+  /** Date de la derniere correction, absente si le message est d'origine. */
+  editedAt?: string | null;
   sender: MessageSender;
   createdAt: string;
   updatedAt: string;

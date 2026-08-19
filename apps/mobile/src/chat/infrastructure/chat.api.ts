@@ -93,6 +93,50 @@ export async function sendVoiceMessageApi(
   return parseResponse(response);
 }
 
+export async function editMessageApi(
+  token: string,
+  chatId: string,
+  messageId: string,
+  content: string,
+): Promise<ChatMessages> {
+  const response = await fetch(
+    `${API_URL}/chats/${chatId}/messages/${messageId}`,
+    {
+      method: 'PATCH',
+      headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    },
+  );
+
+  return parseResponse(response);
+}
+
+export async function deleteMessageApi(
+  token: string,
+  chatId: string,
+  messageId: string,
+): Promise<void> {
+  const response = await fetch(
+    `${API_URL}/chats/${chatId}/messages/${messageId}`,
+    { method: 'DELETE', headers: authHeaders(token) },
+  );
+
+  if (!response.ok) throw new Error('La suppression a échoué');
+}
+
+// Ne retire la conversation que de sa propre liste.
+export async function hideChatApi(
+  token: string,
+  chatId: string,
+): Promise<void> {
+  const response = await fetch(`${API_URL}/chats/${chatId}`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) throw new Error('La suppression a échoué');
+}
+
 export async function getRequestsApi(
   token: string,
 ): Promise<MyRequestListItem[]> {

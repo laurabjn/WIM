@@ -9,6 +9,7 @@ export type ChatUser = {
 }
 
 export type ChatParticipant = {
+  hiddenAt?: Date | null
   id: string
   chatId: string
   userId: string
@@ -27,6 +28,7 @@ export type ChatMessage = {
   type: MessageKind
   attachmentUrl: string | null
   attachmentDurationMs: number | null
+  editedAt?: Date | null
   createdAt: Date
   updatedAt: Date
   sender: ChatUser

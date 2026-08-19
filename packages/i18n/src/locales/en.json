@@ -842,6 +842,17 @@
       "fakeProfile": "Fake profile",
       "spam": "Spam or advertising",
       "other": "Other reason"
-    }
+    },
+    "edited": "edited",
+    "editMessage": "Edit",
+    "editingMessage": "Editing message",
+    "deleteMessage": "Delete",
+    "deleteMessageTitle": "Delete this message?",
+    "deleteMessageConfirm": "It will disappear for the other person too.",
+    "deleteError": "The message could not be deleted.",
+    "deleteChat": "Delete",
+    "deleteChatTitle": "Delete this conversation?",
+    "deleteChatConfirm": "It disappears from your list. The other person keeps theirs, and it comes back if they write to you.",
+    "deleteChatError": "The conversation could not be deleted."
   }
 }

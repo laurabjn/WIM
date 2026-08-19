@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -32,6 +33,11 @@ import { transcodeToM4a } from 'src/infrastructure/media/audio-transcoder';
 import { PushSenderService } from 'src/application/notification/push-sender.service';
 import { CHAT_REPOSITORY } from '../tokens/token';
 import type { ChatMessages } from '@wim/shared';
+import {
+  DeleteMessageUseCase,
+  EditMessageUseCase,
+  HideChatUseCase,
+} from 'src/application/message/use-cases/edit-message.usecase';
 
 function editFileName(
   _req: unknown,
@@ -92,6 +98,9 @@ export class ChatController {
     private readonly getUnreadCount: GetUnreadCountUseCase,
     private readonly gateway: AppGateway,
     private readonly pushSender: PushSenderService,
+    private readonly editMessage: EditMessageUseCase,
+    private readonly deleteMessage: DeleteMessageUseCase,
+    private readonly hideChat: HideChatUseCase,
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: ChatRepository,
   ) {}
@@ -274,6 +283,48 @@ export class ChatController {
     await this.notifyChatUpdated(chatId, message);
 
     return message;
+  }
+
+  @Patch(':chatId/messages/:messageId')
+  async editMessageRoute(
+    @Req() request: AuthenticatedRequest,
+    @Param('chatId') chatId: string,
+    @Param('messageId') messageId: string,
+    @Body() dto: { content?: string },
+  ) {
+    const message = await this.editMessage.execute(
+      messageId,
+      this.getUserId(request),
+      dto?.content ?? '',
+    );
+
+    this.gateway.emitMessageUpdated(chatId, message);
+
+    return message;
+  }
+
+  @Delete(':chatId/messages/:messageId')
+  async deleteMessageRoute(
+    @Req() request: AuthenticatedRequest,
+    @Param('chatId') chatId: string,
+    @Param('messageId') messageId: string,
+  ) {
+    await this.deleteMessage.execute(messageId, this.getUserId(request));
+
+    this.gateway.emitMessageDeleted(chatId, messageId);
+
+    return { deleted: true };
+  }
+
+  // Ne retire la conversation que de sa propre liste : l'autre garde la sienne.
+  @Delete(':chatId')
+  async hideChatRoute(
+    @Req() request: AuthenticatedRequest,
+    @Param('chatId') chatId: string,
+  ) {
+    await this.hideChat.execute(chatId, this.getUserId(request));
+
+    return { hidden: true };
   }
 
   private async notifyChatUpdated(chatId: string, lastMessage) {

@@ -23,6 +23,11 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
 import { MessageTranslationService } from 'src/application/message/services/message-translation.service';
 import { DeeplTranslator } from 'src/infrastructure/translation/deepl.translator';
 import { NotificationModule } from './notification.module';
+import {
+  DeleteMessageUseCase,
+  EditMessageUseCase,
+  HideChatUseCase,
+} from 'src/application/message/use-cases/edit-message.usecase';
 
 @Module({
   imports: [NotificationModule, WebsocketModule, ModerationModule],
@@ -39,6 +44,9 @@ import { NotificationModule } from './notification.module';
       SendMessageUseCase,
       MarkChatAsReadUseCase,
       GetUnreadCountUseCase,
+      EditMessageUseCase,
+      DeleteMessageUseCase,
+      HideChatUseCase,
       MessageTranslationService,
       {
         provide: TRANSLATOR,

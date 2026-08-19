@@ -48,6 +48,8 @@ import {
   sendMessageApi,
   sendPhotoMessageApi,
   sendVoiceMessageApi,
+  editMessageApi,
+  deleteMessageApi,
 } from '../infrastructure/chat.api';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { useChatSocket } from '../hooks/useChatSocket';
@@ -67,6 +69,7 @@ import {
 } from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
 import { VoiceMessageBubble } from './components/VoiceMessageBubble';
+import { TypingBubble } from './components/TypingBubble';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
@@ -172,6 +175,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [reporting, setReporting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [translated, setTranslated] = useState(true);
   const [participantLastReadAt, setParticipantLastReadAt] = useState<string | null>(null);
@@ -358,11 +362,35 @@ export function ConversationScreen({ route, navigation }: Props) {
     [currentUserId],
   );
 
+  // Une correction ou une suppression faite par l'autre doit se voir sans
+  // recharger : c'est le meme message qui change sous les yeux.
+  const handleMessageUpdated = useCallback(
+    (payload: MessageCreatedSocketPayload) => {
+      setMessages((actuels) =>
+        actuels.map((item) =>
+          item.id === payload.message.id ? payload.message : item,
+        ),
+      );
+    },
+    [],
+  );
+
+  const handleMessageDeleted = useCallback(
+    (payload: { messageId: string }) => {
+      setMessages((actuels) =>
+        actuels.filter((item) => item.id !== payload.messageId),
+      );
+    },
+    [],
+  );
+
   useChatSocket({
     chatId,
     onMessage: handleIncomingMessage,
     onRead: handleRead,
     onTyping: handleTyping,
+    onMessageUpdated: handleMessageUpdated,
+    onMessageDeleted: handleMessageDeleted,
   });
 
   useEffect(
@@ -702,6 +730,106 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
+  function ouvrirActions(message: ChatMessages) {
+    const actions: {
+      text: string;
+      style?: 'cancel' | 'destructive';
+      onPress?: () => void;
+    }[] = [];
+
+    // Une photo ou un vocal n'a pas de texte a corriger.
+    if (message.type === 'TEXT') {
+      actions.push({
+        text: t('editMessage'),
+        onPress: () => {
+          setEditingId(message.id);
+          setDraft(message.content);
+        },
+      });
+    }
+
+    actions.push({
+      text: t('deleteMessage'),
+      style: 'destructive',
+      onPress: () => confirmerSuppression(message),
+    });
+
+    actions.push({ text: t('cancel'), style: 'cancel' });
+
+    Alert.alert('', '', actions);
+  }
+
+  function confirmerSuppression(message: ChatMessages) {
+    Alert.alert(t('deleteMessageTitle'), t('deleteMessageConfirm'), [
+      { text: t('cancel'), style: 'cancel' },
+      {
+        text: t('deleteMessage'),
+        style: 'destructive',
+        onPress: () => supprimerMessage(message.id),
+      },
+    ]);
+  }
+
+  async function supprimerMessage(messageId: string) {
+    // Retire d'abord, previens ensuite : la passerelle repercutera la meme
+    // chose chez l'autre.
+    setMessages((actuels) => actuels.filter((item) => item.id !== messageId));
+
+    if (editingId === messageId) annulerEdition();
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      await deleteMessageApi(session.accessToken, chatId, messageId);
+    } catch (deleteError) {
+      console.log('Delete message error:', deleteError);
+      setError(t('deleteError'));
+    }
+  }
+
+  function annulerEdition() {
+    setEditingId(null);
+    setDraft('');
+  }
+
+  async function enregistrerEdition() {
+    const contenu = draft.trim();
+
+    if (!editingId || !contenu || sending) return;
+
+    setSending(true);
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      const modifie = await editMessageApi(
+        session.accessToken,
+        chatId,
+        editingId,
+        contenu,
+      );
+
+      setMessages((actuels) =>
+        actuels.map((item) => (item.id === modifie.id ? modifie : item)),
+      );
+
+      annulerEdition();
+
+      setError(null);
+    } catch (editError) {
+      console.log('Edit message error:', editError);
+      setError(
+        editError instanceof Error ? editError.message : t('sendError'),
+      );
+    } finally {
+      setSending(false);
+    }
+  }
+
   async function sendPhoto(uri: string) {
     setUploading(true);
 
@@ -908,7 +1036,10 @@ export function ConversationScreen({ route, navigation }: Props) {
             isLastOfGroup ? styles.bubbleRowSpaced : null,
           ]}
         >
-          <View
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onLongPress={isMine ? () => ouvrirActions(message) : undefined}
+            delayLongPress={300}
             style={[
               styles.bubble,
               isMine ? styles.bubbleMine : styles.bubbleTheirs,
@@ -958,8 +1089,9 @@ export function ConversationScreen({ route, navigation }: Props) {
               ]}
             >
               {formatMessageTime(message.createdAt)}
+              {message.editedAt ? ` · ${t('edited')}` : ''}
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {isMine && message.id === lastSeenOwnMessageId ? (
@@ -1008,9 +1140,7 @@ export function ConversationScreen({ route, navigation }: Props) {
               {participantName}
             </Text>
 
-            {participantTyping ? (
-              <Text style={styles.headerPresence}>{t('typing')}</Text>
-            ) : participantOnline ? (
+            {participantOnline ? (
               <Text style={styles.headerPresence}>{t('online')}</Text>
             ) : participantLastSeen ? (
               <Text style={styles.headerLastSeen}>
@@ -1082,6 +1212,7 @@ export function ConversationScreen({ route, navigation }: Props) {
             keyExtractor={(message) => message.id}
             renderItem={({ item, index }) => renderMessage(item, index)}
             inverted
+            ListHeaderComponent={participantTyping ? <TypingBubble /> : null}
             contentContainerStyle={styles.list}
             onEndReached={loadEarlier}
             onEndReachedThreshold={0.4}
@@ -1097,6 +1228,18 @@ export function ConversationScreen({ route, navigation }: Props) {
           <View
             style={[styles.composerArea, { paddingBottom: 10 + insets.bottom }]}
           >
+            {editingId ? (
+              <View style={styles.editingBar}>
+                <Text style={styles.editingLabel} numberOfLines={1}>
+                  {t('editingMessage')}
+                </Text>
+
+                <TouchableOpacity onPress={annulerEdition} activeOpacity={0.7}>
+                  <Text style={styles.editingCancel}>{t('cancel')}</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
+
             {showTranslationNotice ? (
               <Text style={styles.translationNotice}>
                 {t('autoTranslated')}{' '}
@@ -1199,7 +1342,7 @@ export function ConversationScreen({ route, navigation }: Props) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={handleSend}
+                  onPress={editingId ? enregistrerEdition : handleSend}
                   disabled={sending || !draft.trim()}
                   activeOpacity={0.85}
                 >
@@ -1254,11 +1397,16 @@ export function ConversationScreen({ route, navigation }: Props) {
               </TouchableOpacity>
             )}
 
-            <TouchableOpacity style={styles.menuItem} onPress={toggleTranslation}>
-              <Text style={styles.menuText}>
-                {translated ? t('stopTranslation') : t('restoreTranslation')}
-              </Text>
-            </TouchableOpacity>
+            {showTranslationNotice || !translated ? (
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={toggleTranslation}
+              >
+                <Text style={styles.menuText}>
+                  {translated ? t('stopTranslation') : t('restoreTranslation')}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
 
             <TouchableOpacity style={styles.menuItem} onPress={reportParticipant}>
               <Text style={styles.menuText}>{t('report')}</Text>
@@ -1585,6 +1733,27 @@ menuBackdrop: {
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 4 },
     elevation: 5,
+  },
+
+  editingBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 6,
+    paddingBottom: 8,
+  },
+
+  editingLabel: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '600',
+    color: c.textMuted,
+  },
+
+  editingCancel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: c.primary,
   },
 
   translationNotice: {

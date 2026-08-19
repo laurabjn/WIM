@@ -10,6 +10,7 @@ export function mapMessage(message: ChatMessage): ChatMessages {
     type: message.type,
     attachmentUrl: message.attachmentUrl,
     attachmentDurationMs: message.attachmentDurationMs,
+    editedAt: message.editedAt ? message.editedAt.toISOString() : null,
     sender: {
       id: message.sender.id,
       firstName: message.sender.firstName,

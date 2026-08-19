@@ -24,12 +24,27 @@ export class GetMyChatsUseCase {
       await this.blockedUsers.getHiddenUserIds(userId),
     );
 
-    const visibleChats = chats.filter((chat) =>
-      chat.participants.every(
+    const visibleChats = chats.filter((chat) => {
+      const bloque = !chat.participants.every(
         (participant) =>
           participant.userId === userId || !hidden.has(participant.userId),
-      ),
-    );
+      );
+
+      if (bloque) return false;
+
+      // Une conversation supprimee reste masquee tant qu'aucun message n'est
+      // arrive depuis : la supprimer ne doit pas empecher l'autre de reprendre
+      // contact.
+      const moi = chat.participants.find(
+        (participant) => participant.userId === userId,
+      );
+
+      if (!moi?.hiddenAt) return true;
+
+      const dernier = chat.messages[0];
+
+      return Boolean(dernier && dernier.createdAt > moi.hiddenAt);
+    });
     
     return Promise.all(
       visibleChats.map(async chat => {

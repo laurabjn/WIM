@@ -841,6 +841,17 @@
       "fakeProfile": "Faux profil",
       "spam": "Spam ou publicité",
       "other": "Autre motif"
-    }
+    },
+    "edited": "modifié",
+    "editMessage": "Modifier",
+    "editingMessage": "Modification du message",
+    "deleteMessage": "Supprimer",
+    "deleteMessageTitle": "Supprimer ce message ?",
+    "deleteMessageConfirm": "Il disparaîtra aussi chez votre correspondant.",
+    "deleteError": "Le message n'a pas pu être supprimé.",
+    "deleteChat": "Supprimer",
+    "deleteChatTitle": "Supprimer cette conversation ?",
+    "deleteChatConfirm": "Elle disparaît de votre liste. Votre correspondant garde la sienne, et elle revient s'il vous écrit.",
+    "deleteChatError": "La conversation n'a pas pu être supprimée."
   }
 }

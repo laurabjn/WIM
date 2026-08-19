@@ -236,6 +236,14 @@ export class AppGateway {
     this.server.to(chatRoom(chatId)).emit('message:created', payload);
   }
 
+  emitMessageUpdated(chatId: string, message: ChatMessages) {
+    this.server.to(chatRoom(chatId)).emit('message:updated', { chatId, message });
+  }
+
+  emitMessageDeleted(chatId: string, messageId: string) {
+    this.server.to(chatRoom(chatId)).emit('message:deleted', { chatId, messageId });
+  }
+
   emitMessagesRead(payload: MessagesReadSocketPayload) {
     this.server.to(chatRoom(payload.chatId)).emit('messages:read', payload);
   }

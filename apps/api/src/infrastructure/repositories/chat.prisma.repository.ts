@@ -38,6 +38,7 @@ export class ChatPrismaRepository implements ChatRepository {
             userId: true,
             lastReadMessageId: true,
             lastReadAt: true,
+            hiddenAt: true,
             joinedAt: true,
 
             user: {

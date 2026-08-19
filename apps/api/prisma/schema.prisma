@@ -336,6 +336,10 @@ model ChatParticipant {
   lastReadMessageId String?
   lastReadAt        DateTime?
 
+  // Supprimer une conversation ne l'efface que pour soi : l'autre garde la
+  // sienne. Elle reapparait si un nouveau message arrive apres cette date.
+  hiddenAt DateTime? @map("hidden_at")
+
   chatId String
   userId String
 
@@ -367,6 +371,10 @@ model Message {
   // La duree accompagne le vocal : sans elle, la bulle devrait charger chaque
   // enregistrement de la liste pour afficher ne serait-ce que sa longueur.
   attachmentDurationMs Int? @map("attachment_duration_ms")
+
+  // Un message corrige doit le dire : sans cette date, le destinataire verrait
+  // le texte changer sous ses yeux sans savoir pourquoi.
+  editedAt DateTime? @map("edited_at")
 
   chat               Chat                 @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender             User                 @relation(fields: [senderId], references: [id], onDelete: Cascade)
