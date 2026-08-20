@@ -1,27 +1,27 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../../navigation/authStack';
 import { useTranslation } from 'react-i18next';
 import { FontAwesome } from '@expo/vector-icons';
+import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStart'>;
 
 export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
     const { t } = useTranslation('auth');
+    const themeColors = useThemeColors();
+    const styles = useMemo(() => createStyles(themeColors), [themeColors]);
     
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.container}>
         <View style={styles.card}>
           <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={styles.backButtonText}>←</Text>
-            </TouchableOpacity>
+            <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
           </View>
           
           <View style={styles.centerSection}>
@@ -40,7 +40,7 @@ export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
             </Text>
             <TouchableOpacity style={styles.socialButton}>
               <View style={styles.socialContent}>
-                <FontAwesome name="google" size={18} color="#000" style={styles.icon} />
+                <FontAwesome name="google" size={18} color={themeColors.text} style={styles.icon} />
                 <Text style={styles.socialButtonText}>
                   {t('register.googleSignUp')}
                 </Text>
@@ -48,7 +48,7 @@ export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity style={styles.socialButton}>
               <View style={styles.socialContent}>
-                <FontAwesome name="apple" size={20} color="#000" style={styles.icon} />
+                <FontAwesome name="apple" size={20} color={themeColors.text} style={styles.icon} />
                 <Text style={styles.socialButtonText}>
                   {t('register.signUpWithApple')}
                 </Text>
@@ -68,18 +68,19 @@ export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 40,
@@ -96,13 +97,13 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   backButtonText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
   logo: {
     width: 64,
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 19,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
     marginBottom: 90,
   },
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
   legalText: {
     fontSize: 11,
     lineHeight: 18,
-    color: '#8B8B8B',
+    color: c.textMuted,
     textAlign: 'center',
     marginBottom: 18,
     paddingHorizontal: 12,
@@ -138,8 +139,8 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#E4E4E4',
-    backgroundColor: '#FFFFFF',
+    borderColor: c.border,
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -154,14 +155,14 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
   primaryButton: {
     height: 52,
     borderRadius: 999,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderWidth: 1,
-    borderColor: '#E4E4E4',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
@@ -170,6 +171,6 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 });

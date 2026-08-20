@@ -1,6 +1,6 @@
+import { API_URL } from '../../config/api';
 import { Home } from "@wim/shared/home/home.type";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
 
 const SERVER_BASE_URL = API_URL.replace(/\/api$/, '');
 
@@ -97,6 +97,25 @@ export async function updateHome(token: string, homeId: string, homeData: Partia
   return normalizeHome(data);
 }
 
+export async function getHomesByOwner(
+  token: string,
+  ownerId: string,
+): Promise<Home[]> {
+  const response = await fetch(`${API_URL}/homes/owner/${ownerId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Impossible de charger les logements');
+  }
+
+  const data = await response.json();
+
+  return (Array.isArray(data) ? data : []).map(normalizeHome);
+}
+
 export async function getHomeById(token: string, homeId: string): Promise<Home> {
   const response = await fetch(`${API_URL}/homes/${homeId}`, {
     method: 'GET',
@@ -165,4 +184,18 @@ export async function removeFavoriteHome(
     const text = await response.text();
     throw new Error(text || 'Impossible de retirer des favoris');
   }
+}
+export async function listHomesByOwner(
+  token: string,
+  ownerId: string,
+): Promise<Home[]> {
+  const response = await fetch(`${API_URL}/homes/owner/${ownerId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    throw new Error('Impossible de charger les logements');
+  }
+
+  return response.json();
 }

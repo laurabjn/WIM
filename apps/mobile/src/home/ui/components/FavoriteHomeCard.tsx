@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Image,
   StyleSheet,
@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Home } from '@wim/shared/home/home.type';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   home: Home;
@@ -21,6 +23,8 @@ export function FavoriteHomeCard({
   onPressFavorite,
 }: Props) {
   const { t } = useTranslation(['home', 'profile']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
     <TouchableOpacity
       style={styles.card}
@@ -79,7 +83,7 @@ export function FavoriteHomeCard({
         </Text>
 
         <View style={styles.bottomRow}>
-          {home.isAvailableForExchange ? (
+          {home.isAvailableForExchange && !home.occupiedByExchange ? (
             <View style={styles.badgeAvailable}>
               <Text style={styles.badgeAvailableText}>{t('available')}</Text>
             </View>
@@ -90,9 +94,10 @@ export function FavoriteHomeCard({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 22,
     overflow: 'hidden',
     marginBottom: 18,
@@ -103,7 +108,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 250,
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   favoriteButton: {
     position: 'absolute',
@@ -112,12 +117,12 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#FFFFFFE6',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   favoriteIcon: {
-    color: '#1F1F1F',
+    color: c.text,
     fontSize: 16,
   },
   ownerAvatar: {
@@ -129,7 +134,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 2,
     borderColor: '#FFFFFF',
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   dotsRow: {
     position: 'absolute',
@@ -142,10 +147,10 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: c.surfaceAlt,
   },
   dotActive: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   content: {
     padding: 14,
@@ -159,22 +164,22 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
     flex: 1,
   },
   rating: {
     fontSize: 12,
-    color: '#444',
+    color: c.text,
   },
   location: {
     marginTop: 4,
     fontSize: 12,
-    color: '#666',
+    color: c.textMuted,
   },
   details: {
     marginTop: 6,
     fontSize: 12,
-    color: '#444',
+    color: c.text,
   },
   bottomRow: {
     marginTop: 10,
@@ -201,12 +206,12 @@ const styles = StyleSheet.create({
   },
   badgeSeasonText: {
     fontSize: 11,
-    color: '#D88500',
+    color: c.warning,
     fontWeight: '600',
   },
   price: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
   },
 });

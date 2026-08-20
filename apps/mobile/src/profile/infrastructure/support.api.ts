@@ -1,5 +1,4 @@
-const API_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
+import { API_URL } from '../../config/api';
 
 export type SupportTopic =
   | 'account'
@@ -35,11 +34,24 @@ export async function sendSupportRequest(
   });
 
   const rawText = await response.text();
-  console.log('SUPPORT STATUS:', response.status);
-  console.log('SUPPORT RAW RESPONSE:', rawText);
 
   if (!response.ok) {
-    throw new Error(`Support API error ${response.status}: ${rawText}`);
+    // On remonte le message de l'API : l'ecran n'a que celui-la a montrer.
+    let message = "Votre demande n'a pas pu être envoyée.";
+
+    try {
+      const body = rawText ? JSON.parse(rawText) : null;
+
+      if (body?.message) {
+        message = Array.isArray(body.message)
+          ? body.message.join(', ')
+          : body.message;
+      }
+    } catch {
+      // Corps illisible : on garde le message generique.
+    }
+
+    throw new Error(message);
   }
 
   try {

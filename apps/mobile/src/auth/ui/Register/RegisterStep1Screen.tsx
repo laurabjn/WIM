@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  KeyboardAvoidingView,
   ScrollView
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -22,11 +21,17 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stepper } from '../components/Stepper';
+import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep1'>;
 
 export const RegisterStep1Screen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation(['auth', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [lastName, setLastName] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -74,16 +79,11 @@ export const RegisterStep1Screen: React.FC<Props> = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
       >
         <View style={styles.card}>
           <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={styles.backButtonText}>←</Text>
-            </TouchableOpacity>
+            <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
 
             <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
           </View>
@@ -173,20 +173,21 @@ export const RegisterStep1Screen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -205,7 +206,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -213,13 +214,13 @@ const styles = StyleSheet.create({
 
   backButtonText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
 
   headerTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 
   content: {
@@ -230,7 +231,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
     marginBottom: 18,
   },
@@ -243,25 +244,25 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#EAEAEA',
+    borderColor: c.border,
     paddingHorizontal: 16,
     marginBottom: 12,
     fontSize: 13,
-    color: '#111111',
-    backgroundColor: '#FFFFFF',
+    color: c.text,
+    backgroundColor: c.surface,
   },
 
   dateInput: {
     height: 48,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#EAEAEA',
+    borderColor: c.border,
     paddingHorizontal: 16,
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   dateText: {
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 4,
     fontSize: 12,
-    color: '#DC2626',
+    color: c.danger,
     textAlign: 'center',
   },
 
@@ -291,7 +292,7 @@ const styles = StyleSheet.create({
   },
 
   primaryText: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 16,
   },

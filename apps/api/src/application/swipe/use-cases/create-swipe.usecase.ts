@@ -50,6 +50,23 @@ export class CreateSwipeUseCase {
       };
     }
 
+    // Un match ouvre une conversation : si elle existe deja et vit, il n'a rien
+    // a ouvrir. Le like reste enregistre, il n'affiche simplement pas de match.
+    const alreadyTalking =
+      await this.swipeRepository.hasOpenConversation(
+        input.swiperId,
+        input.targetUserId,
+      );
+
+    if (alreadyTalking) {
+      return {
+        success: true,
+        swipeId: swipe.id,
+        match: false,
+        matchId: null,
+      };
+    }
+
     const reciprocalLike =
       await this.swipeRepository.hasLike(
         input.targetUserId,

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   View,
   ActivityIndicator,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { ProfileHeaderCard } from './components/ProfileHeaderCard';
 import { UserHomeCard } from '../../home/ui/components/UserHomeCard';
@@ -18,8 +19,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { clearSession, getSession } from 'src/auth/infrastructure/authStorage';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { useFocusEffect } from '@react-navigation/native';
-import { publicUserMock } from '../infrastructure/mocks/userMocks';
-import { publicUserHomesMock } from 'src/home/infrastructure/mocks/homeMocks';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
+import { unregisterPushToken } from 'src/notifications/pushRegistration';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,8 +29,9 @@ type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileMain'> & {
 
 export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated, route }) => {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
-  const USE_MOCKS = true;
   
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -67,6 +70,9 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
 
   async function handleLogout() {
     try {
+      // Avant d'effacer la session : le retrait du jeton s'authentifie encore.
+      await unregisterPushToken();
+
       await clearSession();
 
       setToken(null);
@@ -92,13 +98,8 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
     reloadHomes: reloadHomes,
   } = useMyHomes(token);
 
-  const profileData = USE_MOCKS
-  ? publicUserMock
-  : profile;
-
-const homesData = USE_MOCKS
-  ? publicUserHomesMock
-  : homes;
+  const profileData = profile;
+  const homesData = homes;
 
   useFocusEffect(
     useCallback(() => {
@@ -147,7 +148,17 @@ const homesData = USE_MOCKS
           }}
         />
 
-        <Text style={styles.sectionTitle}>{t('homes')}</Text>
+        <View style={styles.homesHeader}>
+          <Text style={styles.sectionTitle}>{t('homes')}</Text>
+
+          <TouchableOpacity
+            style={styles.addHomeButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('EditHome', {})}
+          >
+            <Text style={styles.addHomeText}>{t('addHome')}</Text>
+          </TouchableOpacity>
+        </View>
 
         {isHomesLoading ? (
           <ActivityIndicator />
@@ -187,14 +198,15 @@ const homesData = USE_MOCKS
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: c.surfaceAlt,
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: c.surfaceAlt,
   },
   container: {
     padding: 16,
@@ -205,14 +217,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: c.surfaceAlt,
+  },
+  homesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  addHomeButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: c.contrast,
+  },
+  addHomeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: c.text,
   },
   sectionTitle: {
     marginTop: 20,
     marginBottom: 12,
     fontSize: 16,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
   },
   homesList: {
     gap: 14,
@@ -222,6 +251,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
-    color: '#666',
+    color: c.textMuted,
   },
 });

@@ -12,7 +12,6 @@ export class JwtPasswordResetTokenAdapter implements PasswordResetTokenRepositor
     payload: { userId: string },
     expiresInSeconds: number,
   ): Promise<string> {
-    console.log('[SIGNING RESET TOKEN]', payload, expiresInSeconds);
     return this.jwtService.signAsync(
       { sub: payload.userId, type: 'password_reset' },
       {
@@ -27,8 +26,6 @@ export class JwtPasswordResetTokenAdapter implements PasswordResetTokenRepositor
       const decoded = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_RESET_SECRET || 'dev-reset-secret',
       });
-
-      console.log('[RESET TOKEN PAYLOAD]', decoded);
 
       if (!decoded?.sub || decoded?.type !== 'password_reset') {
         throw new InvalidPasswordResetTokenError();

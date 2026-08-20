@@ -17,10 +17,12 @@ export type ProfileStackParamList = {
   };
   Favorites: undefined;
   Settings: { profile: UserProfile };
+  BlockedUsers: undefined;
   PublicProfile: { userId: string };
   Help: undefined;
+  Support: { mode?: 'report' } | undefined;
   HomeDetails: { homeId: string };
-  EditHome: { homeId: string };
+  EditHome: { homeId?: string } | undefined;
   ExchangeAvailability: { homeId: string };
   ExchangeMessage: {
     homeId: string;

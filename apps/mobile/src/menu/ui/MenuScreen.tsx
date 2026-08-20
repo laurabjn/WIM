@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -22,26 +22,27 @@ import { useTranslation } from 'react-i18next';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { Home } from '@wim/shared/home/home.type';
 import { searchHomesApi } from 'src/home/infrastructure/searchHome.api';
-import { publicUserHomesMock } from 'src/home/infrastructure/mocks/homeMocks';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { SearchToggle } from './components/SearchToggle';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<SearchStackParamList,'Menu'>;
 
 export function MenuScreen({ navigation }: Props) {
   const { t } = useTranslation(['search', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
     
   type CategoryFilter = 'ALL' | 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
 
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('NATURE');
   const [homes, setHomes] = useState<Home[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [quickSearch, setQuickSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [useMocks, setUseMocks] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
@@ -97,12 +98,19 @@ export function MenuScreen({ navigation }: Props) {
     loadExploreHomes();
   }, [token, isSessionLoading]);
 
-  const sourceHomes = useMocks ? publicUserHomesMock : homes;
+  const sourceHomes = homes;
 
-  const filteredHomes = sourceHomes.filter(
-    (home) => home.category === selectedCategory,
-  );
+  // Une categorie ouvre la page de resultats, carte comprise, plutot que de
+  // filtrer en silence une liste que rien n'affichait.
+  const openCategory = (category: Exclude<CategoryFilter, 'ALL'>) =>
+    navigation.navigate('SearchResults', {
+      city: '',
+      category,
+      capacity: undefined,
+    });
 
+  // Un logement sans theme ne doit pas disparaitre de l'accueil : il reste
+  // visible tant qu'aucun filtre n'est actif.
   const featuredCity = sourceHomes[0]?.city;
   const featuredCountry = sourceHomes[0]?.country;
 
@@ -117,7 +125,11 @@ export function MenuScreen({ navigation }: Props) {
     : t('search:toExplore');
   
   const toggleSearch = () => {
-    navigation.navigate('Swipe');
+    // On laisse le curseur glisser avant de changer d'ecran : sinon
+    // l'animation etait remplacee par la navigation.
+    setQuickSearch(true);
+
+    setTimeout(() => navigation.navigate('Swipe'), 260);
   };
     
   return (
@@ -151,7 +163,17 @@ export function MenuScreen({ navigation }: Props) {
                 <Text style={styles.exchangeCount}>{featuredHomes.length}</Text>
               </View>
 
-              <TouchableOpacity style={styles.heroButton}>
+              <TouchableOpacity
+                style={styles.heroButton}
+                activeOpacity={0.85}
+                disabled={!featuredCity}
+                onPress={() =>
+                  navigation.navigate('SearchResults', {
+                    city: featuredCity ?? '',
+                    capacity: undefined,
+                  })
+                }
+              >
                 <Text style={styles.heroButtonText}>{t('common:seeMore')}</Text>
                 <Text style={styles.arrow}>→</Text>
               </TouchableOpacity>
@@ -166,25 +188,25 @@ export function MenuScreen({ navigation }: Props) {
             icon={<Umbrella color="white" size={24} />}
             label="Nature"
             color="#37c878"
-            onPress={() => setSelectedCategory('NATURE')}
+            onPress={() => openCategory('NATURE')}
           />
           <Category
             icon={<Waves color="white" size={24} />}
             label="Plage"
             color="#169bea"
-            onPress={() => setSelectedCategory('BEACH')}
+            onPress={() => openCategory('BEACH')}
           />
           <Category
             icon={<Building2 color="white" size={24} />}
             label="Ville"
             color="#777"
-            onPress={() => setSelectedCategory('CITY')}
+            onPress={() => openCategory('CITY')}
           />
           <Category
             icon={<Landmark color="white" size={24} />}
             label="Culture"
             color="#f47b20"
-            onPress={() => setSelectedCategory('CULTURE')}
+            onPress={() => openCategory('CULTURE')}
           />
         </View>
 
@@ -201,6 +223,9 @@ export function MenuScreen({ navigation }: Props) {
             title={`${home.city}, ${home.country}`}
             dates="Dates disponibles"
             travelers={`${home.capacity} voyageurs`}
+            onPress={() =>
+              navigation.navigate('HomeDetails', { homeId: home.id })
+            }
           />
         ))}
       </ScrollView>
@@ -208,10 +233,11 @@ export function MenuScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
   content: {
     paddingTop: 8,
@@ -240,7 +266,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
   heroCard: {
     height: 180,
@@ -259,7 +285,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.15)',
   },
   heroTitle: {
-    color: '#fff',
+    // Pose sur la photo : toujours blanc, quel que soit le theme.
+    color: '#FFFFFF',
     fontSize: 36,
     fontWeight: '900',
     lineHeight: 36,
@@ -270,12 +297,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   smallLabel: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '600',
   },
   exchangeCount: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 36,
     fontWeight: '900',
   },
@@ -290,14 +317,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   heroButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   arrow: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 18,
   },
   sectionTitle: {
+    color: c.text,
     fontSize: 13,
     fontWeight: '800',
     marginBottom: 8,
@@ -310,7 +338,7 @@ const styles = StyleSheet.create({
   recentCard: {
     height: 95,
     borderRadius: 16,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     marginBottom: 12,
     flexDirection: 'row',
     overflow: 'hidden',
@@ -336,7 +364,7 @@ const styles = StyleSheet.create({
   },
   recentText: {
     fontSize: 12,
-    color: '#444',
+    color: c.text,
     marginBottom: 4,
   },
   bottomNav: {
@@ -345,7 +373,7 @@ const styles = StyleSheet.create({
     left: 10,
     right: 10,
     height: 58,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     borderRadius: 30,
     flexDirection: 'row',
     alignItems: 'center',
@@ -360,7 +388,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     borderRadius: 24,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -374,7 +402,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   headerTextActive: {
-    color: '#000',
+    color: c.text,
     fontWeight: '700',
   },
   toggleCircleActive: {

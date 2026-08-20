@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import {
   Animated,
   Dimensions,
@@ -15,6 +15,8 @@ import {
 import { Star } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_HORIZONTAL_PADDING = 18;
@@ -34,6 +36,8 @@ export function SwipeHomeCard({
   onDislike,
 }: Props) {
   const { t } = useTranslation(['profile', 'swipe']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [photoIndex, setPhotoIndex] = useState(0);
   const [isCarouselDragging, setIsCarouselDragging] =
@@ -283,7 +287,7 @@ export function SwipeHomeCard({
         <View style={styles.rating}>
           <Star
             size={15}
-            color="#111"
+            color={themeColors.text}
             fill="#111"
           />
 
@@ -321,7 +325,8 @@ export function SwipeHomeCard({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
     paddingHorizontal:
       CARD_HORIZONTAL_PADDING,
@@ -332,7 +337,7 @@ const styles = StyleSheet.create({
     height: 370,
     borderRadius: 22,
     overflow: 'hidden',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: c.surfaceAlt,
   },
   carouselImage: {
     width: CAROUSEL_WIDTH,
@@ -360,7 +365,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   photoCounter: {
     position: 'absolute',
@@ -390,7 +395,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: '#FFFFFF',
     overflow: 'hidden',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: c.surfaceAlt,
   },
   avatarImage: {
     width: '100%',
@@ -408,17 +413,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
   location: {
     marginTop: 3,
     fontSize: 14,
-    color: '#555555',
+    color: c.textMuted,
   },
   meta: {
     marginTop: 3,
     fontSize: 14,
-    color: '#333333',
+    color: c.text,
   },
   rating: {
     flexDirection: 'row',
@@ -429,7 +434,7 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 15,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
   },
   statusRow: {
     marginTop: 18,
@@ -449,7 +454,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
   tags: {
     marginTop: 18,
@@ -488,12 +493,12 @@ const styles = StyleSheet.create({
   },
   likeText: {
     fontSize: 72,
-    color: '#2ECC71',
+    color: c.success,
     fontWeight: '900',
   },
   dislikeText: {
     fontSize: 82,
-    color: '#E74C3C',
+    color: c.danger,
     fontWeight: '900',
   },
   likeBadge: {

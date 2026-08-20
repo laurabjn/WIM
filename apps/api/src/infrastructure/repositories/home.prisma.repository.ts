@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { HomePhotoEntity, HomeEntity } from 'src/domain/auth/entities/home.entity';
 import {
   HomeRepository,
@@ -7,94 +6,23 @@ import {
   UpdateHomeRepositoryData
 } from 'src/domain/auth/repositories/home.repository';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
-
-type PrismaHomeWithRelations  = Prisma.HomeGetPayload<{
-  include: {
-    photos: true;
-    vehicle: true;
-    owner: {
-      select: {
-        id: true;
-        firstName: true;
-        lastName: true;
-        avatarUrl: true;
-        createdAt: true;
-      };
-    };
-  };
-}>;
+import {
+  HOME_WITH_RELATIONS_INCLUDE,
+  PrismaHomeWithRelations,
+  mapHome,
+  mapPhoto,
+} from './home.mapper';
 
 @Injectable()
 export class HomeRepositoryPrisma implements HomeRepository {
   constructor(private readonly prisma: PrismaService) { }
-  
-  private mapVehicle(vehicle: PrismaHomeWithRelations['vehicle']) {
-    if (!vehicle) return null;
-
-    return {
-      id: vehicle.id,
-      homeId: vehicle.homeId,
-      brand: vehicle.brand,
-      model: vehicle.model,
-      seats: vehicle.seats,
-      type: vehicle.type,
-      fuelType: vehicle.fuelType,
-      imageUrl: vehicle.imageUrl,
-      createdAt: vehicle.createdAt,
-      updatedAt: vehicle.updatedAt,
-    };
-  }
-
-  private mapOwner(owner: PrismaHomeWithRelations['owner']) {
-    if (!owner) return null;
-
-    return {
-      id: owner.id,
-      firstName: owner.firstName,
-      lastName: owner.lastName,
-      avatarUrl: owner.avatarUrl,
-      createdAt: owner.createdAt,
-    };
-  }
 
   private mapPhoto(photo: PrismaHomeWithRelations['photos'][number]): HomePhotoEntity {
-    return {
-      id: photo.id,
-      homeId: photo.homeId,
-      url: photo.url,
-      position: photo.position,
-      createdAt: photo.createdAt,
-    };
+    return mapPhoto(photo);
   }
 
   private mapHome(home: PrismaHomeWithRelations): HomeEntity {
-    return {
-      id: home.id,
-      ownerId: home.ownerId,
-      owner: this.mapOwner(home.owner),
-      title: home.title,
-      description: home.description,
-      address: home.address,
-      city: home.city,
-      country: home.country,
-      latitude: home.latitude ? Number(home.latitude) : null,
-      longitude: home.longitude ? Number(home.longitude) : null,
-      capacity: home.capacity,
-      beds: home.beds,
-      bedrooms: home.bedrooms ?? 0,
-      bathrooms: home.bathrooms ?? 0,
-      homeType: home.homeType,
-      amenities: Array.isArray(home.amenities) ? (home.amenities as string[]) : [],
-      isAvailableForExchange: home.isAvailableForExchange ?? false,
-      pricePerNight: home.pricePerNight ?? null,
-      averageRating: home.averageRating ?? null,
-      reviewsCount: home.reviewsCount ?? 0,
-      carExchangeAccepted: home.carExchangeAccepted ?? false,
-      photos: home.photos.map((photo) => this.mapPhoto(photo)),
-      createdAt: home.createdAt,
-      updatedAt: home.updatedAt,
-      vehicle: this.mapVehicle(home.vehicle),
-    };
+    return mapHome(home);
   }
 
   async create(data: CreateHomeRepositoryData): Promise<HomeEntity> {
@@ -115,6 +43,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
         bathrooms: data.bathrooms,
 
         homeType: data.homeType,
+        category: data.category ?? null,
         amenities: data.amenities,
         isAvailableForExchange: data.isAvailableForExchange,
         pricePerNight: data.pricePerNight,
@@ -136,19 +65,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
               }
             : undefined,
       },
-      include: {
-        photos: true,
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
     });
 
     return this.mapHome(home);
@@ -156,21 +73,7 @@ export class HomeRepositoryPrisma implements HomeRepository {
 
   async findAll(): Promise<HomeEntity[]> {
     const homes = await this.prisma.home.findMany({
-      include: {
-        photos: {
-          orderBy: { position: 'asc' },
-        },
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
       orderBy: { createdAt: 'desc' },
     });
 
@@ -180,45 +83,18 @@ export class HomeRepositoryPrisma implements HomeRepository {
   async findById(id: string): Promise<HomeEntity | null> {
     const home = await this.prisma.home.findUnique({
       where: { id },
-      include: {
-        photos: {
-          orderBy: { position: 'asc' },
-        },
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
     });
 
     if (!home) return null;
-    return this.mapHome(home);
+
+return this.mapHome(home);
   }
 
   async findByOwnerId(ownerId: string): Promise<HomeEntity[]> {
     const homes = await this.prisma.home.findMany({
       where: { ownerId },
-      include: {
-        photos: {
-          orderBy: { position: 'asc' },
-        },
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
       orderBy: { createdAt: 'desc' },
     });
 
@@ -227,6 +103,13 @@ export class HomeRepositoryPrisma implements HomeRepository {
 
   async update(id: string, data: UpdateHomeRepositoryData): Promise<HomeEntity> {
     const { vehicle, ...homeData } = data;
+
+    // Un `delete` imbrique echoue quand le logement n'a pas de vehicule, ce qui
+    // faisait planter toute modification d'un logement sans voiture. On le
+    // retire donc a part, ou l'absence est acceptee.
+    if (vehicle === null) {
+      await this.prisma.vehicle.deleteMany({ where: { homeId: id } });
+    }
 
     const home = await this.prisma.home.update({
       where: { id },
@@ -254,26 +137,10 @@ export class HomeRepositoryPrisma implements HomeRepository {
                     },
                   },
                 }
-              : {
-                  delete: true,
-                }
+              : undefined
             : undefined,
       },
-      include: {
-        photos: {
-          orderBy: { position: 'asc' },
-        },
-        vehicle: true,
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
-            createdAt: true,
-          },
-        },
-      },
+      include: HOME_WITH_RELATIONS_INCLUDE,
     });
 
     return this.mapHome(home);

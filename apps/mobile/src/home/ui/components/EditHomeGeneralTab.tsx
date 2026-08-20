@@ -1,23 +1,39 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   title: string;
   description: string;
+  address: string;
+  city: string;
+  country: string;
   photos: string[];
   onChangeTitle: (value: string) => void;
   onChangeDescription: (value: string) => void;
+  onChangeAddress: (value: string) => void;
+  onChangeCity: (value: string) => void;
+  onChangeCountry: (value: string) => void;
 };
 
 export function EditHomeGeneralTab({
   title,
   description,
+  address,
+  city,
+  country,
   photos,
   onChangeTitle,
   onChangeDescription,
+  onChangeAddress,
+  onChangeCity,
+  onChangeCountry,
 }: Props) {
   const { t } = useTranslation('home');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   return (
     <View style={styles.form}>
@@ -41,6 +57,42 @@ export function EditHomeGeneralTab({
         textAlignVertical="top"
         style={styles.textarea}
       />
+
+      <Text style={styles.label}>{t('address')}</Text>
+
+      <TextInput
+        value={address}
+        onChangeText={onChangeAddress}
+        placeholder={t('address')}
+        placeholderTextColor="#C9C9C9"
+        style={styles.input}
+      />
+
+      <View style={styles.row}>
+        <View style={styles.rowItem}>
+          <Text style={styles.label}>{t('city')}</Text>
+
+          <TextInput
+            value={city}
+            onChangeText={onChangeCity}
+            placeholder={t('city')}
+            placeholderTextColor="#C9C9C9"
+            style={styles.input}
+          />
+        </View>
+
+        <View style={styles.rowItem}>
+          <Text style={styles.label}>{t('country')}</Text>
+
+          <TextInput
+            value={country}
+            onChangeText={onChangeCountry}
+            placeholder={t('country')}
+            placeholderTextColor="#C9C9C9"
+            style={styles.input}
+          />
+        </View>
+      </View>
 
       <Text style={styles.label}>{t('homePhoto')}</Text>
 
@@ -77,36 +129,44 @@ export function EditHomeGeneralTab({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   form: {
     paddingHorizontal: 12,
   },
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
   input: {
     height: 48,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     marginBottom: 18,
   },
   textarea: {
     minHeight: 145,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     marginBottom: 18,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  rowItem: {
+    flex: 1,
   },
   photosGrid: {
     flexDirection: 'row',
@@ -117,7 +177,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 185,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
   },
   smallPhotosColumn: {
     width: 118,
@@ -127,23 +187,23 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 88.5,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
   },
   fullPhoto: {
     width: '100%',
     height: 245,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
   },
   emptyPhotos: {
     height: 180,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyPhotosText: {
-    color: '#6B7280',
+    color: c.textMuted,
     fontSize: 13,
   },
 });

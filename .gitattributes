@@ -1,0 +1,12 @@
+# Les scripts shell et les fichiers consommés par Docker doivent rester en LF.
+# Sans cette règle, `core.autocrlf=true` (config par défaut sous Windows) les
+# commite en CRLF : `sh` lit alors `set -e\r` et échoue avec
+# "illegal option -", ce qui fait redémarrer le conteneur en boucle.
+*.sh              text eol=lf
+Dockerfile        text eol=lf
+Dockerfile.*      text eol=lf
+*.yml             text eol=lf
+*.yaml            text eol=lf
+Caddyfile         text eol=lf
+.env.example      text eol=lf
+.env.prod.example text eol=lf

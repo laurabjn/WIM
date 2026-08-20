@@ -1,6 +1,9 @@
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsEmail,
+  IsISO8601,
+  IsOptional,
   IsString,
   MinLength,
   Matches,
@@ -22,27 +25,40 @@ export class RegisterDto {
   })
   password!: string;
 
+  @IsOptional()
   @IsString()
   firstName?: string;
 
+  @IsOptional()
   @IsString()
   lastName?: string;
 
+  @IsOptional()
   @IsString()
   avatarUrl?: string;
 
+  @IsOptional()
   @IsString()
   bio?: string;
 
+  @IsOptional()
   @IsString()
   country?: string;
 
+  @IsOptional()
   @IsString()
   nationality?: string;
 
+  @IsOptional()
   @IsString()
   phone?: string;
 
-  @IsString()
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value !== 'string' || value === '') return value;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? value : parsed.toISOString();
+  })
+  @IsISO8601()
   birthDate?: string;
 }

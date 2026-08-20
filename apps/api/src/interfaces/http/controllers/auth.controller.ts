@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.usecase';
@@ -37,7 +38,6 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() dto: RegisterDto) {
     try {
-      console.log('REGISTER step A - dto received', dto);
 
       const user = await this.registerUserUseCase.execute({
         email: dto.email,
@@ -52,8 +52,6 @@ export class AuthController {
         avatarUrl: dto.avatarUrl,
       });
 
-      console.log('REGISTER step B - user created', user);
-
       const payload = {
         sub: user.id,
         email: user.email,
@@ -66,29 +64,21 @@ export class AuthController {
         avatarUrl: user.avatarUrl,
       };
 
-      console.log('REGISTER step C - payload built', payload);
-
       const accessToken = await this.jwtService.signAsync(payload, {
         secret: process.env.JWT_ACCESS_SECRET,
         expiresIn: '15m',
       });
-
-      console.log('REGISTER step D - access token ok');
 
       const refreshToken = await this.jwtService.signAsync(payload, {
         secret: process.env.JWT_REFRESH_SECRET,
         expiresIn: '7d',
       });
 
-      console.log('REGISTER step E - refresh token ok');
-
       /*const { redirectUrl } =
         await this.startIdentityVerificationUseCase.execute({
           userId: user.id,
         });*/
       const redirectUrl = 'https://example.com/identity/mock';
-
-      console.log('REGISTER step F - identity verification ok', redirectUrl);
 
       return {
         accessToken,
@@ -113,11 +103,51 @@ export class AuthController {
       console.error('REGISTER ERROR FULL =', error);
 
       if (error instanceof UserAlreadyExistsError) {
-        throw new BadRequestException('Email already in use');
+        throw new BadRequestException(
+          'Un compte existe déjà avec cette adresse.',
+        );
       }
 
       throw error;
     }
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Body() body: { refreshToken?: string }) {
+    if (!body?.refreshToken) {
+      throw new UnauthorizedException('Jeton de rafraîchissement manquant.');
+    }
+
+    let payload: { sub: string; email: string; isAdmin?: boolean };
+
+    try {
+      payload = await this.jwtService.verifyAsync(body.refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',
+      });
+    } catch {
+      throw new UnauthorizedException('Session expirée, reconnectez-vous.');
+    }
+
+    const charge = {
+      sub: payload.sub,
+      email: payload.email,
+      isAdmin: payload.isAdmin === true,
+    };
+
+    const accessToken = await this.jwtService.signAsync(charge, {
+      expiresIn: '15m',
+      secret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret',
+    });
+
+    // Le jeton de rafraichissement est reconduit a chaque passage : une
+    // application ouverte regulierement ne demande jamais de se reconnecter.
+    const refreshToken = await this.jwtService.signAsync(charge, {
+      expiresIn: '30d',
+      secret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',
+    });
+
+    return { accessToken, refreshToken };
   }
 
   @Post('login')
@@ -132,6 +162,7 @@ export class AuthController {
       const payload = {
         sub: user.id,
         email: user.email,
+        isAdmin: user.isAdmin === true,
       };
 
       const accessToken = await this.jwtService.signAsync(payload, {

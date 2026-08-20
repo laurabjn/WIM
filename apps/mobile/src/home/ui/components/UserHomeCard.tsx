@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { Home } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 import {
   View,
   Text,
@@ -17,6 +20,8 @@ type Props = {
 
 export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }: Props) {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
     
   const coverUrl =
     home.photos?.[0]?.url ??
@@ -55,7 +60,7 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
             {home.title}
           </Text>
           <Text style={styles.rating}>
-            ★ {home.owner.rating ?? '0.0'}
+            ★ {home.averageRating?.toFixed(1) ?? '0.0'}
           </Text>
         </View>
 
@@ -68,13 +73,15 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
         </Text>
 
         <View style={styles.bottomRow}>
-          {home.isAvailableForExchange ? (
+          {home.isAvailableForExchange && !home.occupiedByExchange ? (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{t('available')}</Text>
             </View>
           ) : (
             <View style={[styles.badge, styles.badgeUnavailable]}>
-              <Text style={styles.badgeText}>{t('unavailable')}</Text>
+              <Text style={[styles.badgeText, styles.badgeTextUnavailable]}>
+                {home.occupiedByExchange ? t('occupied') : t('unavailable')}
+              </Text>
             </View>
           )}
         </View>
@@ -83,9 +90,10 @@ export function UserHomeCard({ home, onPressEdit, onPressCard, hideEditButton }:
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: c.surface,
     borderRadius: 22,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -96,7 +104,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 210,
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   editButton: {
     position: 'absolute',
@@ -105,11 +113,12 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#FFFFFFEE',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   editIcon: {
+    color: c.text,
     fontSize: 14,
   },
   content: {
@@ -125,21 +134,21 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     flex: 1,
-    color: '#1F1F1F',
+    color: c.text,
   },
   rating: {
     fontSize: 12,
-    color: '#444',
+    color: c.text,
   },
   location: {
     marginTop: 4,
     fontSize: 12,
-    color: '#666',
+    color: c.textMuted,
   },
   details: {
     marginTop: 6,
     fontSize: 12,
-    color: '#444',
+    color: c.text,
   },
   bottomRow: {
     marginTop: 10,
@@ -156,6 +165,10 @@ const styles = StyleSheet.create({
   badgeUnavailable: {
     backgroundColor: '#F5D8D8',
   },
+  // Le vert de la pastille disponible s'appliquait aussi a l'indisponible.
+  badgeTextUnavailable: {
+    color: '#A32020',
+  },
   badgeText: {
     fontSize: 11,
     color: '#267A40',
@@ -164,6 +177,6 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
   },
 });

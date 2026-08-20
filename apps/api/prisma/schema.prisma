@@ -19,6 +19,10 @@ model User {
   languages         Json?
   rating            Int            @default(0)
   isAdmin           Boolean        @default(false) @map("is_admin")
+
+  // Un compte suspendu ne peut plus se connecter. La date sert autant de
+  // marqueur que de trace : on saura quand la decision a ete prise.
+  suspendedAt DateTime? @map("suspended_at")
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @updatedAt @map("updated_at")
   identityStatus    IdentityStatus @default(NOT_VERIFIED)
@@ -27,6 +31,27 @@ model User {
   phone             String?
   preferredLocale   String         @default("fr")
   travelPreferences Json?
+
+  // Reglages de confidentialite. Ils vivent en base et non sur l'appareil :
+  // c'est le serveur qui doit les faire respecter, pas l'affichage.
+  // Ecrite a la deconnexion : elle seule permet d'afficher "vu il y a ..."
+  // quand la personne n'est plus connectee.
+  lastSeenAt DateTime? @map("last_seen_at")
+
+  // Statut court, affiche au-dessus de l'avatar. Il se perime au bout d'un
+  // jour : c'est une humeur du moment, pas une seconde biographie.
+  statusText      String?   @map("status_text")
+  statusUpdatedAt DateTime? @map("status_updated_at")
+
+  // Le reglage vit sur le serveur : c'est lui qui envoie, il doit donc
+  // pouvoir le consulter. Range dans le telephone, il n'aurait aucun effet.
+  notifyNewMessages Boolean @default(true) @map("notify_new_messages")
+
+  pushTokens PushToken[]
+
+  profileVisible Boolean @default(true) @map("profile_visible")
+  showAge        Boolean @default(true) @map("show_age")
+  dataSharing    Boolean @default(false) @map("data_sharing")
 
   homes     Home[]
   favorites Favorite[]
@@ -42,6 +67,11 @@ model User {
 
   chatParticipants ChatParticipant[]
   messages         Message[]
+  reviews          Review[]
+  blocksMade       BlockedUser[]     @relation("BlocksMade")
+  blocksReceived   BlockedUser[]     @relation("BlocksReceived")
+  reportsMade      UserReport[]      @relation("ReportsMade")
+  reportsReceived  UserReport[]      @relation("ReportsReceived")
 
   @@map("users")
 }
@@ -62,6 +92,7 @@ model Home {
   bedrooms    Int     @default(1)
   bathrooms   Int     @default(1)
   homeType    String  @map("home_type")
+  category    HomeCategory?
   amenities   Json?
 
   isAvailableForExchange Boolean @default(true) @map("is_available_for_exchange")
@@ -77,10 +108,12 @@ model Home {
   photos         HomePhoto[]
   favorites      Favorite[]
   availabilities HomeAvailability[]
-  exchanges      Exchange[]
+  exchanges      Exchange[]         @relation("ExchangeHostHome")
+  guestExchanges Exchange[]         @relation("ExchangeGuestHome")
 
   vehicle Vehicle?
   swipes  Swipe[]
+  reviews Review[]
 
   @@index([city, country])
   @@index([latitude, longitude])
@@ -97,6 +130,15 @@ model HomePhoto {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("home_photos")
+}
+
+// Theme d'un sejour, choisi par l'hote. Distinct de homeType, qui decrit le
+// bati : un chalet peut etre montagne comme culture selon ce qu'on vient y faire.
+enum HomeCategory {
+  NATURE
+  BEACH
+  CITY
+  CULTURE
 }
 
 enum VehicleFuelType {
@@ -161,6 +203,8 @@ model HomeAvailability {
 }
 
 enum ExchangeStatus {
+  PENDING
+  DECLINED
   CURRENT
   FUTURE
   PAST
@@ -168,9 +212,16 @@ enum ExchangeStatus {
 }
 
 model Exchange {
-  id     String @id @default(uuid())
+  id String @id @default(uuid())
+
+  // Un echange de maison porte deux logements : celui de l'hote, ou l'invite se
+  // rend, et celui de l'invite, ou l'hote sejourne en retour. Le second reste
+  // facultatif : on peut demander un echange sans encore proposer de logement.
   homeId String @map("home_id")
-  home   Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  home   Home   @relation("ExchangeHostHome", fields: [homeId], references: [id], onDelete: Cascade)
+
+  guestHomeId String? @map("guest_home_id")
+  guestHome   Home?   @relation("ExchangeGuestHome", fields: [guestHomeId], references: [id], onDelete: SetNull)
 
   hostId  String @map("host_id")
   guestId String @map("guest_id")
@@ -273,8 +324,8 @@ enum IdentityStatus {
 model Chat {
   id String @id @default(uuid())
 
-  matchId String @unique
-  match   Match  @relation(fields: [matchId], references: [id])
+  matchId String? @unique
+  match   Match?  @relation(fields: [matchId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -286,15 +337,29 @@ model Chat {
 model ChatParticipant {
   id String @id @default(uuid())
 
+  lastReadMessageId String?
+  lastReadAt        DateTime?
+
+  // Supprimer une conversation ne l'efface que pour soi : l'autre garde la
+  // sienne. Elle reapparait si un nouveau message arrive apres cette date.
+  hiddenAt DateTime? @map("hidden_at")
+
   chatId String
   userId String
 
-  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id])
+  lastReadMessage Message? @relation("LastReadMessage", fields: [lastReadMessageId], references: [id], onDelete: SetNull)
+  chat            Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id])
 
   joinedAt DateTime @default(now())
 
   @@unique([chatId, userId])
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
 }
 
 model Message {
@@ -304,11 +369,120 @@ model Message {
   senderId String
   content  String
 
-  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  type          MessageType @default(TEXT)
+  attachmentUrl String?     @map("attachment_url")
+
+  // La duree accompagne le vocal : sans elle, la bulle devrait charger chaque
+  // enregistrement de la liste pour afficher ne serait-ce que sa longueur.
+  attachmentDurationMs Int? @map("attachment_duration_ms")
+
+  // Un message corrige doit le dire : sans cette date, le destinataire verrait
+  // le texte changer sous ses yeux sans savoir pourquoi.
+  editedAt DateTime? @map("edited_at")
+
+  // Reponse a un message precis. SetNull plutot que Cascade : supprimer le
+  // message cite ne doit pas emporter la reponse avec lui.
+  replyToId String?  @map("reply_to_id")
+  replyTo   Message? @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   Message[] @relation("MessageReply")
+
+  chat               Chat                 @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender             User                 @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  readByParticipants ChatParticipant[]    @relation("LastReadMessage")
+  translations       MessageTranslation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([chatId, createdAt])
+}
+
+// La traduction est facturee au caractere : on la conserve pour ne jamais
+// repayer la traduction d'un message deja vu.
+model MessageTranslation {
+  id        String @id @default(uuid())
+  messageId String
+  locale    String
+  content   String
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, locale])
+}
+
+model Review {
+  id String @id @default(uuid())
+
+  homeId String @map("home_id")
+  home   Home   @relation(fields: [homeId], references: [id], onDelete: Cascade)
+
+  authorId String @map("author_id")
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  score   Int
+  comment String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([homeId, authorId])
+  @@index([homeId])
+  @@map("reviews")
+}
+
+// Un compte peut etre ouvert sur plusieurs appareils : chacun a son jeton, et
+// c'est le jeton, pas l'utilisateur, qui est unique.
+model PushToken {
+  id String @id @default(uuid())
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token    String @unique
+  platform String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("push_tokens")
+}
+
+model BlockedUser {
+  id String @id @default(uuid())
+
+  blockerId String @map("blocker_id")
+  blockedId String @map("blocked_id")
+
+  blocker User @relation("BlocksMade", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("BlocksReceived", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@map("blocked_users")
+}
+
+model UserReport {
+  id String @id @default(uuid())
+
+  reporterId String @map("reporter_id")
+  reportedId String @map("reported_id")
+
+  reporter User @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported User @relation("ReportsReceived", fields: [reportedId], references: [id], onDelete: Cascade)
+
+  reason  String
+  message String?
+
+  handledAt DateTime? @map("handled_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([reportedId])
+  @@index([handledAt])
+  @@map("user_reports")
 }

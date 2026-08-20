@@ -4,6 +4,7 @@ import { View, Text } from 'react-native';
 import { MenuScreen } from "src/menu/ui/MenuScreen";
 import { SwipeDetailHomeScreen } from "src/swipe/ui/components/SwipeDetailsHomeScreen";
 import { SwipeHomeScreen } from "src/swipe/ui/SwipeHomeScreen";
+import { ProfilePublicScreen } from "src/profile/ui/ProfilePublicScreen";
 
 const Stack = createStackNavigator<SearchStackParamList>();
 
@@ -21,6 +22,7 @@ export function SwipeStackNavigator() {
           <Stack.Screen name="Menu" component={MenuScreen} />
           <Stack.Screen name="Swipe" component={SwipeHomeScreen} />
           <Stack.Screen name="SwipeHomeDetails" component={SwipeDetailHomeScreen} />
+          <Stack.Screen name="PublicProfile" component={ProfilePublicScreen} />
         </Stack.Navigator>
     );
 }

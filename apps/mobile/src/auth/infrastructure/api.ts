@@ -1,7 +1,7 @@
+import { API_URL } from '../../config/api';
 import { LoginUser, LoginResult } from "../dtos/loginUser";
 import { RegisterUser, RegisterUserResponse } from "../dtos/registerUser";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
 
 export async function registerUserApi(payload: RegisterUser): Promise<RegisterUserResponse> {
 

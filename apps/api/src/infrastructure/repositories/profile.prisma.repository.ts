@@ -6,6 +6,7 @@ import type {
 import { PrismaService } from '../database/prisma/prisma.service';
 import { UpdateProfileInput } from 'src/application/profile/dto/update-my-profile.dto';
 import { calculateAge } from 'src/shared/utils/calculated-age';
+import { currentStatus } from 'src/application/profile/status';
 
 @Injectable()
 export class PrismaProfileRepository implements ProfileRepository {
@@ -18,7 +19,37 @@ export class PrismaProfileRepository implements ProfileRepository {
 
     if (!user) return null;
 
-    return this.mapUserToProfile(user);
+    const [homesCount, exchangesCount, reviewStats] = await Promise.all([
+      this.prisma.home.count({ where: { ownerId: userId } }),
+
+      this.prisma.exchange.count({
+        where: {
+          status: { not: 'CANCELLED' },
+          OR: [{ hostId: userId }, { guestId: userId }],
+        },
+      }),
+
+      this.prisma.review.aggregate({
+        where: { home: { ownerId: userId } },
+        _count: { _all: true },
+        _avg: { score: true },
+      }),
+    ]);
+
+    return {
+      ...this.mapUserToProfile(user),
+      profileVisible: user.profileVisible,
+      showAge: user.showAge,
+      dataSharing: user.dataSharing,
+      notifyNewMessages: user.notifyNewMessages,
+      homesCount,
+      exchangesCount,
+      reviewsCount: reviewStats._count._all,
+      averageRating:
+        reviewStats._avg.score !== null
+          ? Math.round(reviewStats._avg.score * 10) / 10
+          : null,
+    };
   }
 
   async getPublicProfile(userId: string): Promise<Partial<UserProfile> | null> {
@@ -28,20 +59,54 @@ export class PrismaProfileRepository implements ProfileRepository {
 
     if (!user) return null;
 
+    const [homesCount, exchangesCount, reviewStats] = await Promise.all([
+      this.prisma.home.count({ where: { ownerId: userId } }),
+      this.prisma.exchange.count({
+        where: {
+          status: { not: 'CANCELLED' },
+          OR: [{ hostId: userId }, { guestId: userId }],
+        },
+      }),
+      this.prisma.review.aggregate({
+        where: { home: { ownerId: userId } },
+        _count: { _all: true },
+        _avg: { score: true },
+      }),
+    ]);
+
+    // Un reglage de confidentialite ne vaut que si le serveur l'applique :
+    // laisser le tri a l'affichage reviendrait a envoyer la donnee quand meme.
+    const masque = !user.profileVisible;
+
     return {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
-      age: calculateAge(user.birthDate),
+      age: user.showAge ? calculateAge(user.birthDate) : null,
+      homesCount,
+      exchangesCount,
+      reviewsCount: reviewStats._count._all,
+      averageRating:
+        reviewStats._avg.score !== null
+          ? Math.round(reviewStats._avg.score * 10) / 10
+          : null,
       avatarUrl: user.avatarUrl,
-      bio: user.bio,
-      country: user.country,
-      nationality: user.nationality,
-      phone: user.phone,
-      birthDate: user.birthDate ? user.birthDate.toISOString() : null,
-      languages: Array.isArray(user.languages)
-        ? user.languages.filter((lang): lang is string => typeof lang === 'string')
-        : [],
+      bio: masque ? null : user.bio,
+      country: masque ? null : user.country,
+      nationality: masque ? null : user.nationality,
+      // Le telephone n'a jamais a sortir d'un profil public.
+      phone: null,
+      birthDate: user.showAge && !masque && user.birthDate
+        ? user.birthDate.toISOString()
+        : null,
+      languages: masque
+        ? []
+        : Array.isArray(user.languages)
+          ? user.languages.filter(
+              (lang): lang is string => typeof lang === 'string',
+            )
+          : [],
+      profileVisible: user.profileVisible,
     };
   }
 
@@ -59,6 +124,18 @@ export class PrismaProfileRepository implements ProfileRepository {
         languages: input.languages,
         preferredLocale: input.preferredLocale,
         travelPreferences: input.travelPreferences,
+        profileVisible: input.profileVisible,
+        showAge: input.showAge,
+        dataSharing: input.dataSharing,
+        notifyNewMessages: input.notifyNewMessages,
+        // Retirer son statut et l'ecrire passent par le meme champ : une
+        // chaine vide vaut effacement, et l'horodatage suit.
+        ...(input.statusText === undefined
+          ? {}
+          : {
+              statusText: input.statusText?.trim() ? input.statusText.trim() : null,
+              statusUpdatedAt: input.statusText?.trim() ? new Date() : null,
+            }),
       },
     });
 
@@ -91,6 +168,7 @@ export class PrismaProfileRepository implements ProfileRepository {
         ? user.languages
         : [],
       preferredLocale: (user.preferredLocale ?? 'fr') as SupportedLocale,
+      status: currentStatus(user.statusText, user.statusUpdatedAt),
       travelPreferences: user.travelPreferences ?? {
         preferredCountries: [],
         preferredHomeTypes: [],

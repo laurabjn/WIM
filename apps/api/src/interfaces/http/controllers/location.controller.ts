@@ -15,6 +15,9 @@ type WikipediaPage = {
     lat: number;
     lon: number;
   }>;
+  pageprops?: {
+    disambiguation?: string;
+  };
 };
 
 type WikipediaQueryResponse = {
@@ -29,6 +32,7 @@ export class LocationController {
   async getLocationDescription(
     @Param('city') city: string,
     @Query('language') language = 'fr',
+    @Query('country') country?: string,
     @Query('latitude') latitude?: string,
     @Query('longitude') longitude?: string,
   ) {
@@ -38,6 +42,25 @@ export class LocationController {
       return null;
     }
 
+    const resultFromTitle = await this.findDescriptionByTitle(
+      normalizedCity,
+      language,
+    );
+
+    if (resultFromTitle) {
+      return resultFromTitle;
+    }
+
+    const resultFromSearch = await this.findDescriptionBySearch(
+      normalizedCity,
+      language,
+      country,
+    );
+
+    if (resultFromSearch) {
+      return resultFromSearch;
+    }
+
     const parsedLatitude = Number(latitude);
     const parsedLongitude = Number(longitude);
 
@@ -45,23 +68,40 @@ export class LocationController {
       Number.isFinite(parsedLatitude) &&
       Number.isFinite(parsedLongitude)
     ) {
-      const resultFromCoordinates =
-        await this.findDescriptionNearCoordinates({
-          city: normalizedCity,
-          language,
-          latitude: parsedLatitude,
-          longitude: parsedLongitude,
-        });
-
-      if (resultFromCoordinates) {
-        return resultFromCoordinates;
-      }
+      return this.findDescriptionNearCoordinates({
+        city: normalizedCity,
+        language,
+        latitude: parsedLatitude,
+        longitude: parsedLongitude,
+      });
     }
 
-    return this.findDescriptionBySearch(
-      normalizedCity,
-      language,
-    );
+    return null;
+  }
+
+  private async findDescriptionByTitle(
+    city: string,
+    language: string,
+  ) {
+    const params = new URLSearchParams({
+      action: 'query',
+      format: 'json',
+      titles: city,
+      redirects: '1',
+      prop: 'extracts|description|info|coordinates|pageprops',
+      inprop: 'url',
+      exintro: '1',
+      explaintext: '1',
+    });
+
+    const data = await this.fetchWikipedia(language, params);
+    const page = Object.values(data?.query?.pages ?? {})[0];
+
+    if (page?.pageprops?.disambiguation !== undefined) {
+      return null;
+    }
+
+    return this.mapWikipediaPage(page);
   }
 
   private async findDescriptionNearCoordinates({
@@ -113,12 +153,13 @@ export class LocationController {
   private async findDescriptionBySearch(
     city: string,
     language: string,
+    country?: string,
   ) {
     const searchParams = new URLSearchParams({
       action: 'query',
       format: 'json',
       generator: 'search',
-      gsrsearch: `${city} Gironde France`,
+      gsrsearch: country ? `${city} ${country}` : city,
       gsrlimit: '10',
       gsrnamespace: '0',
 
@@ -175,18 +216,19 @@ export class LocationController {
       }
 
       if (
-        normalizedDescription.includes('gironde') ||
-        normalizedDescription.includes(
-          'nouvelle aquitaine',
-        ) ||
-        normalizedDescription.includes('france')
+        normalizedDescription.includes('commune') ||
+        normalizedDescription.includes('ville') ||
+        normalizedDescription.includes('cite') ||
+        normalizedDescription.includes('localite')
       ) {
         score += 40;
       }
 
       if (
-        normalizedDescription.includes('belgique') ||
-        normalizedDescription.includes('flandre')
+        normalizedDescription.includes('eglise') ||
+        normalizedDescription.includes('musee') ||
+        normalizedDescription.includes('gare') ||
+        normalizedDescription.includes('administration')
       ) {
         score -= 100;
       }

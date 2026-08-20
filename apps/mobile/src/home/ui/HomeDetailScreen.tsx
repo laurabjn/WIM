@@ -1,5 +1,5 @@
 import { Home } from '@wim/shared/home/home.type';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ScrollView,
@@ -21,20 +21,25 @@ import { HomeReviews } from './components/details/HomeReviews';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeAvailabilityBadge } from './components/details/HomeAvailabilityBadge';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
-import { reviewMocks } from '../infrastructure/mocks/reviewMocks';
-import { amenitiesMocks } from '../infrastructure/mocks/amenitiesMocks';
-import { vehiculeMock } from '../infrastructure/mocks/vehiculeMocks';
-import { homeLocationSanFranciscoMock } from '../infrastructure/mocks/homeLocationMapMocks';
 import { HomeLocationMap } from './components/details/HomeLocationMap';
+import { OwnerHomeStatus } from './components/details/OwnerHomeStatus';
+import { getMyExchanges } from '../infrastructure/exchange.api';
+import type { Exchange } from '@wim/shared';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'HomeDetails'>;
 
 export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { t } = useTranslation(["home", "profile", "common"]);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params;
     
   const [home, setHome] = useState<Home | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [myExchanges, setMyExchanges] = useState<Exchange[]>([]);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +49,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         try {
             const session = await getSession();
             setToken(session?.accessToken ?? null);
+            setCurrentUserId(session?.user?.id ?? null);
             console.log('Loaded session:', session);
         } catch (error) {
             console.log('Error loading session:', error);
@@ -55,6 +61,28 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
     loadSession();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadExchanges() {
+      if (!token) return;
+
+      try {
+        const mine = await getMyExchanges(token);
+
+        if (!cancelled) setMyExchanges(mine);
+      } catch (loadError) {
+        console.log('Load exchanges error:', loadError);
+      }
+    }
+
+    loadExchanges();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
     
   useEffect(() => {
     async function loadHome() {
@@ -149,6 +177,8 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     .filter(Boolean)
     .join(', ');
     
+  const isMine = !!currentUserId && home.owner?.id === currentUserId;
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -158,6 +188,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           isFavorite={home.isFavorite ?? false}
           onToggleFavorite={toggleFavorite}
           onShare={handleShare}
+          showFavorite={!isMine}
         />
         
         <HomeSummary home={home} />
@@ -165,19 +196,34 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.content}>
           <View style={styles.separator} />
 
-          <HostSummary
-            owner={home.owner}
-            onPress={() => navigation.navigate('PublicProfile', { userId: home.owner.id })}
-          />
+          {isMine ? null : (
+            <>
+              <HostSummary
+                owner={home.owner}
+                onPress={() =>
+                  navigation.navigate('PublicProfile', { userId: home.owner.id })
+                }
+              />
 
-          <View style={styles.separator} />
-          
-          <HomeAvailabilityBadge
-            home={home}
-            onPressContact={() =>
-              navigation.navigate('ExchangeAvailability', { homeId: home.id })
-            }
-          />
+              <View style={styles.separator} />
+            </>
+          )}
+
+          {isMine ? (
+            <OwnerHomeStatus
+              availabilities={home.availabilities ?? []}
+              exchanges={myExchanges.filter(
+                (exchange) => exchange.homeId === home.id,
+              )}
+            />
+          ) : (
+            <HomeAvailabilityBadge
+              home={home}
+              onPressContact={() =>
+                navigation.navigate('ExchangeAvailability', { homeId: home.id })
+              }
+            />
+          )}
 
           <HomeDescription description={home.description} />
 
@@ -193,11 +239,14 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
           <View style={styles.separator} />
 
-          <HomeLocationMap home={/*homeLocationSanFranciscoMock*/home} />
+          <HomeLocationMap home={home} />
 
           <View style={styles.separator} />
 
           <HomeReviews
+            onPressAuthor={(userId) =>
+              navigation.navigate('PublicProfile', { userId })
+            }
             reviews={home.reviews ?? []}
             averageRating={home.averageRating}
             reviewsCount={home.reviewsCount ?? 0}
@@ -209,10 +258,11 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   center: {
     flex: 1,
@@ -237,7 +287,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -255,7 +305,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 20,
-    color: '#111111',
+    color: c.text,
   },
   imageCounter: {
     position: 'absolute',
@@ -266,7 +316,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   content: {
     padding: 18,
@@ -274,28 +324,28 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 13,
-    color: '#6B7280',
+    color: c.textMuted,
     marginBottom: 4,
   },
   meta: {
     fontSize: 13,
-    color: '#6B7280',
+    color: c.textMuted,
     marginBottom: 10,
   },
   rating: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
     marginBottom: 12,
   },
   separator: {
     height: 1,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: c.border,
     marginVertical: 28,
   },
   hostRow: {
@@ -314,44 +364,44 @@ const styles = StyleSheet.create({
   hostName: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   hostSince: {
     fontSize: 12,
-    color: '#6B7280',
+    color: c.textMuted,
   },
   hostRating: {
     alignItems: 'center',
   },
   star: {
     fontSize: 18,
-    color: '#111111',
+    color: c.text,
   },
   hostScore: {
     fontSize: 22,
-    color: '#111111',
+    color: c.text,
   },
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 12,
   },
   description: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#333333',
+    color: c.text,
   },
   price: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginTop: 14,
   },
   contactButton: {
     marginTop: 12,
     alignSelf: 'flex-end',
-    backgroundColor: '#52D1A6',
+    backgroundColor: c.accent,
     paddingHorizontal: 28,
     height: 48,
     borderRadius: 24,
@@ -365,7 +415,7 @@ const styles = StyleSheet.create({
   carCard: {
     marginTop: 16,
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 16,
     padding: 10,
     gap: 12,
@@ -389,24 +439,24 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 15,
-    color: '#111111',
+    color: c.text,
   },
   outlineButton: {
     marginTop: 16,
     height: 34,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   outlineText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
   reviewCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     padding: 16,
     shadowColor: '#000',
@@ -418,7 +468,7 @@ const styles = StyleSheet.create({
   reviewStars: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
   reviewUser: {
@@ -434,6 +484,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
 });

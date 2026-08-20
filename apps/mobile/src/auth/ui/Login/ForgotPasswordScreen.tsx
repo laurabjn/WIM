@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,11 +14,17 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { requestPasswordReset } from '../../application/requestPassword.usecase';
 import { AuthStackParamList } from '../../../navigation/authStack';
+import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'ForgotPassword'>;
 
 export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
   const { t, i18n } = useTranslation(['auth']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +58,7 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -64,13 +69,7 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.container}>
             <View style={styles.card}>
               <View style={styles.header}>
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={() => navigation.goBack()}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.backButtonText}>←</Text>
-                </TouchableOpacity>
+                <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
               </View>
 
               <View style={styles.centerSection}>
@@ -130,10 +129,11 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
 
   scrollContent: {
@@ -142,12 +142,12 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
 
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -165,14 +165,14 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   backButtonText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
 
   centerSection: {
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
     marginBottom: 12,
   },
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 12,
     lineHeight: 18,
-    color: '#6B7280',
+    color: c.textMuted,
     textAlign: 'center',
     maxWidth: 290,
   },
@@ -213,19 +213,19 @@ const styles = StyleSheet.create({
     height: 46,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     paddingHorizontal: 16,
     fontSize: 13,
-    color: '#111111',
-    backgroundColor: '#FFFFFF',
+    color: c.text,
+    backgroundColor: c.surface,
   },
 
   submitButton: {
     height: 52,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#E4E4E4',
-    backgroundColor: '#FFFFFF',
+    borderColor: c.border,
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -233,12 +233,12 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   errorText: {
     fontSize: 12,
-    color: '#DC2626',
+    color: c.danger,
     textAlign: 'center',
   },
 

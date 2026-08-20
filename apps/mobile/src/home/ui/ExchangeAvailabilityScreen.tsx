@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Pressable,
@@ -10,11 +10,16 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeAvailability'>;
 
 export function ExchangeAvailabilityScreen({ navigation, route }: any) {
   const { t } = useTranslation(["availability", "common"]);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params;
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<
@@ -32,9 +37,7 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={navigation.goBack}>
-        <Text style={styles.backText}>‹</Text>
-      </TouchableOpacity>
+      <BackButton onPress={navigation.goBack} style={styles.backButton} />
 
       <View style={styles.content}>
         <Text style={styles.title}>
@@ -86,10 +89,11 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     paddingHorizontal: 8,
   },
   backButton: {
@@ -97,7 +101,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#EEEEEE',
+    borderColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 28,
     lineHeight: 28,
-    color: '#111111',
+    color: c.text,
   },
   content: {
     flex: 1,
@@ -117,25 +121,25 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'center',
     marginBottom: 56,
-    color: '#000000',
+    color: c.text,
   },
   option: {
     height: 56,
     borderRadius: 28,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: c.border,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 18,
   },
   optionSelected: {
     borderColor: '#25A9E0',
-    backgroundColor: '#EEF9FD',
+    backgroundColor: c.surfaceAlt,
   },
   optionText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   button: {
     height: 56,
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
   },
   messageBox: {
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: c.border,
     borderRadius: 14,
     padding: 14,
   },
@@ -163,12 +167,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     marginBottom: 12,
-    color: '#111111',
+    color: c.text,
   },
   input: {
     minHeight: 210,
     fontSize: 13,
-    color: '#555555',
+    color: c.textMuted,
     lineHeight: 20,
   },
 });

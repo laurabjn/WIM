@@ -10,19 +10,22 @@ export type MatchUserRecord = {
   lastName: string | null;
   avatarUrl: string | null;
   country: string | null;
-  chat: {
-    id: string;
-    matchId: string;
-    createdAt: Date;
-    updatedAt: Date;
+};
 
-    participants: Array<{
-      id: string;
-      chatId: string;
-      userId: string;
-      joinedAt: Date;
-    }>;
-  };
+export type MatchChatRecord = {
+  id: string;
+  matchId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+
+  participants: Array<{
+    id: string;
+    chatId: string;
+    userId: string;
+    joinedAt: Date;
+  }>;
+
+  messagesCount?: number;
 };
 
 export type MatchWithUsersRecord = {
@@ -35,6 +38,8 @@ export type MatchWithUsersRecord = {
 
   user1: MatchUserRecord;
   user2: MatchUserRecord;
+
+  chat: MatchChatRecord | null;
 };
 
 export interface MatchRepository {

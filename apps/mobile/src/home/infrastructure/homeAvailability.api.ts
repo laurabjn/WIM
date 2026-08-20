@@ -1,9 +1,9 @@
+import { API_URL } from '../../config/api';
 import type {
   CreateHomeAvailabilityPayload,
   HomeAvailability,
 } from '@wim/shared';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3002/api';
 
 export async function getHomeAvailabilities(
   homeId: string,

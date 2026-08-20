@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   tabs: string[];
@@ -8,6 +10,8 @@ type Props = {
 };
 
 export function HomeTabs({ tabs, activeTab, onChange }: Props) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
     <ScrollView
       horizontal
@@ -33,7 +37,8 @@ export function HomeTabs({ tabs, activeTab, onChange }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   tabsContent: {
     paddingHorizontal: 10,
     gap: 8,
@@ -56,7 +61,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   activeTabText: {

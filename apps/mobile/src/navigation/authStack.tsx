@@ -36,16 +36,13 @@ export type AuthStackParamList = {
     country: string;
   };
   RegisterStep4: {
-    photos: PickedPhoto[];
-    description: string;
-    location: {
-      address: string;
-      city: string;
-      country: string;
-      postalCode?: string;
-      latitude?: number | null;
-      longitude?: number | null;
-    };
+    firstName: string;
+    lastName: string;
+    birthDate: string;
+    nationality: string;
+    country: string;
+    email: string;
+    phone: string;
   };
   RegisterStep5: {
     firstName: string;

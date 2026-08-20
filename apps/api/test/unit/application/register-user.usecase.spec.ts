@@ -16,6 +16,8 @@ describe('RegisterUserUseCase', () => {
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
       updateIdentityStatus: jest.fn(),
+      touchLastSeen: jest.fn(),
+      findLastSeen: jest.fn(),
     };
 
     passwordHasher = {
@@ -46,6 +48,7 @@ describe('RegisterUserUseCase', () => {
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
+      suspendedAt: null,
     });
 
     const result = await useCase.execute({
@@ -99,6 +102,7 @@ describe('RegisterUserUseCase', () => {
       identityStatus: IdentityStatus.NOT_VERIFIED,
       createdAt: new Date(),
       updatedAt: new Date(),
+      suspendedAt: null,
     });
 
     await expect(

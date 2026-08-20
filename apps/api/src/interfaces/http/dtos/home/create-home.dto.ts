@@ -2,6 +2,7 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsIn,
   IsInt,
   IsNumber,
   IsObject,
@@ -61,6 +62,10 @@ export class CreateHomeDto {
 
   @IsString()
   homeType!: string;
+
+  @IsOptional()
+  @IsIn(['NATURE', 'BEACH', 'CITY', 'CULTURE'])
+  category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
 
   @IsArray()
   @IsString({ each: true })

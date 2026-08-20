@@ -1,4 +1,4 @@
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3002/api';
+import { API_URL } from '../../config/api';
 
 export async function requestPasswordReset(
   email: string,

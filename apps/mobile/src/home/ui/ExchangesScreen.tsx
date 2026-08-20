@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ActivityIndicator,
   RefreshControl,
@@ -13,9 +13,13 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { useMyExchanges } from '../infrastructure/hooks/useMyExchanges';
 import { ExchangeSection } from './components/exchange/ExchangeSection';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 export function ExchangesScreen({ navigation }: any) {
   const { t } = useTranslation("exchange");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const [token, setToken] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -34,14 +38,19 @@ export function ExchangesScreen({ navigation }: any) {
   } = useMyExchanges(token);
 
   function goToDetails(exchange: Exchange) {
-    navigation.navigate('ExchangeDetails', {
-      exchangeId: exchange.id,
-    });
+    navigation.navigate('HomeDetails', { homeId: exchange.homeId });
   }
 
   function goToMessages(exchange: Exchange) {
+    if (!exchange.chatId) return;
+
+    // La conversation s'ouvre dans la pile des echanges : sauter dans l'onglet
+    // Messages faisait revenir ailleurs, le retour d'onglet ramenant au premier.
     navigation.navigate('Conversation', {
-      exchangeId: exchange.id,
+      chatId: exchange.chatId,
+      participantId: exchange.partner?.id,
+      participantName: exchange.partner?.firstName ?? '',
+      participantAvatar: exchange.partner?.avatarUrl ?? null,
     });
   }
 
@@ -105,10 +114,11 @@ export function ExchangesScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: c.surfaceAlt,
   },
   content: {
     paddingHorizontal: 14,
@@ -117,7 +127,7 @@ const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
@@ -135,12 +145,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#666666',
+    color: c.textMuted,
     textAlign: 'center',
   },
 });

@@ -1,7 +1,9 @@
 import { HomeOwner } from '@wim/shared/home/home.type';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   owner: HomeOwner;
@@ -13,6 +15,8 @@ export function HostSummary({
   onPress
 }: Props) {
    const { t } = useTranslation('home');
+   const themeColors = useThemeColors();
+   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
     
     function getYearsSince(date: string) {
       const createdAt = new Date(date);
@@ -44,7 +48,8 @@ export function HostSummary({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -65,13 +70,13 @@ const styles = StyleSheet.create({
   hostName: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   hostSince: {
     marginTop: 3,
     fontSize: 13,
-    color: '#6B6B6B',
+    color: c.textMuted,
   },
 
   ratingWrapper: {
@@ -81,14 +86,14 @@ const styles = StyleSheet.create({
 
   star: {
     fontSize: 18,
-    color: '#111111',
+    color: c.text,
     lineHeight: 18,
   },
 
   rating: {
     marginTop: 2,
     fontSize: 24,
-    color: '#111111',
+    color: c.text,
     fontWeight: '400',
   },
 });

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { Exchange } from '@wim/shared';
+import type { Exchange, PendingExchange } from '@wim/shared';
 import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
@@ -23,11 +23,53 @@ export class ExchangeRepositoryPrisma {
             },
           },
         },
+        guestHome: {
+          include: {
+            photos: {
+              orderBy: { position: 'asc' },
+              take: 1,
+            },
+          },
+        },
       },
       orderBy: {
         startDate: 'asc',
       },
     });
+
+    // Exchange ne porte que des identifiants, sans relation vers User : on
+    // charge donc les personnes a part.
+    const partnerIds = exchanges.map((exchange) =>
+      exchange.hostId === userId ? exchange.guestId : exchange.hostId,
+    );
+
+    const partners = await this.prisma.user.findMany({
+      where: { id: { in: partnerIds } },
+      select: { id: true, firstName: true, lastName: true, avatarUrl: true },
+    });
+
+    const partnerById = new Map(partners.map((p) => [p.id, p]));
+
+    const chats = await this.prisma.chat.findMany({
+      where: {
+        AND: [
+          { participants: { some: { userId } } },
+          { participants: { some: { userId: { in: partnerIds } } } },
+        ],
+      },
+      select: {
+        id: true,
+        participants: { select: { userId: true } },
+      },
+    });
+
+    const chatByPartnerId = new Map<string, string>();
+
+    for (const chat of chats) {
+      const other = chat.participants.find((p) => p.userId !== userId);
+
+      if (other) chatByPartnerId.set(other.userId, chat.id);
+    }
 
     return exchanges.map((exchange) => ({
       id: exchange.id,
@@ -38,11 +80,37 @@ export class ExchangeRepositoryPrisma {
       startDate: exchange.startDate.toISOString(),
       endDate: exchange.endDate.toISOString(),
       travelersCount: exchange.travelersCount,
-      status: this.computeStatus(exchange.startDate, exchange.endDate),
+      status: this.computeStatus(
+        exchange.status,
+        exchange.startDate,
+        exchange.endDate,
+      ),
+      partner:
+        partnerById.get(
+          exchange.hostId === userId ? exchange.guestId : exchange.hostId,
+        ) ?? null,
+      isHost: exchange.hostId === userId,
+      chatId:
+        chatByPartnerId.get(
+          exchange.hostId === userId ? exchange.guestId : exchange.hostId,
+        ) ?? null,
+      guestHomeId: exchange.guestHomeId ?? null,
+      guestHomeTitle: exchange.guestHome?.title ?? null,
+      guestHomeImageUrl: exchange.guestHome?.photos?.[0]?.url ?? null,
     }));
   }
 
-  private computeStatus(startDate: Date, endDate: Date): Exchange['status'] {
+  private computeStatus(
+    stored: Exchange['status'],
+    startDate: Date,
+    endDate: Date,
+  ): Exchange['status'] {
+    // Un echange non accepte reste en attente : le classer sur ses dates le
+    // ferait passer pour un sejour confirme dans la liste des echanges.
+    if (stored === 'PENDING' || stored === 'DECLINED') {
+      return stored;
+    }
+
     const now = new Date();
 
     if (startDate <= now && endDate >= now) {
@@ -54,5 +122,101 @@ export class ExchangeRepositoryPrisma {
     }
 
     return 'PAST';
+  }
+
+  private readonly pendingInclude = {
+    home: {
+      include: {
+        photos: { orderBy: { position: 'asc' }, take: 1 },
+      },
+    },
+    guestHome: {
+      include: {
+        photos: { orderBy: { position: 'asc' }, take: 1 },
+      },
+    },
+  } as const;
+
+  private mapPending(exchange: any, viewerId?: string): PendingExchange {
+    return {
+      id: exchange.id,
+      homeId: exchange.homeId,
+      homeTitle: exchange.home.title,
+      homeImageUrl: exchange.home.photos[0]?.url ?? null,
+      location: `${exchange.home.city}, ${exchange.home.country}`,
+      startDate: exchange.startDate.toISOString(),
+      endDate: exchange.endDate.toISOString(),
+      travelersCount: exchange.travelersCount,
+      status: exchange.status,
+      hostId: exchange.hostId,
+      guestId: exchange.guestId,
+      isHost: viewerId ? exchange.hostId === viewerId : false,
+      guestHomeId: exchange.guestHomeId ?? null,
+      guestHomeTitle: exchange.guestHome?.title ?? null,
+      guestHomeImageUrl: exchange.guestHome?.photos?.[0]?.url ?? null,
+    };
+  }
+
+  // Les trois etats vivants d'un echange : en attente d'acceptation, a venir,
+  // ou en cours. La conversation en a besoin pour proposer l'annulation, pas
+  // seulement pour afficher le bandeau d'acceptation.
+  async findActiveBetween(
+    firstUserId: string,
+    secondUserId: string,
+  ): Promise<PendingExchange | null> {
+    const exchange = await this.prisma.exchange.findFirst({
+      where: {
+        status: { in: ['PENDING', 'FUTURE', 'CURRENT'] },
+        OR: [
+          { hostId: firstUserId, guestId: secondUserId },
+          { hostId: secondUserId, guestId: firstUserId },
+        ],
+      },
+      include: this.pendingInclude,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return exchange ? this.mapPending(exchange, firstUserId) : null;
+  }
+
+  async findById(
+    exchangeId: string,
+    viewerId?: string,
+  ): Promise<PendingExchange | null> {
+    const exchange = await this.prisma.exchange.findUnique({
+      where: { id: exchangeId },
+      include: this.pendingInclude,
+    });
+
+    return exchange ? this.mapPending(exchange, viewerId) : null;
+  }
+
+  async updateStatus(
+    exchangeId: string,
+    status: string,
+    viewerId?: string,
+  ): Promise<PendingExchange> {
+    const exchange = await this.prisma.exchange.update({
+      where: { id: exchangeId },
+      data: { status: status as any },
+      include: this.pendingInclude,
+    });
+
+    return this.mapPending(exchange, viewerId);
+  }
+
+  async updateDates(
+    exchangeId: string,
+    startDate: Date,
+    endDate: Date,
+    viewerId?: string,
+  ): Promise<PendingExchange> {
+    const exchange = await this.prisma.exchange.update({
+      where: { id: exchangeId },
+      data: { startDate, endDate },
+      include: this.pendingInclude,
+    });
+
+    return this.mapPending(exchange, viewerId);
   }
 }

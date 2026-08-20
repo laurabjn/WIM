@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/authStack';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'WelcomeEntry'>;
 
 export const WelcomeEntryScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useTranslation(['auth', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   function handleRegister() {
     navigation.navigate('RegisterStart');
@@ -65,15 +69,16 @@ export const WelcomeEntryScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
 
   container: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
 
   stepLabel: {
@@ -81,13 +86,13 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     marginBottom: 8,
     fontSize: 14,
-    color: '#B0B0B0',
+    color: c.textFaint,
     fontWeight: '500',
   },
 
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 40,
@@ -111,7 +116,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
   },
 
@@ -124,8 +129,8 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#E4E4E4',
-    backgroundColor: '#FFFFFF',
+    borderColor: c.border,
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -133,6 +138,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 });

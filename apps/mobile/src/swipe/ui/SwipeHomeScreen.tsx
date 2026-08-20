@@ -1,5 +1,6 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   StyleSheet,
   Text,
@@ -12,6 +13,7 @@ import {
   Check
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { SwipeHomeCard } from '../ui/components/SwipehomeCard';
 import { useTranslation } from 'react-i18next';
 import { getSession } from 'src/auth/infrastructure/authStorage';
@@ -19,388 +21,186 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { SearchToggle } from 'src/menu/ui/components/SearchToggle';
 import {
-  chatsMock,
-  currentUserMock,
-  matchesMock,
-  reciprocalLikesMock
-} from '../infrastructure/mocks/matchesMocks';
-import { swipeHomesMock } from '../infrastructure/mocks/swipeHomeMocks';
-import {
-  RecommendationScenarioName,
-  recommendationScenarios
-} from '../infrastructure/mocks/swipeRecommendationScenarioMock';
-import { SwipeRecommendation, getSwipeRecommendationsApi, SwipeDirection } from '../infrastructure/swipe.api';
-import { SwipeMockRecommendationEngine } from '../infrastructure/swipeRecommendationEngine';
+  createSwipeApi,
+  getSwipeRecommendationsApi,
+  SwipeDirection,
+  SwipeRecommendation,
+} from '../infrastructure/swipe.api';
+import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { SwipeTopPreview } from './components/SwipeTopPreview';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<SearchStackParamList, 'Swipe'>;
 
+function withResolvedPhotos(
+  home: SwipeRecommendation,
+): SwipeRecommendation {
+  return {
+    ...home,
+    photos: (home.photos ?? []).map((photo) => ({
+      ...photo,
+      url: resolveImageUrl(photo.url) ?? photo.url,
+    })),
+    owner: home.owner
+      ? {
+          ...home.owner,
+          avatarUrl: resolveImageUrl(home.owner.avatarUrl),
+        }
+      : home.owner,
+  };
+}
+
 export function SwipeHomeScreen({ navigation, route }: Props) {
-  const { t } = useTranslation(['common', "swipe"]);
+  const { t } = useTranslation(['common', 'swipe']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const position = useRef(new Animated.ValueXY()).current;
 
   const [index, setIndex] = useState(0);
   const [homes, setHomes] = useState<SwipeRecommendation[]>([]);
-  const [photoIndex, setPhotoIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [swipeLoading, setSwipeLoading] = useState(false);
   const [quickSearch, setQuickSearch] = useState(true);
-  const [matchId, setMatchId] = useState<string | null>(null);
-  const [showMatch, setShowMatch] = useState(false);
+  const [matchedName, setMatchedName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [chatId, setChatId] = useState<string | null>(null);
 
-  const engine = useMemo(
-    () => new SwipeMockRecommendationEngine(),
-    [],
-  );
+  const home = homes[index];
 
-  const [scenario, setScenario] =
-    useState<RecommendationScenarioName>(
-      'SOUTH_WEST_FAMILY',
-    );
-
-  const recommendedHomes = useMemo(
-    () =>
-      engine.recommend(
-        recommendationScenarios[scenario],
-        swipeHomesMock,
-        {
-          limit: 30,
-          excludeAlreadySwiped: true,
-          includeDiscovery: true,
-        },
-      ),
-    [engine, scenario],
-  );
-
-  const home = recommendedHomes[index];
-
-  useEffect(() => {
-    setIndex(0);
-  }, [scenario]);
-
-  useEffect(() => {
-    const restoreHomeId = route.params?.restoreHomeId;
-
-    const restoreIndex = route.params?.restoreIndex;
-
-    if (
-      typeof restoreIndex === 'number' &&
-      recommendedHomes[restoreIndex]?.id === restoreHomeId
-    ) {
-      setIndex(restoreIndex);
-      return;
-    }
-
-    if (restoreHomeId) {
-      const foundIndex =
-        recommendedHomes.findIndex(
-          item => item.id === restoreHomeId,
-        );
-
-      if (foundIndex >= 0) {
-        setIndex(foundIndex);
-      }
-    }
-  }, [
-    route.params?.restoreHomeId,
-    route.params?.restoreIndex,
-    recommendedHomes,
-  ]);
-
-  // useEffect(() => {
-  //   loadRecommendations();
-  // }, []);
-
-  async function loadRecommendations() {
+  const loadRecommendations = useCallback(async () => {
     try {
-      setSwipeLoading(true);
       setError(null);
 
-      const session =
-        await getSession();
+      const session = await getSession();
 
       if (!session?.accessToken) {
-        setError(
-          'Utilisateur non connecté',
-        );
-
+        setError(t('swipe:notSignedIn'));
         return;
       }
 
-      const recommendations =
-        await getSwipeRecommendationsApi(
-          session.accessToken,
-          20,
-        );
+      const recommendations = await getSwipeRecommendationsApi(
+        session.accessToken,
+        20,
+      );
 
-      setHomes(recommendations);
+      setHomes(recommendations.map(withResolvedPhotos));
       setIndex(0);
     } catch (loadError) {
-      console.error(
-        'Load recommendations error:',
-        loadError,
-      );
-
-      setError(
-        'Impossible de charger les logements',
-      );
+      console.log('Load recommendations error:', loadError);
+      setError(t('swipe:loadError'));
     } finally {
-      setSwipeLoading(false);
+      setLoading(false);
     }
-  }
+  }, [t]);
 
-  async function handleSwipe(
-    direction: SwipeDirection,
-  ) {
-    if (!home || swipeLoading) {
-      return;
-    }
+  useFocusEffect(
+    useCallback(() => {
+      // Une seule fois : revenir du detail d'un logement ne doit pas rebattre
+      // les cartes ni ramener l'utilisateur au debut de la pile.
+      if (homes.length === 0) loadRecommendations();
+    }, [homes.length, loadRecommendations]),
+  );
+
+  async function handleSwipe(direction: SwipeDirection) {
+    if (!home || swipeLoading) return;
+
+    setSwipeLoading(true);
 
     try {
-      setSwipeLoading(true);
-      setError(null);
+      const session = await getSession();
 
-      const swipe = {
-        id: `swipe-${Date.now()}`,
-        swiperId: currentUserMock.id,
-        targetUserId: home.ownerId,
-        homeId: home.id,
-        direction,
-        createdAt: new Date().toISOString(),
-      };
-
-      console.log('MOCK SWIPE:', swipe);
-
-      if (direction === 'DISLIKE') {
-        next();
+      if (!session?.accessToken) {
+        setError(t('swipe:notSignedIn'));
         return;
       }
 
-      const hasReciprocalLike =
-        reciprocalLikesMock.includes(
-          home.ownerId,
-        );
-
-      if (!hasReciprocalLike) {
-        next();
-        return;
-      }
-
-      const [user1Id, user2Id] = [
-        currentUserMock.id,
+      const result = await createSwipeApi(
+        session.accessToken,
         home.ownerId,
-      ].sort();
+        home.id,
+        direction,
+      );
 
-      const existingMatch = matchesMock.find(
-          match =>
-            match.user1Id === user1Id &&
-            match.user2Id === user2Id,
-        );
-
-      const match = existingMatch ?? {
-          id: `match-${user1Id}-${user2Id}`,
-          user1Id,
-          user2Id,
-          status: 'ACCEPTED' as const,
-          createdAt: new Date().toISOString(),
-        };
-
-      if (!existingMatch) {
-        matchesMock.push(match);
+      if (result.match) {
+        setMatchedName(home.owner?.firstName ?? '');
+        return;
       }
 
-      console.log(
-        'MOCK MATCH:',
-        match,
-      );
-
-      const existingChat = chatsMock.find(chat =>
-          chat.matchId === match.id,
-      );
-
-      const chat = existingChat ?? {
-          id: `chat-${match.id}`,
-          matchId: match.id,
-          participantIds: [
-            currentUserMock.id,
-            home.ownerId,
-          ],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          messages: [],
-        };
-
-      if (!existingChat) {
-        chatsMock.push(chat);
-      }
-
-      console.log(
-        'MOCK CHAT:',
-        chat,
-      );
-
-      setChatId(chat.id);
-      setMatchId(match.id);
-      setShowMatch(true);
+      next();
     } catch (swipeError) {
-      console.error(
-        'Mock swipe error:',
-        swipeError,
-      );
-
-      setError(
-        'Impossible d’enregistrer le swipe',
-      );
+      console.log('Swipe error:', swipeError);
+      setError(t('swipe:swipeError'));
     } finally {
       setSwipeLoading(false);
     }
   }
-
-  // async function handleSwipe(direction: SwipeDirection) {
-  //   if (!home || swipeLoading) return;
-
-  //   try {
-  //     setSwipeLoading(true);
-
-  //     const session = await getSession();
-
-  //     if (!session?.accessToken) {
-  //       console.log('Utilisateur non connecté');
-  //       return;
-  //     }
-
-  //     const result = await createSwipeApi(
-  //       session.accessToken,
-  //       home.ownerId,
-  //       direction,
-  //     );
-
-  //     if (result.match) {
-  //       setMatchId(result.matchId);
-  //       setChatId(result.chatId);
-  //       setShowMatch(true);
-  //       return;
-  //     }
-
-  //     next();
-  //   } catch (error) {
-  //     console.log('Swipe error:', error);
-  //   } finally {
-  //     setSwipeLoading(false);
-  //   }
-  // }
 
   function next() {
     setIndex((current) => current + 1);
   }
 
-  if (!home) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.empty}>{t('swipe:noMoreHome')}</Text>
-      </SafeAreaView>
-    );
+  function closeMatch() {
+    setMatchedName(null);
+    next();
   }
 
   const toggleSearch = () => {
-    const nextValue = !quickSearch;
+    setQuickSearch(false);
 
-    setQuickSearch(nextValue);
-
-    if (nextValue) {
-      navigation.navigate('Menu');
-    }
+    setTimeout(() => navigation.navigate('Menu'), 260);
   };
 
   function openHomeDetails() {
-    console.log('open')
     navigation.navigate('SwipeHomeDetails', {
       homeId: home.id,
       swipeIndex: index,
     });
   }
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator style={styles.loader} color="#087EBE" />
+      </SafeAreaView>
+    );
+  }
+
+  if (!home) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.empty}>
+          {error ?? t('swipe:noMoreHome')}
+        </Text>
+
+        <TouchableOpacity
+          style={styles.retryButton}
+          activeOpacity={0.8}
+          onPress={() => {
+            setLoading(true);
+            loadRecommendations();
+          }}
+        >
+          <Text style={styles.retryText}>{t('common:retry')}</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.toggleWrapper}>
         <SearchToggle
-          quickSearch={true}
-          onToggle={() => navigation.navigate('Menu')}
+          quickSearch={quickSearch}
+          onToggle={toggleSearch}
           exploreLabel={t('search:toExplore')}
           quickSearchLabel={t('search:fastSearch')}
         />
       </View>
 
-      {/* <View style={styles.debugButtons}>
-        <TouchableOpacity
-          style={styles.debugButton}
-          onPress={() =>
-            setScenario('SOUTH_WEST_FAMILY')
-          }
-        >
-          <Text>Famille</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.debugButton}
-          onPress={() =>
-            setScenario('CITY_COUPLE')
-          }
-        >
-          <Text>Ville</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.debugButton}
-          onPress={() =>
-            setScenario('NATURE_MOUNTAIN')
-          }
-        >
-          <Text>Nature</Text>
-        </TouchableOpacity>
-      </View> */}
-
       <SwipeTopPreview
         home={home}
         onInfoPress={openHomeDetails}
       />
-
-      {/* <View style={styles.debugScore}>
-        <Text style={styles.debugTitle}>
-          Score : {home.recommendationScore}
-        </Text>
-
-        <Text>
-          Ville :
-          {' '}
-          {home.recommendationDetails.cityScore}
-        </Text>
-
-        <Text>
-          Type :
-          {' '}
-          {home.recommendationDetails.homeTypeScore}
-        </Text>
-
-        <Text>
-          Equipements :
-          {' '}
-          {home.recommendationDetails.amenitiesScore}
-        </Text>
-
-        <Text>
-          Recherche :
-          {' '}
-          {home.recommendationDetails.searchScore}
-        </Text>
-
-        <Text>
-          Pénalité :
-          {' '}
-          {home.recommendationDetails.dislikePenalty}
-        </Text>
-      </View> */}
 
       <SwipeHomeCard
         key={home.id}
@@ -420,7 +220,7 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.moreButton} onPress={openHomeDetails}>
-          <Info size={16} color="#111" />
+          <Info size={16} color={themeColors.text} />
           <Text style={styles.moreText}>{t('common:seeMore')}</Text>
         </TouchableOpacity>
 
@@ -433,26 +233,23 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
         </TouchableOpacity>
       </View>
 
-      {showMatch && (
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      {matchedName !== null && (
         <View style={styles.matchOverlay}>
           <View style={styles.matchCard}>
             <Text style={styles.matchTitle}>{t('swipe:match')}</Text>
             <Text style={styles.matchText}>
-              {t('swipe:matchText', {
-                firstName: home.owner.firstName,
-              })}
+              {t('swipe:matchText', { firstName: matchedName })}
             </Text>
 
             <TouchableOpacity
               style={styles.matchButton}
-              onPress={() => {
-                setShowMatch(false);
-                setMatchId(null);
-                setChatId(null);
-                next();
-              }}
+              onPress={closeMatch}
             >
-              <Text style={styles.matchButtonText}>{t('common:continue')}</Text>
+              <Text style={styles.matchButtonText}>
+                {t('common:continue')}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -461,17 +258,45 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
+  },
+  loader: {
+    marginTop: 90,
   },
   empty: {
     marginTop: 80,
     textAlign: 'center',
     fontSize: 15,
     fontWeight: '700',
-    color: '#555',
+    color: c.textMuted,
+    paddingHorizontal: 40,
+  },
+  retryButton: {
+    alignSelf: 'center',
+    marginTop: 18,
+    paddingHorizontal: 24,
+    paddingVertical: 11,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: c.border,
+  },
+  retryText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: c.text,
+  },
+  error: {
+    position: 'absolute',
+    left: 24,
+    right: 24,
+    bottom: 115,
+    textAlign: 'center',
+    fontSize: 12,
+    color: c.danger,
   },
   toggleWrapper: {
     paddingHorizontal: 18,
@@ -490,7 +315,7 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 8,
@@ -505,8 +330,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 18,
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    backgroundColor: '#fff',
+    borderColor: c.border,
+    backgroundColor: c.surface,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -515,7 +340,7 @@ const styles = StyleSheet.create({
   moreText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111',
+    color: c.text,
   },
   matchOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -527,18 +352,19 @@ const styles = StyleSheet.create({
   matchCard: {
     width: '100%',
     borderRadius: 24,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     padding: 24,
     alignItems: 'center',
   },
   matchTitle: {
+    color: c.text,
     fontSize: 24,
     fontWeight: '900',
     marginBottom: 10,
   },
   matchText: {
     fontSize: 14,
-    color: '#555',
+    color: c.textMuted,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -551,50 +377,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   matchButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '800',
   },
-  debugScore: {
-    position: 'absolute',
-    top: 150,
-    right: 12,
-    zIndex: 100,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  debugScoreText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  debugDetail: {
-    color: '#fff',
-    fontSize: 10,
-    marginTop: 2,
-  },
-  debugButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 16,
-    backgroundColor: '#F3F4F6',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-  },
-  debugButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 12,
-    marginBottom: 8,
-    paddingHorizontal: 16,
-  },
-  debugTitle: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#111827',
-    marginBottom: 6,
-  }
 });

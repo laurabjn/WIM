@@ -3,6 +3,7 @@ import { HomeCreationProvider } from 'src/home/context/homeCreation.context';
 import { HomesStackParamList } from './type/homeStack';
 import { View, Text } from 'react-native';
 import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
+import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
 import { EditHomeScreen } from 'src/home/ui/EditHomeScreen';
 import { ExchangeAvailabilityScreen } from 'src/home/ui/ExchangeAvailabilityScreen';
 import { ExchangeMessageScreen } from 'src/home/ui/ExchangeMessageScreen';
@@ -23,6 +24,7 @@ export function HomesStackNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="MyHomes" component={TestScreen} />
         <Stack.Screen name="HomeDetails" component={HomeDetailsScreen} />
+        <Stack.Screen name="PublicProfile" component={ProfilePublicScreen} />
         <Stack.Screen name="CreateHomePhotos" component={TestScreen} />
         <Stack.Screen name="CreateHomeDescription" component={TestScreen} />
         <Stack.Screen name="CreateHomeLocation" component={TestScreen} />

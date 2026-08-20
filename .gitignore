@@ -11,6 +11,8 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
+.env.prod
+deploy/.env.prod
 
 # Testing
 coverage
@@ -38,3 +40,9 @@ yarn-error.log*
 *.pem
 
 /generated/prisma
+
+# Cle de compte de service Firebase : elle donne acces au projet et n'a rien a
+# faire dans le depot. Elle se televerse chez EAS, qui la conserve.
+# (google-services.json, lui, est versionne : il ne contient aucun secret.)
+*firebase-adminsdk*.json
+service-account*.json

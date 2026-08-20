@@ -1,13 +1,8 @@
+import { STAY_DURATIONS } from '../utils/travelOption';
+
 export type SupportedLocale = 'fr' | 'en';
 
-export const STAY_DURATIONS = [
-  '1w',
-  '2w',
-  '3w',
-  '1m',
-  '2m',
-  '3m'
-];
+export { STAY_DURATIONS };
 
 export enum IdentityStatus {
   NOT_VERIFIED = 'NOT_VERIFIED',
@@ -26,7 +21,7 @@ export interface TravelPreferences {
   preferredCities?: string[];
   preferredContinents?: string[];
   preferredDestinationsByRegion?: Record<string, string[]>;
-  stayDuration?: typeof STAY_DURATIONS[number] | null;
+  stayDuration?: string | null;
   preferredSeasons?: string[];
   essentialAmenities?: string[];
   preferredEnvironments?: string[];
@@ -55,6 +50,12 @@ export interface UserProfile {
   exchangesCount?: number;
   homesCount?: number;
   identityStatus?: IdentityStatus | null;
+  profileVisible?: boolean;
+  showAge?: boolean;
+  dataSharing?: boolean;
+  /** Statut court du moment, null passe un jour. */
+  status?: string | null;
+  notifyNewMessages?: boolean;
 }
 
 export interface MyHome {

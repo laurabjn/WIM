@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import React, {
   RefObject,
   useRef,
@@ -15,6 +16,8 @@ import {
 import { Home } from '@wim/shared/home/home.type';
 import { SearchResultCard } from './SearchResultCard';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   homes: Home[];
@@ -41,6 +44,8 @@ export function SearchResultsSheet({
   onVisibleHomeChange,
   onPressHome,
 }: Props) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { t } = useTranslation('search')
   const lastSheetY = useRef(collapsedPosition);
 
@@ -200,14 +205,15 @@ export function SearchResultsSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   sheet: {
     position: 'absolute',
     top: 0,
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     overflow: 'hidden',
@@ -225,7 +231,7 @@ const styles = StyleSheet.create({
     height: 5,
     marginTop: 3,
     borderRadius: 10,
-    backgroundColor: '#111',
+    backgroundColor: c.contrast,
   },
 
   resultsCount: {
@@ -233,7 +239,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     textAlign: 'center',
     fontSize: 12,
-    color: '#666',
+    color: c.textMuted,
   },
 
   loader: {
@@ -257,7 +263,7 @@ const styles = StyleSheet.create({
 
   resultWrapperSelected: {
     borderColor: '#25AEEB',
-    backgroundColor: '#F4FBFF',
+    backgroundColor: c.surfaceAlt,
   },
 
   numberBadge: {
@@ -268,7 +274,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     borderWidth: 2,
     borderColor: '#25AEEB',
     alignItems: 'center',
@@ -277,17 +283,17 @@ const styles = StyleSheet.create({
   },
 
   numberBadgeSelected: {
-    backgroundColor: '#087EBE',
+    backgroundColor: c.primary,
     borderColor: '#fff',
   },
 
   numberText: {
-    color: '#087EBE',
+    color: c.primary,
     fontSize: 13,
     fontWeight: '900',
   },
 
   numberTextSelected: {
-    color: '#fff',
+    color: c.onContrast,
   },
 });

@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Image,
@@ -19,7 +20,7 @@ import {
   View,
 } from 'react-native';
 import {
-  ArrowLeft,
+
   Heart,
   Home as HomeIcon,
 } from 'lucide-react-native';
@@ -33,8 +34,8 @@ import {
 } from 'react-native-safe-area-context';
 
 import { Home } from '@wim/shared/home/home.type';
-import { SwipeStackParamList } from 'src/navigation/type/swipeTabs';
-import { swipeHomesMock } from 'src/swipe/infrastructure/mocks/swipeHomeMocks';
+import { SearchStackParamList } from 'src/navigation/type/searchTabs';
+import { getHomeById } from 'src/home/infrastructure/home.api';
 
 import { SearchResultsMap } from 'src/search/ui/components/SearchResultsMap';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +46,9 @@ import { HomeAmenities } from 'src/home/ui/components/details/HomeAmenities';
 import { HomeReviews } from 'src/home/ui/components/details/HomeReviews';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { addFavoriteHome, listFavoriteHomes, removeFavoriteHome } from 'src/home/infrastructure/home.api';
+import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -53,7 +57,7 @@ const SHEET_EXPANDED = 85;
 const PHOTO_WIDTH = SCREEN_WIDTH - 36;
 
 type Props = NativeStackScreenProps<
-  SwipeStackParamList,
+  SearchStackParamList,
   'SwipeHomeDetails'
 >;
 
@@ -67,6 +71,8 @@ export function SwipeDetailHomeScreen({
   route,
 }: Props) {
   const { t } = useTranslation("swipe");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params;
   const insets = useSafeAreaInsets();
   const cameraRef = useRef<Mapbox.Camera>(null);
@@ -83,13 +89,8 @@ export function SwipeDetailHomeScreen({
   const [photoIndex, setPhotoIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  const home = useMemo(
-    () =>
-      swipeHomesMock.find(
-        item => item.id === homeId,
-      ) as Home | undefined,
-    [homeId],
-  );
+  const [home, setHome] = useState<Home | undefined>(undefined);
+  const [isHomeLoading, setIsHomeLoading] = useState(true);
 
   const photos = useMemo(() => {
     if (!home?.photos?.length) {
@@ -152,6 +153,32 @@ export function SwipeDetailHomeScreen({
 
     return () => clearTimeout(timer);
   }, [centerCamera, home]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadHome() {
+      try {
+        const session = await getSession();
+
+        if (!session?.accessToken || cancelled) return;
+
+        const loaded = await getHomeById(session.accessToken, homeId);
+
+        if (!cancelled) setHome(loaded);
+      } catch (loadError) {
+        console.log('Load home error:', loadError);
+      } finally {
+        if (!cancelled) setIsHomeLoading(false);
+      }
+    }
+
+    loadHome();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [homeId]);
 
   useEffect(() => {
     async function loadSession() {
@@ -355,6 +382,14 @@ export function SwipeDetailHomeScreen({
     }
   }
 
+  if (isHomeLoading) {
+    return (
+      <SafeAreaView style={styles.emptyContainer}>
+        <ActivityIndicator color="#087EBE" />
+      </SafeAreaView>
+    );
+  }
+
   if (!home) {
     return (
       <SafeAreaView
@@ -390,12 +425,7 @@ export function SwipeDetailHomeScreen({
       edges={['top']}
     >
       <View style={styles.header}>
-        <TouchableOpacity
-        style={styles.iconButton}
-        onPress={handleBack}
-        >
-           <ArrowLeft size={20} color="#111" />
-        </TouchableOpacity>
+        <BackButton onPress={handleBack} style={styles.iconButton} />
       </View>
 
       <SearchResultsMap
@@ -619,6 +649,9 @@ export function SwipeDetailHomeScreen({
               }}
             >
               <HomeReviews
+                onPressAuthor={(userId) =>
+                  navigation.navigate('PublicProfile', { userId })
+                }
                 reviews={home.reviews ?? []}
                 averageRating={home.averageRating}
                 reviewsCount={home.reviewsCount ?? 0}
@@ -636,6 +669,10 @@ function SectionTitle({
 }: {
   title: string;
 }) {
+  // Ce titre vit hors du composant principal : il lui faut sa propre palette.
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+
   return (
     <Text style={styles.sectionTitle}>
       {title}
@@ -643,10 +680,11 @@ function SectionTitle({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
     
   header: {
@@ -655,7 +693,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     zIndex: 20,
   },
 
@@ -663,7 +701,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 3,
@@ -688,7 +726,7 @@ const styles = StyleSheet.create({
     height: SCREEN_HEIGHT,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     overflow: 'hidden',
     shadowColor: '#000000',
     shadowOpacity: 0.16,
@@ -704,7 +742,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingHorizontal: 18,
     paddingBottom: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   dragHandle: {
@@ -712,7 +750,7 @@ const styles = StyleSheet.create({
     width: 46,
     height: 5,
     borderRadius: 3,
-    backgroundColor: '#D2D2D2',
+    backgroundColor: c.border,
   },
 
   sheetHeaderRow: {
@@ -728,20 +766,20 @@ const styles = StyleSheet.create({
   sheetSmallTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   sheetInstruction: {
     marginTop: 2,
     fontSize: 11,
-    color: '#777777',
+    color: c.textMuted,
   },
 
   favoriteButton: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -756,7 +794,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 18,
     borderRadius: 22,
     overflow: 'hidden',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: c.surfaceAlt,
   },
 
   carouselImage: {
@@ -788,7 +826,7 @@ const styles = StyleSheet.create({
     width: 9,
     height: 9,
     borderRadius: 4.5,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   photoCounter: {
@@ -832,7 +870,7 @@ const styles = StyleSheet.create({
     fontSize: 23,
     lineHeight: 29,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   locationRow: {
@@ -845,14 +883,14 @@ const styles = StyleSheet.create({
   location: {
     flex: 1,
     fontSize: 14,
-    color: '#5F5F5F',
+    color: c.textMuted,
   },
 
   rating: {
     minWidth: 65,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: c.surfaceAlt,
     paddingHorizontal: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -863,20 +901,20 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
   },
 
   reviewText: {
     marginTop: 8,
     fontSize: 14,
-    color: '#686868',
+    color: c.textMuted,
     textDecorationLine:
       'underline',
   },
 
   separator: {
     height: 1,
-    backgroundColor: '#ECECEC',
+    backgroundColor: c.surfaceAlt,
     marginVertical: 24,
   },
 
@@ -901,14 +939,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 17,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   summaryLabel: {
     marginTop: 2,
     fontSize: 11,
     lineHeight: 15,
-    color: '#696969',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
@@ -921,7 +959,7 @@ const styles = StyleSheet.create({
     width: 62,
     height: 62,
     borderRadius: 31,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: c.surfaceAlt,
   },
 
   hostInfo: {
@@ -931,39 +969,39 @@ const styles = StyleSheet.create({
 
   hostLabel: {
     fontSize: 13,
-    color: '#6B6B6B',
+    color: c.textMuted,
   },
 
   hostName: {
     marginTop: 2,
     fontSize: 17,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   hostDescription: {
     marginTop: 3,
     fontSize: 13,
-    color: '#737373',
+    color: c.textMuted,
   },
 
   sectionTitle: {
     marginBottom: 16,
     fontSize: 21,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   description: {
     fontSize: 15,
     lineHeight: 23,
-    color: '#333333',
+    color: c.text,
   },
 
   homeTypeCard: {
     marginTop: 20,
     borderRadius: 18,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: c.surfaceAlt,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -973,7 +1011,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -986,14 +1024,14 @@ const styles = StyleSheet.create({
   homeTypeTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   homeTypeSubtitle: {
     marginTop: 4,
     fontSize: 13,
     lineHeight: 18,
-    color: '#696969',
+    color: c.textMuted,
   },
 
   amenitiesContainer: {
@@ -1014,18 +1052,18 @@ const styles = StyleSheet.create({
   amenityText: {
     flex: 1,
     fontSize: 15,
-    color: '#222222',
+    color: c.text,
   },
 
   emptySectionText: {
     fontSize: 14,
-    color: '#777777',
+    color: c.textMuted,
   },
 
   availabilityCard: {
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E7E7E7',
+    borderColor: c.border,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -1035,7 +1073,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#EAF9F2',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1048,14 +1086,14 @@ const styles = StyleSheet.create({
   availabilityTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   availabilitySubtitle: {
     marginTop: 4,
     fontSize: 13,
     lineHeight: 18,
-    color: '#696969',
+    color: c.textMuted,
   },
 
   carRow: {
@@ -1067,7 +1105,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1080,14 +1118,14 @@ const styles = StyleSheet.create({
   carTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   carSubtitle: {
     marginTop: 5,
     fontSize: 13,
     lineHeight: 19,
-    color: '#696969',
+    color: c.textMuted,
   },
 
   bottomBar: {
@@ -1097,8 +1135,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 50,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
-    backgroundColor: '#FFFFFF',
+    borderTopColor: c.border,
+    backgroundColor: c.surface,
     paddingTop: 14,
     paddingHorizontal: 18,
     flexDirection: 'row',
@@ -1118,8 +1156,8 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 27,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
-    backgroundColor: '#FFFFFF',
+    borderColor: c.border,
+    backgroundColor: c.surface,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1129,7 +1167,7 @@ const styles = StyleSheet.create({
   dislikeButtonText: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#E74C3C',
+    color: c.danger,
   },
 
   likeButton: {
@@ -1146,13 +1184,13 @@ const styles = StyleSheet.create({
   likeButtonText: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: c.onContrast,
   },
 
   emptyContainer: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1160,13 +1198,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#111111',
+    color: c.text,
   },
 
   emptyText: {
     marginTop: 8,
     fontSize: 14,
-    color: '#666666',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
@@ -1174,14 +1212,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     height: 46,
     borderRadius: 23,
-    backgroundColor: '#111111',
+    backgroundColor: c.contrast,
     paddingHorizontal: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   emptyButtonText: {
-    color: '#FFFFFF',
+    color: c.onContrast,
     fontSize: 14,
     fontWeight: '800',
   },

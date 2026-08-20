@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import React, {
   useCallback,
   useEffect,
@@ -16,11 +17,14 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Home } from '@wim/shared/home/home.type';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
-import { searchHomesMock } from '../infrastructure/mocks/searchHomeMocks';
+import { searchHomesApi } from '../../home/infrastructure/searchHome.api';
+import { getSession } from 'src/auth/infrastructure/authStorage';
 
 import { SearchResultsHeader } from './components/SearchResultsHeader';
 import { SearchResultsSheet } from './components/SearchResultsSheet';
 import { SearchResultsMap } from './components/SearchResultsMap';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<
   SearchStackParamList,
@@ -35,7 +39,9 @@ export const SearchResultsScreen: React.FC<Props> = ({
   navigation,
   route,
 }) => {
-  const { city, capacity, startDate, endDate } = route.params ?? {};
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+  const { city, capacity, startDate, endDate, category } = route.params ?? {};
 
   const [homes, setHomes] = useState<Home[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,9 +83,6 @@ export const SearchResultsScreen: React.FC<Props> = ({
       setLoading(true);
 
       try {
-        /*
-        ===== VERSION API =====
-
         const session = await getSession();
 
         if (!session?.accessToken) {
@@ -87,46 +90,14 @@ export const SearchResultsScreen: React.FC<Props> = ({
         }
 
         const data = await searchHomesApi(session.accessToken, {
-          city,
+          city: city?.split(',')[0]?.trim(),
+          category,
           startDate,
           endDate,
           capacity,
         });
 
         setHomes(data);
-
-        */
-
-        // ===== VERSION MOCK =====
-
-        const searchedCity = city
-          ?.split(',')[0]
-          ?.trim()
-          .toLowerCase();
-
-        const filteredHomes = (searchHomesMock as Home[]).filter((home) => {
-          const matchesCity =
-            !searchedCity ||
-            home.city.trim().toLowerCase() === searchedCity;
-
-          const matchesCapacity =
-            !capacity ||
-            home.capacity >= capacity;
-
-          const matchesAvailability = isHomeAvailable(
-            home,
-            startDate,
-            endDate,
-          );
-
-          return (
-            matchesCity &&
-            matchesCapacity &&
-            matchesAvailability
-          );
-        });
-
-        setHomes(filteredHomes);
       } catch (error) {
         console.log('Search homes error:', error);
       } finally {
@@ -135,7 +106,7 @@ export const SearchResultsScreen: React.FC<Props> = ({
     }
 
     loadHomes();
-  }, [city, capacity, startDate, endDate]);
+  }, [city, capacity, startDate, endDate, category]);
 
   const moveSheet = useCallback(
     (position: number) => {
@@ -229,9 +200,10 @@ export const SearchResultsScreen: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
 });

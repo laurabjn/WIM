@@ -25,6 +25,7 @@ describe('StartIdentityVerificationUseCase', () => {
     identityStatus: IdentityStatus.NOT_VERIFIED,
     createdAt: new Date(),
     updatedAt: new Date(),
+    suspendedAt: null,
   };
 
   beforeEach(() => {
@@ -34,6 +35,8 @@ describe('StartIdentityVerificationUseCase', () => {
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
       updateIdentityStatus: jest.fn(),
+      touchLastSeen: jest.fn(),
+      findLastSeen: jest.fn(),
     };
 
     provider = {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Image,
   StyleSheet,
@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import type { Exchange } from '@wim/shared';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   exchange: Exchange;
@@ -21,6 +23,8 @@ export function ExchangeCard({
   onPressMessages,
 }: Props) {
   const { t } = useTranslation("home");
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   return (
     <View style={styles.card}>
@@ -34,9 +38,12 @@ export function ExchangeCard({
       />
 
       <View style={styles.content}>
-        <Text style={styles.title} numberOfLines={1}>
-          {exchange.homeTitle}
-        </Text>
+        {exchange.partner ? (
+          <Text style={styles.partner} numberOfLines={1}>
+            {exchange.isHost ? t('guest') : t('host')} ·{' '}
+            {exchange.partner.firstName} {exchange.partner.lastName}
+          </Text>
+        ) : null}
 
         <Text style={styles.dates}>
           {formatDate(exchange.startDate)} - {formatDate(exchange.endDate)}
@@ -53,8 +60,16 @@ export function ExchangeCard({
           <Text style={styles.icon}>ⓘ</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.iconButton} onPress={onPressMessages}>
-          <Text style={styles.icon}>▤</Text>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={onPressMessages}
+          disabled={!exchange.chatId}
+        >
+          <Text
+            style={[styles.icon, !exchange.chatId && styles.iconDisabled]}
+          >
+            ▤
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -68,9 +83,10 @@ function formatDate(date: string) {
   });
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     flexDirection: 'row',
     padding: 8,
@@ -85,27 +101,30 @@ const styles = StyleSheet.create({
     width: 96,
     height: 86,
     borderRadius: 14,
-    backgroundColor: '#EDEDED',
+    backgroundColor: c.surfaceAlt,
   },
   content: {
     flex: 1,
     paddingHorizontal: 10,
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#111111',
-    marginBottom: 8,
+  partner: {
+    marginTop: 2,
+    fontSize: 12,
+    fontWeight: '600',
+    color: c.text,
+  },
+  iconDisabled: {
+    opacity: 0.3,
   },
   dates: {
     fontSize: 12,
-    color: '#222222',
+    color: c.text,
     marginBottom: 8,
   },
   travelers: {
     fontSize: 12,
-    color: '#444444',
+    color: c.text,
   },
   actions: {
     justifyContent: 'center',
@@ -116,12 +135,12 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   icon: {
     fontSize: 15,
-    color: '#111111',
+    color: c.text,
   },
 });

@@ -1,12 +1,13 @@
+import { API_URL } from '../../config/api';
 import { Home } from "@wim/shared/home/home.type";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
 
 type SearchHomesParams = {
   city?: string;
   country?: string;
   capacity?: number;
   homeType?: string;
+  category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
   startDate?: string;
   endDate?: string;
 };

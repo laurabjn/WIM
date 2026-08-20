@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   value: string;
@@ -15,6 +17,8 @@ export function StayDurationSlider({
   options,
   getLabel,
 }: Props) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const selectedIndex = Math.max(0, options.indexOf(value));
 
   return (
@@ -70,16 +74,17 @@ export function StayDurationSlider({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   sliderCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingTop: 14,
     paddingBottom: 16,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#E7E7E7',
+    borderColor: c.border,
   },
 
   sliderTopRow: {
@@ -91,12 +96,12 @@ const styles = StyleSheet.create({
 
   minLabel: {
     fontSize: 11,
-    color: '#9B9B9B',
+    color: c.textMuted,
   },
 
   maxLabel: {
     fontSize: 11,
-    color: '#9B9B9B',
+    color: c.textMuted,
   },
 
   badge: {
@@ -132,7 +137,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#D9D9D9',
+    backgroundColor: c.border,
     marginBottom: 6,
   },
 
@@ -142,12 +147,12 @@ const styles = StyleSheet.create({
 
   tickLabel: {
     fontSize: 9,
-    color: '#9B9B9B',
+    color: c.textMuted,
     textAlign: 'center',
   },
 
   tickLabelActive: {
-    color: '#1F1F1F',
+    color: c.text,
     fontWeight: '700',
   },
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,8 @@ import { LanguagePills } from './LanguagePills';
 import { ProfileStatsRow } from './ProfileStatsRow';
 import { UserProfile } from '@wim/shared';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   profile: UserProfile;
@@ -19,6 +21,8 @@ type Props = {
 
 export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Props) {
     const { t } = useTranslation('profile');
+    const themeColors = useThemeColors();
+    const styles = useMemo(() => createStyles(themeColors), [themeColors]);
     
     function calculateAgeFromString(birthDate: string | null): number | null {
         if (!birthDate) return null;
@@ -88,9 +92,10 @@ export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Prop
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: c.surface,
     borderRadius: 20,
     padding: 16,
     shadowColor: '#000',
@@ -112,7 +117,7 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   identityBlock: {
     marginLeft: 12,
@@ -121,16 +126,16 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
   },
   age: {
     fontSize: 12,
-    color: '#6B6B6B',
+    color: c.textMuted,
     marginTop: 2,
   },
   rating: {
     fontSize: 12,
-    color: '#3D3D3D',
+    color: c.text,
     marginTop: 6,
   },
   editButton: {
@@ -138,17 +143,18 @@ const styles = StyleSheet.create({
     height: 34,
     borderRadius: 17,
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   editIcon: {
+    color: c.text,
     fontSize: 14,
   },
   bio: {
     marginTop: 14,
     fontSize: 13,
     lineHeight: 19,
-    color: '#454545',
+    color: c.text,
   },
 });

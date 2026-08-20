@@ -19,11 +19,16 @@ import { updateMyProfile } from '../infrastructure/profile.api';
 import { ENVIRONMENTS } from '@wim/shared/src/utils/travelOption';
 import { LANGUAGES_OPTIONS } from '../../../../../packages/shared/src/utils/languagesOptions';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'EditProfile'>;
 
 export function EditProfileScreen({ route, navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { profile } = route.params;
 
   const initialPreferredEnvironments =
@@ -136,12 +141,7 @@ export function EditProfileScreen({ route, navigation }: Props) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerIconButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.headerIcon}>←</Text>
-          </TouchableOpacity>
+          <BackButton onPress={() => navigation.goBack()} style={styles.headerIconButton} />
           
           <TouchableOpacity onPress={handleSave} disabled={isSaving}>
             <Text style={styles.headerSaveText}>
@@ -287,14 +287,15 @@ export function EditProfileScreen({ route, navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
   screen: {
     flex: 1,
-    backgroundColor: '#F3F3F4',
+    backgroundColor: c.surfaceAlt,
   },
   container: {
     padding: 16,
@@ -310,23 +311,23 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerIcon: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
   headerTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   headerSaveText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2DA7F3',
+    color: c.info,
   },
   avatarSection: {
     alignItems: 'center',
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
     width: 86,
     height: 86,
     borderRadius: 43,
-    backgroundColor: '#DDD',
+    backgroundColor: c.surfaceAlt,
   },
   avatarEditBadge: {
     position: 'absolute',
@@ -348,7 +349,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: '#52D1A6',
+    backgroundColor: c.accent,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -361,12 +362,12 @@ const styles = StyleSheet.create({
   changePhotoText: {
     marginTop: 8,
     fontSize: 12,
-    color: '#7A7A7A',
+    color: c.textMuted,
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
     marginBottom: 10,
     marginTop: 10,
   },
@@ -378,10 +379,10 @@ const styles = StyleSheet.create({
   },
   environmentChip: {
     minWidth: '47%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#DCDCDC',
+    borderColor: c.border,
     paddingVertical: 14,
     paddingHorizontal: 12,
     alignItems: 'center',
@@ -394,7 +395,7 @@ const styles = StyleSheet.create({
   environmentChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
   },
   environmentChipTextSelected: {
     color: '#FFFFFF',
@@ -403,21 +404,21 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   input: {
-    backgroundColor: '#F8F8F8',
+    backgroundColor: c.surfaceAlt,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E7E7E7',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 14,
-    color: '#111111',
+    color: c.text,
     marginBottom: 10,
   },
   bioInput: {
     minHeight: 120,
   },
   searchBox: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 22,
     paddingHorizontal: 16,
     paddingVertical: 4,
@@ -426,7 +427,7 @@ const styles = StyleSheet.create({
   searchInput: {
     height: 46,
     fontSize: 14,
-    color: '#1F1F1F',
+    color: c.text,
   },
   languagesList: {
     flexDirection: 'row',
@@ -435,21 +436,21 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   languageChip: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#DCDCDC',
+    borderColor: c.border,
   },
   languageChipSelected: {
-    backgroundColor: '#52D1A6',
-    borderColor: '#52D1A6',
+    backgroundColor: c.accent,
+    borderColor: c.accent,
   },
   languageChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: c.text,
   },
   languageChipTextSelected: {
     color: '#FFFFFF',

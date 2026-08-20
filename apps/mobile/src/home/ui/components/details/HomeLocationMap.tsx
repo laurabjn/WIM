@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -12,6 +12,8 @@ import { MapPin } from 'lucide-react-native';
 import { Home } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
 import { getLocationDescription, LocationDescription } from 'src/home/infrastructure/locationDescription.api';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   home: Home;
@@ -19,6 +21,8 @@ type Props = {
 
 export function HomeLocationMap({ home }: Props) {
   const { t } = useTranslation(['home']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [locationDescription, setLocationDescription] =
     useState<LocationDescription | null>(null);
@@ -60,6 +64,7 @@ export function HomeLocationMap({ home }: Props) {
           home.latitude,
           home.longitude,
           'fr',
+          home.country,
         );
 
         console.log('LOCATION DESCRIPTION', data);
@@ -202,18 +207,19 @@ export function HomeLocationMap({ home }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 12,
   },
   mapContainer: {
     height: 240,
     borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: '#E8EEF3',
+    backgroundColor: c.surfaceAlt,
   },
   map: {
     flex: 1,
@@ -255,14 +261,14 @@ const styles = StyleSheet.create({
   mapUnavailable: {
     height: 160,
     borderRadius: 16,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
   },
   mapUnavailableText: {
     fontSize: 13,
-    color: '#6B7280',
+    color: c.textMuted,
     fontWeight: '600',
   },
   locationTitle: {
@@ -270,12 +276,12 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontSize: 15,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   locationAddress: {
     fontSize: 13,
     lineHeight: 19,
-    color: '#6B7280',
+    color: c.textMuted,
   },
   descriptionLoader: {
     marginTop: 16,
@@ -288,13 +294,13 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontSize: 12,
     fontWeight: '700',
-    color: '#6B7280',
+    color: c.textMuted,
     textTransform: 'capitalize',
   },
   locationDescription: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#333333',
+    color: c.text,
   },
   descriptionActions: {
     marginTop: 7,
@@ -305,12 +311,12 @@ const styles = StyleSheet.create({
   readMore: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textDecorationLine: 'underline',
   },
   sourceText: {
     marginTop: 8,
     fontSize: 10,
-    color: '#9CA3AF',
+    color: c.textMuted,
   },
 });

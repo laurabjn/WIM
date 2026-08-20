@@ -4,13 +4,17 @@ import {
   Car,
   Check,
   CircleParking,
+  CookingPot,
   Dog,
   Dumbbell,
   Flame,
+  Laptop,
   Mountain,
   Palmtree,
   Trees,
+  Tv,
   Umbrella,
+  WashingMachine,
   Waves,
   Wifi,
 } from 'lucide-react-native';
@@ -32,23 +36,23 @@ const AMENITY_ICON_RULES: Array<{
     icon: Wifi,
   },
   {
-    keywords: ['plage'],
+    keywords: ['plage', 'beach'],
     icon: Umbrella,
   },
   {
-    keywords: ['mer', 'océan', 'ocean', 'lac', 'piscine'],
+    keywords: ['mer', 'océan', 'ocean', 'lac', 'piscine', 'pool'],
     icon: Waves,
   },
   {
-    keywords: ['terrasse'],
+    keywords: ['terrasse', 'balcon', 'balcony', 'terrace'],
     icon: Palmtree,
   },
   {
-    keywords: ['jardin'],
+    keywords: ['jardin', 'garden'],
     icon: Trees,
   },
   {
-    keywords: ['animaux', 'chien'],
+    keywords: ['animaux', 'chien', 'pets'],
     icon: Dog,
   },
   {
@@ -60,24 +64,40 @@ const AMENITY_ICON_RULES: Array<{
     icon: Car,
   },
   {
-    keywords: ['vue'],
+    keywords: ['vue', 'view'],
     icon: Binoculars,
   },
   {
-    keywords: ['sport', 'fitness'],
+    keywords: ['sport', 'fitness', 'gym'],
     icon: Dumbbell,
   },
   {
-    keywords: ['climatisation'],
+    keywords: ['climatisation', 'airconditioning', 'clim'],
     icon: AirVent,
   },
   {
-    keywords: ['cheminée', 'cheminee'],
+    keywords: ['cheminée', 'cheminee', 'fireplace'],
     icon: Flame,
   },
   {
-    keywords: ['montagne'],
+    keywords: ['montagne', 'mountain'],
     icon: Mountain,
+  },
+  {
+    keywords: ['cuisine', 'kitchen'],
+    icon: CookingPot,
+  },
+  {
+    keywords: ['tv', 'television', 'télévision'],
+    icon: Tv,
+  },
+  {
+    keywords: ['machine', 'washingmachine', 'lave-linge', 'laverie'],
+    icon: WashingMachine,
+  },
+  {
+    keywords: ['workspace', 'bureau', 'travail'],
+    icon: Laptop,
   },
 ];
 

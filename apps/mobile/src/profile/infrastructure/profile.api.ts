@@ -1,7 +1,6 @@
+import { API_URL } from '../../config/api';
 import type { UserProfile } from '@wim/shared';
 
-const API_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
 
 export async function getMyProfile(token: string): Promise<UserProfile> {
 
@@ -25,9 +24,13 @@ export async function getMyProfile(token: string): Promise<UserProfile> {
   }
 }
 
+export type UpdateProfilePayload = Partial<UserProfile> & {
+  statusText?: string | null;
+};
+
 export async function updateMyProfile(
   token: string,
-  payload: Partial<UserProfile>,
+  payload: UpdateProfilePayload,
 ): Promise<UserProfile> {
   const response = await fetch(`${API_URL}/users/me/profile`, {
     method: 'PATCH',

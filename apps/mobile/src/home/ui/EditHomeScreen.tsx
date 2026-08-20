@@ -12,16 +12,30 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomesStackParamList } from 'src/navigation/type/homeStack';
+import type { HomeCategory } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
 import { Home } from '@wim/shared/home/home.type';
 import { getSession } from 'src/auth/infrastructure/authStorage';
-import { getHomeById, resolveImageUrl, updateHome } from '../infrastructure/home.api';
+import {
+  createHome,
+  getHomeById,
+  resolveImageUrl,
+  updateHome,
+} from '../infrastructure/home.api';
 import { HomeTabs } from './components/HomeTabs';
 import { EditHomeGeneralTab } from './components/EditHomeGeneralTab';
 import { EditHomeDetailsTab } from './components/edit/EditHomeDetailsTab';
 import { EditHomeAmenitiesTab } from './components/edit/EditHomeAmenitiesTab';
 import { EditHomeRulesTab } from './components/edit/EditHomeRulesTab';
 import { EditHomeAvailabilityTab } from './components/edit/EditHomeAvailabilityTab';
+import {
+  createHomeAvailability,
+  deleteHomeAvailability,
+} from '../infrastructure/homeAvailability.api';
+import type { HomeAvailability } from '@wim/shared';
+import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<HomesStackParamList, 'EditHome'>;
 
@@ -29,19 +43,30 @@ const tabs = ['Général', 'Détails', 'Équipements', 'Règles', 'Disponibilit�
 
 export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation("home");
-  const { homeId } = route.params;
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+  const { homeId } = route.params ?? {};
+
+  // Le meme ecran sert a creer : sans identifiant, il n'y a rien a charger et
+  // l'enregistrement cree au lieu de mettre a jour.
+  const isCreating = !homeId;
     
   const [activeTab, setActiveTab] = useState('Général');
   const [home, setHome] = useState<Home | null>(null);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [country, setCountry] = useState('');
+  const [availabilities, setAvailabilities] = useState<HomeAvailability[]>([]);
   const [capacity, setCapacity] = useState(1);
   const [beds, setBeds] = useState(1);
   const [bathrooms, setBathrooms] = useState(1);
   const [amenities, setAmenities] = useState<string[]>([]);
 
   const [homeType, setHomeType] = useState('HOUSE');
+  const [category, setCategory] = useState<HomeCategory | null>(null);
   const [carExchangeAccepted, setCarExchangeAccepted] = useState(false);
   const [isAvailableForExchange, setIsAvailableForExchange] = useState(true);
   const [pricePerNight, setPricePerNight] = useState<number | null>(null);
@@ -67,16 +92,23 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
         setToken(session.accessToken);
 
+        if (isCreating) return;
+
         const data = await getHomeById(session.accessToken, homeId);
 
         setHome(data);
         setTitle(data.title ?? '');
         setDescription(data.description ?? '');
+        setAddress(data.address ?? '');
+        setCity(data.city ?? '');
+        setCountry(data.country ?? '');
+        setAvailabilities(data.availabilities ?? []);
         setCapacity(data.capacity ?? 1);
         setBeds(data.beds ?? 1);
         setBathrooms(data.bathrooms ?? 1);
         setAmenities(data.amenities ?? []);
         setHomeType(data.homeType ?? 'HOUSE');
+        setCategory(data.category ?? null);
         setCarExchangeAccepted(data.carExchangeAccepted ?? false);
         setIsAvailableForExchange(data.isAvailableForExchange ?? true);
         setPricePerNight(data.pricePerNight ?? null);
@@ -89,7 +121,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     }
 
     loadHome();
-  }, [homeId]);
+  }, [homeId, isCreating]);
     
   const photos = useMemo(() => {
     return home?.photos
@@ -98,53 +130,82 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [home]);
 
   const handleSave = useCallback(async () => {
-    if (!token || !home || isSaving) return;
+    if (!token || isSaving) return;
+    if (!isCreating && !home) return;
 
     try {
       setIsSaving(true);
       setError(null);
 
-      const updatedHome = await updateHome(token, home.id, {
+      const payload = {
         title: title.trim(),
         description: description.trim(),
+        address: address.trim(),
+        city: city.trim(),
+        country: country.trim(),
         capacity,
         beds,
         bathrooms,
         amenities,
         homeType,
+        category,
         carExchangeAccepted,
         isAvailableForExchange,
         pricePerNight,
-      });
+      };
+
+      if (isCreating) {
+        const created = await createHome(token, { ...payload, bedrooms: 1 });
+
+        navigation.replace('EditHome', { homeId: created.id });
+        return;
+      }
+
+      const updatedHome = await updateHome(token, home!.id, payload);
 
       setHome(updatedHome);
       setTitle(updatedHome.title ?? '');
       setDescription(updatedHome.description ?? '');
+      setAddress(updatedHome.address ?? '');
+      setCity(updatedHome.city ?? '');
+      setCountry(updatedHome.country ?? '');
       setCapacity(updatedHome.capacity ?? 1);
       setBeds(updatedHome.beds ?? 1);
       setBathrooms(updatedHome.bathrooms ?? 1);
       setAmenities(updatedHome.amenities ?? []);
       setHomeType(updatedHome.homeType ?? 'HOUSE');
+      setCategory(updatedHome.category ?? null);
       setCarExchangeAccepted(updatedHome.carExchangeAccepted ?? false);
       setIsAvailableForExchange(updatedHome.isAvailableForExchange ?? true);
       setPricePerNight(updatedHome.pricePerNight ?? null);
     } catch (err) {
-      console.log('Update home error:', err);
-      setError('Impossible de mettre à jour le logement.');
+      console.log(isCreating ? 'Create home error:' : 'Update home error:', err);
+
+      setError(
+        isCreating
+          ? 'Impossible de créer le logement.'
+          : 'Impossible de mettre à jour le logement.',
+      );
     } finally {
       setIsSaving(false);
     }
   }, [
     token,
     home,
+    isCreating,
+    navigation,
     isSaving,
     title,
     description,
+    address,
+    city,
+    country,
     capacity,
     beds,
     bathrooms,
     amenities,
     homeType,
+    category,
     carExchangeAccepted,
     isAvailableForExchange,
     pricePerNight,
@@ -152,7 +213,12 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (event) => {
-      if (!home || !token || isSaving) return;
+      if (!token || isSaving) return;
+      if (!isCreating && !home) return;
+      // Quitter un formulaire de creation reste vide ne doit rien creer.
+      if (isCreating && (!title.trim() || !city.trim() || !country.trim())) {
+        return;
+      }
 
       event.preventDefault();
 
@@ -162,7 +228,17 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     });
 
     return unsubscribe;
-  }, [navigation, home, token, isSaving, handleSave]);
+  }, [
+    navigation,
+    home,
+    token,
+    isSaving,
+    isCreating,
+    title,
+    city,
+    country,
+    handleSave,
+  ]);
  
   if (isLoading) {
     return (
@@ -172,7 +248,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     );
   }
 
-  if (error || !home) {
+  if (error || (!isCreating && !home)) {
     return (
       <SafeAreaView style={styles.center}>
         <Text style={styles.errorText}>{error ?? t('home.not_found')}</Text>
@@ -187,9 +263,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.backIcon}>←</Text>
-          </TouchableOpacity>
+          <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
 
           <Text style={styles.headerTitle}>{t('editHomePage')}</Text>
 
@@ -206,9 +280,15 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
           <EditHomeGeneralTab
             title={title}
             description={description}
+            address={address}
+            city={city}
+            country={country}
             photos={photos}
             onChangeTitle={setTitle}
             onChangeDescription={setDescription}
+            onChangeAddress={setAddress}
+            onChangeCity={setCity}
+            onChangeCountry={setCountry}
           />
         )}
 
@@ -218,10 +298,12 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
             beds={beds}
             bathrooms={bathrooms}
             homeType={homeType}
+            category={category}
             onChangeCapacity={setCapacity}
             onChangeBeds={setBeds}
             onChangeBathrooms={setBathrooms}
             onChangeHomeType={setHomeType}
+            onChangeCategory={setCategory}
           />
         )}
 
@@ -241,6 +323,27 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
 
         {activeTab === 'Disponibilité' && (
           <EditHomeAvailabilityTab
+            availabilities={availabilities}
+            onAddAvailability={async (start, end) => {
+              if (!token || !home) return;
+
+              const creee = await createHomeAvailability(token, home.id, {
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
+                type: 'AVAILABLE',
+              });
+
+              setAvailabilities((current) => [...current, creee]);
+            }}
+            onRemoveAvailability={async (availabilityId) => {
+              if (!token || !home) return;
+
+              await deleteHomeAvailability(token, home.id, availabilityId);
+
+              setAvailabilities((current) =>
+                current.filter((periode) => periode.id !== availabilityId),
+              );
+            }}
             isAvailableForExchange={isAvailableForExchange}
             pricePerNight={pricePerNight}
             onChangeIsAvailableForExchange={setIsAvailableForExchange}
@@ -252,17 +355,18 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     paddingHorizontal: 24,
   },
 
   errorText: {
-    color: '#DC2626',
+    color: c.danger,
     fontSize: 14,
     textAlign: 'center',
   },
@@ -275,19 +379,19 @@ const styles = StyleSheet.create({
   emptyPhotos: {
     height: 180,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   emptyPhotosText: {
-    color: '#6B7280',
+    color: c.textMuted,
     fontSize: 13,
   },
 
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   scrollContent: {
@@ -307,20 +411,20 @@ const styles = StyleSheet.create({
     height: 34,
     borderRadius: 17,
     borderWidth: 1,
-    borderColor: '#E8E8E8',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   backIcon: {
     fontSize: 18,
-    color: '#111111',
+    color: c.text,
   },
 
   headerTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   headerSpacer: {
@@ -349,7 +453,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 
   activeTabText: {
@@ -363,7 +467,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
 
@@ -371,10 +475,10 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     marginBottom: 18,
   },
 
@@ -382,11 +486,11 @@ const styles = StyleSheet.create({
     minHeight: 145,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     marginBottom: 18,
   },
 

@@ -1,80 +1,135 @@
 import { Home } from '@wim/shared/home/home.type';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import {
+  Dimensions,
+  Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { Share } from 'react-native';
+import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 type Props = {
   home: Home;
   onBack: () => void;
   isFavorite: boolean;
   onToggleFavorite: (homeId: string) => void;
+  showFavorite?: boolean;
   onShare?: () => void;
 };
 
-export function HomeHero({ home, onBack, isFavorite, onToggleFavorite, onShare }: Props) {
+export function HomeHero({
+  home,
+  onBack,
+  isFavorite,
+  onToggleFavorite,
+  onShare,
+  showFavorite = true,
+}: Props) {
   const { t } = useTranslation('home');
-  const coverUrl = resolveImageUrl(home.photos?.[0]?.url);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  const photos = (home.photos ?? [])
+    .map((photo) => resolveImageUrl(photo.url))
+    .filter(Boolean) as string[];
+
+  function handleScrollEnd(event: NativeSyntheticEvent<NativeScrollEvent>) {
+    setPhotoIndex(
+      Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH),
+    );
+  }
 
   return (
     <View style={styles.hero}>
-      {coverUrl ? (
-        <Image source={{ uri: coverUrl }} style={styles.heroImage} />
+      {photos.length > 0 ? (
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={handleScrollEnd}
+          scrollEventThrottle={16}
+        >
+          {photos.map((url, index) => (
+            <Image
+              key={`${url}-${index}`}
+              source={{ uri: url }}
+              style={styles.heroImage}
+            />
+          ))}
+        </ScrollView>
       ) : (
         <View style={styles.emptyHero}>
           <Text style={styles.emptyHeroText}>{t('noPhotos')}</Text>
         </View>
       )}
 
-      <TouchableOpacity style={[styles.circleButton, styles.backButton]} onPress={onBack}>
-        <Text style={styles.icon}>‹</Text>
-      </TouchableOpacity>
+      <BackButton onPress={onBack} style={[styles.circleButton, styles.backButton]} />
 
       <View style={styles.topActions}>
         <TouchableOpacity style={styles.circleButton} onPress={onShare}>
           <Text style={styles.icon}>↗</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.circleButton} onPress={() => onToggleFavorite(home.id)}>
-          <Text style={[styles.icon, isFavorite && styles.favoriteIcon]}>
-            {isFavorite ? '★' : '☆'}
-          </Text>
-        </TouchableOpacity>
+        {showFavorite ? (
+          <TouchableOpacity
+            style={styles.circleButton}
+            onPress={() => onToggleFavorite(home.id)}
+          >
+            <Text style={[styles.icon, isFavorite && styles.favoriteIcon]}>
+              {isFavorite ? '★' : '☆'}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
 
-      {home.photos?.length > 0 ? (
-        <Text style={styles.imageCounter}>1/{home.photos.length}</Text>
+      {photos.length > 0 ? (
+        <Text style={styles.imageCounter}>
+          {photoIndex + 1}/{photos.length}
+        </Text>
       ) : null}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   hero: {
     height: 300,
     position: 'relative',
   },
   heroImage: {
-    width: '100%',
+    width: SCREEN_WIDTH,
     height: '100%',
   },
   emptyHero: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#E5E7EB',
+    backgroundColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyHeroText: {
-    color: '#6B7280',
+    color: c.textMuted,
     fontWeight: '600',
   },
   circleButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -92,7 +147,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 20,
-    color: '#111111',
+    color: c.text,
   },
   favoriteIcon: {
     color: '#F59E0B',

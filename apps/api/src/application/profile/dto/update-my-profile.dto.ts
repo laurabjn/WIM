@@ -18,4 +18,10 @@ export type UpdateProfileInput = {
   languages?: string[];
   preferredLocale?: 'fr' | 'en';
   travelPreferences?: Partial<TravelPreferencesInput>;
+  profileVisible?: boolean;
+  showAge?: boolean;
+  dataSharing?: boolean;
+  /** Chaine vide ou null pour retirer le statut. */
+  statusText?: string | null;
+  notifyNewMessages?: boolean;
 };

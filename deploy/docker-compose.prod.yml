@@ -1,0 +1,103 @@
+# Stack de production WIM — VPS OVH.
+# Lancement (depuis la racine du repo sur le VPS) :
+#   docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env.prod up -d --build
+#
+# Trois services : Caddy (TLS + reverse proxy), l'API NestJS, PostgreSQL.
+# Seul Caddy publie des ports sur l'hôte ; l'API et la base ne sont joignables
+# que depuis le réseau Docker interne.
+
+# Nom de projet figé : sans lui, Compose le déduirait du dossier `deploy/` et les
+# volumes s'appelleraient `deploy_wim_pg`. Ici ils sont préfixés `wim_`.
+name: wim
+
+services:
+  db:
+    image: postgres:15
+    container_name: wim_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      # Empêche l'initdb de créer le cluster en trust si la variable est vide.
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    volumes:
+      - wim_pg:/var/lib/postgresql/data
+    # Volontairement AUCUN `ports:` — la base n'est pas exposée sur Internet.
+    # Pour s'y connecter depuis ton poste : tunnel SSH (voir deploy/README.md).
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - wim_internal
+
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile.prod
+    image: wim-api:latest
+    container_name: wim_api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+      UPLOADS_DIR: /app/apps/api/uploads
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      WS_CORS_ORIGIN: ${WS_CORS_ORIGIN}
+      WS_NAMESPACE: ${WS_NAMESPACE:-/ws}
+      FRONTEND_URL: ${FRONTEND_URL}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_RESET_SECRET: ${JWT_RESET_SECRET}
+      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-900}
+      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-2592000}
+      JWT_RESET_TTL: ${JWT_RESET_TTL:-3600}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      DEEPL_API_KEY: ${DEEPL_API_KEY:-}
+      MAIL_FROM: ${MAIL_FROM}
+    volumes:
+      # Les fichiers uploadés survivent aux redéploiements et rebuilds d'image.
+      - wim_uploads:/app/apps/api/uploads
+    healthcheck:
+      # GET /api/health vérifie aussi la connexion Prisma, pas seulement que le
+      # process répond. `start_period` laisse le temps aux migrations de tourner.
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://127.0.0.1:3000/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    ports:
+      # Publié UNIQUEMENT sur la loopback du VPS : c'est le nginx de l'hôte qui
+      # expose l'API au public, en TLS. Sans le préfixe 127.0.0.1, Docker
+      # ouvrirait le port sur toutes les interfaces en contournant UFW.
+      - '127.0.0.1:${API_HOST_PORT:-3010}:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wim_internal
+      - wim_public
+
+volumes:
+  wim_pg:
+  wim_uploads:
+
+networks:
+  # `internal: true` prive ce réseau d'accès sortant : la base n'a aucune raison
+  # de joindre Internet. L'API est aussi sur wim_public, d'où son accès au SMTP.
+  wim_internal:
+    internal: true
+  wim_public:

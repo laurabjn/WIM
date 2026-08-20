@@ -1,56 +1,76 @@
 export type ChatUser = {
-  id: string;
-  firstName: string | null;
-  lastName: string | null;
-  avatarUrl: string | null;
-};
+  id: string
+  firstName: string
+  lastName: string
+  avatarUrl: string | null
+  // Statut brut : c'est la couche application qui decide s'il est perime.
+  statusText?: string | null
+  statusUpdatedAt?: Date | null
+}
 
-export type ChatListItem = {
-  id: string;
-  matchId: string;
-  createdAt: Date;
-  updatedAt: Date;
+export type ChatParticipant = {
+  hiddenAt?: Date | null
+  id: string
+  chatId: string
+  userId: string
+  lastReadMessageId: string | null
+  joinedAt: Date
+  user: ChatUser
+}
 
-  participants: {
-    user: ChatUser;
-  }[];
-
-  messages: {
-    id: string;
-    content: string;
-    senderId: string;
-    createdAt: Date;
-  }[];
-};
+export type MessageKind = 'TEXT' | 'IMAGE' | 'AUDIO'
 
 export type ChatMessage = {
-  id: string;
-  chatId: string;
-  senderId: string;
-  content: string;
-  createdAt: Date;
+  id: string
+  chatId: string
+  senderId: string
+  content: string
+  type: MessageKind
+  attachmentUrl: string | null
+  attachmentDurationMs: number | null
+  editedAt?: Date | null
+  replyToId?: string | null
+  replyTo?: {
+    id: string
+    content: string
+    type: MessageKind
+    senderId: string
+    sender: { firstName: string }
+  } | null
+  createdAt: Date
+  updatedAt: Date
+  sender: ChatUser
+}
 
-  sender: ChatUser;
-};
+export type Chat = {
+  id: string
+  matchId: string
+  createdAt: Date
+  updatedAt: Date
+  participants: ChatParticipant[]
+  messages: ChatMessage[]
+}
+
+export type ChatListItem = {
+  id: string
+  matchId: string
+  createdAt: Date
+  updatedAt: Date
+  participants: ChatParticipant[]
+  messages: ChatMessage[]
+}
 
 export interface ChatRepository {
-  findByUserId(
-    userId: string,
-  ): Promise<ChatListItem[]>;
-
-  findMessages(
-    chatId: string,
-    userId: string,
-  ): Promise<ChatMessage[]>;
-
-  createMessage(input: {
-    chatId: string;
-    senderId: string;
-    content: string;
-  }): Promise<ChatMessage>;
-
-  isParticipant(
-    chatId: string,
-    userId: string,
-  ): Promise<boolean>;
+  findByUserId(userId: string,): Promise<ChatListItem[]>
+  findById(chatId: string,): Promise<Chat>
+  findMessages(chatId: string, userId: string,): Promise<ChatMessage[]>
+  findParticipant(chatId: string,userId: string): Promise<ChatParticipant | null>;
+  findMyChats(userId: string): Promise<ChatListItem[]>
+  updateLastReadMessage(chatId: string, userId: string, lastReadMessageId: string | null): Promise<void>
+  countUnreadMessages(chatId: string, userId: string): Promise<number>
+  countAllUnreadMessages(userId: string): Promise<number>
+  touchChat(chatId: string): Promise<void>
+  createMessage(input: {chatId: string, senderId: string, content: string, type?: MessageKind, attachmentUrl?: string | null, attachmentDurationMs?: number | null}): Promise<ChatMessage>;
+  isParticipant(chatId: string, userId: string): Promise<boolean>
+  hasUserReplied(chatId: string, userId: string): Promise<boolean>
 }

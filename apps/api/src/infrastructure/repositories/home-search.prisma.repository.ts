@@ -11,13 +11,22 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async search(filters: SearchHomesFilters): Promise<HomeSearchResult[]> {
-    const { userId, city, country, capacity, homeType, startDate, endDate } =
-      filters;
+    const {
+      userId,
+      city,
+      country,
+      capacity,
+      homeType,
+      category,
+      startDate,
+      endDate,
+    } = filters;
 
     const homes = await this.prisma.home.findMany({
       where: {
         ownerId: {
           not: userId,
+          notIn: await this.hiddenOwnerIds(userId),
         },
 
         city: city
@@ -41,12 +50,13 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
           : undefined,
 
         homeType: homeType || undefined,
+        category: category || undefined,
 
         ...(startDate && endDate
           ? {
               availabilities: {
                 some: {
-                  isAvailable: true,
+                  type: 'AVAILABLE',
                   startDate: {
                     lte: new Date(startDate),
                   },
@@ -73,6 +83,11 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
             avatarUrl: true,
           },
         },
+
+        favorites: {
+          where: { userId },
+          select: { id: true },
+        },
       },
 
       orderBy: {
@@ -88,9 +103,20 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
       country: home.country,
       capacity: home.capacity,
       homeType: home.homeType,
+      category: home.category ?? null,
       latitude: home.latitude,
       longitude: home.longitude,
       coverPhotoUrl: home.photos[0]?.url ?? null,
+      beds: home.beds,
+      bedrooms: home.bedrooms,
+      averageRating: home.averageRating,
+      reviewsCount: home.reviewsCount,
+      isFavorite: home.favorites.length > 0,
+      photos: home.photos.map((photo) => ({
+        id: photo.id,
+        url: photo.url,
+        position: photo.position,
+      })),
       owner: {
         id: home.owner.id,
         firstName: home.owner.firstName,
@@ -98,5 +124,18 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
         avatarUrl: home.owner.avatarUrl,
       },
     }));
+  }
+
+  private async hiddenOwnerIds(userId: string): Promise<string[]> {
+    const relations = await this.prisma.blockedUser.findMany({
+      where: {
+        OR: [{ blockerId: userId }, { blockedId: userId }],
+      },
+      select: { blockerId: true, blockedId: true },
+    });
+
+    return relations.map((relation) =>
+      relation.blockerId === userId ? relation.blockedId : relation.blockerId,
+    );
   }
 }

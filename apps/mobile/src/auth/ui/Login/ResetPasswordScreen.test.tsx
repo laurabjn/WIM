@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
-import * as resetPasswordUsecase from '../application/resetPassword.usecase';
+import * as resetPasswordUsecase from '../../application/resetPassword.usecase';
 import { ResetPasswordScreen } from './ResetPasswordScreen';
 
 describe('<ResetPasswordScreen />', () => {

@@ -16,6 +16,22 @@ export type RecommendationHome = {
     url: string;
     position: number;
   }>;
+
+  // Champs d'affichage : la carte de swipe les montre, le calcul de score les
+  // ignore. Optionnels pour que tout appelant qui ne fait que scorer puisse
+  // construire un candidat sans les charger.
+  beds?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  averageRating?: number | null;
+  reviewsCount?: number;
+
+  owner?: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    avatarUrl: string | null;
+  };
 };
 
 export type WeightedPreference = {
@@ -37,6 +53,12 @@ export type UserRecommendationProfile = {
 
   lastSearchLatitude: number | null;
   lastSearchLongitude: number | null;
+
+  // Ce que l'utilisateur a declare lui-meme dans ses preferences de voyage.
+  // Une declaration explicite pese plus qu'un comportement devine.
+  requiredAmenities: string[];
+  wantsCarExchange: boolean | null;
+  desiredCapacity: number | null;
 };
 
 export type RecommendationScoreDetails = {

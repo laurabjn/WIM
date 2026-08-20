@@ -40,6 +40,26 @@ export class SwipePrismaRepository implements SwipeRepository {
     return swipe?.direction === 'LIKE';
   }
 
+  async hasOpenConversation(
+    firstUserId: string,
+    secondUserId: string,
+  ): Promise<boolean> {
+    // Une conversation entamee, pas une simple coquille : deux personnes qui se
+    // parlent deja n'ont pas a se redecouvrir par un match.
+    const chat = await this.prisma.chat.findFirst({
+      where: {
+        AND: [
+          { participants: { some: { userId: firstUserId } } },
+          { participants: { some: { userId: secondUserId } } },
+          { messages: { some: {} } },
+        ],
+      },
+      select: { id: true },
+    });
+
+    return chat !== null;
+  }
+
   async createMatch(
     firstUserId: string,
     secondUserId: string,

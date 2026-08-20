@@ -1,6 +1,6 @@
+import { API_URL } from '../../config/api';
 import { MyHome } from "@wim/shared";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
 
 export async function fetchMyHomes(token: string): Promise<MyHome[]> {
   console.log('Fetching homes with token:', token);

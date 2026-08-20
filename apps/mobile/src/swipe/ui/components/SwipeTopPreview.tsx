@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Image,
   StyleSheet,
@@ -9,6 +9,8 @@ import {
 import { getCountryFlag } from '../../../utils/countryFlag';
 import { Info } from 'lucide-react-native';
 import { getCityImagesApi } from 'src/utils/cityImages';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   home: any;
@@ -19,6 +21,8 @@ export function SwipeTopPreview({
   home,
   onInfoPress,
 }: Props) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
     const [cityImages, setCityImages] = useState<{ id: string; url: string }[]>([]);
     
     useEffect(() => {
@@ -60,13 +64,14 @@ export function SwipeTopPreview({
         style={styles.infoCard}
         onPress={onInfoPress}
       >
-        <Info size={15} color="#111" />
+        <Info size={15} color={themeColors.text} />
       </TouchableOpacity>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     height: 62,
     paddingHorizontal: 18,
@@ -84,6 +89,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   flag: {
+    color: c.text,
     fontSize: 14,
   },
   flagSmall: {
@@ -93,7 +99,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     lineHeight: 12,
     fontWeight: '800',
-    color: '#111',
+    color: c.text,
   },
   photos: {
     flexDirection: 'row',
@@ -111,7 +117,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 58,
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },

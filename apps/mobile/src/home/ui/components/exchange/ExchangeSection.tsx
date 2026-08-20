@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { Exchange } from '@wim/shared';
 import { ExchangeCard } from './ExchangeCard';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   title: string;
@@ -16,6 +18,8 @@ export function ExchangeSection({
   onPressDetails,
   onPressMessages,
 }: Props) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   if (exchanges.length === 0) {
     return null;
   }
@@ -36,14 +40,15 @@ export function ExchangeSection({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   section: {
     marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
   },
 });

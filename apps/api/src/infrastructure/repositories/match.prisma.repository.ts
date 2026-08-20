@@ -23,7 +23,7 @@ export class MatchPrismaRepository
   async findByUserId(
     userId: string,
   ): Promise<MatchWithUsersRecord[]> {
-    return this.prisma.match.findMany({
+    const matches = await this.prisma.match.findMany({
       where: {
         OR: [
           {
@@ -62,11 +62,47 @@ export class MatchPrismaRepository
             country: true,
           },
         },
+
+        chat: {
+          select: {
+            id: true,
+            matchId: true,
+            createdAt: true,
+            updatedAt: true,
+
+            participants: {
+              select: {
+                id: true,
+                chatId: true,
+                userId: true,
+                joinedAt: true,
+              },
+            },
+
+            _count: {
+              select: { messages: true },
+            },
+          },
+        },
       },
 
       orderBy: {
         createdAt: 'desc',
       },
     });
+
+    return matches.map((match) => ({
+      ...match,
+      chat: match.chat
+        ? {
+            id: match.chat.id,
+            matchId: match.chat.matchId,
+            createdAt: match.chat.createdAt,
+            updatedAt: match.chat.updatedAt,
+            participants: match.chat.participants,
+            messagesCount: match.chat._count.messages,
+          }
+        : null,
+    }));
   }
 }

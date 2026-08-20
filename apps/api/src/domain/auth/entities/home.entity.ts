@@ -1,3 +1,5 @@
+export type HomeCategory = 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
+
 export type HomeType =
   | 'APARTMENT'
   | 'HOUSE'
@@ -34,6 +36,31 @@ export interface HomeOwnerEntity {
   createdAt: Date;
 }
 
+export interface ReviewAuthorEntity {
+  id: string;
+  firstName?: string | null;
+  avatarUrl?: string | null;
+  createdAt: Date;
+}
+
+export interface ReviewEntity {
+  id: string;
+  score: number;
+  comment: string;
+  createdAt: Date;
+  author: ReviewAuthorEntity;
+}
+
+export interface HomeAvailabilityEntity {
+  id: string;
+  homeId: string;
+  startDate: Date;
+  endDate: Date;
+  type: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface HomeEntity {
   id: string;
   ownerId: string;
@@ -50,13 +77,17 @@ export interface HomeEntity {
   bathrooms: number;
   bedrooms: number;
   homeType: string;
+  category: HomeCategory | null;
   amenities: string[];
   isAvailableForExchange: boolean;
+  occupiedByExchange?: boolean;
   pricePerNight?: number | null;
   averageRating?: number | null;
   reviewsCount: number;
   carExchangeAccepted: boolean;
   photos: HomePhotoEntity[];
+  reviews: ReviewEntity[];
+  availabilities: HomeAvailabilityEntity[];
   vehicle?: VehicleEntity | null;
   createdAt: Date;
   updatedAt: Date;

@@ -23,6 +23,7 @@ describe('GetIdentityStatusUseCase', () => {
     identityStatus: IdentityStatus.IN_PROGRESS,
     createdAt: new Date(),
     updatedAt: new Date(),
+    suspendedAt: null,
   };
 
   beforeEach(() => {
@@ -32,6 +33,8 @@ describe('GetIdentityStatusUseCase', () => {
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
       updateIdentityStatus: jest.fn(),
+      touchLastSeen: jest.fn(),
+      findLastSeen: jest.fn(),
     };
 
     useCase = new GetIdentityStatusUseCase(userRepository);

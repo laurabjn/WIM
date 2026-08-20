@@ -7,10 +7,13 @@ export type SupportTopic =
   | 'other';
 
 export interface CreateSupportRequestDto {
-  userId: string;
-  userEmail: string;
-  userFullName?: string | null;
   topic: SupportTopic;
   subject: string;
   message: string;
+}
+
+export interface CreateSupportRequestData extends CreateSupportRequestDto {
+  userId: string;
+  userEmail: string;
+  userFullName?: string | null;
 }

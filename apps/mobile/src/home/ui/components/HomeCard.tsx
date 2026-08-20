@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   imageUri: string;
@@ -16,6 +18,8 @@ export const HomeCard: React.FC<Props> = ({
   travelersText,
   onPress,
 }) => {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const Container = onPress ? Pressable : View;
 
   return (
@@ -39,11 +43,12 @@ export const HomeCard: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'stretch',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 18,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -68,20 +73,20 @@ const styles = StyleSheet.create({
   location: {
     fontSize: 20,
     fontWeight: '500',
-    color: '#2A2A2A',
+    color: c.text,
     marginBottom: 10,
   },
 
   dateRange: {
     fontSize: 20,
     fontWeight: '400',
-    color: '#2A2A2A',
+    color: c.text,
     marginBottom: 10,
   },
 
   travelers: {
     fontSize: 18,
     fontWeight: '400',
-    color: '#7A7A7A',
+    color: c.textMuted,
   },
 });

@@ -1,4 +1,4 @@
-import { IsDateString, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsDateString, IsIn, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchHomesDto {
@@ -19,6 +19,10 @@ export class SearchHomesDto {
   @IsOptional()
   @IsString()
   homeType?: string;
+
+  @IsOptional()
+  @IsIn(['NATURE', 'BEACH', 'CITY', 'CULTURE'])
+  category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
 
   @IsOptional()
   @IsDateString()

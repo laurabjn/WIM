@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 export function CounterRow({
   label,
@@ -10,6 +12,8 @@ export function CounterRow({
   value: number;
   onChange: (value: number) => void;
 }) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
     <View style={styles.counterRow}>
       <Text style={styles.counterLabel}>{label}</Text>
@@ -43,7 +47,8 @@ export function CounterRow({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   counterRow: {
     height: 58,
     borderBottomWidth: 1,
@@ -55,7 +60,7 @@ const styles = StyleSheet.create({
   counterLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
   counterControls: {
     flexDirection: 'row',
@@ -67,19 +72,19 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   counterButtonText: {
     fontSize: 18,
-    color: '#111111',
+    color: c.text,
   },
   counterInput: {
     width: 36,
     textAlign: 'center',
     fontSize: 14,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
 });

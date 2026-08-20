@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Switch } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   label: string;
@@ -14,6 +16,8 @@ export function SettingsSwitchRow({
   value,
   onValueChange,
 }: Props) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
     <View style={styles.row}>
       <View style={styles.left}>
@@ -26,7 +30,8 @@ export function SettingsSwitchRow({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   row: {
     minHeight: 52,
     paddingHorizontal: 14,
@@ -34,7 +39,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E6E6E6',
+    borderBottomColor: c.border,
   },
   left: {
     flexDirection: 'row',
@@ -44,13 +49,14 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   icon: {
+    color: c.text,
     width: 18,
     textAlign: 'center',
     fontSize: 15,
   },
   label: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: c.text,
     flexShrink: 1,
   },
 });

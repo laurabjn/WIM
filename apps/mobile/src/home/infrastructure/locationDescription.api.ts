@@ -1,4 +1,4 @@
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.0.34:3002/api';
+import { API_URL } from '../../config/api';
 
 export type LocationDescription = {
   title: string;
@@ -12,10 +12,15 @@ export async function getLocationDescription(
   latitude?: number | null,
   longitude?: number | null,
   language = 'fr',
+  country?: string | null,
 ): Promise<LocationDescription | null> {
   const params = new URLSearchParams({
     language,
   });
+
+  if (country) {
+    params.append('country', country);
+  }
 
   if (typeof latitude === 'number') {
     params.append('latitude', String(latitude));

@@ -26,6 +26,7 @@ describe('registerUser use case', () => {
       password: 'secret123',
       firstName: 'Laura',
       lastName: 'Bojon',
+      isAdmin: false,
     });
 
     expect(fetch).toHaveBeenCalledWith(`${API_URL}/auth/register`, {
@@ -38,6 +39,7 @@ describe('registerUser use case', () => {
         password: 'secret123',
         firstName: 'Laura',
         lastName: 'Bojon',
+        isAdmin: false,
       }),
       credentials: 'include',
     });
@@ -61,6 +63,7 @@ describe('registerUser use case', () => {
         password: 'secret123',
         firstName: 'Laura',
         lastName: 'Bojon',
+        isAdmin: false,
       }),
     ).rejects.toThrow('Email already in use');
   });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dimensions,
   Image,
@@ -13,10 +13,19 @@ import {
 import { Star } from 'lucide-react-native';
 import { Home } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
+import { getSession } from 'src/auth/infrastructure/authStorage';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
+import {
+  addFavoriteHome,
+  removeFavoriteHome,
+} from 'src/home/infrastructure/home.api';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_HORIZONTAL_MARGIN = 20;
-const IMAGE_WIDTH = SCREEN_WIDTH - CARD_HORIZONTAL_MARGIN;
+const SELECTION_FRAME_INSET = 10;
+const IMAGE_WIDTH =
+  SCREEN_WIDTH - CARD_HORIZONTAL_MARGIN - SELECTION_FRAME_INSET;
 
 type Props = {
   home: Home;
@@ -28,7 +37,35 @@ export function SearchResultCard({
   onPress,
 }: Props) {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(
+    home.isFavorite ?? false,
+  );
+
+  async function handleToggleFavorite() {
+    const nextValue = !isFavorite;
+    setIsFavorite(nextValue);
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) {
+        setIsFavorite(!nextValue);
+        return;
+      }
+
+      if (nextValue) {
+        await addFavoriteHome(session.accessToken, home.id);
+      } else {
+        await removeFavoriteHome(session.accessToken, home.id);
+      }
+    } catch (error) {
+      setIsFavorite(!nextValue);
+      console.log('Toggle favorite error:', error);
+    }
+  }
 
   const photos =
     home.photos && home.photos.length > 0
@@ -54,11 +91,7 @@ export function SearchResultCard({
   }
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.95}
-      onPress={onPress}
-    >
+    <View style={styles.card}>
       <View style={styles.carouselContainer}>
         <ScrollView
           horizontal
@@ -69,29 +102,30 @@ export function SearchResultCard({
           scrollEventThrottle={16}
         >
           {photos.map((photo, index) => (
-            <Image
+            <TouchableOpacity
               key={
                 photo.id ??
                 `${photo.url}-${index}`
               }
-              source={{ uri: photo.url }}
-              style={styles.image}
-            />
+              activeOpacity={0.95}
+              onPress={onPress}
+            >
+              <Image
+                source={{ uri: photo.url }}
+                style={styles.image}
+              />
+            </TouchableOpacity>
           ))}
         </ScrollView>
 
         <TouchableOpacity
           style={styles.favoriteButton}
           activeOpacity={0.8}
-          onPress={(event) => {
-            event.stopPropagation();
-            console.log(
-              'Favorite pressed:',
-              home.id,
-            );
-          }}
+          onPress={handleToggleFavorite}
         >
-          <Text style={styles.favorite}>☆</Text>
+          <Text style={styles.favorite}>
+            {isFavorite ? '★' : '☆'}
+          </Text>
         </TouchableOpacity>
 
         {photos.length > 1 ? (
@@ -116,7 +150,11 @@ export function SearchResultCard({
         </View>
       </View>
 
-      <View style={styles.content}>
+      <TouchableOpacity
+        style={styles.content}
+        activeOpacity={0.95}
+        onPress={onPress}
+      >
         <View style={styles.topRow}>
           <View style={styles.left}>
             <Text style={styles.title}>
@@ -137,7 +175,7 @@ export function SearchResultCard({
           <View style={styles.rating}>
             <Star
               size={13}
-              color="#111"
+              color={themeColors.text}
               fill="#111"
             />
 
@@ -153,15 +191,15 @@ export function SearchResultCard({
             {t('available')}
           </Text>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   card: {
-    marginBottom: 18,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
 
   carouselContainer: {
@@ -169,7 +207,7 @@ const styles = StyleSheet.create({
     height: 360,
     borderRadius: 14,
     overflow: 'hidden',
-    backgroundColor: '#F1F1F1',
+    backgroundColor: c.surfaceAlt,
   },
 
   image: {
@@ -180,25 +218,27 @@ const styles = StyleSheet.create({
 
   favoriteButton: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 9,
+    right: 9,
     zIndex: 10,
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.92)',
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
 
   favorite: {
-    fontSize: 34,
-    color: '#fff',
-    fontWeight: '300',
-    textShadowColor: 'rgba(0,0,0,0.35)',
-    textShadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    textShadowRadius: 3,
+    fontSize: 22,
+    lineHeight: 24,
+    color: c.primary,
+    fontWeight: '400',
   },
 
   pagination: {
@@ -224,7 +264,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
 
   photoCounter: {
@@ -242,7 +282,7 @@ const styles = StyleSheet.create({
   },
 
   photoCounterText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '800',
   },
@@ -264,19 +304,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#111',
+    color: c.text,
   },
 
   location: {
     marginTop: 2,
     fontSize: 11,
-    color: '#555',
+    color: c.textMuted,
   },
 
   meta: {
     marginTop: 2,
     fontSize: 11,
-    color: '#444',
+    color: c.text,
   },
 
   rating: {
@@ -286,6 +326,7 @@ const styles = StyleSheet.create({
   },
 
   ratingText: {
+    color: c.text,
     fontSize: 11,
     fontWeight: '700',
   },
@@ -299,7 +340,7 @@ const styles = StyleSheet.create({
 
   available: {
     backgroundColor: '#41D086',
-    color: '#fff',
+    color: '#FFFFFF',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,

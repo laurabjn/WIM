@@ -12,6 +12,10 @@ import { FavoriteModule } from './interfaces/http/modules/favorite.module';
 import { SwipeModule } from './interfaces/http/modules/swipe.module';
 import { LocationModule } from './interfaces/http/modules/location.module';
 import { ChatModule } from './interfaces/http/modules/chat.module';
+import { HealthModule } from './interfaces/http/modules/health.module';
+import { ModerationModule } from './interfaces/http/modules/moderation.module';
+import { NotificationModule } from './interfaces/http/modules/notification.module';
+import { AdminModule } from './interfaces/http/modules/admin.module';
 
 @Module({
   imports: [
@@ -30,7 +34,11 @@ import { ChatModule } from './interfaces/http/modules/chat.module';
     FavoriteModule,
     SwipeModule,
     LocationModule,
-    ChatModule
+    ChatModule,
+    NotificationModule,
+    AdminModule,
+    HealthModule,
+    ModerationModule
   ],
 })
 export class AppModule {}

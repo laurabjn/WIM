@@ -1,18 +1,29 @@
+import { useMemo } from 'react';
 import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 export function RecentSearch({
   image,
   title,
   dates,
   travelers,
+  onPress,
 }: {
   image: string;
   title: string;
   dates: string;
   travelers: string;
+  onPress?: () => void;
 }) {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
-    <TouchableOpacity style={styles.recentCard}>
+    <TouchableOpacity
+      style={styles.recentCard}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
       <Image source={{ uri: image }} style={styles.recentImage} />
 
       <View style={styles.recentContent}>
@@ -24,11 +35,12 @@ export function RecentSearch({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   recentCard: {
     height: 95,
     borderRadius: 16,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     marginBottom: 12,
     flexDirection: 'row',
     overflow: 'hidden',
@@ -48,13 +60,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   recentTitle: {
+    color: c.text,
     fontSize: 14,
     fontWeight: '800',
     marginBottom: 8,
   },
   recentText: {
     fontSize: 12,
-    color: '#444',
+    color: c.text,
     marginBottom: 4,
   },
 });

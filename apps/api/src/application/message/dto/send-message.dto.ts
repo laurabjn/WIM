@@ -1,4 +1,5 @@
 import {
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -9,4 +10,10 @@ export class SendMessageDto {
   @MinLength(1)
   @MaxLength(2000)
   content!: string;
+
+  // Sans cette declaration, le filtre global rejetterait le champ et l'envoi
+  // d'une reponse citee echouerait entierement.
+  @IsOptional()
+  @IsString()
+  replyToId?: string;
 }

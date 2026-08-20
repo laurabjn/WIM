@@ -1,5 +1,9 @@
 FROM node:20-alpine
 
+# ffmpeg convertit les vocaux : la reconnaissance vocale rend un wav sur
+# Android et un caf sur iOS, que l'autre plateforme ne sait pas lire.
+RUN apk add --no-cache ffmpeg
+
 WORKDIR /app
 
 COPY package.json package-lock.json turbo.json ./

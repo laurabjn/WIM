@@ -1,5 +1,7 @@
 import { HomeAvailability } from "./homeAvailability.type";
 
+export type HomeCategory = 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
+
 export interface Home {
   id: string;
   ownerId: string;
@@ -12,7 +14,7 @@ export interface Home {
   latitude?: number | null;
   longitude?: number | null;
   capacity: number;
-  category: string;
+  category: HomeCategory | null;
   beds: number;
   bedrooms: number;
   bathrooms: number;
@@ -23,6 +25,8 @@ export interface Home {
   vehicle?: Vehicule | null;
   availabilities?: HomeAvailability[];
   isAvailableForExchange: boolean;
+  // Un sejour en cours occupe ce logement precis, sans toucher au reglage.
+  occupiedByExchange?: boolean;
   pricePerNight?: number | null;
   isFavorite?: boolean;
   averageRating?: number | null;
@@ -79,6 +83,7 @@ export type Review = {
   comment: string;
   createdAt: string;
   author: {
+    id: string;
     firstName?: string | null;
     avatarUrl?: string | null;
     createdAt?: string | null;

@@ -237,30 +237,44 @@ export class HomeRecommendationScorer {
     return Math.min(40, penalty);
   }
 
+  // Ce que l'utilisateur a declare dans ses preferences de voyage. Une
+  // demande explicite compte davantage qu'un gout devine par les swipes.
   private calculateProfileScore(
     home: RecommendationHome,
     profile: UserRecommendationProfile,
   ): number {
     let score = 0;
 
-    /*
-     * Exemple :
-     * bonus si l’utilisateur aime souvent
-     * les logements avec échange de voiture.
-     *
-     * Plus tard, on utilisera les travelPreferences
-     * enregistrées dans le profil.
-     */
+    if (profile.requiredAmenities.length > 0) {
+      const presents = profile.requiredAmenities.filter((amenity) =>
+        home.amenities.some(
+          (value) => normalizeValue(value) === amenity,
+        ),
+      ).length;
 
-    if (home.carExchangeAccepted) {
-      score += 3;
+      score +=
+        (presents / profile.requiredAmenities.length) * 8;
+    }
+
+    if (profile.wantsCarExchange === true && home.carExchangeAccepted) {
+      score += 4;
+    }
+
+    if (profile.desiredCapacity !== null) {
+      // Un logement trop petit pour le groupe annonce ne convient pas ;
+      // legerement plus grand ne derange personne.
+      if (home.capacity >= profile.desiredCapacity) {
+        score += 3;
+      } else {
+        score -= 4;
+      }
     }
 
     if (home.photos.length >= 4) {
-      score += 2;
+      score += 1;
     }
 
-    return Math.min(5, score);
+    return Math.max(-4, Math.min(15, score));
   }
 
   private calculateQualityScore(

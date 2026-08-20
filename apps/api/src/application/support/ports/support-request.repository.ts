@@ -1,4 +1,4 @@
-import { CreateSupportRequestDto } from '../dto/create-support-request.dto';
+import { CreateSupportRequestData } from '../dto/create-support-request.dto';
 
 export interface SupportRequestEntity {
   id: string;
@@ -13,6 +13,6 @@ export interface SupportRequestEntity {
 
 export interface SupportRequestRepository {
   create(
-    input: CreateSupportRequestDto,
+    input: CreateSupportRequestData,
   ): Promise<SupportRequestEntity>;
 }

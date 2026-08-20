@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -30,6 +29,9 @@ import {
   saveRecentDestination,
 } from '../infrastructure/recentDestination.storage';
 import { useTranslation } from 'react-i18next';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<
   SearchStackParamList,
@@ -40,6 +42,8 @@ export const DestinationSearchScreen: React.FC<Props> = ({
   navigation,
   route,
 }) => {
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { t } = useTranslation("search")
   const [query, setQuery] = useState(
     route.params?.currentDestination ?? '',
@@ -152,14 +156,10 @@ export const DestinationSearchScreen: React.FC<Props> = ({
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.content}
-        behavior={
-          Platform.OS === 'ios'
-            ? 'padding'
-            : undefined
-        }
+        behavior="padding"
       >
         <View style={styles.searchBox}>
-          <Search size={18} color="#111" />
+          <Search size={18} color={themeColors.text} />
 
           <TextInput
             value={query}
@@ -225,12 +225,12 @@ export const DestinationSearchScreen: React.FC<Props> = ({
                   {isSearching ? (
                     <MapPin
                       size={16}
-                      color="#111"
+                      color={themeColors.text}
                     />
                   ) : (
                     <Clock3
                       size={16}
-                      color="#111"
+                      color={themeColors.text}
                     />
                   )}
                 </View>
@@ -263,10 +263,11 @@ export const DestinationSearchScreen: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
   },
   content: {
     flex: 1,
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 26,
     borderWidth: 1,
-    borderColor: '#E8E8E8',
+    borderColor: c.border,
     paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '600',
-    color: '#111',
+    color: c.text,
   },
   sectionHeader: {
     marginTop: 22,
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#111',
+    color: c.text,
   },
   clearButton: {
     flexDirection: 'row',
@@ -309,7 +310,7 @@ const styles = StyleSheet.create({
   clearText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#777',
+    color: c.textMuted,
   },
   list: {
     flex: 1,
@@ -325,7 +326,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: c.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -336,12 +337,12 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontSize: 13,
     fontWeight: '800',
-    color: '#111',
+    color: c.text,
   },
   itemSubtitle: {
     marginTop: 3,
     fontSize: 12,
-    color: '#666',
+    color: c.textMuted,
   },
   recentLoader: {
     marginTop: 20,
@@ -354,6 +355,6 @@ const styles = StyleSheet.create({
   emptyText: {
     marginTop: 12,
     fontSize: 13,
-    color: '#777',
+    color: c.textMuted,
   },
 });

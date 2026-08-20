@@ -80,31 +80,6 @@ export class HomeController {
         throw new UnauthorizedException();
       }
 
-    console.log('CREATE HOME DTO:', dto);
-
-    console.log('CREATE HOME PAYLOAD:', {
-      ownerId,
-      title: dto.title,
-      description: dto.description,
-      address: dto.address,
-      city: dto.city,
-      country: dto.country,
-      latitude: dto.latitude,
-      longitude: dto.longitude,
-      capacity: dto.capacity,
-      beds: dto.beds ?? 1,
-      bedrooms: dto.bedrooms ?? 1,
-      bathrooms: dto.bathrooms ?? 1,
-      homeType: dto.homeType,
-      amenities: dto.amenities ?? [],
-      isAvailableForExchange: dto.isAvailableForExchange ?? false,
-      pricePerNight: dto.pricePerNight,
-      averageRating: null,
-      reviewsCount: 0,
-      carExchangeAccepted: dto.carExchangeAccepted ?? false,
-      vehicle: dto.carExchangeAccepted ? dto.vehicle ?? null : null,
-    });
-        
       return this.createHomeUseCase.execute({
         ownerId,
         title: dto.title,
@@ -121,12 +96,13 @@ export class HomeController {
         bathrooms: dto.bathrooms ?? 1,
 
         homeType: dto.homeType,
+        category: dto.category ?? null,
         amenities: dto.amenities ?? [],
         isAvailableForExchange: dto.isAvailableForExchange ?? false,
         pricePerNight: dto.pricePerNight,
         averageRating: null,
-        reviewsCount: 0,
-        
+        reviewCount: 0,
+
         carExchangeAccepted: dto.carExchangeAccepted ?? false,
 
         vehicle: dto.carExchangeAccepted ? dto.vehicle ?? null : null,

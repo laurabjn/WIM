@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Alert,
   Image,
-  KeyboardAvoidingView,
   ScrollView,
   Platform,
 } from 'react-native';
@@ -21,6 +20,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { uploadProfileImage } from '../../infrastructure/upload/uploadProfileImage';
 import { Stepper } from '../components/Stepper';
 import { clearSession, saveSession } from 'src/auth/infrastructure/authStorage';
+import { BackButton } from 'src/shared/ui/BackButton';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
+import { registerPushToken } from 'src/notifications/pushRegistration';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep5'>;
 
@@ -28,6 +32,8 @@ const BIO_MAX_LENGTH = 200;
 
 export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
   const { t } = useTranslation(['auth', 'common']);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const {
     firstName,
     lastName,
@@ -113,6 +119,10 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
           },
       });
 
+      // Une inscription vaut une connexion : sans cela, un compte tout neuf ne
+      // recevrait aucune notification avant sa premiere reconnexion.
+      await registerPushToken();
+
       navigation.navigate('RegisterIdentity', {
         identityRedirectUrl: session.identityRedirectUrl,
       });
@@ -127,7 +137,7 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -138,12 +148,7 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
           <View style={styles.container}>
             <View style={styles.card}>
               <View style={styles.header}>
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={() => navigation.goBack()}
-                >
-                  <Text style={styles.backButtonText}>←</Text>
-                </TouchableOpacity>
+                <BackButton onPress={() => navigation.goBack()} style={styles.backButton} />
 
                 <Text style={styles.headerTitle}>{t('auth:register.title')}</Text>
               </View>
@@ -237,15 +242,16 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   keyboardContainer: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   scrollContent: {
@@ -254,12 +260,12 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F5',
+    backgroundColor: c.surfaceAlt,
   },
 
   card: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
     borderRadius: 32,
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -278,7 +284,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -286,13 +292,13 @@ const styles = StyleSheet.create({
 
   backButtonText: {
     fontSize: 16,
-    color: '#111111',
+    color: c.text,
   },
 
   headerTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111111',
+    color: c.text,
   },
 
   content: {
@@ -303,7 +309,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     textAlign: 'center',
     marginBottom: 18,
    },
@@ -312,11 +318,11 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#EAEAEA',
+    borderColor: c.border,
     paddingHorizontal: 14,
     justifyContent: 'center',
     marginBottom: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
 
   uploadLeft: {
@@ -327,12 +333,12 @@ const styles = StyleSheet.create({
   uploadIcon: {
     fontSize: 14,
     marginRight: 10,
-    color: '#111111',
+    color: c.text,
   },
 
   uploadText: {
     fontSize: 13,
-    color: '#111111',
+    color: c.text,
     fontWeight: '500',
   },
 
@@ -350,7 +356,7 @@ const styles = StyleSheet.create({
 
   removePhotoText: {
     fontSize: 12,
-    color: '#DC2626',
+    color: c.danger,
     fontWeight: '500',
   },
 
@@ -359,17 +365,17 @@ const styles = StyleSheet.create({
     maxHeight: 100,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#EAEAEA',
+    borderColor: c.border,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 13,
-    color: '#111111',
-    backgroundColor: '#FFFFFF',
+    color: c.text,
+    backgroundColor: c.surface,
   },
 
   charCount: {
     fontSize: 11,
-    color: '#7C7C7C',
+    color: c.textMuted,
     textAlign: 'right',
     marginTop: 4,
     marginBottom: 8,
@@ -378,7 +384,7 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 4,
     fontSize: 12,
-    color: '#DC2626',
+    color: c.danger,
     textAlign: 'center',
   },
 
@@ -398,7 +404,7 @@ const styles = StyleSheet.create({
   },
 
   primaryText: {
-    color: '#FFF',
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 16,
   },

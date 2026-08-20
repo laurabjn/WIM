@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "73395488159",
+    "project_id": "worldismine-dcedf",
+    "storage_bucket": "worldismine-dcedf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:73395488159:android:e11b1ff27906f9d8eb69aa",
+        "android_client_info": {
+          "package_name": "com.wim.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoZcm7tUidcnC8szuXRMpLxFWKMLbqicg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

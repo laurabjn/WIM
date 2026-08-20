@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,12 @@ import { AppTabsParamList } from './type/appTabs';
 import { ProfileStackNavigator } from './ProfileStack';
 import { useTranslation } from 'react-i18next';
 import { CustomTabBar } from './components/CustomTabBar';
-import { ExchangesScreen } from 'src/home/ui/ExchangesScreen';
+import { ExchangeStackNavigator } from './ExchangeStack';
 import { SearchStackNavigator } from './SearchStack';
 import { SearchOnlyStackNavigator } from './SearchOnlyStack';
+import { MessagesStackNavigator } from './MessagesStack';
+import { useUnreadMessages } from 'src/chat/hooks/useUnreadMessages';
+import * as Notifications from 'expo-notifications';
 
 const Tab = createBottomTabNavigator<AppTabsParamList>();
 
@@ -32,9 +35,18 @@ type Props = {
 
 export function AppTabsNavigator({ setIsAuthenticated }: Props) {
   const { t } = useTranslation('common');
+  const unreadCount = useUnreadMessages();
+
+  // Le total non lu est deja connu et tenu a jour par la passerelle : le poser
+  // sur l'icone ne coute qu'un appel, et evite d'ouvrir l'application pour
+  // savoir s'il s'est passe quelque chose.
+  useEffect(() => {
+    Notifications.setBadgeCountAsync(unreadCount).catch(() => undefined);
+  }, [unreadCount]);
 
   return (
     <Tab.Navigator
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
@@ -45,11 +57,11 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
         const routeName =
           getFocusedRouteNameFromRoute(route) ?? route.name;
 
-        if (routeName === 'Swipe') {
+        if (routeName === 'Swipe' || routeName === 'Conversation') {
           return null;
         }
 
-        return <CustomTabBar {...props} />;
+        return <CustomTabBar {...props} unreadCount={unreadCount} />;
       }}
     >
       <Tab.Screen
@@ -61,7 +73,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
       />
       <Tab.Screen
         name="ExchangeTab"
-        component={ExchangesScreen}
+        component={ExchangeStackNavigator}
         options={{
           title: t('exchange'),
         }}
@@ -76,7 +88,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
       </Tab.Screen>
       <Tab.Screen
         name="MessagesTab"
-        component={TestScreen}
+        component={MessagesStackNavigator}
         options={{
           title: t('messages'),
         }}
@@ -98,7 +110,7 @@ export function AppTabsNavigator({ setIsAuthenticated }: Props) {
 const styles = StyleSheet.create({
   testScreen: {
     flex: 1,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },

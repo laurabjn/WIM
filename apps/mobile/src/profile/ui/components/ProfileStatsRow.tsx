@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   exchangesCount: number;
@@ -14,6 +16,8 @@ export function ProfileStatsRow({
   homesCount,
 }: Props) {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   return (
     <View style={styles.container}>
@@ -35,7 +39,8 @@ export function ProfileStatsRow({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -51,11 +56,11 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1F1F1F',
+    color: c.text,
   },
   label: {
     marginTop: 4,
     fontSize: 12,
-    color: '#666',
+    color: c.textMuted,
   },
 });

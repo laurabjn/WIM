@@ -1,18 +1,23 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { HOME_TYPES } from '@wim/shared/src/utils/travelOption';
+import { HOME_CATEGORIES, HOME_TYPES } from '@wim/shared/src/utils/travelOption';
+import type { HomeCategory } from '@wim/shared/home/home.type';
 import { CounterRow } from '../CounterRow';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   capacity: number;
   beds: number;
   bathrooms: number;
   homeType: string;
+  category: HomeCategory | null;
   onChangeCapacity: (value: number) => void;
   onChangeBeds: (value: number) => void;
   onChangeBathrooms: (value: number) => void;
   onChangeHomeType: (value: string) => void;
+  onChangeCategory: (value: HomeCategory | null) => void;
 };
 
 export function EditHomeDetailsTab({
@@ -20,12 +25,16 @@ export function EditHomeDetailsTab({
   beds,
   bathrooms,
   homeType,
+  category,
   onChangeCapacity,
   onChangeBeds,
   onChangeBathrooms,
   onChangeHomeType,
+  onChangeCategory,
 }: Props) {
   const { t } = useTranslation(['home', "profile"]);
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   return (
     <View style={styles.form}>
@@ -43,6 +52,31 @@ export function EditHomeDetailsTab({
             >
               <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
                 {t(`profile:homeType.${type}`, type)}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <Text style={styles.label}>{t('home:category')}</Text>
+
+      <Text style={styles.hint}>{t('home:categoryHint')}</Text>
+
+      <View style={styles.chipsRow}>
+        {HOME_CATEGORIES.map((value) => {
+          const selected = category === value;
+
+          return (
+            <TouchableOpacity
+              key={value}
+              style={[styles.chip, selected && styles.chipSelected]}
+              // Retaper le theme actif le retire : un logement peut n'en avoir aucun.
+              onPress={() => onChangeCategory(selected ? null : value)}
+            >
+              <Text
+                style={[styles.chipText, selected && styles.chipTextSelected]}
+              >
+                {t(`home:categories.${value}`, value)}
               </Text>
             </TouchableOpacity>
           );
@@ -72,15 +106,23 @@ export function EditHomeDetailsTab({
 
 
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   form: {
     paddingHorizontal: 12,
   },
   label: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
     marginBottom: 8,
+  },
+  hint: {
+    marginTop: -4,
+    marginBottom: 10,
+    fontSize: 12,
+    lineHeight: 17,
+    color: c.textMuted,
   },
   chipsRow: {
     flexDirection: 'row',
@@ -93,10 +135,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderColor: c.border,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.surface,
   },
   chipSelected: {
     backgroundColor: '#58D6B2',
@@ -105,7 +147,7 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#111111',
+    color: c.text,
   },
   chipTextSelected: {
     color: '#FFFFFF',

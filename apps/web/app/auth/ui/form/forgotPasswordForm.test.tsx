@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import * as usecase from '../application/requestPasswordReset.usecase';
+import * as usecase from '../../application/requestPasswordReset.usecase';
 import { ForgotPasswordForm } from './forgotPasswordForm';
 
 jest.mock('next-intl', () => ({

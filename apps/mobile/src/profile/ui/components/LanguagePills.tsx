@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet } from 'react-native';
+import { useThemeColors } from 'src/theme/ThemeContext';
+import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   languages?: string[];
@@ -8,6 +10,8 @@ type Props = {
 
 export function LanguagePills({ languages = [] }: Props) {
   const { t } = useTranslation('profile');
+  const themeColors = useThemeColors();
+  const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   if (!Array.isArray(languages) || languages.length === 0) {
     return null;
@@ -24,7 +28,8 @@ export function LanguagePills({ languages = [] }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: ThemeColors) =>
+  StyleSheet.create({
   container: {
     flexDirection: 'row',
     gap: 8,
@@ -32,13 +37,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   pill: {
-    backgroundColor: '#F2F2F2',
+    backgroundColor: c.surfaceAlt,
     borderRadius: 14,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   pillText: {
     fontSize: 12,
-    color: '#444',
+    color: c.textMuted,
   },
 });

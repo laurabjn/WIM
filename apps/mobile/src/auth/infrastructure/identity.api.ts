@@ -1,7 +1,7 @@
+import { API_URL } from '../../config/api';
 import { getSession } from "./authStorage";
 import { IdentityStatus } from "../dtos/identityStatus";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3002/api';
 
 export async function fetchIdentityStatus(): Promise<IdentityStatus> {
   const session = await getSession();
