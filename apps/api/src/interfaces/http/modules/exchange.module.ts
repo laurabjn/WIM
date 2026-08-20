@@ -14,12 +14,20 @@ import { ChatPrismaRepository } from 'src/infrastructure/repositories/chat.prism
 import { CHAT_REPOSITORY, EXCHANGE_REPOSITORY } from '../tokens/token';
 import { ModerationModule } from './moderation.module';
 import { WebsocketModule } from 'src/interfaces/websocket/websocket.module';
+import { StayLifecycleService } from 'src/application/exchange/services/stay-lifecycle.service';
+import {
+  ListStaysToReviewUseCase,
+  ReviewStayUseCase,
+} from 'src/application/exchange/use-cases/review-stay.usecase';
 
 @Module({
   imports: [ModerationModule, WebsocketModule],
   controllers: [ExchangeController],
   providers: [
     PrismaService,
+    StayLifecycleService,
+    ListStaysToReviewUseCase,
+    ReviewStayUseCase,
     ExchangeRepositoryPrisma,
     {
       provide: EXCHANGE_REPOSITORY,

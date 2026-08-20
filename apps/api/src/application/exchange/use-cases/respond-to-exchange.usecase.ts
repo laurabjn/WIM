@@ -9,6 +9,7 @@ import type { PendingExchange } from '@wim/shared';
 
 import { ExchangeRepository } from 'src/domain/auth/repositories/exchange.repository';
 import { EXCHANGE_REPOSITORY } from 'src/interfaces/http/tokens/token';
+import { ListStaysToReviewUseCase } from './review-stay.usecase';
 
 export type ExchangeResponse = 'ACCEPT' | 'DECLINE';
 
@@ -17,6 +18,7 @@ export class RespondToExchangeUseCase {
   constructor(
     @Inject(EXCHANGE_REPOSITORY)
     private readonly exchangeRepository: ExchangeRepository,
+    private readonly staysToReview: ListStaysToReviewUseCase,
   ) {}
 
   async execute(
@@ -37,6 +39,15 @@ export class RespondToExchangeUseCase {
     if (exchange.status !== 'PENDING') {
       throw new BadRequestException(
         'Cet échange a déjà reçu une réponse.',
+      );
+    }
+
+    if (
+      response === 'ACCEPT' &&
+      (await this.staysToReview.hasPendingReview(userId))
+    ) {
+      throw new BadRequestException(
+        'Notez votre dernier séjour avant d’accepter un nouvel échange.',
       );
     }
 

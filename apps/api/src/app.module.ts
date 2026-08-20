@@ -16,9 +16,11 @@ import { HealthModule } from './interfaces/http/modules/health.module';
 import { ModerationModule } from './interfaces/http/modules/moderation.module';
 import { NotificationModule } from './interfaces/http/modules/notification.module';
 import { AdminModule } from './interfaces/http/modules/admin.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,

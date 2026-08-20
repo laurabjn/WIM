@@ -8,6 +8,7 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
 import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
 import { mapMessage } from 'src/application/message/message.mapper';
 import type { ChatMessages } from '@wim/shared';
+import { ListStaysToReviewUseCase } from './review-stay.usecase';
 
 export type RequestExchangeInput = {
   requesterId: string;
@@ -33,6 +34,7 @@ export class RequestExchangeUseCase {
   constructor(
     private readonly prisma: PrismaService,
     private readonly blockedUsers: BlockedUsersService,
+    private readonly staysToReview: ListStaysToReviewUseCase,
   ) {}
 
   async execute(input: RequestExchangeInput): Promise<RequestExchangeResult> {
@@ -73,6 +75,14 @@ export class RequestExchangeUseCase {
       },
       select: { id: true, status: true },
     });
+
+    // Un sejour passe non note ferme la porte a un nouvel echange : c'est la
+    // seule contrainte qui rende la notation reellement obligatoire.
+    if (await this.staysToReview.hasPendingReview(input.requesterId)) {
+      throw new BadRequestException(
+        'Notez votre dernier séjour avant de demander un nouvel échange.',
+      );
+    }
 
     if (active) {
       throw new BadRequestException(

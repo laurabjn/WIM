@@ -232,9 +232,16 @@ model Exchange {
 
   status ExchangeStatus
 
+  // Date du dernier rappel de notation envoye : sans elle, la tache
+  // relancerait les memes personnes a chaque passage.
+  reviewReminderAt DateTime? @map("review_reminder_at")
+
+  reviews Review[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@index([status, endDate])
   @@map("exchanges")
 }
 
@@ -421,13 +428,20 @@ model Review {
   authorId String @map("author_id")
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
+  // L'avis porte sur un sejour precis. Facultatif : les avis existants n'en
+  // ont pas, et un avis survit a la suppression de son echange.
+  exchangeId String?   @map("exchange_id")
+  exchange   Exchange? @relation(fields: [exchangeId], references: [id], onDelete: SetNull)
+
   score   Int
   comment String
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@unique([homeId, authorId])
+  // Un avis par sejour et par personne, et non plus un par logement : deux
+  // sejours successifs dans le meme logement meritent chacun le leur.
+  @@unique([exchangeId, authorId])
   @@index([homeId])
   @@map("reviews")
 }
