@@ -21,7 +21,6 @@ export type UpdateProfileInput = {
   profileVisible?: boolean;
   showAge?: boolean;
   dataSharing?: boolean;
-  /** Chaine vide ou null pour retirer le statut. */
   statusText?: string | null;
   notifyNewMessages?: boolean;
 };

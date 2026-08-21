@@ -23,10 +23,6 @@ export type StayToReview = {
   endDate: string;
 };
 
-/**
- * Le logement ou la personne a dormi. L'hote recoit chez lui et se rend chez
- * l'invite : chacun note donc le logement de l'autre.
- */
 function logementSejourne(exchange: {
   hostId: string;
   homeId: string;
@@ -44,7 +40,6 @@ export class ListStaysToReviewUseCase {
       where: {
         status: 'PAST',
         OR: [{ hostId: userId }, { guestId: userId }],
-        // Aucun avis de cette personne sur ce sejour.
         reviews: { none: { authorId: userId } },
       },
       orderBy: { endDate: 'desc' },
@@ -56,8 +51,6 @@ export class ListStaysToReviewUseCase {
       },
     });
 
-    // L'echange porte les identifiants des deux personnes sans relation
-    // declaree : leurs prenoms se lisent en une requete a part.
     const partenaires = await this.prisma.user.findMany({
       where: {
         id: {
@@ -79,8 +72,6 @@ export class ListStaysToReviewUseCase {
 
         const logement = estHote ? sejour.guestHome : sejour.home;
 
-        // Un echange sans logement en retour ne se note pas : l'hote n'a
-        // sejourne nulle part.
         if (!logement) return null;
 
         return {
@@ -97,14 +88,12 @@ export class ListStaysToReviewUseCase {
       .filter((sejour): sejour is StayToReview => sejour !== null);
   }
 
-  /** Un sejour non note suffit a bloquer un nouvel echange. */
   async hasPendingReview(userId: string): Promise<boolean> {
     const compte = await this.prisma.exchange.count({
       where: {
         status: 'PAST',
         OR: [{ hostId: userId }, { guestId: userId }],
         reviews: { none: { authorId: userId } },
-        // Meme condition que ci-dessus : sans logement sejourne, rien a noter.
         NOT: [
           { hostId: userId, guestHomeId: null },
         ],
@@ -155,8 +144,6 @@ export class ReviewStayUseCase {
 
     const propre = comment.trim();
 
-    // Le commentaire est obligatoire : une note seule n'apprend rien a qui
-    // lira l'avis.
     if (propre.length < COMMENTAIRE_MIN) {
       throw new BadRequestException(
         `Le commentaire doit faire au moins ${COMMENTAIRE_MIN} caractères.`,
@@ -202,10 +189,6 @@ export class ReviewStayUseCase {
     return avis;
   }
 
-  /**
-   * La moyenne et le nombre d'avis sont stockes sur le logement : les
-   * recalculer a chaque lecture couterait une agregation par carte affichee.
-   */
   private async rafraichirMoyenne(homeId: string): Promise<void> {
     const resultat = await this.prisma.review.aggregate({
       where: { homeId },

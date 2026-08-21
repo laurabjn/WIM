@@ -85,10 +85,6 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
       });
-      // Le jeton d'appareil est rattache au compte qui vient d'ouvrir : sans
-      // attendre, sinon la premiere notification pourrait partir dans le vide.
-      // L'adresse sert a reremplir le formulaire la prochaine fois ; le mot
-      // de passe, lui, reste au trousseau du telephone.
       await rememberEmail(email);
 
       await registerPushToken();

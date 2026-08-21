@@ -76,8 +76,6 @@ export class RequestExchangeUseCase {
       select: { id: true, status: true },
     });
 
-    // Un sejour passe non note ferme la porte a un nouvel echange : c'est la
-    // seule contrainte qui rende la notation reellement obligatoire.
     if (await this.staysToReview.hasPendingReview(input.requesterId)) {
       throw new BadRequestException(
         'Notez votre dernier séjour avant de demander un nouvel échange.',

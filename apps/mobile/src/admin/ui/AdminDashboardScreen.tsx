@@ -69,8 +69,6 @@ export function AdminDashboardScreen({
     }
   }
 
-  // Ce qui reste a traiter passe avant le volume : c'est ce qui appelle une
-  // action.
   const aTraiter = [
     {
       cle: 'pending',

@@ -3,8 +3,6 @@ import { CreateMessageData, FindMessagesOptions, FindMessagesResult, MessageRepo
 import { PrismaService } from '../database/prisma/prisma.service';
 import { ChatMessage } from 'src/domain/auth/repositories/chat.repository';
 
-
-// L'expediteur, et le message cite reduit a ce que la citation affiche.
 const AVEC_EXPEDITEUR_ET_CITATION = {
   sender: {
     select: {

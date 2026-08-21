@@ -51,10 +51,6 @@ export class SendMessageUseCase {
       );
     }
 
-    // Seuls les messages ecrits sont filtres. Un vocal porte lui aussi sa
-    // transcription, mais elle est faite par la reconnaissance de l'appareil :
-    // refuser un enregistrement sur un mot peut-etre mal entendu obligerait a
-    // tout refaire, sans moyen de corriger.
     if (type === 'TEXT' && isOffensive(cleanedContent)) {
       throw new BadRequestException(
         'Ce message contient des propos injurieux. Reformulez-le pour l’envoyer.',

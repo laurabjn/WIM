@@ -7,14 +7,6 @@ const executer = promisify(execFile);
 
 const logger = new Logger('AudioTranscoder');
 
-/**
- * La reconnaissance vocale de l'appareil rend un `wav` sur Android et un `caf`
- * sur iOS, tous deux en PCM non compresse. Le `caf` ne se lit pas sur Android,
- * et le poids brut penalise la reception : on ramene tout au m4a.
- *
- * En cas d'echec, le fichier d'origine est conserve : mieux vaut un vocal
- * lisible sur une seule plateforme qu'un message perdu.
- */
 export async function transcodeToM4a(
   cheminSource: string,
 ): Promise<{ chemin: string; transcode: boolean }> {

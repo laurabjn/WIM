@@ -38,10 +38,6 @@ export class FavoriteRepositoryPrisma implements FavoriteRepository {
     return favorites.map((favorite) => mapHome(favorite.home));
   }
 
-  /**
-   * Un blocage vaut dans les deux sens. Le favori lui-meme n'est pas
-   * supprime : debloquer la personne le fait revenir.
-   */
   private async hiddenOwnerIds(userId: string): Promise<string[]> {
     const relations = await this.prisma.blockedUser.findMany({
       where: { OR: [{ blockerId: userId }, { blockedId: userId }] },

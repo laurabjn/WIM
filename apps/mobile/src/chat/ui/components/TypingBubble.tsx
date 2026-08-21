@@ -4,7 +4,6 @@ import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
-/** Les trois points de la bulle, decales pour donner l'onde. */
 function Point({ delai, couleur }: { delai: number; couleur: string }) {
   const opacite = useRef(new Animated.Value(0.3)).current;
 
@@ -24,8 +23,6 @@ function Point({ delai, couleur }: { delai: number; couleur: string }) {
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-        // Le reste du cycle, pour que les trois points ne repartent pas
-        // ensemble apres le premier tour.
         Animated.delay(600 - delai),
       ]),
     );

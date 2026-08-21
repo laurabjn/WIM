@@ -26,8 +26,6 @@ export class NotificationController {
     return { registered: true };
   }
 
-  // Appelee a la deconnexion : sans cela, l'appareil continuerait de recevoir
-  // les messages du compte precedent.
   @Delete('token')
   async unregister(@Body() body: { token?: string }) {
     if (body?.token) await this.pushSender.removeToken(body.token);

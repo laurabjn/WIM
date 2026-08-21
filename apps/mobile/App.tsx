@@ -38,8 +38,6 @@ function Coquille({
 }) {
   const { isDark, colors } = useAppTheme();
 
-  // Toucher une notification doit ouvrir la conversation visee, pas seulement
-  // l'application. La navigation n'est tentee qu'une fois connecte.
   useNotificationNavigation(isAuthenticated);
 
   const navigationTheme = {
@@ -76,10 +74,6 @@ export default function App() {
     async function setup() {
       await initI18n();
 
-      // Une session valide dormait dans le stockage sans que personne ne la
-      // lise : les identifiants etaient redemandes a chaque ouverture. La
-      // lecture renouvelle le jeton au passage, et rend null si la session est
-      // reellement morte.
       try {
         const session = await getSession();
 
@@ -94,9 +88,6 @@ export default function App() {
     setup();
   }, []);
 
-  // Une connexion qui vient d'aboutir change de compte : le drapeau doit etre
-  // relu, sinon un administrateur atterrirait dans l'application ordinaire
-  // jusqu'au prochain demarrage.
   useEffect(() => {
     if (!isAuthenticated) {
       setIsAdmin(false);

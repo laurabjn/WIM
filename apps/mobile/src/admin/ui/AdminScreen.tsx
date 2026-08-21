@@ -301,7 +301,6 @@ const createStyles = (c: ThemeColors) =>
       borderRadius: 16,
       backgroundColor: c.surface,
     },
-    // Un signalement traite reste consultable mais s'efface visuellement.
     carteTraitee: { opacity: 0.55 },
     entete: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     avatar: {

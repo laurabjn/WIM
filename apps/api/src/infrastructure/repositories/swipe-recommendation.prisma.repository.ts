@@ -44,9 +44,6 @@ export class SwipeRecommendationPrismaRepository {
       .flatMap((chat) => chat.participants.map((p) => p.userId))
       .filter((id) => id !== userId);
 
-    // Un blocage vaut dans les deux sens : ni celui qui a bloque ni celui qui
-    // l'a ete ne doivent se retrouver dans les cartes de l'autre. Signaler
-    // quelqu'un le bloque aussi, donc c'est ici que le signalement prend effet.
     const blocages = await this.prisma.blockedUser.findMany({
       where: { OR: [{ blockerId: userId }, { blockedId: userId }] },
       select: { blockerId: true, blockedId: true },
@@ -70,11 +67,6 @@ export class SwipeRecommendationPrismaRepository {
           id: {
             notIn: excludedHomeIds,
           },
-
-          /*
-           * Adapte avec les champs existants.
-           */
-          // status: 'PUBLISHED',
 
           photos: {
             some: {},

@@ -23,16 +23,12 @@ export const VehicleCard: React.FC<Props> = ({ vehicle }) => {
     ? t(`vehicule.fuelType.${vehicle.fuelType}`)
     : null;
 
-  // Le type etait affiche tel qu'il est stocke : la carte annoncait "city".
-  // Un type inconnu vaut mieux tu que rendu brut.
   const TYPES = ['city', 'suv', 'break', 'van', 'utility'];
 
   const typeLabel = vehicle.type && TYPES.includes(vehicle.type)
     ? t(`vehicule.type.${vehicle.type}`)
     : null;
 
-  // Chaque mention est posee dans une liste, puis jointe : c'est l'absence de
-  // separateur qui collait "city" a "Électrique".
   const details = [
     vehicle.seats
       ? `${vehicle.seats} ${t('vehicule.places')}`

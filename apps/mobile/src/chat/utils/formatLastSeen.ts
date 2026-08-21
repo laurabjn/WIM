@@ -1,9 +1,5 @@
 import type { TFunction } from 'i18next';
 
-/**
- * Rend la derniere presence sous forme lisible. Au-dela d'une semaine, la
- * precision n'apprend plus rien : on s'arrete a la date.
- */
 export function formatLastSeen(iso: string, t: TFunction): string {
   const date = new Date(iso);
 

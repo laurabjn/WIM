@@ -18,9 +18,6 @@ export const RootNavigator: React.FC<Props> = ({
     return <AuthStackNavigator setIsAuthenticated={setIsAuthenticated} />;
   }
 
-  // Un compte d'administration ne voit que son panneau : lui donner les
-  // onglets ordinaires le ferait apparaitre dans les swipes et les recherches
-  // des autres, et fausserait ses propres chiffres.
   if (isAdmin) {
     return <AdminStackNavigator setIsAuthenticated={setIsAuthenticated} />;
   }

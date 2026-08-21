@@ -73,15 +73,11 @@ export async function sendVoiceMessageApi(
   form.append('file', {
     uri,
     name: `message.${extension}`,
-    // La reconnaissance rend un wav sur Android et un caf sur iOS : declarer
-    // le mauvais type ferait rejeter le fichier par le filtre du serveur.
     type: extension === 'caf' ? 'audio/x-caf' : 'audio/wav',
   } as unknown as Blob);
 
   form.append('durationMs', String(Math.round(durationMs)));
 
-  // Le texte reconnu sur l'appareil : le serveur le pose dans le message, ce
-  // qui le rend traduisible comme n'importe quel texte.
   form.append('transcript', transcript);
 
   const response = await fetch(`${API_URL}/chats/${chatId}/voice`, {
@@ -137,7 +133,6 @@ export async function deleteMessageApi(
   if (!response.ok) throw new Error('La suppression a échoué');
 }
 
-// Ne retire la conversation que de sa propre liste.
 export async function hideChatApi(
   token: string,
   chatId: string,
@@ -193,8 +188,6 @@ export async function sendMessageApi(
       'Content-Type': 'application/json',
       ...authHeaders(token),
     },
-    // Le champ n'est envoye que s'il existe : le filtre du serveur refuse un
-    // champ declare mais vide.
     body: JSON.stringify(replyToId ? { content, replyToId } : { content }),
   });
 

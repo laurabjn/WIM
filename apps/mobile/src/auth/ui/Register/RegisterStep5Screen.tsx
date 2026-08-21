@@ -119,8 +119,6 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
           },
       });
 
-      // Une inscription vaut une connexion : sans cela, un compte tout neuf ne
-      // recevrait aucune notification avant sa premiere reconnexion.
       await registerPushToken();
 
       navigation.navigate('RegisterIdentity', {

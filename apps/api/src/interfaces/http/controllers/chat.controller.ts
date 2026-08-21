@@ -68,8 +68,6 @@ function audioFileFilter(
   file: Express.Multer.File,
   callback: (error: Error | null, acceptFile: boolean) => void,
 ) {
-  // iOS enregistre en m4a, Android en aac ou 3gp : les deux plateformes
-  // annoncent des types varies pour ces memes conteneurs.
   if (!file.mimetype.match(/^audio\/|^video\/(mp4|3gpp)$/)) {
     return callback(
       new BadRequestException('Seuls les enregistrements audio sont acceptés.'),
@@ -246,8 +244,6 @@ export class ChatController {
         filename: editFileName,
       }),
       fileFilter: audioFileFilter,
-      // Le PCM de la reconnaissance vocale pese ~32 ko/s : trois minutes en
-      // font une vingtaine. La conversion en m4a n'intervient qu'apres.
       limits: { fileSize: 25 * 1024 * 1024 },
     }),
   )
@@ -262,16 +258,12 @@ export class ChatController {
       throw new BadRequestException('Aucun enregistrement reçu.');
     }
 
-    // Le multipart ne transporte que du texte : une duree illisible ne doit
-    // pas faire echouer l'envoi, la bulle sait se passer d'elle.
     const duration = Number.parseInt(dto?.durationMs ?? '', 10);
 
     const { chemin } = await transcodeToM4a(file.path);
 
     const nomFinal = basename(chemin);
 
-    // La transcription faite sur l'appareil devient le contenu du message :
-    // elle passe des lors par la traduction comme n'importe quel texte.
     const message = await this.sendMessage.execute({
       chatId,
       senderId: this.getUserId(request),
@@ -332,7 +324,6 @@ export class ChatController {
     return { deleted: true };
   }
 
-  // Ne retire la conversation que de sa propre liste : l'autre garde la sienne.
   @Delete(':chatId')
   async hideChatRoute(
     @Req() request: AuthenticatedRequest,
@@ -369,10 +360,6 @@ export class ChatController {
     }
   }
 
-  /**
-   * La notification ne part que vers l'autre personne, et seulement si elle n'a
-   * pas la conversation ouverte : le message y arrive deja sous ses yeux.
-   */
   private async notifierParPush(
     chatId: string,
     lastMessage: ChatMessages,
@@ -389,8 +376,6 @@ export class ChatController {
           ? 'Message vocal'
           : lastMessage.content;
 
-    // L'envoi ne doit jamais faire echouer la requete qui l'a declenche : le
-    // message est deja enregistre et diffuse.
     await this.pushSender
       .sendToUser(destinataireId, {
         title: lastMessage.sender.firstName,

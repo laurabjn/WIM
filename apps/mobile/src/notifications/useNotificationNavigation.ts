@@ -5,8 +5,6 @@ import {
   type NavigationContainerRef,
 } from '@react-navigation/native';
 
-// Hors de l'arbre de composants : la reponse a une notification arrive avant
-// que le moindre ecran ne soit monte.
 export const navigationRef =
   createNavigationContainerRef<Record<string, object | undefined>>();
 
@@ -21,13 +19,6 @@ function ouvrirConversation(chatId: string) {
   });
 }
 
-/**
- * Ouvre la conversation visee par une notification touchee.
- *
- * Deux cas a couvrir : l'application etait ouverte et recoit l'evenement, ou
- * elle etait fermee et c'est la notification qui l'a lancee — la reponse est
- * alors deja disponible au demarrage.
- */
 export function useNotificationNavigation(pret: boolean): void {
   useEffect(() => {
     if (!pret) return;
@@ -41,7 +32,6 @@ export function useNotificationNavigation(pret: boolean): void {
 
       traitee = true;
 
-      // Le conteneur de navigation peut n'etre pret qu'apres ce tour de boucle.
       setTimeout(() => ouvrirConversation(chatId), 0);
     }
 

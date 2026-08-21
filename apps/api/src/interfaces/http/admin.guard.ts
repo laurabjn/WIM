@@ -5,10 +5,6 @@ import {
   Injectable,
 } from '@nestjs/common';
 
-/**
- * Le drapeau vient du jeton, donc du serveur : il ne peut pas etre force
- * depuis l'application. A poser apres JwtAuthGuard, qui remplit `user`.
- */
 @Injectable()
 export class AdminGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {

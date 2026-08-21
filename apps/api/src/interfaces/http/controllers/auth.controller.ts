@@ -140,8 +140,6 @@ export class AuthController {
       secret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret',
     });
 
-    // Le jeton de rafraichissement est reconduit a chaque passage : une
-    // application ouverte regulierement ne demande jamais de se reconnecter.
     const refreshToken = await this.jwtService.signAsync(charge, {
       expiresIn: '30d',
       secret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',

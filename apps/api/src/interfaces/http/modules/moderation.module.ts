@@ -23,8 +23,6 @@ import {
     ConsoleEmailSender,
     NodemailerEmailSender,
     {
-      // Meme arbitrage qu'a l'authentification : sans SMTP configure, le mail
-      // s'affiche dans la console plutot que de disparaitre.
       provide: EMAIL_SENDER,
       useFactory: (
         nodemailer: NodemailerEmailSender,

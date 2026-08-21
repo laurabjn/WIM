@@ -3,7 +3,6 @@ export type MessageSender = {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
-  /** Statut court du moment, null passe un jour. */
   status?: string | null;
 };
 
@@ -16,13 +15,9 @@ export type ChatMessages = {
   content: string;
   type: MessageKind;
   attachmentUrl: string | null;
-  // Renseignee pour les vocaux uniquement : la bulle affiche la duree sans
-  // avoir a charger l'enregistrement.
   attachmentDurationMs?: number | null;
   translatedContent?: string | null;
-  /** Date de la derniere correction, absente si le message est d'origine. */
   editedAt?: string | null;
-  /** Apercu du message cite, null si la citation a ete supprimee depuis. */
   replyTo?: {
     id: string;
     content: string;

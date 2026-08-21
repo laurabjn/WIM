@@ -58,10 +58,6 @@ export class ReportUserUseCase {
     private readonly emailSender: EmailSenderPort,
   ) {}
 
-  /**
-   * Previent l'administration. Un signalement qui dort dans une table sans que
-   * personne ne le sache n'a jamais ete traite.
-   */
   private async prevenirAdministration(
     reportId: string,
     reason: string,
@@ -86,8 +82,6 @@ export class ReportUserUseCase {
           .join(String.fromCharCode(10)),
       });
     } catch (error) {
-      // Le signalement est deja enregistre : l'echec du mail ne doit pas le
-      // faire echouer, sinon on perdrait la trace en voulant l'annoncer.
       this.logger.warn(
         `Alerte de signalement non envoyee : ${
           error instanceof Error ? error.message : String(error)
@@ -135,8 +129,6 @@ export class ReportUserUseCase {
       message?.trim() || null,
     );
 
-    // Signaler quelqu'un, c'est ne plus vouloir le croiser : le blocage suit.
-    // Il reste retirable depuis les reglages, le signalement non.
     await this.prisma.blockedUser.upsert({
       where: {
         blockerId_blockedId: { blockerId: reporterId, blockedId: reportedId },

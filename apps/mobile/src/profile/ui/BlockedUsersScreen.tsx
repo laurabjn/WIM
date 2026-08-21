@@ -66,8 +66,6 @@ export function BlockedUsersScreen({ navigation }: Props) {
 
       await unblockUserApi(session.accessToken, utilisateur.id);
 
-      // On retire la ligne sans recharger : la reponse du serveur ne dit rien
-      // de plus que ce que l'on sait deja.
       setBloques((actuels) =>
         actuels.filter((membre) => membre.id !== utilisateur.id),
       );

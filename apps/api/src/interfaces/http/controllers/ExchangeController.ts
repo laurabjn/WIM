@@ -47,8 +47,6 @@ export class ExchangeController {
     private readonly chatRepository: ChatRepository,
   ) {}
 
-  // Les sejours termines que cette personne n'a pas encore notes. L'ecran
-  // s'en sert autant pour proposer la notation que pour expliquer un blocage.
   @Get('stays-to-review')
   async staysToReview(@Req() req: any) {
     return this.listStaysToReview.execute(req.user.sub);
