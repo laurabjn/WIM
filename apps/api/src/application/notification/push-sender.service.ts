@@ -34,13 +34,21 @@ export class PushSenderService {
     await this.prisma.pushToken.deleteMany({ where: { token } });
   }
 
-  async sendToUser(userId: string, notification: Notification): Promise<void> {
-    const destinataire = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { notifyNewMessages: true },
-    });
+  async sendToUser(
+    userId: string,
+    notification: Notification,
+    options: { onlyIfMessagesEnabled?: boolean } = {},
+  ): Promise<void> {
+    const { onlyIfMessagesEnabled = true } = options;
 
-    if (destinataire?.notifyNewMessages === false) return;
+    if (onlyIfMessagesEnabled) {
+      const destinataire = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { notifyNewMessages: true },
+      });
+
+      if (destinataire?.notifyNewMessages === false) return;
+    }
 
     const tokens = await this.prisma.pushToken.findMany({
       where: { userId },

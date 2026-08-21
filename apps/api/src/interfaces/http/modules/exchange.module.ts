@@ -1,4 +1,12 @@
 import { Module } from '@nestjs/common';
+import { ReviewReminderService } from 'src/application/exchange/services/review-reminder.service';
+import { NotificationModule } from './notification.module';
+import { ConsoleEmailSender } from 'src/infrastructure/notifications/console-email.sender';
+import {
+  NodemailerEmailSender,
+  isSmtpConfigured,
+} from 'src/infrastructure/notifications/nodemailer-email.sender';
+import { EMAIL_SENDER } from '../tokens/token';
 import { ListMyExchangesUseCase } from 'src/application/exchange/use-cases/list-my-exchanges.usecase';
 import {
   CancelExchangeUseCase,
@@ -21,11 +29,22 @@ import {
 } from 'src/application/exchange/use-cases/review-stay.usecase';
 
 @Module({
-  imports: [ModerationModule, WebsocketModule],
+  imports: [NotificationModule, ModerationModule, WebsocketModule],
   controllers: [ExchangeController],
   providers: [
     PrismaService,
     StayLifecycleService,
+    ReviewReminderService,
+    ConsoleEmailSender,
+    NodemailerEmailSender,
+    {
+      provide: EMAIL_SENDER,
+      useFactory: (
+        nodemailer: NodemailerEmailSender,
+        console_: ConsoleEmailSender,
+      ) => (isSmtpConfigured() ? nodemailer : console_),
+      inject: [NodemailerEmailSender, ConsoleEmailSender],
+    },
     ListStaysToReviewUseCase,
     ReviewStayUseCase,
     ExchangeRepositoryPrisma,
