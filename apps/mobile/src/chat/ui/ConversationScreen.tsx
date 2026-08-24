@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { usePendingStayReview } from 'src/home/infrastructure/hooks/usePendingStayReview';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
   ActivityIndicator,
@@ -179,6 +180,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<ChatMessages | null>(null);
   const [actionsFor, setActionsFor] = useState<ChatMessages | null>(null);
+  const sejourANoter = usePendingStayReview();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<ChatMessages[]>([]);
@@ -941,10 +943,36 @@ export function ConversationScreen({ route, navigation }: Props) {
     ]);
   }
 
+  function avertirSejourANoter() {
+    if (!sejourANoter) return false;
+
+    Alert.alert(
+      t('exchange:review.blockedTitle'),
+      t('exchange:review.blockedText'),
+      [
+        { text: t('exchange:review.later'), style: 'cancel' },
+        {
+          text: t('exchange:review.rateNow'),
+          onPress: () =>
+            navigation.navigate('ReviewStay', {
+              exchangeId: sejourANoter.exchangeId,
+              homeTitle: sejourANoter.homeTitle,
+              homePhotoUrl: sejourANoter.homePhotoUrl,
+              partnerFirstName: sejourANoter.partnerFirstName,
+            }),
+        },
+      ],
+    );
+
+    return true;
+  }
+
   async function proposeExchange() {
     setMenuOpen(false);
 
     if (!participantId) return;
+
+    if (avertirSejourANoter()) return;
 
     const session = await getSession();
 

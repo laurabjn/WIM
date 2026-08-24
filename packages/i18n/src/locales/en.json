@@ -735,7 +735,11 @@
       "error": "Your review could not be saved.",
       "pendingTitle": "A stay is waiting for your rating",
       "pendingText": "Rate it to be able to arrange a new exchange.",
-      "rateNow": "Rate this stay"
+      "rateNow": "Rate this stay",
+      "blockedTitle": "A stay is waiting for your rating",
+      "blockedText": "Rate your last stay before arranging a new exchange.",
+      "later": "Later",
+      "blockedFromHome": "Rate your last stay before arranging a new exchange. The reminder is at the top of your Exchanges page."
     }
   },
   "admin": {

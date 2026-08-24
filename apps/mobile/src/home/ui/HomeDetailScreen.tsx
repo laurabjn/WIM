@@ -1,7 +1,9 @@
 import { Home } from '@wim/shared/home/home.type';
+import { usePendingStayReview } from '../infrastructure/hooks/usePendingStayReview';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Alert,
   ScrollView,
   Share,
   StyleSheet,
@@ -31,7 +33,8 @@ import type { ThemeColors } from 'src/theme/colors';
 type Props = NativeStackScreenProps<ProfileStackParamList, 'HomeDetails'>;
 
 export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
-  const { t } = useTranslation(["home", "profile", "common"]);
+  const { t } = useTranslation(["home", "profile", "common", "exchange"]);
+  const sejourANoter = usePendingStayReview();
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params;
@@ -219,9 +222,20 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           ) : (
             <HomeAvailabilityBadge
               home={home}
-              onPressContact={() =>
-                navigation.navigate('ExchangeAvailability', { homeId: home.id })
-              }
+              onPressContact={() => {
+                if (sejourANoter) {
+                  Alert.alert(
+                    t('exchange:review.blockedTitle'),
+                    t('exchange:review.blockedFromHome'),
+                  );
+
+                  return;
+                }
+
+                navigation.navigate('ExchangeAvailability', {
+                  homeId: home.id,
+                });
+              }}
             />
           )}
 

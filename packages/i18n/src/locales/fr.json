@@ -734,7 +734,11 @@
       "error": "Votre avis n'a pas pu être enregistré.",
       "pendingTitle": "Un séjour attend votre note",
       "pendingText": "Notez-le pour pouvoir organiser un nouvel échange.",
-      "rateNow": "Noter ce séjour"
+      "rateNow": "Noter ce séjour",
+      "blockedTitle": "Un séjour attend votre note",
+      "blockedText": "Notez votre dernier séjour avant d'organiser un nouvel échange.",
+      "later": "Plus tard",
+      "blockedFromHome": "Notez votre dernier séjour avant d'organiser un nouvel échange. Le rappel se trouve en haut de votre page Échanges."
     }
   },
   "admin": {
