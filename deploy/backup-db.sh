@@ -8,6 +8,14 @@
 
 set -euo pipefail
 
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin${PATH:+:$PATH}"
+export PATH
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "[backup] ERREUR : docker introuvable dans le PATH ($PATH)" >&2
+  exit 1
+fi
+
 REPO_DIR="${REPO_DIR:-/opt/wim}"
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/wim}"
 RETENTION_DAYS="${RETENTION_DAYS:-14}"
