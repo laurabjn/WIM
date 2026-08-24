@@ -30,6 +30,13 @@ fi
 set -a && . "$ENV_FILE" && set +a
 
 mkdir -p "$BACKUP_DIR"
+
+if [ ! -w "$BACKUP_DIR" ]; then
+  echo "[backup] ERREUR : $BACKUP_DIR n'est pas accessible en ecriture pour $(id -un)." >&2
+  echo "[backup] Corrigez avec : sudo chown $(id -un) $BACKUP_DIR" >&2
+  exit 1
+fi
+
 STAMP="$(date +%Y%m%d-%H%M%S)"
 DUMP_FILE="$BACKUP_DIR/wim-$STAMP.dump"
 
