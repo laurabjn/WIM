@@ -43,6 +43,13 @@
           "microphonePermission": "Wim utilise le micro pour enregistrer vos messages vocaux.",
           "speechRecognitionPermission": "Wim transcrit vos messages vocaux directement sur votre téléphone."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#3FC0BF"
+        }
       ]
     ],
     "extra": {
