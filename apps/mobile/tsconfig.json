@@ -1,47 +1,24 @@
 {
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "module": "commonjs",
-    "target": "ES2021",
-    "moduleResolution": "node",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
-    "paths": {
-      "src/*": [
-        "src/*"
-      ],
-      "@wim/shared": [
-        "../../packages/shared/src"
-      ],
-      "@wim/shared/*": [
-        "../../packages/shared/src/*"
-      ]
-    },
     "strict": true,
-    "skipLibCheck": true,
-    "types": [
-      "node",
-      "jest"
-    ]
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"],
+      "@wim/shared": ["../../packages/shared/src"],
+      "@wim/shared/*": ["../../packages/shared/src/*"],
+      "@wim/i18n": ["../../packages/i18n/src"],
+      "@wim/i18n/*": ["../../packages/i18n/src/*"]
+    },
+    "types": ["jest", "node"]
   },
   "include": [
     "src/**/*",
     "test/**/*",
-    "prisma/**/*",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "expo-env.d.ts",
+    ".expo/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
-  "extends": "expo/tsconfig.base"
+  "exclude": ["node_modules", "dist"]
 }
