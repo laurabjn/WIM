@@ -233,21 +233,33 @@ source ~/.bashrc
 
 ## 8. Sauvegardes
 
+Le script dumpe la base depuis le conteneur : il lui faut donc l'accès au
+socket Docker. Si ton compte n'est pas dans le groupe `docker` — le cas par
+défaut — lance-le avec `sudo`, sans quoi il s'arrête sur
+`permission denied ... /var/run/docker.sock`.
+
 ```bash
 chmod +x /opt/wim/deploy/backup-db.sh
 sudo mkdir -p /var/backups/wim
 
 # Test manuel
-/opt/wim/deploy/backup-db.sh
+sudo /opt/wim/deploy/backup-db.sh
 
-# Planification quotidienne à 3h
-crontab -e
+# Planification quotidienne à 3h, dans la crontab de root pour la même raison
+sudo crontab -e
 # ajouter :
 0 3 * * * /opt/wim/deploy/backup-db.sh >> /var/log/wim-backup.log 2>&1
 ```
 
 Le script dumpe la base (`pg_dump -Fc`) **et** archive le volume des uploads,
 avec 14 jours de rétention.
+
+Une sauvegarde qui échoue en silence ne se découvre qu'au moment de restaurer.
+Après la première nuit, vérifie que le fichier existe :
+
+```bash
+ls -lh /var/backups/wim/
+```
 
 **Restauration** :
 
