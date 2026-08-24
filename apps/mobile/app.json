@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "Wim",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,8 +10,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
-      "package": "com.wim.mobile"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
