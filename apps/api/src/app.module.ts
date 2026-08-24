@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ReviewModule } from './interfaces/http/modules/review.module';
 import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from './interfaces/http/modules/http.module';
 import { WebsocketModule } from './interfaces/websocket/websocket.module';
@@ -39,6 +40,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ChatModule,
     NotificationModule,
     AdminModule,
+    ReviewModule,
     HealthModule,
     ModerationModule
   ],

@@ -7,6 +7,7 @@ import {
 
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { isOffensive } from 'src/application/moderation/offensive-language';
+import { HomeRatingService } from 'src/application/home/services/home-rating.service';
 
 const NOTE_MIN = 1;
 const NOTE_MAX = 5;
@@ -106,7 +107,10 @@ export class ListStaysToReviewUseCase {
 
 @Injectable()
 export class ReviewStayUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly rating: HomeRatingService,
+  ) {}
 
   async execute(
     exchangeId: string,
@@ -184,27 +188,8 @@ export class ReviewStayUseCase {
       select: { id: true },
     });
 
-    await this.rafraichirMoyenne(homeId);
+    await this.rating.recalculer(homeId);
 
     return avis;
-  }
-
-  private async rafraichirMoyenne(homeId: string): Promise<void> {
-    const resultat = await this.prisma.review.aggregate({
-      where: { homeId },
-      _avg: { score: true },
-      _count: { _all: true },
-    });
-
-    await this.prisma.home.update({
-      where: { id: homeId },
-      data: {
-        averageRating:
-          resultat._avg.score !== null
-            ? Math.round(resultat._avg.score * 10) / 10
-            : null,
-        reviewsCount: resultat._count._all,
-      },
-    });
   }
 }

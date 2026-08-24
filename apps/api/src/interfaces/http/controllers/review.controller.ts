@@ -1,0 +1,100 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+
+import {
+  DeleteReviewUseCase,
+  ListHomeReviewsUseCase,
+  ListUserReviewsUseCase,
+  ReplyToReviewUseCase,
+  ReportReviewUseCase,
+  UpdateReviewUseCase,
+} from 'src/application/home/use-cases/manage-reviews.usecase';
+import { JwtAuthGuard } from '../jwt-auth.guard';
+
+type AuthenticatedRequest = { user?: { sub?: string } };
+
+@Controller('reviews')
+@UseGuards(JwtAuthGuard)
+export class ReviewController {
+  constructor(
+    private readonly listHomeReviews: ListHomeReviewsUseCase,
+    private readonly listUserReviews: ListUserReviewsUseCase,
+    private readonly updateReview: UpdateReviewUseCase,
+    private readonly deleteReview: DeleteReviewUseCase,
+    private readonly replyToReview: ReplyToReviewUseCase,
+    private readonly reportReview: ReportReviewUseCase,
+  ) {}
+
+  @Get('home/:homeId')
+  async byHome(
+    @Param('homeId') homeId: string,
+    @Query('cursor') cursor?: string,
+  ) {
+    return this.listHomeReviews.execute(homeId, cursor);
+  }
+
+  @Get('user/:userId')
+  async byUser(@Param('userId') userId: string) {
+    return this.listUserReviews.execute(userId);
+  }
+
+  @Patch(':reviewId')
+  async update(
+    @Req() request: AuthenticatedRequest,
+    @Param('reviewId') reviewId: string,
+    @Body() body: { score?: number; comment?: string },
+  ) {
+    return this.updateReview.execute(
+      reviewId,
+      request.user?.sub ?? '',
+      Number(body?.score),
+      body?.comment ?? '',
+    );
+  }
+
+  @Delete(':reviewId')
+  async remove(
+    @Req() request: AuthenticatedRequest,
+    @Param('reviewId') reviewId: string,
+  ) {
+    await this.deleteReview.execute(reviewId, request.user?.sub ?? '');
+
+    return { deleted: true };
+  }
+
+  @Post(':reviewId/reply')
+  async reply(
+    @Req() request: AuthenticatedRequest,
+    @Param('reviewId') reviewId: string,
+    @Body() body: { reply?: string },
+  ) {
+    return this.replyToReview.execute(
+      reviewId,
+      request.user?.sub ?? '',
+      body?.reply ?? '',
+    );
+  }
+
+  @Post(':reviewId/report')
+  async report(
+    @Req() request: AuthenticatedRequest,
+    @Param('reviewId') reviewId: string,
+    @Body() body: { reason?: string },
+  ) {
+    return this.reportReview.execute(
+      reviewId,
+      request.user?.sub ?? '',
+      body?.reason ?? '',
+    );
+  }
+}

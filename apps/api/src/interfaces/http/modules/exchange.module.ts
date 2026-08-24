@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HomeRatingService } from 'src/application/home/services/home-rating.service';
 import { ReviewReminderService } from 'src/application/exchange/services/review-reminder.service';
 import { NotificationModule } from './notification.module';
 import { ConsoleEmailSender } from 'src/infrastructure/notifications/console-email.sender';
@@ -34,6 +35,7 @@ import {
   providers: [
     PrismaService,
     StayLifecycleService,
+    HomeRatingService,
     ReviewReminderService,
     ConsoleEmailSender,
     NodemailerEmailSender,

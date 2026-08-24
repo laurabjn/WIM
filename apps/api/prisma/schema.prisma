@@ -421,6 +421,11 @@ model Review {
   score   Int
   comment String
 
+  reply     String?
+  replyAt   DateTime? @map("reply_at")
+
+  reports UserReport[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -472,6 +477,9 @@ model UserReport {
 
   reason  String
   message String?
+
+  reviewId String? @map("review_id")
+  review   Review? @relation(fields: [reviewId], references: [id], onDelete: SetNull)
 
   handledAt DateTime? @map("handled_at")
 
