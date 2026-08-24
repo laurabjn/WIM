@@ -19,6 +19,14 @@ function ouvrirConversation(chatId: string) {
   });
 }
 
+function ouvrirLesEchanges() {
+  if (!navigationRef.isReady()) return;
+
+  const cible = navigationRef as NavigationContainerRef<any>;
+
+  cible.navigate('ExchangeTab', { screen: 'Exchanges' });
+}
+
 export function useNotificationNavigation(pret: boolean): void {
   useEffect(() => {
     if (!pret) return;
@@ -26,9 +34,22 @@ export function useNotificationNavigation(pret: boolean): void {
     let traitee = false;
 
     function traiter(response: Notifications.NotificationResponse | null) {
-      const chatId = response?.notification.request.content.data?.chatId;
+      if (traitee) return;
 
-      if (typeof chatId !== 'string' || traitee) return;
+      const donnees = response?.notification.request.content.data;
+
+      const chatId = donnees?.chatId;
+      const reviewExchangeId = donnees?.reviewExchangeId;
+
+      if (typeof reviewExchangeId === 'string') {
+        traitee = true;
+
+        setTimeout(ouvrirLesEchanges, 0);
+
+        return;
+      }
+
+      if (typeof chatId !== 'string') return;
 
       traitee = true;
 
