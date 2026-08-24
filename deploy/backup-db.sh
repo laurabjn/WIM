@@ -39,20 +39,24 @@ fi
 
 STAMP="$(date +%Y%m%d-%H%M%S)"
 DUMP_FILE="$BACKUP_DIR/wim-$STAMP.dump"
+PARTIAL="$DUMP_FILE.part"
+
+trap 'rm -f "$PARTIAL"' EXIT
 
 echo "[backup] $(date -Is) — dump de la base $POSTGRES_DB"
 
 # Format custom (-Fc) : compressé et restaurable sélectivement via pg_restore.
 docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" wim_db \
-  pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc > "$DUMP_FILE"
+  pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc > "$PARTIAL"
 
 # Un dump tronqué (disque plein, conteneur tué) ne doit pas écraser l'historique
 # ni passer pour une sauvegarde valide.
-if [ ! -s "$DUMP_FILE" ]; then
-  echo "[backup] ERREUR : dump vide, suppression" >&2
-  rm -f "$DUMP_FILE"
+if [ ! -s "$PARTIAL" ]; then
+  echo "[backup] ERREUR : dump vide" >&2
   exit 1
 fi
+
+mv "$PARTIAL" "$DUMP_FILE"
 
 # Les fichiers uploadés ne sont pas dans la base : les sauvegarder aussi.
 UPLOADS_FILE="$BACKUP_DIR/wim-uploads-$STAMP.tar.gz"
