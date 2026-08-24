@@ -9,7 +9,8 @@ import { EMAIL_SENDER } from 'src/interfaces/http/tokens/token';
 const JOUR_MS = 24 * 60 * 60 * 1000;
 const DELAI_PREMIER_RAPPEL_MS = JOUR_MS;
 const INTERVALLE_ENTRE_RAPPELS_MS = 3 * JOUR_MS;
-const ABANDON_APRES_MS = 30 * JOUR_MS;
+const SEJOUR_ANCIEN_APRES_MS = 30 * JOUR_MS;
+const INTERVALLE_SEJOUR_ANCIEN_MS = 14 * JOUR_MS;
 const LOT_MAX = 200;
 
 type Destinataire = {
@@ -73,19 +74,23 @@ export class ReviewReminderService {
   private async destinatairesDuJour(): Promise<Destinataire[]> {
     const maintenant = Date.now();
 
+    const limiteRecente = new Date(maintenant - INTERVALLE_ENTRE_RAPPELS_MS);
+    const limiteAncienne = new Date(maintenant - INTERVALLE_SEJOUR_ANCIEN_MS);
+    const bascule = new Date(maintenant - SEJOUR_ANCIEN_APRES_MS);
+
     const sejours = await this.prisma.exchange.findMany({
       where: {
         status: 'PAST',
-        endDate: {
-          lt: new Date(maintenant - DELAI_PREMIER_RAPPEL_MS),
-          gt: new Date(maintenant - ABANDON_APRES_MS),
-        },
+        endDate: { lt: new Date(maintenant - DELAI_PREMIER_RAPPEL_MS) },
         OR: [
           { reviewReminderAt: null },
           {
-            reviewReminderAt: {
-              lt: new Date(maintenant - INTERVALLE_ENTRE_RAPPELS_MS),
-            },
+            endDate: { gte: bascule },
+            reviewReminderAt: { lt: limiteRecente },
+          },
+          {
+            endDate: { lt: bascule },
+            reviewReminderAt: { lt: limiteAncienne },
           },
         ],
       },
