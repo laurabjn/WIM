@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import { AdminAlertService } from 'src/application/moderation/admin-alert.service';
 import { isOffensive } from 'src/application/moderation/offensive-language';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { HomeRatingService } from '../services/home-rating.service';
@@ -196,7 +197,10 @@ export class ReplyToReviewUseCase {
 
 @Injectable()
 export class ReportReviewUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly adminAlert: AdminAlertService,
+  ) {}
 
   async execute(
     reviewId: string,
@@ -205,7 +209,12 @@ export class ReportReviewUseCase {
   ): Promise<{ id: string }> {
     const avis = await this.prisma.review.findUnique({
       where: { id: reviewId },
-      select: { id: true, authorId: true, comment: true },
+      select: {
+        id: true,
+        authorId: true,
+        comment: true,
+        author: { select: { firstName: true, lastName: true, email: true } },
+      },
     });
 
     if (!avis) throw new NotFoundException('Avis introuvable.');
@@ -220,7 +229,7 @@ export class ReportReviewUseCase {
       throw new BadRequestException('Un motif est requis.');
     }
 
-    return this.prisma.userReport.create({
+    const report = await this.prisma.userReport.create({
       data: {
         reporterId,
         reportedId: avis.authorId,
@@ -230,5 +239,19 @@ export class ReportReviewUseCase {
       },
       select: { id: true },
     });
+
+    await this.adminAlert.signalementRecu({
+      reportId: report.id,
+      reason: reason.trim(),
+      message: avis.comment.slice(0, 500),
+      cible: `un avis publié par ${[
+        avis.author.firstName,
+        avis.author.lastName,
+      ]
+        .filter(Boolean)
+        .join(' ')} (${avis.author.email})`,
+    });
+
+    return report;
   }
 }

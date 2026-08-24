@@ -1,13 +1,10 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 
-import type { EmailSenderPort } from 'src/application/notifications/ports/email-sender.port';
-import { EMAIL_SENDER } from 'src/interfaces/http/tokens/token';
+import { AdminAlertService } from './admin-alert.service';
 
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 
@@ -50,45 +47,10 @@ export class UnblockUserUseCase {
 
 @Injectable()
 export class ReportUserUseCase {
-  private readonly logger = new Logger(ReportUserUseCase.name);
-
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(EMAIL_SENDER)
-    private readonly emailSender: EmailSenderPort,
+    private readonly adminAlert: AdminAlertService,
   ) {}
-
-  private async prevenirAdministration(
-    reportId: string,
-    reason: string,
-    message: string | null,
-  ): Promise<void> {
-    const destinataire = process.env.ADMIN_EMAIL?.trim();
-
-    if (!destinataire) return;
-
-    try {
-      await this.emailSender.send({
-        to: destinataire,
-        subject: `Wim — nouveau signalement : ${reason}`,
-        text: [
-          `Motif : ${reason}`,
-          message ? `Message : ${message}` : null,
-          '',
-          `Identifiant du signalement : ${reportId}`,
-          'Il est consultable dans l espace administration de l application.',
-        ]
-          .filter(Boolean)
-          .join(String.fromCharCode(10)),
-      });
-    } catch (error) {
-      this.logger.warn(
-        `Alerte de signalement non envoyee : ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
-    }
-  }
 
   async execute(
     reporterId: string,
@@ -106,7 +68,7 @@ export class ReportUserUseCase {
 
     const target = await this.prisma.user.findUnique({
       where: { id: reportedId },
-      select: { id: true },
+      select: { id: true, firstName: true, lastName: true, email: true },
     });
 
     if (!target) {
@@ -123,11 +85,14 @@ export class ReportUserUseCase {
       select: { id: true },
     });
 
-    await this.prevenirAdministration(
-      report.id,
-      reason.trim(),
-      message?.trim() || null,
-    );
+    await this.adminAlert.signalementRecu({
+      reportId: report.id,
+      reason: reason.trim(),
+      message: message?.trim() || null,
+      cible: `le compte de ${[target.firstName, target.lastName]
+        .filter(Boolean)
+        .join(' ')} (${target.email})`,
+    });
 
     await this.prisma.blockedUser.upsert({
       where: {

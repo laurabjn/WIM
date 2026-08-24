@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ModerationModule } from './moderation.module';
 
 import { HomeRatingService } from 'src/application/home/services/home-rating.service';
 import {
@@ -12,6 +13,7 @@ import { ReviewController } from '../controllers/review.controller';
 
 @Module({
   controllers: [ReviewController],
+  imports: [ModerationModule],
   providers: [
     PrismaService,
     HomeRatingService,
