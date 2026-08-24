@@ -42,6 +42,13 @@ export class PrismaProfileRepository implements ProfileRepository {
       showAge: user.showAge,
       dataSharing: user.dataSharing,
       notifyNewMessages: user.notifyNewMessages,
+      notifyPush: user.notifyPush,
+      notifyExchanges: user.notifyExchanges,
+      notifySms: user.notifySms,
+      marketingEmails: user.marketingEmails,
+      showPreciseLocation: user.showPreciseLocation,
+      allowMessages: user.allowMessages,
+      distanceUnit: user.distanceUnit === 'mi' ? 'mi' : 'km',
       homesCount,
       exchangesCount,
       reviewsCount: reviewStats._count._all,
@@ -128,6 +135,13 @@ export class PrismaProfileRepository implements ProfileRepository {
         showAge: input.showAge,
         dataSharing: input.dataSharing,
         notifyNewMessages: input.notifyNewMessages,
+        notifyPush: input.notifyPush,
+        notifyExchanges: input.notifyExchanges,
+        notifySms: input.notifySms,
+        marketingEmails: input.marketingEmails,
+        showPreciseLocation: input.showPreciseLocation,
+        allowMessages: input.allowMessages,
+        distanceUnit: input.distanceUnit,
         ...(input.statusText === undefined
           ? {}
           : {

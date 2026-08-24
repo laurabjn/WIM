@@ -37,17 +37,27 @@ export class PushSenderService {
   async sendToUser(
     userId: string,
     notification: Notification,
-    options: { onlyIfMessagesEnabled?: boolean } = {},
+    options: { categorie?: 'messages' | 'exchanges' } = {},
   ): Promise<void> {
-    const { onlyIfMessagesEnabled = true } = options;
+    const { categorie = 'messages' } = options;
 
-    if (onlyIfMessagesEnabled) {
-      const destinataire = await this.prisma.user.findUnique({
-        where: { id: userId },
-        select: { notifyNewMessages: true },
-      });
+    const destinataire = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        notifyPush: true,
+        notifyNewMessages: true,
+        notifyExchanges: true,
+      },
+    });
 
-      if (destinataire?.notifyNewMessages === false) return;
+    if (destinataire?.notifyPush === false) return;
+
+    if (categorie === 'messages' && destinataire?.notifyNewMessages === false) {
+      return;
+    }
+
+    if (categorie === 'exchanges' && destinataire?.notifyExchanges === false) {
+      return;
     }
 
     const tokens = await this.prisma.pushToken.findMany({

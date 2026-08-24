@@ -61,6 +61,17 @@ export class RequestExchangeUseCase {
 
     await this.blockedUsers.assertNotBlocked(input.requesterId, home.ownerId);
 
+    const proprietaire = await this.prisma.user.findUnique({
+      where: { id: home.ownerId },
+      select: { allowMessages: true },
+    });
+
+    if (proprietaire?.allowMessages === false) {
+      throw new BadRequestException(
+        'Cette personne n’accepte pas les nouveaux messages.',
+      );
+    }
+
     // Un seul echange vivant a la fois entre deux personnes. Sans ce garde-fou,
     // les demandes s'empilent et le bandeau n'en montre qu'une, les autres
     // devenant invisibles. Une fois l'echange termine, refuse ou annule, un

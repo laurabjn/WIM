@@ -23,4 +23,11 @@ export type UpdateProfileInput = {
   dataSharing?: boolean;
   statusText?: string | null;
   notifyNewMessages?: boolean;
+  notifyPush?: boolean;
+  notifyExchanges?: boolean;
+  notifySms?: boolean;
+  marketingEmails?: boolean;
+  showPreciseLocation?: boolean;
+  allowMessages?: boolean;
+  distanceUnit?: 'km' | 'mi';
 };

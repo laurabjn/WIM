@@ -55,6 +55,13 @@ export interface UserProfile {
   dataSharing?: boolean;
   status?: string | null;
   notifyNewMessages?: boolean;
+  notifyPush?: boolean;
+  notifyExchanges?: boolean;
+  notifySms?: boolean;
+  marketingEmails?: boolean;
+  showPreciseLocation?: boolean;
+  allowMessages?: boolean;
+  distanceUnit?: 'km' | 'mi';
 }
 
 export interface MyHome {

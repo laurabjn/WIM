@@ -165,7 +165,7 @@ export class ReviewReminderService {
           body: corps,
           data: { reviewExchangeId: destinataire.exchangeId },
         },
-        { onlyIfMessagesEnabled: false },
+        { categorie: 'exchanges' },
       )
       .catch(() => undefined);
 

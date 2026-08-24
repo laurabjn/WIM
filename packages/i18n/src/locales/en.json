@@ -788,7 +788,9 @@
     "statCurrentExchanges": "Current exchanges",
     "statPendingExchanges": "Pending exchanges",
     "statMessages": "Messages",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "runReminders": "Send rating reminders",
+    "remindersDone": "{{envoyes}} reminder(s) sent, {{termines}} stay(s) marked completed."
   },
   "search": {
     "search": "Search",

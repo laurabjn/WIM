@@ -41,12 +41,6 @@ export function SettingsScreen({ route, navigation }: Props) {
 
       if (cancelled) return;
 
-      setPushNotifications(enregistres.pushNotifications);
-      setSmsNotifications(enregistres.smsNotifications);
-      setNewExchangeDays(enregistres.newExchangeDays);
-      setMarketingEmails(enregistres.marketingEmails);
-      setShowPreciseLocation(enregistres.showPreciseLocation);
-      setAllowMessages(enregistres.allowMessages);
       setCurrency(enregistres.currency);
       setDistanceUnit(enregistres.distanceUnit);
     }
@@ -101,18 +95,30 @@ export function SettingsScreen({ route, navigation }: Props) {
     }
   }
 
-  const [pushNotifications, setPushNotifications] = useState(false);
-  const [smsNotifications, setSmsNotifications] = useState(false);
+  const [pushNotifications, setPushNotifications] = useState(
+    profile.notifyPush ?? true,
+  );
+  const [smsNotifications, setSmsNotifications] = useState(
+    profile.notifySms ?? false,
+  );
   const [newMessages, setNewMessages] = useState(
     profile.notifyNewMessages ?? true,
   );
-  const [newExchangeDays, setNewExchangeDays] = useState(true);
-  const [marketingEmails, setMarketingEmails] = useState(false);
+  const [newExchangeDays, setNewExchangeDays] = useState(
+    profile.notifyExchanges ?? true,
+  );
+  const [marketingEmails, setMarketingEmails] = useState(
+    profile.marketingEmails ?? false,
+  );
 
   const [profileVisible, setProfileVisible] = useState(true);
-  const [showPreciseLocation, setShowPreciseLocation] = useState(false);
+  const [showPreciseLocation, setShowPreciseLocation] = useState(
+    profile.showPreciseLocation ?? true,
+  );
   const [showAge, setShowAge] = useState(true);
-  const [allowMessages, setAllowMessages] = useState(true);
+  const [allowMessages, setAllowMessages] = useState(
+    profile.allowMessages ?? true,
+  );
 
   const [currency, setCurrency] = useState<'EUR' | 'USD' | 'GBP'>('EUR');
   const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km');
@@ -339,13 +345,23 @@ export function SettingsScreen({ route, navigation }: Props) {
             icon="⌂"
             label={t('profile:settings.pushNotifications')}
             value={pushNotifications}
-            onValueChange={(valeur) => enregistrerLocal('pushNotifications', valeur, setPushNotifications)}
+            onValueChange={(valeur) => {
+              setPushNotifications(valeur);
+              enregistrerProfil({ notifyPush: valeur }, () =>
+                setPushNotifications(!valeur),
+              );
+            }}
           />
           <SettingsSwitchRow
             icon="⌕"
             label={t('profile:settings.smsNotifications')}
             value={smsNotifications}
-            onValueChange={(valeur) => enregistrerLocal('smsNotifications', valeur, setSmsNotifications)}
+            onValueChange={(valeur) => {
+              setSmsNotifications(valeur);
+              enregistrerProfil({ notifySms: valeur }, () =>
+                setSmsNotifications(!valeur),
+              );
+            }}
           />
           <SettingsSwitchRow
             icon="✉"
@@ -362,13 +378,23 @@ export function SettingsScreen({ route, navigation }: Props) {
             icon="◎"
             label={t('profile:settings.updateMessages')}
             value={newExchangeDays}
-            onValueChange={(valeur) => enregistrerLocal('newExchangeDays', valeur, setNewExchangeDays)}
+            onValueChange={(valeur) => {
+              setNewExchangeDays(valeur);
+              enregistrerProfil({ notifyExchanges: valeur }, () =>
+                setNewExchangeDays(!valeur),
+              );
+            }}
           />
           <SettingsSwitchRow
             icon="✉"
             label={t('profile:settings.emailMarketing')}
             value={marketingEmails}
-            onValueChange={(valeur) => enregistrerLocal('marketingEmails', valeur, setMarketingEmails)}
+            onValueChange={(valeur) => {
+              setMarketingEmails(valeur);
+              enregistrerProfil({ marketingEmails: valeur }, () =>
+                setMarketingEmails(!valeur),
+              );
+            }}
           />
         </SettingsSection>
 
@@ -389,7 +415,12 @@ export function SettingsScreen({ route, navigation }: Props) {
             icon="⌖"
             label={t('profile:settings.preciseLocation')}
             value={showPreciseLocation}
-            onValueChange={(valeur) => enregistrerLocal('showPreciseLocation', valeur, setShowPreciseLocation)}
+            onValueChange={(valeur) => {
+              setShowPreciseLocation(valeur);
+              enregistrerProfil({ showPreciseLocation: valeur }, () =>
+                setShowPreciseLocation(!valeur),
+              );
+            }}
           />
 
           <SettingsSwitchRow
@@ -408,7 +439,12 @@ export function SettingsScreen({ route, navigation }: Props) {
             icon="✉"
             label={t('profile:settings.allowMessage')}
             value={allowMessages}
-            onValueChange={(valeur) => enregistrerLocal('allowMessages', valeur, setAllowMessages)}
+            onValueChange={(valeur) => {
+              setAllowMessages(valeur);
+              enregistrerProfil({ allowMessages: valeur }, () =>
+                setAllowMessages(!valeur),
+              );
+            }}
           />
 
           <SettingsSwitchRow

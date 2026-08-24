@@ -35,7 +35,14 @@ model User {
   statusText      String?   @map("status_text")
   statusUpdatedAt DateTime? @map("status_updated_at")
 
-  notifyNewMessages Boolean @default(true) @map("notify_new_messages")
+  notifyPush          Boolean @default(true) @map("notify_push")
+  notifyNewMessages   Boolean @default(true) @map("notify_new_messages")
+  notifyExchanges     Boolean @default(true) @map("notify_exchanges")
+  notifySms           Boolean @default(false) @map("notify_sms")
+  marketingEmails     Boolean @default(false) @map("marketing_emails")
+  showPreciseLocation Boolean @default(true) @map("show_precise_location")
+  allowMessages       Boolean @default(true) @map("allow_messages")
+  distanceUnit        String  @default("km") @map("distance_unit")
 
   pushTokens PushToken[]
 

@@ -787,7 +787,9 @@
     "statCurrentExchanges": "Échanges en cours",
     "statPendingExchanges": "Échanges en attente",
     "statMessages": "Messages",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "runReminders": "Envoyer les rappels de notation",
+    "remindersDone": "{{envoyes}} rappel(s) envoyé(s), {{termines}} séjour(s) passé(s) en terminé."
   },
   "search": {
     "search": "Recherche",
