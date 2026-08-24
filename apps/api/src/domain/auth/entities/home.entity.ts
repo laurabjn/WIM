@@ -47,6 +47,8 @@ export interface ReviewEntity {
   id: string;
   score: number;
   comment: string;
+  reply?: string | null;
+  replyAt?: Date | null;
   createdAt: Date;
   author: ReviewAuthorEntity;
 }

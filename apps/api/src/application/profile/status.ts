@@ -1,4 +1,3 @@
-/** Au-dela d'un jour, un statut n'a plus rien a dire : il cesse d'exister. */
 export const STATUS_TTL_MS = 24 * 60 * 60 * 1000;
 
 export function currentStatus(

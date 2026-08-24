@@ -82,6 +82,8 @@ export type Review = {
   score: number;
   comment: string;
   createdAt: string;
+  reply?: string | null;
+  replyAt?: string | null;
   author: {
     id: string;
     firstName?: string | null;

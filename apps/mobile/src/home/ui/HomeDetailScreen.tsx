@@ -1,13 +1,27 @@
 import { Home } from '@wim/shared/home/home.type';
+import {
+  deleteReviewApi,
+  replyToReviewApi,
+  reportReviewApi,
+  updateReviewApi,
+} from '../infrastructure/review.api';
+import { usePendingStayReview } from '../infrastructure/hooks/usePendingStayReview';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Pressable,
   ScrollView,
   Share,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { addFavoriteHome, getHomeById, removeFavoriteHome } from '../infrastructure/home.api';
 import { getSession } from 'src/auth/infrastructure/authStorage';
@@ -24,14 +38,16 @@ import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { HomeLocationMap } from './components/details/HomeLocationMap';
 import { OwnerHomeStatus } from './components/details/OwnerHomeStatus';
 import { getMyExchanges } from '../infrastructure/exchange.api';
-import type { Exchange } from '@wim/shared';
+import type { Exchange, Review } from '@wim/shared';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'HomeDetails'>;
 
 export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
-  const { t } = useTranslation(["home", "profile", "common"]);
+  const { t } = useTranslation(["home", "profile", "common", "exchange"]);
+  const sejourANoter = usePendingStayReview();
+
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params;
@@ -40,6 +56,23 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [token, setToken] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [myExchanges, setMyExchanges] = useState<Exchange[]>([]);
+  const [avisLocaux, setAvisLocaux] = useState<Review[] | null>(null);
+  const [saisie, setSaisie] = useState<{
+    mode: 'edit' | 'reply';
+    review: Review;
+    texte: string;
+  } | null>(null);
+  const [envoiSaisie, setEnvoiSaisie] = useState(false);
+
+  const echangeEnCours = useMemo(() => {
+    const enCours = myExchanges.find(
+      (exchange) =>
+        (exchange.homeId === home?.id || exchange.guestHomeId === home?.id) &&
+        ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status),
+    );
+
+    return (enCours?.status as 'PENDING' | 'FUTURE' | 'CURRENT') ?? null;
+  }, [myExchanges, home?.id]);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -179,6 +212,104 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
     
   const isMine = !!currentUserId && home.owner?.id === currentUserId;
 
+  const avis = avisLocaux ?? home.reviews ?? [];
+
+  async function avecJeton<T>(action: (jeton: string) => Promise<T>) {
+    const session = await getSession();
+
+    if (!session?.accessToken) return null;
+
+    return action(session.accessToken);
+  }
+
+  function ouvrirCorrection(review: Review) {
+    setSaisie({ mode: 'edit', review, texte: review.comment });
+  }
+
+  function ouvrirReponse(review: Review) {
+    setSaisie({ mode: 'reply', review, texte: '' });
+  }
+
+  async function validerSaisie() {
+    if (!saisie || envoiSaisie) return;
+
+    const texte = saisie.texte.trim();
+
+    if (!texte) return;
+
+    setEnvoiSaisie(true);
+
+    try {
+      if (saisie.mode === 'edit') {
+        await avecJeton((jeton) =>
+          updateReviewApi(jeton, saisie.review.id, saisie.review.score, texte),
+        );
+
+        setAvisLocaux(
+          avis.map((item) =>
+            item.id === saisie.review.id ? { ...item, comment: texte } : item,
+          ),
+        );
+      } else {
+        await avecJeton((jeton) =>
+          replyToReviewApi(jeton, saisie.review.id, texte),
+        );
+
+        setAvisLocaux(
+          avis.map((item) =>
+            item.id === saisie.review.id ? { ...item, reply: texte } : item,
+          ),
+        );
+      }
+
+      setSaisie(null);
+    } catch (error) {
+      Alert.alert('', error instanceof Error ? error.message : '');
+    } finally {
+      setEnvoiSaisie(false);
+    }
+  }
+
+  function confirmerSuppressionAvis(review: Review) {
+    Alert.alert(t('home:reviews.deleteTitle'), t('home:reviews.deleteConfirm'), [
+      { text: t('common:cancel'), style: 'cancel' },
+      {
+        text: t('home:reviews.delete'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await avecJeton((jeton) => deleteReviewApi(jeton, review.id));
+
+            setAvisLocaux(avis.filter((item) => item.id !== review.id));
+          } catch (error) {
+            Alert.alert('', error instanceof Error ? error.message : '');
+          }
+        },
+      },
+    ]);
+  }
+
+  function confirmerSignalementAvis(review: Review) {
+    Alert.alert(t('home:reviews.reportTitle'), t('home:reviews.reportConfirm'), [
+      { text: t('common:cancel'), style: 'cancel' },
+      {
+        text: t('home:reviews.report'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await avecJeton((jeton) =>
+              reportReviewApi(jeton, review.id, t('home:reviews.reportReason')),
+            );
+
+            Alert.alert('', t('home:reviews.reported'));
+          } catch (error) {
+            Alert.alert('', error instanceof Error ? error.message : '');
+          }
+        },
+      },
+    ]);
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -219,9 +350,21 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           ) : (
             <HomeAvailabilityBadge
               home={home}
-              onPressContact={() =>
-                navigation.navigate('ExchangeAvailability', { homeId: home.id })
-              }
+              exchangeStatus={echangeEnCours}
+              onPressContact={() => {
+                if (sejourANoter) {
+                  Alert.alert(
+                    t('exchange:review.blockedTitle'),
+                    t('exchange:review.blockedFromHome'),
+                  );
+
+                  return;
+                }
+
+                navigation.navigate('ExchangeAvailability', {
+                  homeId: home.id,
+                });
+              }}
             />
           )}
 
@@ -247,19 +390,139 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
             onPressAuthor={(userId) =>
               navigation.navigate('PublicProfile', { userId })
             }
-            reviews={home.reviews ?? []}
+            reviews={avis}
             averageRating={home.averageRating}
             reviewsCount={home.reviewsCount ?? 0}
+            currentUserId={currentUserId}
+            isOwner={isMine}
+            onEdit={ouvrirCorrection}
+            onDelete={confirmerSuppressionAvis}
+            onReply={ouvrirReponse}
+            onReport={confirmerSignalementAvis}
           />
         </View>
         <View style={styles.bottomSpacer} />
       </ScrollView>
+
+      <Modal
+        visible={saisie !== null}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={() => setSaisie(null)}
+      >
+        <KeyboardAvoidingView style={styles.saisieFond} behavior="padding">
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setSaisie(null)}
+          />
+
+          <View style={styles.saisieCarte}>
+            <Text style={styles.saisieTitre}>
+              {saisie?.mode === 'reply'
+                ? t('home:reviews.reply')
+                : t('home:reviews.edit')}
+            </Text>
+
+            <TextInput
+              style={styles.saisieChamp}
+              value={saisie?.texte ?? ''}
+              onChangeText={(texte) =>
+                setSaisie((actuel) => (actuel ? { ...actuel, texte } : actuel))
+              }
+              placeholder={
+                saisie?.mode === 'reply'
+                  ? t('home:reviews.replyPrompt')
+                  : t('home:reviews.editPrompt')
+              }
+              placeholderTextColor={themeColors.textFaint}
+              multiline
+              maxLength={1000}
+              textAlignVertical="top"
+              autoFocus
+            />
+
+            <View style={styles.saisieActions}>
+              <TouchableOpacity onPress={() => setSaisie(null)}>
+                <Text style={styles.saisieAnnuler}>{t('common:cancel')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.saisieValider}
+                disabled={!saisie?.texte.trim() || envoiSaisie}
+                onPress={validerSaisie}
+              >
+                {envoiSaisie ? (
+                  <ActivityIndicator size="small" color={themeColors.onContrast} />
+                ) : (
+                  <Text style={styles.saisieValiderTexte}>
+                    {t('common:save')}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
+  saisieFond: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 28,
+    backgroundColor: c.overlay,
+  },
+  saisieCarte: {
+    padding: 18,
+    borderRadius: 20,
+    backgroundColor: c.surface,
+  },
+  saisieTitre: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: c.text,
+  },
+  saisieChamp: {
+    marginTop: 12,
+    minHeight: 110,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: c.border,
+    fontSize: 15,
+    lineHeight: 20,
+    color: c.text,
+  },
+  saisieActions: {
+    marginTop: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 16,
+  },
+  saisieAnnuler: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: c.textMuted,
+  },
+  saisieValider: {
+    height: 40,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: c.contrast,
+  },
+  saisieValiderTexte: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: c.onContrast,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: c.surface,

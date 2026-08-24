@@ -21,6 +21,10 @@ import {
   RequestExchangeInput,
   RequestExchangeUseCase,
 } from 'src/application/exchange/use-cases/request-exchange.usecase';
+import {
+  ListStaysToReviewUseCase,
+  ReviewStayUseCase,
+} from 'src/application/exchange/use-cases/review-stay.usecase';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 import { AppGateway } from 'src/interfaces/websocket/app.gateway';
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
@@ -36,10 +40,31 @@ export class ExchangeController {
     private readonly requestExchangeUseCase: RequestExchangeUseCase,
     private readonly updateExchangeDatesUseCase: UpdateExchangeDatesUseCase,
     private readonly cancelExchangeUseCase: CancelExchangeUseCase,
+    private readonly listStaysToReview: ListStaysToReviewUseCase,
+    private readonly reviewStay: ReviewStayUseCase,
     private readonly gateway: AppGateway,
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: ChatRepository,
   ) {}
+
+  @Get('stays-to-review')
+  async staysToReview(@Req() req: any) {
+    return this.listStaysToReview.execute(req.user.sub);
+  }
+
+  @Post(':exchangeId/review')
+  async review(
+    @Req() req: any,
+    @Param('exchangeId') exchangeId: string,
+    @Body() body: { score?: number; comment?: string },
+  ) {
+    return this.reviewStay.execute(
+      exchangeId,
+      req.user.sub,
+      Number(body?.score),
+      body?.comment ?? '',
+    );
+  }
 
   @Post()
   async request(

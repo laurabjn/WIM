@@ -20,8 +20,6 @@ model User {
   rating            Int            @default(0)
   isAdmin           Boolean        @default(false) @map("is_admin")
 
-  // Un compte suspendu ne peut plus se connecter. La date sert autant de
-  // marqueur que de trace : on saura quand la decision a ete prise.
   suspendedAt DateTime? @map("suspended_at")
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @updatedAt @map("updated_at")
@@ -32,20 +30,19 @@ model User {
   preferredLocale   String         @default("fr")
   travelPreferences Json?
 
-  // Reglages de confidentialite. Ils vivent en base et non sur l'appareil :
-  // c'est le serveur qui doit les faire respecter, pas l'affichage.
-  // Ecrite a la deconnexion : elle seule permet d'afficher "vu il y a ..."
-  // quand la personne n'est plus connectee.
   lastSeenAt DateTime? @map("last_seen_at")
 
-  // Statut court, affiche au-dessus de l'avatar. Il se perime au bout d'un
-  // jour : c'est une humeur du moment, pas une seconde biographie.
   statusText      String?   @map("status_text")
   statusUpdatedAt DateTime? @map("status_updated_at")
 
-  // Le reglage vit sur le serveur : c'est lui qui envoie, il doit donc
-  // pouvoir le consulter. Range dans le telephone, il n'aurait aucun effet.
-  notifyNewMessages Boolean @default(true) @map("notify_new_messages")
+  notifyPush          Boolean @default(true) @map("notify_push")
+  notifyNewMessages   Boolean @default(true) @map("notify_new_messages")
+  notifyExchanges     Boolean @default(true) @map("notify_exchanges")
+  notifySms           Boolean @default(false) @map("notify_sms")
+  marketingEmails     Boolean @default(false) @map("marketing_emails")
+  showPreciseLocation Boolean @default(true) @map("show_precise_location")
+  allowMessages       Boolean @default(true) @map("allow_messages")
+  distanceUnit        String  @default("km") @map("distance_unit")
 
   pushTokens PushToken[]
 
@@ -232,9 +229,16 @@ model Exchange {
 
   status ExchangeStatus
 
+  reviewReminderAt DateTime? @map("review_reminder_at")
+  startReminderAt  DateTime? @map("start_reminder_at")
+  endReminderAt    DateTime? @map("end_reminder_at")
+
+  reviews Review[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@index([status, endDate])
   @@map("exchanges")
 }
 
@@ -340,8 +344,6 @@ model ChatParticipant {
   lastReadMessageId String?
   lastReadAt        DateTime?
 
-  // Supprimer une conversation ne l'efface que pour soi : l'autre garde la
-  // sienne. Elle reapparait si un nouveau message arrive apres cette date.
   hiddenAt DateTime? @map("hidden_at")
 
   chatId String
@@ -372,16 +374,10 @@ model Message {
   type          MessageType @default(TEXT)
   attachmentUrl String?     @map("attachment_url")
 
-  // La duree accompagne le vocal : sans elle, la bulle devrait charger chaque
-  // enregistrement de la liste pour afficher ne serait-ce que sa longueur.
   attachmentDurationMs Int? @map("attachment_duration_ms")
 
-  // Un message corrige doit le dire : sans cette date, le destinataire verrait
-  // le texte changer sous ses yeux sans savoir pourquoi.
   editedAt DateTime? @map("edited_at")
 
-  // Reponse a un message precis. SetNull plutot que Cascade : supprimer le
-  // message cite ne doit pas emporter la reponse avec lui.
   replyToId String?  @map("reply_to_id")
   replyTo   Message? @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
   replies   Message[] @relation("MessageReply")
@@ -421,19 +417,25 @@ model Review {
   authorId String @map("author_id")
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
+  exchangeId String?   @map("exchange_id")
+  exchange   Exchange? @relation(fields: [exchangeId], references: [id], onDelete: SetNull)
+
   score   Int
   comment String
+
+  reply     String?
+  replyAt   DateTime? @map("reply_at")
+
+  reports UserReport[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@unique([homeId, authorId])
+  @@unique([exchangeId, authorId])
   @@index([homeId])
   @@map("reviews")
 }
 
-// Un compte peut etre ouvert sur plusieurs appareils : chacun a son jeton, et
-// c'est le jeton, pas l'utilisateur, qui est unique.
 model PushToken {
   id String @id @default(uuid())
 
@@ -477,6 +479,9 @@ model UserReport {
 
   reason  String
   message String?
+
+  reviewId String? @map("review_id")
+  review   Review? @relation(fields: [reviewId], references: [id], onDelete: SetNull)
 
   handledAt DateTime? @map("handled_at")
 

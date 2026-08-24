@@ -16,6 +16,7 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
       firstName: true,
       lastName: true,
       avatarUrl: true,
+      showPreciseLocation: true,
       createdAt: true,
       homes: {
         select: {
@@ -58,6 +59,25 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
 export type PrismaHomeWithRelations = Prisma.HomeGetPayload<{
   include: typeof HOME_WITH_RELATIONS_INCLUDE;
 }>;
+
+const PRECISION_APPROCHEE = 100;
+
+function arrondirSiDemande(
+  valeur: unknown,
+  precise: boolean | undefined,
+): number | null {
+  if (valeur === null || valeur === undefined) return null;
+
+  const nombre = Number(valeur);
+
+  if (Number.isNaN(nombre)) return null;
+
+  if (precise === false) {
+    return Math.round(nombre * PRECISION_APPROCHEE) / PRECISION_APPROCHEE;
+  }
+
+  return nombre;
+}
 
 export function mapVehicle(vehicle: PrismaHomeWithRelations['vehicle']) {
   if (!vehicle) return null;
@@ -118,6 +138,8 @@ export function mapReview(
     id: review.id,
     score: review.score,
     comment: review.comment,
+    reply: review.reply,
+    replyAt: review.replyAt,
     createdAt: review.createdAt,
     author: {
       id: review.author.id,
@@ -138,8 +160,11 @@ export function mapHome(home: PrismaHomeWithRelations): HomeEntity {
     address: home.address,
     city: home.city,
     country: home.country,
-    latitude: home.latitude ? Number(home.latitude) : null,
-    longitude: home.longitude ? Number(home.longitude) : null,
+    latitude: arrondirSiDemande(home.latitude, home.owner?.showPreciseLocation),
+    longitude: arrondirSiDemande(
+      home.longitude,
+      home.owner?.showPreciseLocation,
+    ),
     capacity: home.capacity,
     beds: home.beds,
     bedrooms: home.bedrooms ?? 0,

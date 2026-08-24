@@ -26,7 +26,12 @@
     "noAvailability": "No availability for the moment",
     "available": "Available",
     "availableWithBlockDates": "Available with blocked dates",
-    "retry": "Try again"
+    "retry": "Try again",
+    "exchangeState": {
+      "PENDING": "Request pending",
+      "FUTURE": "Exchange planned",
+      "CURRENT": "Exchange ongoing"
+    }
   },
   "auth": {
     "welcomeTitle": "Welcome to Wim!",
@@ -663,7 +668,20 @@
       "showMore": "Show more",
       "showAllReviews": "Show all {{count}} reviews",
       "noReviews": "No reviews for the moment.",
-      "noReviewsDescription": "The first travelers will soon be able to share their experience."
+      "noReviewsDescription": "The first travelers will soon be able to share their experience.",
+      "ownerReply": "Owner's reply",
+      "edit": "Edit",
+      "editPrompt": "Correct your comment",
+      "delete": "Delete",
+      "deleteTitle": "Delete your review?",
+      "deleteConfirm": "It will disappear from the listing and the average will be recomputed.",
+      "reply": "Reply",
+      "replyPrompt": "Your reply, visible to everyone",
+      "report": "Report",
+      "reportTitle": "Report this review?",
+      "reportConfirm": "It will be sent to moderation, which will decide what happens next.",
+      "reportReason": "Inappropriate review",
+      "reported": "Report sent."
     },
     "coordinatesUnavailable": "Location unavailable",
     "unknownLocation": "Location not specified",
@@ -720,7 +738,27 @@
     "noExchanges": "No exchanges for the moment.",
     "noExchangesDescription": "Your exchanges will appear here once they are confirmed.",
     "host": "Host",
-    "guest": "Guest"
+    "guest": "Guest",
+    "review": {
+      "title": "Rate your stay",
+      "hostedBy": "Stayed with {{nom}}",
+      "scoreQuestion": "How do you rate this home?",
+      "commentQuestion": "Tell us about your stay",
+      "commentPlaceholder": "Welcome, cleanliness, location, what you liked or not…",
+      "minChars": "{{count}} more character(s)",
+      "mandatory": "Both the rating and the comment are required. Until this stay is rated, you cannot request or accept a new exchange.",
+      "submit": "Publish my review",
+      "thanks": "Thank you, your review is published.",
+      "ok": "OK",
+      "error": "Your review could not be saved.",
+      "pendingTitle": "A stay is waiting for your rating",
+      "pendingText": "Rate it to be able to arrange a new exchange.",
+      "rateNow": "Rate this stay",
+      "blockedTitle": "A stay is waiting for your rating",
+      "blockedText": "Rate your last stay before arranging a new exchange.",
+      "later": "Later",
+      "blockedFromHome": "Rate your last stay before arranging a new exchange. The reminder is at the top of your Exchanges page."
+    }
   },
   "admin": {
     "adminTitle": "Admin dashboard",
@@ -763,7 +801,9 @@
     "statCurrentExchanges": "Current exchanges",
     "statPendingExchanges": "Pending exchanges",
     "statMessages": "Messages",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "runReminders": "Send rating reminders",
+    "remindersDone": "{{envoyes}} reminder(s) sent, {{termines}} stay(s) marked completed."
   },
   "search": {
     "search": "Search",

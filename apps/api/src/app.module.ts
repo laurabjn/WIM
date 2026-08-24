@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ReviewModule } from './interfaces/http/modules/review.module';
 import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from './interfaces/http/modules/http.module';
 import { WebsocketModule } from './interfaces/websocket/websocket.module';
@@ -16,9 +17,11 @@ import { HealthModule } from './interfaces/http/modules/health.module';
 import { ModerationModule } from './interfaces/http/modules/moderation.module';
 import { NotificationModule } from './interfaces/http/modules/notification.module';
 import { AdminModule } from './interfaces/http/modules/admin.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     HttpModule,
     ConfigModule.forRoot({
       isGlobal: true,
@@ -37,6 +40,7 @@ import { AdminModule } from './interfaces/http/modules/admin.module';
     ChatModule,
     NotificationModule,
     AdminModule,
+    ReviewModule,
     HealthModule,
     ModerationModule
   ],

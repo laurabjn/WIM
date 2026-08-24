@@ -11,8 +11,6 @@ export class SendMessageDto {
   @MaxLength(2000)
   content!: string;
 
-  // Sans cette declaration, le filtre global rejetterait le champ et l'envoi
-  // d'une reponse citee echouerait entierement.
   @IsOptional()
   @IsString()
   replyToId?: string;

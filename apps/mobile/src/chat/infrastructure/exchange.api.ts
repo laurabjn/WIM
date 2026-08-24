@@ -29,6 +29,58 @@ async function parseOptional(response: Response) {
   return JSON.parse(raw);
 }
 
+function authHeaders(token: string) {
+  return { Authorization: `Bearer ${token}` };
+}
+
+export type StayToReview = {
+  exchangeId: string;
+  homeId: string;
+  homeTitle: string;
+  homePhotoUrl: string | null;
+  partnerFirstName: string;
+  startDate: string;
+  endDate: string;
+};
+
+export async function getStaysToReviewApi(
+  token: string,
+): Promise<StayToReview[]> {
+  const response = await fetch(`${API_URL}/exchanges/stays-to-review`, {
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) throw new Error('Le chargement des séjours a échoué');
+
+  return response.json();
+}
+
+export async function reviewStayApi(
+  token: string,
+  exchangeId: string,
+  score: number,
+  comment: string,
+): Promise<void> {
+  const response = await fetch(
+    `${API_URL}/exchanges/${exchangeId}/review`,
+    {
+      method: 'POST',
+      headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ score, comment }),
+    },
+  );
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+
+    throw new Error(
+      Array.isArray(data?.message)
+        ? data.message.join(', ')
+        : data?.message ?? 'La note n’a pas pu être enregistrée',
+    );
+  }
+}
+
 export async function getChatExchangeApi(
   token: string,
   chatId: string,

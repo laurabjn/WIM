@@ -1,4 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
+import { ReviewStayScreen } from 'src/home/ui/ReviewStayScreen';
 
 import { ExchangesScreen } from 'src/home/ui/ExchangesScreen';
 import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
@@ -20,6 +21,12 @@ export type ExchangeStackParamList = {
   // Le menu de la conversation propose un echange : les ecrans du parcours
   // doivent exister ici aussi, sinon la navigation echouerait.
   ExchangeAvailability: { homeId: string };
+  ReviewStay: {
+    exchangeId: string;
+    homeTitle: string;
+    homePhotoUrl?: string | null;
+    partnerFirstName?: string;
+  };
   ExchangeMessage: {
     homeId: string;
     availabilityType: 'FREE' | 'EXCHANGER_DATES' | 'SPECIFIC_DATES';
@@ -41,6 +48,7 @@ export function ExchangeStackNavigator() {
         name="ExchangeAvailability"
         component={ExchangeAvailabilityScreen}
       />
+      <Stack.Screen name="ReviewStay" component={ReviewStayScreen} />
       <Stack.Screen name="ExchangeMessage" component={ExchangeMessageScreen} />
     </Stack.Navigator>
   );

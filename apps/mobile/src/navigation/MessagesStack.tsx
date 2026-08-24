@@ -8,6 +8,7 @@ import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
 import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
 import { ExchangeAvailabilityScreen } from 'src/home/ui/ExchangeAvailabilityScreen';
 import { ExchangeMessageScreen } from 'src/home/ui/ExchangeMessageScreen';
+import { ReviewStayScreen } from 'src/home/ui/ReviewStayScreen';
 
 export type MessagesStackParamList = {
   Conversations: undefined;
@@ -22,6 +23,12 @@ export type MessagesStackParamList = {
   PublicProfile: { userId: string };
   HomeDetails: { homeId: string };
   ExchangeAvailability: { homeId: string };
+  ReviewStay: {
+    exchangeId: string;
+    homeTitle: string;
+    homePhotoUrl?: string | null;
+    partnerFirstName?: string;
+  };
   ExchangeMessage: {
     homeId: string;
     availabilityType: 'FREE' | 'EXCHANGER_DATES' | 'SPECIFIC_DATES';
@@ -43,6 +50,7 @@ export function MessagesStackNavigator() {
         name="ExchangeAvailability"
         component={ExchangeAvailabilityScreen}
       />
+      <Stack.Screen name="ReviewStay" component={ReviewStayScreen} />
       <Stack.Screen name="ExchangeMessage" component={ExchangeMessageScreen} />
     </Stack.Navigator>
   );

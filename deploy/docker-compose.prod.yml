@@ -62,6 +62,7 @@ services:
       SMTP_PASS: ${SMTP_PASS}
       DEEPL_API_KEY: ${DEEPL_API_KEY:-}
       MAIL_FROM: ${MAIL_FROM}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
     volumes:
       # Les fichiers uploadés survivent aux redéploiements et rebuilds d'image.
       - wim_uploads:/app/apps/api/uploads

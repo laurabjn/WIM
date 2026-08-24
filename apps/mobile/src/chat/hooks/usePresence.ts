@@ -10,9 +10,7 @@ type PresenceChange = {
 };
 
 export type Presence = {
-  /** Identifiants actuellement connectes. */
   online: Set<string>;
-  /** Derniere presence connue des autres, en ISO. */
   lastSeen: Map<string, string>;
 };
 
@@ -62,7 +60,6 @@ export function usePresence(userIds: string[]): Presence {
 
           if (change.isOnline) {
             online.add(change.userId);
-            // Une personne revenue en ligne n'a plus de "vu il y a" a montrer.
             lastSeen.delete(change.userId);
           } else {
             online.delete(change.userId);

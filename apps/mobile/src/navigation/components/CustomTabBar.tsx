@@ -11,8 +11,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
-// Le compte vient du navigateur : l'appeler ici aussi lancerait un second
-// sondage pour la meme information.
 type Props = BottomTabBarProps & { unreadCount?: number };
 
 export function CustomTabBar({
@@ -194,7 +192,6 @@ const createStyles = (c: ThemeColors) =>
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: c.danger,
-    // L'anneau detache la pastille de l'icone, quel que soit le theme.
     borderWidth: 2,
     borderColor: c.surface,
   },

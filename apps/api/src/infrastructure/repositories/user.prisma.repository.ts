@@ -67,8 +67,6 @@ export class UserPrismaRepository implements UserRepository {
     });
   }
 
-  // updateMany plutot que update : une deconnexion peut suivre la suppression
-  // du compte, et une ligne absente ferait alors lever une erreur.
   async touchLastSeen(userId: string): Promise<void> {
     await this.prisma.user.updateMany({
       where: { id: userId },

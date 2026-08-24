@@ -70,7 +70,6 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
 
   async function handleLogout() {
     try {
-      // Avant d'effacer la session : le retrait du jeton s'authentifie encore.
       await unregisterPushToken();
 
       await clearSession();

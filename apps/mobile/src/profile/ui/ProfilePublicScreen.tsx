@@ -25,8 +25,6 @@ import { Home } from '@wim/shared/home/home.type';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
-// Les memes motifs que dans la conversation : un signalement sans motif
-// n'apprend rien a qui devra le traiter.
 const REPORT_REASONS = [
   'harassment',
   'inappropriate',
@@ -71,8 +69,6 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
 
       setReportOpen(false);
 
-      // Le signalement bloque aussi : rester sur le profil de quelqu'un qu'on
-      // ne verra plus n'aurait pas de sens.
       Alert.alert('', tChat('reportedAndBlocked'), [
         { text: tChat('ok'), onPress: () => navigation.goBack() },
       ]);

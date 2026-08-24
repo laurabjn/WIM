@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { usePendingStayReview } from 'src/home/infrastructure/hooks/usePendingStayReview';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
   ActivityIndicator,
@@ -82,7 +83,6 @@ import {
 
 const PAGE_SIZE = 30;
 
-// Un signalement sans motif n'apprend rien a qui devra le traiter.
 const REPORT_REASONS = [
   'harassment',
   'inappropriate',
@@ -92,23 +92,15 @@ const REPORT_REASONS = [
   'other',
 ] as const;
 
-// Un enregistrement plus court est un appui malencontreux ; plus long, il
-// depasserait la taille acceptee par le serveur.
-// Delai sans frappe avant d'annoncer l'arret, et duree au bout de laquelle
-// le destinataire oublie une frappe dont l'arret ne lui est jamais parvenu.
 const TYPING_STOP_MS = 2500;
 const TYPING_EXPIRY_MS = 4000;
 
 const MIN_RECORDING_MS = 800;
-// La reconnaissance enregistre en PCM non compresse (~32 ko/s a 16 kHz) : au
-// dela de trois minutes, l'envoi depasserait la taille acceptee.
 const MAX_RECORDING_MS = 3 * 60 * 1000;
-// Une session qui ne rend jamais son fichier bloquerait l'envoi sans ce delai.
 const AUDIO_FILE_TIMEOUT_MS = 8000;
 
 const translationKey = (chatId: string) => `chat:translate:${chatId}`;
 
-/** Une citation ne montre pas une photo : elle la nomme. */
 function apercuMessage(message: {
   type: string;
   content: string;
@@ -162,8 +154,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   const participantId = participant.id;
 
-  // La presence circule deja sur la passerelle : la liste des conversations
-  // l'affichait, la conversation elle-meme l'ignorait.
   const presence = usePresence(participantId ? [participantId] : []);
 
   const participantOnline = participantId
@@ -190,6 +180,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<ChatMessages | null>(null);
   const [actionsFor, setActionsFor] = useState<ChatMessages | null>(null);
+  const sejourANoter = usePendingStayReview();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<ChatMessages[]>([]);
@@ -212,8 +203,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   const transcriptRef = useRef('');
   const finalPartsRef = useRef<string[]>([]);
   const audioEndRef = useRef<((uri: string | null) => void) | null>(null);
-  // La coupure automatique peut se declencher deux fois avant que l'etat ne
-  // se propage : sans ce verrou, le vocal partirait en double.
   const stoppingRef = useRef(false);
 
   const cursorRef = useRef<string | null>(null);
@@ -368,8 +357,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
       if (typingClearRef.current) clearTimeout(typingClearRef.current);
 
-      // Un "j'arrete" perdu en route laisserait la mention affichee pour
-      // toujours : elle expire d'elle-meme.
       if (payload.isTyping) {
         typingClearRef.current = setTimeout(
           () => setParticipantTyping(false),
@@ -380,8 +367,6 @@ export function ConversationScreen({ route, navigation }: Props) {
     [currentUserId],
   );
 
-  // Une correction ou une suppression faite par l'autre doit se voir sans
-  // recharger : c'est le meme message qui change sous les yeux.
   const handleMessageUpdated = useCallback(
     (payload: MessageCreatedSocketPayload) => {
       setMessages((actuels) =>
@@ -428,8 +413,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   function handleDraftChange(texte: string) {
     setDraft(texte);
 
-    // Un evenement par seconde suffit : le destinataire fait expirer l'etat
-    // tout seul, inutile d'en emettre a chaque touche.
     const maintenant = Date.now();
 
     if (maintenant - typingSentAtRef.current > 1000) {
@@ -526,8 +509,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
     await AsyncStorage.setItem(translationKey(chatId), next ? 'on' : 'off');
 
-    // Couper n'a rien a recharger, l'original accompagne toujours la
-    // traduction ; remettre en route, si.
     if (next) setTranslationEpoch((epoch) => epoch + 1);
   }
 
@@ -537,9 +518,6 @@ export function ConversationScreen({ route, navigation }: Props) {
     applyTranslation(!translated);
   }
 
-  // La reconnaissance rend le texte au fil de la parole. iOS renvoie un
-  // resultat cumulatif pour la session, Android un segment par prise de
-  // parole : les concatener partout dupliquerait la phrase sur iOS.
   useSpeechRecognitionEvent('result', (event) => {
     const texte = event.results?.[0]?.transcript?.trim() ?? '';
 
@@ -564,7 +542,6 @@ export function ConversationScreen({ route, navigation }: Props) {
     setTranscript(complet);
   });
 
-  // Le fichier n'est utilisable qu'a partir de cet evenement.
   useSpeechRecognitionEvent('audioend', (event) => {
     const resoudre = audioEndRef.current;
 
@@ -576,8 +553,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   useSpeechRecognitionEvent('error', (event) => {
     console.log('Speech recognition error:', event.error, event.message);
 
-    // "no-speech" survient sur un silence et la session s'arrete la aussi :
-    // sans ce retour a l'etat normal, la barre restait figee a l'ecran.
     if (!recording || stoppingRef.current) return;
 
     stoppingRef.current = true;
@@ -585,7 +560,6 @@ export function ConversationScreen({ route, navigation }: Props) {
     setRecording(false);
     setError(t('voiceError'));
 
-    // L'attente d'un fichier qui n'arrivera plus doit etre relachee.
     const resoudre = audioEndRef.current;
 
     audioEndRef.current = null;
@@ -593,8 +567,6 @@ export function ConversationScreen({ route, navigation }: Props) {
     resoudre?.(null);
   });
 
-  // Le compteur affiche pendant l'enregistrement, et la coupure automatique
-  // avant que le fichier ne depasse la taille acceptee.
   useEffect(() => {
     if (!recording) return;
 
@@ -627,8 +599,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
     const langue = i18n.language?.startsWith('en') ? 'en-US' : 'fr-FR';
 
-    // Sans modele installe, exiger le hors-ligne ferait echouer la
-    // reconnaissance : on ne l'impose que si la langue est bien sur l'appareil.
     let surAppareil = false;
 
     try {
@@ -657,8 +627,6 @@ export function ConversationScreen({ route, navigation }: Props) {
         requiresOnDeviceRecognition: surAppareil,
         recordingOptions: {
           persist: true,
-          // iOS enregistrerait sinon en 44,1 kHz flottant : quatre fois plus
-          // lourd pour une parole qui n'y gagne rien.
           outputSampleRate: 16000,
           outputEncoding: 'pcmFormatInt16',
         },
@@ -703,8 +671,6 @@ export function ConversationScreen({ route, navigation }: Props) {
       return;
     }
 
-    // L'attente est armee avant l'arret : l'evenement porte l'unique adresse
-    // du fichier enregistre.
     const attente = attendreFichier();
 
     ExpoSpeechRecognitionModule.stop();
@@ -813,8 +779,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   }
 
   async function supprimerMessage(messageId: string) {
-    // Retire d'abord, previens ensuite : la passerelle repercutera la meme
-    // chose chez l'autre.
     setMessages((actuels) => actuels.filter((item) => item.id !== messageId));
 
     if (editingId === messageId) annulerEdition();
@@ -979,10 +943,36 @@ export function ConversationScreen({ route, navigation }: Props) {
     ]);
   }
 
+  function avertirSejourANoter() {
+    if (!sejourANoter) return false;
+
+    Alert.alert(
+      t('exchange:review.blockedTitle'),
+      t('exchange:review.blockedText'),
+      [
+        { text: t('exchange:review.later'), style: 'cancel' },
+        {
+          text: t('exchange:review.rateNow'),
+          onPress: () =>
+            navigation.navigate('ReviewStay', {
+              exchangeId: sejourANoter.exchangeId,
+              homeTitle: sejourANoter.homeTitle,
+              homePhotoUrl: sejourANoter.homePhotoUrl,
+              partnerFirstName: sejourANoter.partnerFirstName,
+            }),
+        },
+      ],
+    );
+
+    return true;
+  }
+
   async function proposeExchange() {
     setMenuOpen(false);
 
     if (!participantId) return;
+
+    if (avertirSejourANoter()) return;
 
     const session = await getSession();
 
@@ -1537,8 +1527,6 @@ export function ConversationScreen({ route, navigation }: Props) {
         onRequestClose={() => setActionsFor(null)}
       >
         <View style={styles.actionsBackdrop}>
-          {/* Sous la carte et non autour : un appui sur la carte ne doit pas
-              la refermer. */}
           <Pressable
             style={StyleSheet.absoluteFill}
             onPress={() => setActionsFor(null)}
@@ -1796,8 +1784,6 @@ menuBackdrop: {
   actionsCard: {
     borderRadius: 20,
     backgroundColor: c.surface,
-    // Les rangees vont jusqu'au bord : sans cela leurs coins depasseraient de
-    // la carte.
     overflow: 'hidden',
   },
 
@@ -1807,7 +1793,6 @@ menuBackdrop: {
     paddingBottom: 12,
   },
 
-  // Rappelle de quel message il s'agit : la carte masque la conversation.
   actionsExtract: {
     fontSize: 13,
     fontStyle: 'italic',

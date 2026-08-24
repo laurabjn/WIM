@@ -7,9 +7,6 @@ import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 
 const DEFAULT_CORS_ORIGINS = ['http://localhost:3000', 'http://localhost:3001'];
 
-// Multer n'ouvre pas les dossiers qu'il ne trouve pas : sans eux, tout envoi de
-// photo ou de vocal echoue avec une erreur serveur. L'image de production les
-// cree, pas un lancement direct.
 const UPLOAD_SUBDIRS = ['avatars', 'homes', 'messages'];
 
 async function bootstrap() {
@@ -36,8 +33,6 @@ async function bootstrap() {
     }),
   );
 
-  // Les intercepteurs ecrivent sous le dossier de travail : c'est cette base
-  // qu'il faut preparer, meme si la diffusion pointe ailleurs.
   for (const sousDossier of UPLOAD_SUBDIRS) {
     mkdirSync(join(process.cwd(), 'uploads', sousDossier), { recursive: true });
   }

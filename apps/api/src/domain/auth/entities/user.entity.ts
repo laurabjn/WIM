@@ -63,8 +63,6 @@ export class User {
     );
   }
 
-  /**
-   */
   static fromPersistence(prismaUser: PrismaUser): User {
     return new User(
       prismaUser.id,

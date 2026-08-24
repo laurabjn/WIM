@@ -15,6 +15,8 @@ import {
   MarkReportHandledUseCase,
   SuspendUserUseCase,
 } from 'src/application/admin/admin-moderation.usecases';
+import { ReviewReminderService } from 'src/application/exchange/services/review-reminder.service';
+import { StayLifecycleService } from 'src/application/exchange/services/stay-lifecycle.service';
 import { AdminGuard } from '../admin.guard';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 
@@ -28,11 +30,22 @@ export class AdminController {
     private readonly listReports: ListReportsUseCase,
     private readonly markHandled: MarkReportHandledUseCase,
     private readonly suspendUser: SuspendUserUseCase,
+    private readonly reviewReminders: ReviewReminderService,
+    private readonly stayLifecycle: StayLifecycleService,
   ) {}
 
   @Get('stats')
   async statistiques() {
     return this.stats.execute();
+  }
+
+  @Post('review-reminders/run')
+  async lancerLesRappels() {
+    const { commences, termines } = await this.stayLifecycle.appliquer();
+
+    const envoyes = await this.reviewReminders.appliquer();
+
+    return { commences, termines, envoyes };
   }
 
   @Get('reports')

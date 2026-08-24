@@ -50,8 +50,6 @@ type Props = {
   };
 };
 
-// Duree au bout de laquelle on oublie une frappe dont l'arret n'est jamais
-// parvenu.
 const TYPING_EXPIRY_MS = 4000;
 
 export function ConversationsScreen({ navigation }: Props) {
@@ -65,8 +63,6 @@ export function ConversationsScreen({ navigation }: Props) {
   const [statusDraft, setStatusDraft] = useState('');
   const [statusOpen, setStatusOpen] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
-  // Conversations ou l'autre est en train d'ecrire, avec leur minuteur
-  // d'oubli : un "j'arrete" perdu figerait la mention pour toujours.
   const [typingChats, setTypingChats] = useState<Set<string>>(new Set());
   const typingTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(
     new Map(),
@@ -89,8 +85,6 @@ export function ConversationsScreen({ navigation }: Props) {
 
       setChats(await getChatsApi(session.accessToken));
 
-      // Le statut et l'avatar de l'utilisateur alimentent la premiere vignette
-      // de la rangee : un echec ici ne doit pas priver de conversations.
       try {
         const profil = await getMyProfile(session.accessToken);
 
@@ -272,8 +266,6 @@ export function ConversationsScreen({ navigation }: Props) {
       await hideChatApi(session.accessToken, chatId);
     } catch (deleteError) {
       console.log('Delete chat error:', deleteError);
-      // La conversation est deja retiree de l'ecran : on la remet plutot que
-      // de laisser croire a une suppression qui n'a pas eu lieu.
       loadChats();
       Alert.alert('', t('deleteChatError'));
     }
@@ -410,10 +402,6 @@ export function ConversationsScreen({ navigation }: Props) {
                 </Text>
               </View>
             ) : (
-              // Sans bulle, la vignette remonterait et casserait l'alignement
-              // de la rangee.
-              // Le vide garde l'alignement : sans lui, les visages sans
-              // statut remonteraient au-dessus des autres.
               <View style={styles.statusBubblePlaceholder} />
             )}
 
@@ -490,8 +478,6 @@ export function ConversationsScreen({ navigation }: Props) {
           style={styles.statusModalBackdrop}
           behavior="padding"
         >
-          {/* Pose sous la feuille et non autour : un appui sur la feuille
-              elle-meme ne doit pas la refermer. */}
           <Pressable
             style={StyleSheet.absoluteFill}
             onPress={() => setStatusOpen(false)}
@@ -659,8 +645,6 @@ const createStyles = (c: ThemeColors) =>
 
   statusSheet: {
     padding: 20,
-    // Au centre de l'ecran, la feuille est arrondie sur ses quatre coins :
-    // collee en bas, les deux du bas ne se voyaient pas.
     borderRadius: 22,
     backgroundColor: c.surface,
   },

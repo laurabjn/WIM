@@ -15,7 +15,11 @@ import { useTranslation } from 'react-i18next';
 
 import { clearSession, getSession } from 'src/auth/infrastructure/authStorage';
 import { unregisterPushToken } from 'src/notifications/pushRegistration';
-import { getAdminStatsApi, type AdminStats } from '../infrastructure/admin.api';
+import {
+  getAdminStatsApi,
+  runReviewRemindersApi,
+  type AdminStats,
+} from '../infrastructure/admin.api';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
@@ -35,6 +39,7 @@ export function AdminDashboardScreen({
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [chargement, setChargement] = useState(true);
   const [rafraichit, setRafraichit] = useState(false);
+  const [rappelsEnCours, setRappelsEnCours] = useState(false);
 
   const charger = useCallback(async () => {
     try {
@@ -58,6 +63,33 @@ export function AdminDashboardScreen({
     }, [charger]),
   );
 
+  async function lancerLesRappels() {
+    setRappelsEnCours(true);
+
+    try {
+      const session = await getSession();
+
+      if (!session?.accessToken) return;
+
+      const bilan = await runReviewRemindersApi(session.accessToken);
+
+      Alert.alert(
+        '',
+        t('remindersDone', {
+          envoyes: bilan.envoyes,
+          termines: bilan.termines,
+        }),
+      );
+
+      await charger();
+    } catch (error) {
+      console.log('Run reminders error:', error);
+      Alert.alert('', t('actionError'));
+    } finally {
+      setRappelsEnCours(false);
+    }
+  }
+
   async function seDeconnecter() {
     try {
       await unregisterPushToken();
@@ -69,8 +101,6 @@ export function AdminDashboardScreen({
     }
   }
 
-  // Ce qui reste a traiter passe avant le volume : c'est ce qui appelle une
-  // action.
   const aTraiter = [
     {
       cle: 'pending',
@@ -162,6 +192,21 @@ export function AdminDashboardScreen({
               <Text style={styles.boutonTexte}>{t('openReports')}</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity
+              style={[styles.bouton, styles.boutonSecondaire]}
+              activeOpacity={0.85}
+              disabled={rappelsEnCours}
+              onPress={lancerLesRappels}
+            >
+              {rappelsEnCours ? (
+                <ActivityIndicator color={themeColors.text} />
+              ) : (
+                <Text style={styles.boutonSecondaireTexte}>
+                  {t('runReminders')}
+                </Text>
+              )}
+            </TouchableOpacity>
+
             <Text style={styles.section}>{t('sectionVolume')}</Text>
 
             <View style={styles.grille}>
@@ -223,6 +268,17 @@ const createStyles = (c: ThemeColors) =>
       backgroundColor: c.contrast,
     },
     boutonTexte: { fontSize: 15, fontWeight: '700', color: c.onContrast },
+    boutonSecondaire: {
+      marginTop: 10,
+      backgroundColor: c.surface,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    boutonSecondaireTexte: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: c.text,
+    },
     section: {
       marginTop: 28,
       fontSize: 13,

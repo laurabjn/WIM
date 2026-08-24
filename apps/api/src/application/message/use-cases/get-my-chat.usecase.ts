@@ -32,9 +32,6 @@ export class GetMyChatsUseCase {
 
       if (bloque) return false;
 
-      // Une conversation supprimee reste masquee tant qu'aucun message n'est
-      // arrive depuis : la supprimer ne doit pas empecher l'autre de reprendre
-      // contact.
       const moi = chat.participants.find(
         (participant) => participant.userId === userId,
       );

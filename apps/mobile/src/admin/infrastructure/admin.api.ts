@@ -47,6 +47,19 @@ export async function getAdminStatsApi(token: string): Promise<AdminStats> {
   return response.json();
 }
 
+export async function runReviewRemindersApi(
+  token: string,
+): Promise<{ commences: number; termines: number; envoyes: number }> {
+  const response = await fetch(`${API_URL}/admin/review-reminders/run`, {
+    method: 'POST',
+    headers: authHeaders(token),
+  });
+
+  if (!response.ok) throw new Error('Les rappels n’ont pas pu être envoyés');
+
+  return response.json();
+}
+
 export async function getReportsApi(
   token: string,
   seulementEnAttente = false,

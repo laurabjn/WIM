@@ -36,8 +36,6 @@ export class EditMessageUseCase {
       throw new ForbiddenException("Ce message n'est pas le vôtre.");
     }
 
-    // Une photo ou un vocal n'a pas de texte a corriger ; seule la
-    // transcription en porte un, et elle decrit ce qui a ete dit.
     if (message.type !== 'TEXT') {
       throw new BadRequestException('Seul un message écrit peut être modifié.');
     }
@@ -60,8 +58,6 @@ export class EditMessageUseCase {
       include: AVEC_EXPEDITEUR,
     });
 
-    // Les traductions gardees en cache decrivent l'ancien texte : les laisser
-    // afficherait une traduction sans rapport avec ce qu'on lit.
     await this.prisma.messageTranslation.deleteMany({ where: { messageId } });
 
     return mapMessage(modifie);
@@ -84,8 +80,6 @@ export class DeleteMessageUseCase {
       throw new ForbiddenException("Ce message n'est pas le vôtre.");
     }
 
-    // La marque de derniere lecture pointe peut-etre dessus : la relation la
-    // remet a null d'elle-meme.
     await this.prisma.message.delete({ where: { id: messageId } });
 
     return { chatId: message.chatId };
@@ -96,10 +90,6 @@ export class DeleteMessageUseCase {
 export class HideChatUseCase {
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Retire la conversation de sa propre liste sans y toucher pour l'autre.
-   * Elle revient si un message arrive apres cette date.
-   */
   async execute(chatId: string, userId: string): Promise<void> {
     const participant = await this.prisma.chatParticipant.findFirst({
       where: { chatId, userId },
@@ -121,10 +111,6 @@ export class HideChatUseCase {
 export class SearchMessagesUseCase {
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Cherche dans une conversation, cote serveur : le telephone n'a en memoire
-   * que les dernieres pages, y chercher ne trouverait que le recent.
-   */
   async execute(
     chatId: string,
     userId: string,

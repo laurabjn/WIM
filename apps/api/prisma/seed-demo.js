@@ -124,8 +124,6 @@ const CONVERSATIONS = [
   },
 ];
 
-// Un statut se perime au bout d'un jour : les poser dans les dernieres heures
-// est la seule facon qu'ils soient visibles apres le seed.
 const hoursAgo = (hours) => new Date(Date.now() - hours * 3600 * 1000);
 
 const daysFromNow = (days) => {

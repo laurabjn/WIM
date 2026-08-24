@@ -5,8 +5,6 @@ import { API_URL } from 'src/config/api';
 const ACCESS_TOKEN_KEY = 'wim.accessToken';
 const REFRESH_TOKEN_KEY = 'wim.refreshToken';
 const USER_KEY = 'wim.user';
-// L'adresse de la derniere connexion, pour reremplir le formulaire. Elle
-// survit a la deconnexion : c'est tout son interet.
 const LAST_EMAIL_KEY = 'wim.lastEmail';
 
 export interface StoredUser {
@@ -31,16 +29,11 @@ export async function saveSession(session: AuthSession): Promise<void> {
   ]);
 }
 
-/** Marge avant l'echeance : une requete partie juste avant expirerait en vol. */
 const RENEW_MARGIN_MS = 60 * 1000;
 
 const ALPHABET_B64 =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-/**
- * React Native ne fournit pas `atob` : le decodage se fait a la main, sur les
- * seuls caracteres de l'alphabet base64.
- */
 function decodeBase64Url(entree: string): string {
   const normalise = entree.replace(/-/g, '+').replace(/_/g, '/');
 
@@ -65,11 +58,6 @@ function decodeBase64Url(entree: string): string {
   return sortie;
 }
 
-/**
- * Lit l'echeance inscrite dans le jeton. On extrait le seul champ utile plutot
- * que d'analyser tout le JSON : un accent mal decode ne doit pas faire echouer
- * une lecture de date. Un jeton illisible est traite comme expire.
- */
 function expiresAt(token: string): number {
   const corps = token.split('.')[1];
 
@@ -80,8 +68,6 @@ function expiresAt(token: string): number {
   return trouve ? Number(trouve[1]) * 1000 : 0;
 }
 
-// Tous les ecrans appellent getSession() : sans ce verrou, l'ouverture d'un
-// ecran lancerait autant de renouvellements que de requetes.
 let renouvellementEnCours: Promise<AuthSession | null> | null = null;
 
 async function renouveler(
@@ -101,9 +87,6 @@ async function renouveler(
         return null;
       }
 
-      // Toute autre reponse ne prouve rien sur la session : un serveur plus
-      // ancien que l'application ne connait pas cette route et repondrait 404.
-      // Rendre null ferait paraitre l'utilisateur deconnecte partout.
       return session;
     }
 
@@ -121,7 +104,6 @@ async function renouveler(
 
     return renouvelee;
   } catch (error) {
-    // Reseau coupe : on rend la session telle quelle plutot que de deconnecter.
     console.log('Refresh session error:', error);
 
     return session;
@@ -147,9 +129,6 @@ export async function getSession(): Promise<AuthSession | null> {
     return null;
   }
 
-  // Le jeton d'acces ne vit qu'un quart d'heure. Sans ce renouvellement, tout
-  // l'ecran tombait en erreur passe ce delai, sans rien dire de plus qu'un
-  // "impossible de charger".
   if (Date.now() < expiresAt(session.accessToken) - RENEW_MARGIN_MS) {
     return session;
   }

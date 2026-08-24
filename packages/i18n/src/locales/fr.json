@@ -27,7 +27,12 @@
     "available": "Disponiblité libre",
     "availableWithBlockDates": "Disponiblité avec dates bloquées",
     "specificDates": "Dates précises",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "exchangeState": {
+      "PENDING": "Demande en cours",
+      "FUTURE": "Échange prévu",
+      "CURRENT": "Échange en cours"
+    }
   },
   "profile": {
     "exchange": "Échange",
@@ -662,7 +667,20 @@
       "showMore": "Voir plus",
       "showAllReviews": "Afficher les {{count}} commentaires",
       "noReviews": "Aucun commentaire pour le moment.",
-      "noReviewsDescription": "Les premiers voyageurs pourront bientôt partager leur expérience."
+      "noReviewsDescription": "Les premiers voyageurs pourront bientôt partager leur expérience.",
+      "ownerReply": "Réponse du propriétaire",
+      "edit": "Modifier",
+      "editPrompt": "Corrigez votre commentaire",
+      "delete": "Supprimer",
+      "deleteTitle": "Supprimer votre avis ?",
+      "deleteConfirm": "Il disparaîtra de la fiche et la moyenne sera recalculée.",
+      "reply": "Répondre",
+      "replyPrompt": "Votre réponse, visible par tous",
+      "report": "Signaler",
+      "reportTitle": "Signaler cet avis ?",
+      "reportConfirm": "Il sera transmis à la modération, qui décidera de la suite.",
+      "reportReason": "Avis inapproprié",
+      "reported": "Signalement envoyé."
     },
     "coordinatesUnavailable": "Localisation indisponible",
     "unknownLocation": "Localisation non renseignée",
@@ -719,7 +737,27 @@
     "noExchanges": "Aucun échange pour le moment.",
     "noExchangesDescription": "Vos échanges apparaîtront ici lorsqu’ils seront confirmés.",
     "host": "Hôte",
-    "guest": "Invité"
+    "guest": "Invité",
+    "review": {
+      "title": "Noter le séjour",
+      "hostedBy": "Séjour chez {{nom}}",
+      "scoreQuestion": "Quelle note donnez-vous à ce logement ?",
+      "commentQuestion": "Racontez votre séjour",
+      "commentPlaceholder": "Accueil, propreté, emplacement, ce qui vous a plu ou déplu…",
+      "minChars": "Encore {{count}} caractère(s)",
+      "mandatory": "La note et le commentaire sont obligatoires. Tant que ce séjour n'est pas noté, vous ne pouvez ni demander ni accepter un nouvel échange.",
+      "submit": "Publier mon avis",
+      "thanks": "Merci, votre avis est publié.",
+      "ok": "D'accord",
+      "error": "Votre avis n'a pas pu être enregistré.",
+      "pendingTitle": "Un séjour attend votre note",
+      "pendingText": "Notez-le pour pouvoir organiser un nouvel échange.",
+      "rateNow": "Noter ce séjour",
+      "blockedTitle": "Un séjour attend votre note",
+      "blockedText": "Notez votre dernier séjour avant d'organiser un nouvel échange.",
+      "later": "Plus tard",
+      "blockedFromHome": "Notez votre dernier séjour avant d'organiser un nouvel échange. Le rappel se trouve en haut de votre page Échanges."
+    }
   },
   "admin": {
     "adminTitle": "Tableau de bord administrateur",
@@ -762,7 +800,9 @@
     "statCurrentExchanges": "Échanges en cours",
     "statPendingExchanges": "Échanges en attente",
     "statMessages": "Messages",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "runReminders": "Envoyer les rappels de notation",
+    "remindersDone": "{{envoyes}} rappel(s) envoyé(s), {{termines}} séjour(s) passé(s) en terminé."
   },
   "search": {
     "search": "Recherche",

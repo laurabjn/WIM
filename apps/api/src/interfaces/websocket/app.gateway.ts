@@ -108,8 +108,6 @@ export class AppGateway {
 
       const lastSeenAt = new Date().toISOString();
 
-      // Une base indisponible ne doit pas empecher l'annonce du depart : le
-      // statut compte plus que l'horodatage.
       try {
         await this.userRepository.touchLastSeen(userId);
       } catch (error) {
@@ -136,10 +134,6 @@ export class AppGateway {
     return this.onlineUsers.has(userId);
   }
 
-  /**
-   * Quelqu'un qui a la conversation sous les yeux n'a pas besoin d'etre
-   * notifie : le message arrive deja devant lui.
-   */
   async isViewingChat(userId: string, chatId: string): Promise<boolean> {
     const sockets = await this.server.in(chatRoom(chatId)).fetchSockets();
 
@@ -173,8 +167,6 @@ export class AppGateway {
     }));
   }
 
-  // La frappe ne laisse aucune trace en base et le client la laisse expirer
-  // d'elle-meme.
   @SubscribeMessage('typing')
   async typing(
     @MessageBody() body: { chatId?: string; isTyping?: boolean },
@@ -182,7 +174,6 @@ export class AppGateway {
   ) {
     if (!body?.chatId || !client.userId) return { sent: false };
 
-    // Seul quelqu'un ayant rejoint la conversation peut y taper.
     if (!client.rooms.has(chatRoom(body.chatId))) return { sent: false };
 
     const chat = await this.chatRepository.findById(body.chatId);

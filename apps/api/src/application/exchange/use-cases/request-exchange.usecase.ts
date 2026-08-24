@@ -8,6 +8,7 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
 import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
 import { mapMessage } from 'src/application/message/message.mapper';
 import type { ChatMessages } from '@wim/shared';
+import { ListStaysToReviewUseCase } from './review-stay.usecase';
 
 export type RequestExchangeInput = {
   requesterId: string;
@@ -33,6 +34,7 @@ export class RequestExchangeUseCase {
   constructor(
     private readonly prisma: PrismaService,
     private readonly blockedUsers: BlockedUsersService,
+    private readonly staysToReview: ListStaysToReviewUseCase,
   ) {}
 
   async execute(input: RequestExchangeInput): Promise<RequestExchangeResult> {
@@ -59,6 +61,17 @@ export class RequestExchangeUseCase {
 
     await this.blockedUsers.assertNotBlocked(input.requesterId, home.ownerId);
 
+    const proprietaire = await this.prisma.user.findUnique({
+      where: { id: home.ownerId },
+      select: { allowMessages: true },
+    });
+
+    if (proprietaire?.allowMessages === false) {
+      throw new BadRequestException(
+        'Cette personne n’accepte pas les nouveaux messages.',
+      );
+    }
+
     // Un seul echange vivant a la fois entre deux personnes. Sans ce garde-fou,
     // les demandes s'empilent et le bandeau n'en montre qu'une, les autres
     // devenant invisibles. Une fois l'echange termine, refuse ou annule, un
@@ -73,6 +86,12 @@ export class RequestExchangeUseCase {
       },
       select: { id: true, status: true },
     });
+
+    if (await this.staysToReview.hasPendingReview(input.requesterId)) {
+      throw new BadRequestException(
+        'Notez votre dernier séjour avant de demander un nouvel échange.',
+      );
+    }
 
     if (active) {
       throw new BadRequestException(

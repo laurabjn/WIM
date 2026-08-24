@@ -30,8 +30,6 @@ export class LoginUserUseCase {
       throw new InvalidCredentialsError();
     }
 
-    // Verifie apres le mot de passe : annoncer la suspension avant reviendrait
-    // a confirmer l'existence du compte a n'importe qui.
     if (user.suspendedAt) {
       throw new ForbiddenException(
         'Ce compte a été suspendu. Contactez le support.',

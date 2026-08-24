@@ -21,10 +21,6 @@ const RESUME_UTILISATEUR = {
 export class ListReportsUseCase {
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Les signalements non traites d'abord, les plus recents en tete : c'est
-   * dans cet ordre qu'on les traite.
-   */
   async execute(seulementEnAttente = false) {
     const reports = await this.prisma.userReport.findMany({
       where: seulementEnAttente ? { handledAt: null } : undefined,
@@ -92,8 +88,6 @@ export class SuspendUserUseCase {
 
     if (!cible) throw new NotFoundException('Utilisateur introuvable.');
 
-    // Un administrateur suspendu ne pourrait plus lever sa propre suspension,
-    // ni personne d'autre s'il est seul.
     if (cible.isAdmin && suspendre) {
       throw new BadRequestException(
         'Un compte administrateur ne peut pas être suspendu.',
@@ -111,10 +105,6 @@ export class SuspendUserUseCase {
 export class GetAdminStatsUseCase {
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * Les chiffres qui disent si la plateforme va bien : ce qui reste a traiter
-   * d'abord, puis le volume.
-   */
   async execute() {
     const [
       signalementsEnAttente,

@@ -16,11 +16,6 @@ type Props = {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-/**
- * Parcours reserve a l'administration : ni onglets, ni swipe, ni profil. Un
- * compte d'administration n'a rien a faire dans l'application ordinaire, et
- * l'y laisser entrer brouillerait ses propres statistiques.
- */
 export function AdminStackNavigator({ setIsAuthenticated }: Props) {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

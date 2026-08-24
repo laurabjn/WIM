@@ -4,7 +4,6 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
 
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
 
-// Expo refuse les lots trop gros ; cent est la taille recommandee.
 const TAILLE_LOT = 100;
 
 type Notification = {
@@ -24,9 +23,6 @@ export class PushSenderService {
     token: string,
     platform?: string,
   ): Promise<void> {
-    // Le jeton suit l'appareil, pas le compte : se connecter avec un autre
-    // compte sur le meme telephone doit le reattribuer, sans quoi les
-    // notifications continueraient d'arriver a l'ancien.
     await this.prisma.pushToken.upsert({
       where: { token },
       update: { userId, platform },
@@ -38,17 +34,31 @@ export class PushSenderService {
     await this.prisma.pushToken.deleteMany({ where: { token } });
   }
 
-  /**
-   * Envoie a tous les appareils d'une personne. L'echec n'est jamais remonte a
-   * l'appelant : un message doit partir meme si la notification se perd.
-   */
-  async sendToUser(userId: string, notification: Notification): Promise<void> {
+  async sendToUser(
+    userId: string,
+    notification: Notification,
+    options: { categorie?: 'messages' | 'exchanges' } = {},
+  ): Promise<void> {
+    const { categorie = 'messages' } = options;
+
     const destinataire = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { notifyNewMessages: true },
+      select: {
+        notifyPush: true,
+        notifyNewMessages: true,
+        notifyExchanges: true,
+      },
     });
 
-    if (destinataire?.notifyNewMessages === false) return;
+    if (destinataire?.notifyPush === false) return;
+
+    if (categorie === 'messages' && destinataire?.notifyNewMessages === false) {
+      return;
+    }
+
+    if (categorie === 'exchanges' && destinataire?.notifyExchanges === false) {
+      return;
+    }
 
     const tokens = await this.prisma.pushToken.findMany({
       where: { userId },
@@ -94,10 +104,6 @@ export class PushSenderService {
     }
   }
 
-  /**
-   * Un appareil desinstalle garde son jeton en base et fait echouer chaque
-   * envoi. Expo le signale par `DeviceNotRegistered` : on le supprime alors.
-   */
   private async nettoyerJetonsMorts(
     lot: { to: string }[],
     reponse: any,

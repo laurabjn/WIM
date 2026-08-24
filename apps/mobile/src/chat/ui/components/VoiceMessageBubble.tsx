@@ -9,7 +9,6 @@ type Props = {
   uri: string;
   durationMs?: number | null;
   mine: boolean;
-  /** Transcription faite sur l'appareil, traduite si la discussion l'est. */
   transcript?: string | null;
 };
 
@@ -22,8 +21,6 @@ export function VoiceMessageBubble({
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
-  // Un objet source recree a chaque rendu ferait recharger le lecteur en
-  // boucle : la lecture repartirait de zero des la premiere seconde ecoulee.
   const source = useMemo(() => ({ uri }), [uri]);
 
   const player = useAudioPlayer(source);
@@ -31,8 +28,6 @@ export function VoiceMessageBubble({
 
   const teinte = mine ? themeColors.onBubbleMine : themeColors.onBubbleTheirs;
 
-  // La duree enregistree a l'envoi s'affiche avant tout chargement ; celle du
-  // lecteur prend le relais des qu'il connait le fichier.
   const totalSecondes =
     status.duration && status.duration > 0
       ? status.duration
@@ -49,8 +44,6 @@ export function VoiceMessageBubble({
       return;
     }
 
-    // Relancer un enregistrement arrive au bout ne bougerait pas : la tete de
-    // lecture y est deja restee.
     if (
       status.didJustFinish ||
       (totalSecondes > 0 && status.currentTime >= totalSecondes - 0.05)
