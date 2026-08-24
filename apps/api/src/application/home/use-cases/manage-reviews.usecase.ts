@@ -14,7 +14,6 @@ const NOTE_MAX = 5;
 const COMMENTAIRE_MIN = 10;
 const COMMENTAIRE_MAX = 1000;
 const REPONSE_MAX = 1000;
-const PAGE_MAX = 20;
 
 const AUTEUR = {
   select: { id: true, firstName: true, avatarUrl: true, createdAt: true },
@@ -76,47 +75,6 @@ function verifierCommentaire(comment: string): string {
   }
 
   return propre;
-}
-
-@Injectable()
-export class ListHomeReviewsUseCase {
-  constructor(private readonly prisma: PrismaService) {}
-
-  async execute(
-    homeId: string,
-    cursor?: string,
-  ): Promise<{ reviews: ReviewView[]; nextCursor: string | null }> {
-    const avis = await this.prisma.review.findMany({
-      where: { homeId },
-      orderBy: { createdAt: 'desc' },
-      take: PAGE_MAX + 1,
-      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      include: { author: AUTEUR, home: { select: { title: true } } },
-    });
-
-    const page = avis.slice(0, PAGE_MAX);
-
-    return {
-      reviews: page.map(versVue),
-      nextCursor: avis.length > PAGE_MAX ? page[page.length - 1].id : null,
-    };
-  }
-}
-
-@Injectable()
-export class ListUserReviewsUseCase {
-  constructor(private readonly prisma: PrismaService) {}
-
-  async execute(userId: string): Promise<ReviewView[]> {
-    const avis = await this.prisma.review.findMany({
-      where: { home: { ownerId: userId } },
-      orderBy: { createdAt: 'desc' },
-      take: PAGE_MAX,
-      include: { author: AUTEUR, home: { select: { title: true } } },
-    });
-
-    return avis.map(versVue);
-  }
 }
 
 @Injectable()

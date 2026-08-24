@@ -13,8 +13,6 @@ import {
 
 import {
   DeleteReviewUseCase,
-  ListHomeReviewsUseCase,
-  ListUserReviewsUseCase,
   ReplyToReviewUseCase,
   ReportReviewUseCase,
   UpdateReviewUseCase,
@@ -27,26 +25,11 @@ type AuthenticatedRequest = { user?: { sub?: string } };
 @UseGuards(JwtAuthGuard)
 export class ReviewController {
   constructor(
-    private readonly listHomeReviews: ListHomeReviewsUseCase,
-    private readonly listUserReviews: ListUserReviewsUseCase,
     private readonly updateReview: UpdateReviewUseCase,
     private readonly deleteReview: DeleteReviewUseCase,
     private readonly replyToReview: ReplyToReviewUseCase,
     private readonly reportReview: ReportReviewUseCase,
   ) {}
-
-  @Get('home/:homeId')
-  async byHome(
-    @Param('homeId') homeId: string,
-    @Query('cursor') cursor?: string,
-  ) {
-    return this.listHomeReviews.execute(homeId, cursor);
-  }
-
-  @Get('user/:userId')
-  async byUser(@Param('userId') userId: string) {
-    return this.listUserReviews.execute(userId);
-  }
 
   @Patch(':reviewId')
   async update(

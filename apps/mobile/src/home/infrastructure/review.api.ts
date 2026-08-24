@@ -47,30 +47,6 @@ async function lire(response: Response) {
   return brut ? JSON.parse(brut) : null;
 }
 
-export async function getHomeReviewsApi(
-  token: string,
-  homeId: string,
-  cursor?: string | null,
-): Promise<{ reviews: ReviewView[]; nextCursor: string | null }> {
-  const response = await fetch(
-    `${API_URL}/reviews/home/${homeId}${cursor ? `?cursor=${cursor}` : ''}`,
-    { headers: authHeaders(token) },
-  );
-
-  return lire(response);
-}
-
-export async function getUserReviewsApi(
-  token: string,
-  userId: string,
-): Promise<ReviewView[]> {
-  const response = await fetch(`${API_URL}/reviews/user/${userId}`, {
-    headers: authHeaders(token),
-  });
-
-  return lire(response);
-}
-
 export async function updateReviewApi(
   token: string,
   reviewId: string,

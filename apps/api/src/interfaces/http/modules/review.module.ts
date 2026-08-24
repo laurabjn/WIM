@@ -3,8 +3,6 @@ import { Module } from '@nestjs/common';
 import { HomeRatingService } from 'src/application/home/services/home-rating.service';
 import {
   DeleteReviewUseCase,
-  ListHomeReviewsUseCase,
-  ListUserReviewsUseCase,
   ReplyToReviewUseCase,
   ReportReviewUseCase,
   UpdateReviewUseCase,
@@ -17,8 +15,6 @@ import { ReviewController } from '../controllers/review.controller';
   providers: [
     PrismaService,
     HomeRatingService,
-    ListHomeReviewsUseCase,
-    ListUserReviewsUseCase,
     UpdateReviewUseCase,
     DeleteReviewUseCase,
     ReplyToReviewUseCase,
