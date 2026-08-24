@@ -4,7 +4,7 @@ import type { User as PrismaUser } from '@prisma/client';
 export enum IdentityStatus {
   NOT_VERIFIED = 'NOT_VERIFIED',
   VERIFIED = 'VERIFIED',
-  REJECTED = 'REJECTED',
+  REFUSED = 'REFUSED',
   IN_PROGRESS = 'IN_PROGRESS',
 }
 

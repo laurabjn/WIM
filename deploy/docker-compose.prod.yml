@@ -73,6 +73,8 @@ services:
       DEEPL_API_KEY: ${DEEPL_API_KEY:-}
       MAIL_FROM: ${MAIL_FROM}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
     volumes:
       # Les fichiers uploadés survivent aux redéploiements et rebuilds d'image.
       - wim_uploads:/app/apps/api/uploads
