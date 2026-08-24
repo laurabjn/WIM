@@ -12,6 +12,11 @@ name: wim
 
 services:
   db:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     image: postgres:15
     container_name: wim_db
     restart: unless-stopped
@@ -35,6 +40,11 @@ services:
       - wim_internal
 
   api:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     build:
       context: ..
       dockerfile: apps/api/Dockerfile.prod
