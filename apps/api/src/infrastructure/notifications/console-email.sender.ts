@@ -1,13 +1,14 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import type { EmailSenderPort } from '../../application/notifications/ports/email-sender.port';
+import { isSmtpConfigured } from './nodemailer-email.sender';
 
 @Injectable()
 export class ConsoleEmailSender implements EmailSenderPort, OnModuleInit {
   private readonly logger = new Logger(ConsoleEmailSender.name);
 
   onModuleInit(): void {
-    // Ce repli affiche le corps des messages, liens de reinitialisation
-    // compris : hors developpement, il faut le savoir.
+    if (isSmtpConfigured()) return;
+
     this.logger.warn(
       'SMTP non configure : les mails ne partent pas et leur contenu, jetons de reinitialisation inclus, est ecrit dans les journaux. Renseignez SMTP_HOST, SMTP_USER et SMTP_PASS.',
     );
