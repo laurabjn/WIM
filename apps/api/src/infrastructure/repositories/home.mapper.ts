@@ -138,6 +138,8 @@ export function mapReview(
     id: review.id,
     score: review.score,
     comment: review.comment,
+    reply: review.reply,
+    replyAt: review.replyAt,
     createdAt: review.createdAt,
     author: {
       id: review.author.id,

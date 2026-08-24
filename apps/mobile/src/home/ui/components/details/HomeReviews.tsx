@@ -12,6 +12,12 @@ type Props = {
   averageRating?: number | null;
   reviewsCount?: number;
   onPressAuthor?: (userId: string) => void;
+  currentUserId?: string | null;
+  isOwner?: boolean;
+  onEdit?: (review: Review) => void;
+  onDelete?: (review: Review) => void;
+  onReply?: (review: Review) => void;
+  onReport?: (review: Review) => void;
 };
 
 export function HomeReviews({
@@ -19,6 +25,12 @@ export function HomeReviews({
   averageRating,
   reviewsCount = 0,
   onPressAuthor,
+  currentUserId,
+  isOwner = false,
+  onEdit,
+  onDelete,
+  onReply,
+  onReport,
 }: Props) {
   const { t } = useTranslation('home');
   const themeColors = useThemeColors();
@@ -102,6 +114,39 @@ export function HomeReviews({
                 </Text>
               </TouchableOpacity>
             ) : null}
+
+            {review.reply ? (
+              <View style={styles.replyBox}>
+                <Text style={styles.replyLabel}>{t('reviews.ownerReply')}</Text>
+                <Text style={styles.replyText}>{review.reply}</Text>
+              </View>
+            ) : null}
+
+            <View style={styles.actionsRow}>
+              {review.author?.id === currentUserId ? (
+                <>
+                  <TouchableOpacity onPress={() => onEdit?.(review)}>
+                    <Text style={styles.action}>{t('reviews.edit')}</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={() => onDelete?.(review)}>
+                    <Text style={[styles.action, styles.actionDanger]}>
+                      {t('reviews.delete')}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <TouchableOpacity onPress={() => onReport?.(review)}>
+                  <Text style={styles.action}>{t('reviews.report')}</Text>
+                </TouchableOpacity>
+              )}
+
+              {isOwner && !review.reply ? (
+                <TouchableOpacity onPress={() => onReply?.(review)}>
+                  <Text style={styles.action}>{t('reviews.reply')}</Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
 
             <TouchableOpacity
               style={styles.authorRow}
@@ -194,6 +239,38 @@ function getHostYears(createdAt?: string | null) {
 
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
+  replyBox: {
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: c.primary,
+    backgroundColor: c.surfaceAlt,
+  },
+  replyLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: c.primary,
+  },
+  replyText: {
+    marginTop: 3,
+    fontSize: 14,
+    lineHeight: 19,
+    color: c.text,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    gap: 16,
+    marginTop: 10,
+  },
+  action: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: c.primary,
+  },
+  actionDanger: {
+    color: c.danger,
+  },
   section: {
     paddingHorizontal: 18,
     paddingBottom: 28,
