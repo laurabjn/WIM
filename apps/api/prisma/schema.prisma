@@ -230,6 +230,8 @@ model Exchange {
   status ExchangeStatus
 
   reviewReminderAt DateTime? @map("review_reminder_at")
+  startReminderAt  DateTime? @map("start_reminder_at")
+  endReminderAt    DateTime? @map("end_reminder_at")
 
   reviews Review[]
 

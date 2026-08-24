@@ -39,7 +39,7 @@ export function useNotificationNavigation(pret: boolean): void {
       const donnees = response?.notification.request.content.data;
 
       const chatId = donnees?.chatId;
-      const reviewExchangeId = donnees?.reviewExchangeId;
+      const reviewExchangeId = donnees?.reviewExchangeId ?? donnees?.exchangeId;
 
       if (typeof reviewExchangeId === 'string') {
         traitee = true;
