@@ -35,6 +35,7 @@ type Props = NativeStackScreenProps<ProfileStackParamList, 'HomeDetails'>;
 export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { t } = useTranslation(["home", "profile", "common", "exchange"]);
   const sejourANoter = usePendingStayReview();
+
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params;
@@ -43,6 +44,16 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [token, setToken] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [myExchanges, setMyExchanges] = useState<Exchange[]>([]);
+
+  const echangeEnCours = useMemo(() => {
+    const enCours = myExchanges.find(
+      (exchange) =>
+        (exchange.homeId === home?.id || exchange.guestHomeId === home?.id) &&
+        ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status),
+    );
+
+    return (enCours?.status as 'PENDING' | 'FUTURE' | 'CURRENT') ?? null;
+  }, [myExchanges, home?.id]);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -222,6 +233,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           ) : (
             <HomeAvailabilityBadge
               home={home}
+              exchangeStatus={echangeEnCours}
               onPressContact={() => {
                 if (sejourANoter) {
                   Alert.alert(

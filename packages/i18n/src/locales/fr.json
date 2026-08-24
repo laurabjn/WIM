@@ -27,7 +27,12 @@
     "available": "Disponiblité libre",
     "availableWithBlockDates": "Disponiblité avec dates bloquées",
     "specificDates": "Dates précises",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "exchangeState": {
+      "PENDING": "Demande en cours",
+      "FUTURE": "Échange prévu",
+      "CURRENT": "Échange en cours"
+    }
   },
   "profile": {
     "exchange": "Échange",

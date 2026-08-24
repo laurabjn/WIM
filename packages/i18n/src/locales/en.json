@@ -26,7 +26,12 @@
     "noAvailability": "No availability for the moment",
     "available": "Available",
     "availableWithBlockDates": "Available with blocked dates",
-    "retry": "Try again"
+    "retry": "Try again",
+    "exchangeState": {
+      "PENDING": "Request pending",
+      "FUTURE": "Exchange planned",
+      "CURRENT": "Exchange ongoing"
+    }
   },
   "auth": {
     "welcomeTitle": "Welcome to Wim!",

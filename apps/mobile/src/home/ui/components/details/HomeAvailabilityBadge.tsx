@@ -8,9 +8,14 @@ import type { ThemeColors } from 'src/theme/colors';
 type Props = {
   home: Home;
   onPressContact: () => void;
+  exchangeStatus?: 'PENDING' | 'FUTURE' | 'CURRENT' | null;
 };
 
-export function HomeAvailabilityBadge({ home, onPressContact }: Props) {
+export function HomeAvailabilityBadge({
+  home,
+  onPressContact,
+  exchangeStatus,
+}: Props) {
   const { t } = useTranslation("common");
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
@@ -49,18 +54,39 @@ export function HomeAvailabilityBadge({ home, onPressContact }: Props) {
             </Text>
         </View>
 
-        <TouchableOpacity
-            style={styles.contactButton}
-            onPress={onPressContact}
-        >
-            <Text style={styles.contactText}>{t("contact")}</Text>
-        </TouchableOpacity>
+        {exchangeStatus ? (
+            <View style={styles.exchangeTag}>
+                <Text style={styles.exchangeTagText}>
+                    {t(`exchangeState.${exchangeStatus}`)}
+                </Text>
+            </View>
+        ) : (
+            <TouchableOpacity
+                style={styles.contactButton}
+                onPress={onPressContact}
+            >
+                <Text style={styles.contactText}>{t("contact")}</Text>
+            </TouchableOpacity>
+        )}
     </View>
   );
 }
 
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
+  exchangeTag: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 16,
+    backgroundColor: c.surface,
+  },
+
+  exchangeTagText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: c.primary,
+  },
+
   availabilityCard: {
     marginHorizontal: 12,
     marginTop: 12,
