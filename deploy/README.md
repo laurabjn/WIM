@@ -261,6 +261,51 @@ Après la première nuit, vérifie que le fichier existe :
 ls -lh /var/backups/wim/
 ```
 
+### Copie hors du VPS
+
+Tant que les sauvegardes ne quittent pas la machine, elles ne protègent que
+des erreurs logicielles : perdre le VPS, c'est perdre la base **et** ses
+sauvegardes. Le script copie vers un stockage distant dès que `RCLONE_REMOTE`
+est renseigné.
+
+Côté OVH, dans l'espace client : **Public Cloud** → **Object Storage** →
+créer un conteneur (`wim-backups`, région GRA, classe Standard), puis
+**Users & Roles** → créer un utilisateur S3 et générer ses identifiants. Le
+volume ici se compte en centaines de mégaoctets : la facture reste de l'ordre
+de quelques centimes par mois.
+
+Sur le VPS, la configuration doit appartenir à **root**, puisque c'est root
+qui exécute la tâche planifiée. Un `rclone config` lancé sans `sudo` écrirait
+dans le mauvais dossier et la copie échouerait toutes les nuits.
+
+```bash
+sudo apt update && sudo apt install -y rclone
+sudo rclone config
+```
+
+Réponses attendues : `n` (nouveau remote), nom `ovh`, type `s3`, provider
+`Other`, la clé d'accès puis la clé secrète, région `gra`, endpoint
+`s3.gra.io.cloud.ovh.net`, le reste par défaut.
+
+```bash
+# Le remote répond-il ?
+sudo rclone lsd ovh:
+
+# Brancher la copie sur les sauvegardes
+grep -q '^RCLONE_REMOTE=' /opt/wim/deploy/.env.prod   && sed -i 's|^RCLONE_REMOTE=.*|RCLONE_REMOTE=ovh:wim-backups|' /opt/wim/deploy/.env.prod   || echo 'RCLONE_REMOTE=ovh:wim-backups' >> /opt/wim/deploy/.env.prod
+
+sudo /opt/wim/deploy/backup-db.sh
+```
+
+La sortie doit se terminer par `[backup] Copie distante OK`. À partir de là, un
+échec de copie fait échouer toute la tâche : le dump local est déjà écrit, mais
+le journal signale que la copie distante n'est pas partie, ce qui est
+préférable à une sauvegarde qu'on croit à l'abri.
+
+La rétention distante (`REMOTE_RETENTION_DAYS`, 90 jours) est plus longue que
+la locale : le stockage objet coûte peu, et une corruption peut n'être
+découverte que des semaines plus tard.
+
 **Restauration** :
 
 ```bash
