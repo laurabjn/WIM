@@ -719,7 +719,23 @@
     "noExchanges": "Aucun échange pour le moment.",
     "noExchangesDescription": "Vos échanges apparaîtront ici lorsqu’ils seront confirmés.",
     "host": "Hôte",
-    "guest": "Invité"
+    "guest": "Invité",
+    "review": {
+      "title": "Noter le séjour",
+      "hostedBy": "Séjour chez {{nom}}",
+      "scoreQuestion": "Quelle note donnez-vous à ce logement ?",
+      "commentQuestion": "Racontez votre séjour",
+      "commentPlaceholder": "Accueil, propreté, emplacement, ce qui vous a plu ou déplu…",
+      "minChars": "Encore {{count}} caractère(s)",
+      "mandatory": "La note et le commentaire sont obligatoires. Tant que ce séjour n'est pas noté, vous ne pouvez ni demander ni accepter un nouvel échange.",
+      "submit": "Publier mon avis",
+      "thanks": "Merci, votre avis est publié.",
+      "ok": "D'accord",
+      "error": "Votre avis n'a pas pu être enregistré.",
+      "pendingTitle": "Un séjour attend votre note",
+      "pendingText": "Notez-le pour pouvoir organiser un nouvel échange.",
+      "rateNow": "Noter ce séjour"
+    }
   },
   "admin": {
     "adminTitle": "Tableau de bord administrateur",
