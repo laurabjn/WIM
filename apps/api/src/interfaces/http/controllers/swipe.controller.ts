@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 import { CreateSwipeUseCase } from 'src/application/swipe/use-cases/create-swipe.usecase';
+import { PushSenderService } from 'src/application/notification/push-sender.service';
+import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { CreateSwipeDto } from 'src/application/swipe/dto/create-swipe.dto';
 import { GetSwipeRecommendationsUseCase } from 'src/application/swipe/use-cases/get-swipe-recommendation.usecase';
 
@@ -17,11 +19,13 @@ type AuthenticatedRequest = {
 export class SwipeController {
   constructor(
     private readonly createSwipeUseCase: CreateSwipeUseCase,
-    private readonly getRecommendations: GetSwipeRecommendationsUseCase
+    private readonly getRecommendations: GetSwipeRecommendationsUseCase,
+    private readonly pushSender: PushSenderService,
+    private readonly prisma: PrismaService,
   ) { }
 
   @Post()
-  create(@Req() req: any, @Body() dto: CreateSwipeDto) {
+  async create(@Req() req: any, @Body() dto: CreateSwipeDto) {
     const swiperId = req.user?.sub ?? req.user?.userId ?? req.user?.id;
 
     if (!swiperId) {
@@ -30,12 +34,45 @@ export class SwipeController {
       );
     }
 
-    return this.createSwipeUseCase.execute({
+    const resultat = await this.createSwipeUseCase.execute({
       swiperId,
       targetUserId: dto.targetUserId,
       homeId: dto.homeId,
       direction: dto.direction,
     });
+
+    if (resultat.match) {
+      await this.annoncerLeMatch(swiperId, dto.targetUserId, resultat.chatId);
+    }
+
+    return resultat;
+  }
+
+  private async annoncerLeMatch(
+    swiperId: string,
+    targetUserId: string,
+    chatId?: string,
+  ): Promise<void> {
+    const swiper = await this.prisma.user.findUnique({
+      where: { id: swiperId },
+      select: { firstName: true },
+    });
+
+    const prenom = swiper?.firstName?.trim();
+
+    await this.pushSender
+      .sendToUser(
+        targetUserId,
+        {
+          title: 'Nouveau match',
+          body: prenom
+            ? `${prenom} aime aussi votre logement. Lancez la conversation !`
+            : 'Quelqu’un aime aussi votre logement. Lancez la conversation !',
+          data: chatId ? { chatId } : {},
+        },
+        { categorie: 'exchanges' },
+      )
+      .catch(() => undefined);
   }
 
   @Get('recommendations')

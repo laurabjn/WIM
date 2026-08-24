@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CreateSwipeUseCase } from 'src/application/swipe/use-cases/create-swipe.usecase';
+import { PushSenderService } from 'src/application/notification/push-sender.service';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { SwipePrismaRepository } from 'src/infrastructure/repositories/swipe.prisma.repository';
 import { SwipeController } from '../controllers/swipe.controller';
@@ -16,6 +17,7 @@ import { MatchPrismaRepository } from 'src/infrastructure/repositories/match.pri
   controllers: [SwipeController, MatchController],
   providers: [
     PrismaService,
+    PushSenderService,
     SwipeRecommendationPrismaRepository,
     UserRecommendationProfileBuilder,
     HomeRecommendationScorer,
