@@ -16,7 +16,7 @@ import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   exchange: PendingExchange;
-  onAccept: () => Promise<void>;
+  onAccept?: () => Promise<void>;
   onChangeDates: (startDate: Date, endDate: Date) => Promise<void>;
 };
 
@@ -38,9 +38,13 @@ export function ExchangeBanner({
 
   const [pending, setPending] = useState(false);
   const [editing, setEditing] = useState<'start' | 'end' | null>(null);
+
+  const enAttente = exchange.status === 'PENDING';
   const [startDate, setStartDate] = useState(new Date(exchange.startDate));
 
   async function accept() {
+    if (!onAccept) return;
+
     setPending(true);
 
     try {
@@ -79,7 +83,9 @@ export function ExchangeBanner({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t('exchangePending')}</Text>
+      <Text style={styles.title}>
+        {enAttente ? t('exchangePending') : t('exchangeConfirmed')}
+      </Text>
 
       <Text style={styles.home} numberOfLines={1}>
         {t('bannerYouGo')}{' '}
@@ -104,13 +110,15 @@ export function ExchangeBanner({
         <ActivityIndicator style={styles.loader} color={themeColors.text} />
       ) : (
         <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.acceptButton}
-            onPress={accept}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.acceptText}>{t('exchangeAccept')}</Text>
-          </TouchableOpacity>
+          {enAttente && onAccept ? (
+            <TouchableOpacity
+              style={styles.acceptButton}
+              onPress={accept}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.acceptText}>{t('exchangeAccept')}</Text>
+            </TouchableOpacity>
+          ) : null}
 
           <TouchableOpacity
             style={styles.datesButton}

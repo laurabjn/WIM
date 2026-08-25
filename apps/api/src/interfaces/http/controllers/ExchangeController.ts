@@ -27,7 +27,7 @@ import {
   ReviewStayUseCase,
 } from 'src/application/exchange/use-cases/review-stay.usecase';
 import { JwtAuthGuard } from '../jwt-auth.guard';
-import { AnnounceExchangeAcceptedUseCase } from 'src/application/exchange/use-cases/announce-exchange-accepted.usecase';
+import { AnnounceExchangeUseCase } from 'src/application/exchange/use-cases/announce-exchange.usecase';
 import { PushSenderService } from 'src/application/notification/push-sender.service';
 import { AppGateway } from 'src/interfaces/websocket/app.gateway';
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
@@ -46,7 +46,7 @@ export class ExchangeController {
     private readonly cancelExchangeUseCase: CancelExchangeUseCase,
     private readonly listStaysToReview: ListStaysToReviewUseCase,
     private readonly reviewStay: ReviewStayUseCase,
-    private readonly announceAccepted: AnnounceExchangeAcceptedUseCase,
+    private readonly annonce: AnnounceExchangeUseCase,
     private readonly pushSender: PushSenderService,
     private readonly gateway: AppGateway,
     @Inject(CHAT_REPOSITORY)
@@ -125,12 +125,34 @@ export class ExchangeController {
     @Param('exchangeId') exchangeId: string,
     @Body() body: { startDate: string; endDate: string },
   ) {
-    return this.updateExchangeDatesUseCase.execute(
+    const exchange = await this.updateExchangeDatesUseCase.execute(
       exchangeId,
       req.user.sub,
       body?.startDate,
       body?.endDate,
     );
+
+    // Rien ne distinguait un changement de dates d'un silence : l'autre
+    // personne ne le decouvrait qu'en rouvrant l'echange.
+    const annonce = await this.annonce.nouvellesDates(exchangeId, req.user.sub);
+
+    if (annonce) {
+      await this.diffuser(annonce.chatId, annonce.message);
+
+      await this.pushSender
+        .sendToUser(
+          annonce.destinataire,
+          {
+            title: 'Dates modifiées',
+            body: annonce.message.content.slice(0, 140),
+            data: { chatId: annonce.chatId },
+          },
+          { categorie: 'exchanges' },
+        )
+        .catch(() => undefined);
+    }
+
+    return exchange;
   }
 
   @Get(':exchangeId/guest-homes')
@@ -159,7 +181,7 @@ export class ExchangeController {
     // Une acceptation ne laissait aucune trace : la conversation restait
     // classee en demande, et l'autre personne n'apprenait rien.
     if (reponse === 'ACCEPT') {
-      const annonce = await this.announceAccepted.execute(exchangeId);
+      const annonce = await this.annonce.acceptation(exchangeId);
 
       if (annonce) {
         await this.diffuser(annonce.chatId, annonce.message);

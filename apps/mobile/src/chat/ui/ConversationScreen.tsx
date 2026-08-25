@@ -72,7 +72,6 @@ import {
   reportUserApi,
 } from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
-import { ExchangeConfirmedBanner } from './components/ExchangeConfirmedBanner';
 import { GuestHomeChoiceModal } from './components/GuestHomeChoiceModal';
 import { fetchLikedHomesApi } from 'src/swipe/infrastructure/swipe.api';
 import { VoiceMessageBubble } from './components/VoiceMessageBubble';
@@ -1281,11 +1280,8 @@ export function ConversationScreen({ route, navigation }: Props) {
         }}
       />
 
-      {exchange && ['FUTURE', 'CURRENT'].includes(exchange.status) ? (
-        <ExchangeConfirmedBanner exchange={exchange} />
-      ) : null}
-
-      {exchange?.status === 'PENDING' ? (
+      {exchange &&
+      ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status) ? (
         <ExchangeBanner
           exchange={exchange}
           onAccept={async () => {

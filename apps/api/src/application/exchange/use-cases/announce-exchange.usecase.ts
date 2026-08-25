@@ -8,10 +8,10 @@ const FORMAT = new Intl.DateTimeFormat('fr-FR', {
 });
 
 @Injectable()
-export class AnnounceExchangeAcceptedUseCase {
+export class AnnounceExchangeUseCase {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute(exchangeId: string) {
+  async acceptation(exchangeId: string) {
     const exchange = await this.prisma.exchange.findUnique({
       where: { id: exchangeId },
       include: {
@@ -22,15 +22,7 @@ export class AnnounceExchangeAcceptedUseCase {
 
     if (!exchange) return null;
 
-    const chat = await this.prisma.chat.findFirst({
-      where: {
-        AND: [
-          { participants: { some: { userId: exchange.hostId } } },
-          { participants: { some: { userId: exchange.guestId } } },
-        ],
-      },
-      select: { id: true },
-    });
+    const chat = await this.chatEntre(exchange.hostId, exchange.guestId);
 
     if (!chat) return null;
 
@@ -53,6 +45,61 @@ export class AnnounceExchangeAcceptedUseCase {
     });
 
     return { chatId: chat.id, message, guestId: exchange.guestId };
+  }
+
+  async nouvellesDates(exchangeId: string, auteurId: string) {
+    const exchange = await this.prisma.exchange.findUnique({
+      where: { id: exchangeId },
+      select: {
+        startDate: true,
+        endDate: true,
+        hostId: true,
+        guestId: true,
+      },
+    });
+
+    if (!exchange) return null;
+
+    const destinataire =
+      exchange.hostId === auteurId ? exchange.guestId : exchange.hostId;
+
+    const chat = await this.chatEntre(exchange.hostId, exchange.guestId);
+
+    if (!chat) return null;
+
+    const message = await this.prisma.message.create({
+      data: {
+        chatId: chat.id,
+        senderId: auteurId,
+        content: `Nouvelles dates proposées : du ${FORMAT.format(
+          exchange.startDate,
+        )} au ${FORMAT.format(exchange.endDate)}.`,
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    return { chatId: chat.id, message, destinataire };
+  }
+
+  private async chatEntre(premier: string, second: string) {
+    return this.prisma.chat.findFirst({
+      where: {
+        AND: [
+          { participants: { some: { userId: premier } } },
+          { participants: { some: { userId: second } } },
+        ],
+      },
+      select: { id: true },
+    });
   }
 
   private texte(exchange: {

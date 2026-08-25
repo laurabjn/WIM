@@ -168,7 +168,9 @@ export class UpdateExchangeDatesUseCase {
       throw new ForbiddenException("Cet échange ne vous concerne pas.");
     }
 
-    if (exchange.status !== 'PENDING') {
+    // Un sejour commence ou termine ne se redate pas : il a eu lieu. Tant qu'il
+    // est a venir, meme accepte, le calendrier reste negociable.
+    if (!['PENDING', 'FUTURE'].includes(exchange.status)) {
       throw new BadRequestException(
         'Les dates ne peuvent plus être modifiées.',
       );
