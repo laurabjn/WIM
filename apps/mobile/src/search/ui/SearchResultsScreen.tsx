@@ -19,7 +19,6 @@ import { Home } from '@wim/shared/home/home.type';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { searchHomesApi } from '../../home/infrastructure/searchHome.api';
 import {
-  FILTRES_VIDES,
   SearchFiltersSheet,
   compterFiltres,
   type FiltresRecherche,
@@ -47,14 +46,25 @@ export const SearchResultsScreen: React.FC<Props> = ({
 }) => {
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
-  const { city, capacity, startDate, endDate, category } = route.params ?? {};
+  const {
+    city,
+    capacity,
+    startDate,
+    endDate,
+    category,
+    bedrooms,
+    homeType,
+    amenities,
+  } = route.params ?? {};
 
   const [homes, setHomes] = useState<Home[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtres, setFiltres] = useState<FiltresRecherche>({
-    ...FILTRES_VIDES,
     category,
     capacity,
+    bedrooms,
+    homeType,
+    amenities: amenities ?? [],
   });
   const [filtresOuverts, setFiltresOuverts] = useState(false);
   const [selectedHomeId, setSelectedHomeId] =
