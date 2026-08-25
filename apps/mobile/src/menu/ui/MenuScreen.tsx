@@ -135,14 +135,12 @@ export function MenuScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <SearchToggle
-            quickSearch={quickSearch}
-            onToggle={toggleSearch}
-            exploreLabel={t('search:toExplore')}
-            quickSearchLabel={t('search:fastSearch')}
-          />
-        </View>
+        <SearchToggle
+          quickSearch={quickSearch}
+          onToggle={toggleSearch}
+          exploreLabel={t('search:toExplore')}
+          quickSearchLabel={t('search:fastSearch')}
+        />
 
         <View style={styles.heroCard}>
           <Image
@@ -243,30 +241,6 @@ const createStyles = (c: ThemeColors) =>
     paddingTop: 8,
     paddingHorizontal: 18,
     paddingBottom: 90,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 20,
-  },
-  headerText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  toggle: {
-    flex: 1,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#b7f0dd',
-    justifyContent: 'center',
-    paddingHorizontal: 4,
-  },
-  toggleCircle: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: c.surface,
   },
   heroCard: {
     height: 180,

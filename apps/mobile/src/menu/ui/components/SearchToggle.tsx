@@ -49,7 +49,10 @@ export function SearchToggle({
 
   return (
     <View style={styles.header}>
-      <Text style={[styles.headerText, !quickSearch && styles.headerTextActive]}>
+      <Text
+        numberOfLines={1}
+        style={[styles.headerText, !quickSearch && styles.headerTextActive]}
+      >
         {exploreLabel}
       </Text>
 
@@ -75,7 +78,14 @@ export function SearchToggle({
         </LinearGradient>
       </TouchableOpacity>
 
-      <Text style={[styles.headerText, quickSearch && styles.headerTextActive]}>
+      <Text
+        numberOfLines={1}
+        style={[
+          styles.headerText,
+          styles.headerTextEnd,
+          quickSearch && styles.headerTextActive,
+        ]}
+      >
         {quickSearchLabel}
       </Text>
     </View>
@@ -87,6 +97,7 @@ const createStyles = (c: ThemeColors) =>
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 8,
     marginBottom: 20,
   },
@@ -94,6 +105,10 @@ const createStyles = (c: ThemeColors) =>
     fontSize: 11,
     fontWeight: '600',
     color: c.textMuted,
+    flexShrink: 1,
+  },
+  headerTextEnd: {
+    textAlign: 'right',
   },
   headerTextActive: {
     color: c.text,
@@ -103,7 +118,6 @@ const createStyles = (c: ThemeColors) =>
     width: TOGGLE_WIDTH,
     height: 28,
     borderRadius: 20,
-    marginLeft: 30,
     justifyContent: 'center',
     paddingHorizontal: TOGGLE_PADDING,
   },
