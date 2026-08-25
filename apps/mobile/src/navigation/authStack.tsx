@@ -1,5 +1,6 @@
 import React from 'react';
 import { RegisterStartScreen } from '../auth/ui/Register/RegisterStartScreen';
+import { OnboardingScreen } from '../onboarding/ui/OnboardingScreen';
 import { RegisterStep1Screen } from '../auth/ui/Register/RegisterStep1Screen';
 import { RegisterStep2Screen } from '../auth/ui/Register/RegisterStep2Screen';
 import { RegisterIdentityScreen } from '../auth/ui/Register/RegisterIdentityScreen';
@@ -54,6 +55,7 @@ export type AuthStackParamList = {
     phone: string;
     password: string;
   };
+  Onboarding: undefined;
   RegisterIdentity: { identityRedirectUrl?: string };
   RegisterHousingStep1: undefined;
   RegisterHousingStep2: { photos: PickedPhoto[] };
@@ -77,12 +79,20 @@ export type AuthStackParamList = {
 
 type Props = {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  introductionVue: boolean;
 };
 
 const Stack = createStackNavigator<AuthStackParamList>();
 
-export const AuthStackNavigator: React.FC<Props> = ({ setIsAuthenticated }) => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
+export const AuthStackNavigator: React.FC<Props> = ({
+  setIsAuthenticated,
+  introductionVue,
+}) => (
+  <Stack.Navigator
+    screenOptions={{ headerShown: false }}
+    initialRouteName={introductionVue ? 'WelcomeEntry' : 'Onboarding'}
+  >
+    <Stack.Screen name="Onboarding" component={OnboardingScreen} />
     <Stack.Screen name="WelcomeEntry" component={WelcomeEntryScreen} />
     <Stack.Screen name="RegisterStart" component={RegisterStartScreen} />
     <Stack.Screen name="Login">

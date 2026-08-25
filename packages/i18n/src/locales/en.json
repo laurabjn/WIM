@@ -940,5 +940,28 @@
     "searchMessages": "Search in conversation",
     "searchPlaceholder": "Search a message…",
     "searchNoResult": "No message matches."
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "continue": "Continue",
+    "start": "Get started",
+    "slides": [
+      {
+        "title": "Find a home",
+        "body": "Swap your home with members around the world, without ever paying for a night."
+      },
+      {
+        "title": "Fast and simple",
+        "body": "With quick search, find a home in a few swipes."
+      },
+      {
+        "title": "Build connections",
+        "body": "Stay in touch with past exchanges and build connections around the world."
+      },
+      {
+        "title": "Made yours",
+        "body": "Adjust your preferences to receive exchange offers that suit you."
+      }
+    ]
   }
 }

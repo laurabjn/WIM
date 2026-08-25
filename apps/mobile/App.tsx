@@ -16,6 +16,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import 'src/search/infrastructure/map/mapbox.config';
 import { getSession } from 'src/auth/infrastructure/authStorage';
+import { introductionDejaVue } from 'src/onboarding/infrastructure/onboardingStorage';
 import {
   navigationRef,
   useNotificationNavigation,
@@ -30,10 +31,12 @@ const Stack = createNativeStackNavigator();
 function Coquille({
   isAuthenticated,
   isAdmin,
+  introductionVue,
   setIsAuthenticated,
 }: {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  introductionVue: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { isDark, colors } = useAppTheme();
@@ -59,6 +62,7 @@ function Coquille({
       <RootNavigator
         isAuthenticated={isAuthenticated}
         isAdmin={isAdmin}
+        introductionVue={introductionVue}
         setIsAuthenticated={setIsAuthenticated}
       />
     </NavigationContainer>
@@ -68,6 +72,7 @@ function Coquille({
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [introductionVue, setIntroductionVue] = useState(true);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -75,6 +80,8 @@ export default function App() {
       await initI18n();
 
       try {
+        setIntroductionVue(await introductionDejaVue());
+
         const session = await getSession();
 
         setIsAuthenticated(Boolean(session?.accessToken));
@@ -107,6 +114,7 @@ export default function App() {
         <SafeAreaProvider>
         <ThemeProvider>
           <Coquille
+            introductionVue={introductionVue}
             isAuthenticated={isAuthenticated}
             isAdmin={isAdmin}
             setIsAuthenticated={setIsAuthenticated}
