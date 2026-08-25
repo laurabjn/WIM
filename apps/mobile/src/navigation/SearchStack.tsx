@@ -9,6 +9,7 @@ import { HomeDetailsScreen } from "src/home/ui/HomeDetailScreen";
 import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
 import { SwipeDetailHomeScreen } from "src/swipe/ui/components/SwipeDetailsHomeScreen";
 import { SwipeHomeScreen } from "src/swipe/ui/SwipeHomeScreen";
+import { FONDU_ENCHAINE } from "./transitions";
 
 const Stack = createStackNavigator<SearchStackParamList>();
 
@@ -27,7 +28,11 @@ export function SearchStackNavigator() {
           <Stack.Screen name="Search" component={SearchScreen} />
           <Stack.Screen name="DestinationSearch" component={DestinationSearchScreen} />
           <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
-          <Stack.Screen name="Swipe" component={SwipeHomeScreen} />
+          <Stack.Screen
+            name="Swipe"
+            component={SwipeHomeScreen}
+            options={FONDU_ENCHAINE}
+          />
           <Stack.Screen name="HomeDetails" component={HomeDetailsScreen} />
         <Stack.Screen name="PublicProfile" component={ProfilePublicScreen} />
           <Stack.Screen name="SwipeHomeDetails" component={SwipeDetailHomeScreen} />
