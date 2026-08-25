@@ -1,5 +1,15 @@
-import { IsDateString, IsIn, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsDateString,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+
+const EQUIPEMENTS_MAX = 12;
 
 export class SearchHomesDto {
   @IsOptional()
@@ -17,8 +27,28 @@ export class SearchHomesDto {
   capacity?: number;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  bedrooms?: number;
+
+  @IsOptional()
   @IsString()
   homeType?: string;
+
+  @IsOptional()
+  @Transform(({ value }) =>
+    typeof value === 'string'
+      ? value
+          .split(',')
+          .map((element) => element.trim())
+          .filter(Boolean)
+          .slice(0, EQUIPEMENTS_MAX)
+      : value,
+  )
+  @IsArray()
+  @IsString({ each: true })
+  amenities?: string[];
 
   @IsOptional()
   @IsIn(['NATURE', 'BEACH', 'CITY', 'CULTURE'])

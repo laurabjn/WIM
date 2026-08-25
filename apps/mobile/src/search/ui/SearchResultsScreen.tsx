@@ -18,6 +18,11 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Home } from '@wim/shared/home/home.type';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { searchHomesApi } from '../../home/infrastructure/searchHome.api';
+import {
+  SearchFiltersSheet,
+  compterFiltres,
+  type FiltresRecherche,
+} from './components/SearchFiltersSheet';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 
 import { SearchResultsHeader } from './components/SearchResultsHeader';
@@ -41,10 +46,27 @@ export const SearchResultsScreen: React.FC<Props> = ({
 }) => {
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
-  const { city, capacity, startDate, endDate, category } = route.params ?? {};
+  const {
+    city,
+    capacity,
+    startDate,
+    endDate,
+    category,
+    bedrooms,
+    homeType,
+    amenities,
+  } = route.params ?? {};
 
   const [homes, setHomes] = useState<Home[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filtres, setFiltres] = useState<FiltresRecherche>({
+    category,
+    capacity,
+    bedrooms,
+    homeType,
+    amenities: amenities ?? [],
+  });
+  const [filtresOuverts, setFiltresOuverts] = useState(false);
   const [selectedHomeId, setSelectedHomeId] =
     useState<string | null>(null);
 
@@ -91,10 +113,13 @@ export const SearchResultsScreen: React.FC<Props> = ({
 
         const data = await searchHomesApi(session.accessToken, {
           city: city?.split(',')[0]?.trim(),
-          category,
           startDate,
           endDate,
-          capacity,
+          category: filtres.category,
+          capacity: filtres.capacity,
+          bedrooms: filtres.bedrooms,
+          homeType: filtres.homeType,
+          amenities: filtres.amenities,
         });
 
         setHomes(data);
@@ -106,7 +131,7 @@ export const SearchResultsScreen: React.FC<Props> = ({
     }
 
     loadHomes();
-  }, [city, capacity, startDate, endDate, category]);
+  }, [city, startDate, endDate, filtres]);
 
   const moveSheet = useCallback(
     (position: number) => {
@@ -162,8 +187,17 @@ export const SearchResultsScreen: React.FC<Props> = ({
       <SearchResultsHeader
         title={city || 'Résultats'}
         onBack={() => navigation.goBack()}
-        onOpenFilters={() => {
-          console.log('Ouvrir les filtres');
+        filtersCount={compterFiltres(filtres)}
+        onOpenFilters={() => setFiltresOuverts(true)}
+      />
+
+      <SearchFiltersSheet
+        visible={filtresOuverts}
+        valeurs={filtres}
+        onFermer={() => setFiltresOuverts(false)}
+        onAppliquer={(choix) => {
+          setFiltres(choix);
+          setFiltresOuverts(false);
         }}
       />
 
