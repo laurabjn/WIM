@@ -27,6 +27,7 @@ import { CHAT_REPOSITORY, EXCHANGE_REPOSITORY } from '../tokens/token';
 import { ModerationModule } from './moderation.module';
 import { WebsocketModule } from 'src/interfaces/websocket/websocket.module';
 import { StayLifecycleService } from 'src/application/exchange/services/stay-lifecycle.service';
+import { AnnounceExchangeAcceptedUseCase } from 'src/application/exchange/use-cases/announce-exchange-accepted.usecase';
 import {
   ListStaysToReviewUseCase,
   ReviewStayUseCase,
@@ -70,6 +71,7 @@ import {
       inject: [ExchangeRepositoryPrisma],
     },
     ListGuestHomesUseCase,
+  AnnounceExchangeAcceptedUseCase,
   RespondToExchangeUseCase,
     UpdateExchangeDatesUseCase,
     CancelExchangeUseCase,

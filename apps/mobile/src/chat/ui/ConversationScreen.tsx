@@ -72,6 +72,7 @@ import {
   reportUserApi,
 } from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
+import { ExchangeConfirmedBanner } from './components/ExchangeConfirmedBanner';
 import { GuestHomeChoiceModal } from './components/GuestHomeChoiceModal';
 import { fetchLikedHomesApi } from 'src/swipe/infrastructure/swipe.api';
 import { VoiceMessageBubble } from './components/VoiceMessageBubble';
@@ -1268,7 +1269,7 @@ export function ConversationScreen({ route, navigation }: Props) {
 
           if (!session?.accessToken || !exchange) return;
 
-          await respondToExchangeApi(
+          const accepte = await respondToExchangeApi(
             session.accessToken,
             exchange.id,
             'ACCEPT',
@@ -1276,9 +1277,13 @@ export function ConversationScreen({ route, navigation }: Props) {
           );
 
           setLogementsCandidats([]);
-          setExchange(null);
+          setExchange(accepte ?? null);
         }}
       />
+
+      {exchange && ['FUTURE', 'CURRENT'].includes(exchange.status) ? (
+        <ExchangeConfirmedBanner exchange={exchange} />
+      ) : null}
 
       {exchange?.status === 'PENDING' ? (
         <ExchangeBanner
@@ -1298,13 +1303,13 @@ export function ConversationScreen({ route, navigation }: Props) {
               return;
             }
 
-            await respondToExchangeApi(
+            const accepte = await respondToExchangeApi(
               session.accessToken,
               exchange.id,
               'ACCEPT',
             );
 
-            setExchange(null);
+            setExchange(accepte ?? null);
           }}
           onChangeDates={async (start, end) => {
             const session = await getSession();

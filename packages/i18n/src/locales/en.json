@@ -873,6 +873,7 @@
     "openConversation": "Open conversation"
   },
   "chat": {
+      "exchangeConfirmed": "Exchange confirmed",
     "title": "Messages",
     "empty": "No conversations",
     "emptyDescription": "Your conversations will appear here as soon as you have a match.",

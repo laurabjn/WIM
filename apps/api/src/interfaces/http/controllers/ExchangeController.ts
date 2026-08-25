@@ -27,6 +27,8 @@ import {
   ReviewStayUseCase,
 } from 'src/application/exchange/use-cases/review-stay.usecase';
 import { JwtAuthGuard } from '../jwt-auth.guard';
+import { AnnounceExchangeAcceptedUseCase } from 'src/application/exchange/use-cases/announce-exchange-accepted.usecase';
+import { PushSenderService } from 'src/application/notification/push-sender.service';
 import { AppGateway } from 'src/interfaces/websocket/app.gateway';
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
 import { CHAT_REPOSITORY } from '../tokens/token';
@@ -44,6 +46,8 @@ export class ExchangeController {
     private readonly cancelExchangeUseCase: CancelExchangeUseCase,
     private readonly listStaysToReview: ListStaysToReviewUseCase,
     private readonly reviewStay: ReviewStayUseCase,
+    private readonly announceAccepted: AnnounceExchangeAcceptedUseCase,
+    private readonly pushSender: PushSenderService,
     private readonly gateway: AppGateway,
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: ChatRepository,
@@ -143,12 +147,60 @@ export class ExchangeController {
     @Param('exchangeId') exchangeId: string,
     @Body() body: { response: ExchangeResponse; guestHomeId?: string },
   ) {
-    return this.respondToExchangeUseCase.execute(
+    const reponse = body?.response === 'DECLINE' ? 'DECLINE' : 'ACCEPT';
+
+    const exchange = await this.respondToExchangeUseCase.execute(
       exchangeId,
       req.user.sub,
-      body?.response === 'DECLINE' ? 'DECLINE' : 'ACCEPT',
+      reponse,
       body?.guestHomeId,
     );
+
+    // Une acceptation ne laissait aucune trace : la conversation restait
+    // classee en demande, et l'autre personne n'apprenait rien.
+    if (reponse === 'ACCEPT') {
+      const annonce = await this.announceAccepted.execute(exchangeId);
+
+      if (annonce) {
+        await this.diffuser(annonce.chatId, annonce.message);
+
+        await this.pushSender
+          .sendToUser(
+            annonce.guestId,
+            {
+              title: 'Échange accepté',
+              body: annonce.message.content.slice(0, 140),
+              data: { chatId: annonce.chatId },
+            },
+            { categorie: 'exchanges' },
+          )
+          .catch(() => undefined);
+      }
+    }
+
+    return exchange;
+  }
+
+  private async diffuser(chatId: string, message: any) {
+    this.gateway.emitMessageCreated(chatId, message);
+
+    const chat = await this.chatRepository.findById(chatId);
+
+    for (const participant of chat?.participants ?? []) {
+      this.gateway.emitChatUpdated(participant.userId, {
+        chatId,
+        lastMessage: message,
+        unreadCount: await this.chatRepository.countUnreadMessages(
+          chatId,
+          participant.userId,
+        ),
+      });
+
+      this.gateway.emitUnreadCount(
+        participant.userId,
+        await this.chatRepository.countAllUnreadMessages(participant.userId),
+      );
+    }
   }
 
   @Patch(':exchangeId/cancel')
