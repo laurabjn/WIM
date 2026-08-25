@@ -28,7 +28,6 @@ export const LoginForm: React.FC<Props> = ({
   loadingLabel,
   googleSignUpLabel,
   appleSignUpLabel,
-  onBack,
   onForgotPassword,
   onSuccess,
 }) => {

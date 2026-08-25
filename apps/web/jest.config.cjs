@@ -12,7 +12,7 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
     '^@wim/shared$': path.resolve(__dirname, '../../packages/shared/src'),
-    '\.(css|scss|sass)$': '<rootDir>/test/style-mock.js',
+    '\\.(css|scss|sass)$': '<rootDir>/test/style-mock.js',
   },
   transform: {
     '^.+\\.(ts|tsx)$': [

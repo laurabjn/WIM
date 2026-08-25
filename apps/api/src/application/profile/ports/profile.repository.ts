@@ -1,4 +1,4 @@
-import type { SupportedLocale, UserProfile } from '@wim/shared';
+import type { UserProfile } from '@wim/shared';
 import { UpdateProfileInput } from '../dto/update-my-profile.dto';
 
 export interface ProfileRepository {

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useTranslations } from 'next-intl';
 import type { UserProfile, SupportedLocale } from '@wim/shared';
 
 type Props = {
@@ -10,8 +9,6 @@ type Props = {
 };
 
 export function ProfileForm({ profile, onSave }: Props) {
-  const t = useTranslations();
-
   const [firstName, setFirstName] = useState(profile.firstName);
   const [lastName, setLastName] = useState(profile.lastName);
   const [bio, setBio] = useState(profile.bio ?? '');

@@ -46,7 +46,6 @@ export function ProfileCard({ profile }: Props) {
   const rating = profile.averageRating ?? 0;
   const reviewsCount = profile.reviewsCount ?? 0;
   const exchangesCount = profile.exchangesCount ?? 0;
-  const homesCount = profile.homesCount ?? 0;
   const languages = profile.languages ?? [];
 
   return (

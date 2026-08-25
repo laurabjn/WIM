@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { getIsAdmin } from 'app/auth/infrastructure/authStorage';
 
@@ -10,7 +9,6 @@ interface AdminGuardProps {
 }
 
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
-  const router = useRouter();
   const t = useTranslations('auth');
   const isAdmin = getIsAdmin();
 

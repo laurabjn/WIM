@@ -4,7 +4,6 @@ import {
   SwipeRepository,
   CreateSwipeInput,
   SwipeRecord,
-  MatchRecord
 } from 'src/domain/auth/repositories/swipe.repository';
 
 @Injectable()

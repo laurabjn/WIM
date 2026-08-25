@@ -33,5 +33,8 @@ jobs:
       - name: Vérifier les types
         run: npm run check-types
 
+      - name: Analyser le code
+        run: npm run lint
+
       - name: Lancer les tests
         run: npm run test
