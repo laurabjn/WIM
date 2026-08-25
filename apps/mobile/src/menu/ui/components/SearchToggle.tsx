@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import {
+  Easing,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Animated
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors } from 'src/theme/ThemeContext';
@@ -35,9 +36,17 @@ export function SearchToggle({
     Animated.timing(progress, {
       toValue: quickSearch ? 1 : 0,
       duration: 250,
-      useNativeDriver: false,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
     }).start();
   }, [quickSearch, progress]);
+
+  const opaciteRapide = progress;
+
+  const opaciteExplorer = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0],
+  });
 
   const translateX = progress.interpolate({
     inputRange: [0, 1],
@@ -57,16 +66,31 @@ export function SearchToggle({
       </Text>
 
       <TouchableOpacity activeOpacity={0.9} onPress={onToggle}>
-        <LinearGradient
-          colors={
-            quickSearch
-              ? ['#ffffff', '#4FC3FF']
-              : ['#40D890', '#ffffff']
-          }
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.toggle}
-        >
+        <View style={styles.toggle}>
+          <Animated.View
+            style={[StyleSheet.absoluteFill, { opacity: opaciteExplorer }]}
+            pointerEvents="none"
+          >
+            <LinearGradient
+              colors={['#40D890', '#ffffff']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={StyleSheet.absoluteFill}
+            />
+          </Animated.View>
+
+          <Animated.View
+            style={[StyleSheet.absoluteFill, { opacity: opaciteRapide }]}
+            pointerEvents="none"
+          >
+            <LinearGradient
+              colors={['#ffffff', '#4FC3FF']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={StyleSheet.absoluteFill}
+            />
+          </Animated.View>
+
           <Animated.View
             style={[
               styles.toggleCircle,
@@ -75,7 +99,7 @@ export function SearchToggle({
               },
             ]}
           />
-        </LinearGradient>
+        </View>
       </TouchableOpacity>
 
       <Text
@@ -118,6 +142,7 @@ const createStyles = (c: ThemeColors) =>
     width: TOGGLE_WIDTH,
     height: 28,
     borderRadius: 20,
+    overflow: 'hidden',
     justifyContent: 'center',
     paddingHorizontal: TOGGLE_PADDING,
   },
