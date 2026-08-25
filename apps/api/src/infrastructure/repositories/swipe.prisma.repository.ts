@@ -14,30 +14,56 @@ export class SwipePrismaRepository implements SwipeRepository {
   async create(input: CreateSwipeInput): Promise<SwipeRecord> {
     return this.prisma.swipe.upsert({
       where: {
-        swiperId_targetUserId: {
+        swiperId_homeId: {
           swiperId: input.swiperId,
-          targetUserId: input.targetUserId,
+          homeId: input.homeId,
         },
       },
       update: {
         direction: input.direction,
-        homeId: input.homeId,
+        targetUserId: input.targetUserId,
       },
       create: input,
     });
   }
 
-  async hasLike(swiperId: string, targetUserId: string): Promise<boolean> {
-    const swipe = await this.prisma.swipe.findUnique({
+  async hasMatch(
+    firstUserId: string,
+    secondUserId: string,
+  ): Promise<boolean> {
+    const match = await this.prisma.match.findFirst({
       where: {
-        swiperId_targetUserId: {
-          swiperId: swiperId,
-          targetUserId: targetUserId,
-        },
+        OR: [
+          { user1Id: firstUserId, user2Id: secondUserId },
+          { user1Id: secondUserId, user2Id: firstUserId },
+        ],
       },
+      select: { id: true },
     });
 
-    return swipe?.direction === 'LIKE';
+    return Boolean(match);
+  }
+
+  async likedHomeIds(
+    swiperId: string,
+    targetUserId: string,
+  ): Promise<string[]> {
+    const swipes = await this.prisma.swipe.findMany({
+      where: { swiperId, targetUserId, direction: 'LIKE' },
+      orderBy: { createdAt: 'asc' },
+      select: { homeId: true },
+    });
+
+    return swipes.map((swipe) => swipe.homeId);
+  }
+
+  async hasLike(swiperId: string, targetUserId: string): Promise<boolean> {
+    const swipe = await this.prisma.swipe.findFirst({
+      where: { swiperId, targetUserId, direction: 'LIKE' },
+      select: { id: true },
+    });
+
+    return Boolean(swipe);
   }
 
   async hasOpenConversation(

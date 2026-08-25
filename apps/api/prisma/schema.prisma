@@ -8,19 +8,19 @@ datasource db {
 }
 
 model User {
-  id                String         @id @default(uuid())
-  email             String         @unique
-  passwordHash      String?        @map("password_hash")
-  firstName         String?        @map("first_name")
-  lastName          String?        @map("last_name")
-  avatarUrl         String?        @map("avatar_url")
-  bio               String?
-  country           String?
-  languages         Json?
-  rating            Int            @default(0)
-  isAdmin           Boolean        @default(false) @map("is_admin")
+  id           String  @id @default(uuid())
+  email        String  @unique
+  passwordHash String? @map("password_hash")
+  firstName    String? @map("first_name")
+  lastName     String? @map("last_name")
+  avatarUrl    String? @map("avatar_url")
+  bio          String?
+  country      String?
+  languages    Json?
+  rating       Int     @default(0)
+  isAdmin      Boolean @default(false) @map("is_admin")
 
-  suspendedAt DateTime? @map("suspended_at")
+  suspendedAt       DateTime?      @map("suspended_at")
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @updatedAt @map("updated_at")
   identityStatus    IdentityStatus @default(NOT_VERIFIED)
@@ -85,10 +85,10 @@ model Home {
   latitude    Float?
   longitude   Float?
   capacity    Int
-  beds        Int     @default(1)
-  bedrooms    Int     @default(1)
-  bathrooms   Int     @default(1)
-  homeType    String  @map("home_type")
+  beds        Int           @default(1)
+  bedrooms    Int           @default(1)
+  bathrooms   Int           @default(1)
+  homeType    String        @map("home_type")
   category    HomeCategory?
   amenities   Json?
 
@@ -267,7 +267,7 @@ model Swipe {
 
   home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
-  @@unique([swiperId, targetUserId])
+  @@unique([swiperId, homeId])
 }
 
 model SearchHistory {
@@ -378,8 +378,8 @@ model Message {
 
   editedAt DateTime? @map("edited_at")
 
-  replyToId String?  @map("reply_to_id")
-  replyTo   Message? @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replyToId String?   @map("reply_to_id")
+  replyTo   Message?  @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
   replies   Message[] @relation("MessageReply")
 
   chat               Chat                 @relation(fields: [chatId], references: [id], onDelete: Cascade)
@@ -423,8 +423,8 @@ model Review {
   score   Int
   comment String
 
-  reply     String?
-  replyAt   DateTime? @map("reply_at")
+  reply   String?
+  replyAt DateTime? @map("reply_at")
 
   reports UserReport[]
 
@@ -442,7 +442,7 @@ model PushToken {
   userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  token    String @unique
+  token    String  @unique
   platform String?
 
   createdAt DateTime @default(now()) @map("created_at")

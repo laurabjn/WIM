@@ -61,7 +61,9 @@ import { getChatSocket } from '../infrastructure/chatSocket';
 import {
   cancelExchangeApi,
   getChatExchangeApi,
+  fetchGuestHomesApi,
   respondToExchangeApi,
+  type LogementCandidat,
   updateExchangeDatesApi,
 } from '../infrastructure/exchange.api';
 import { getHomesByOwner } from 'src/home/infrastructure/home.api';
@@ -70,6 +72,8 @@ import {
   reportUserApi,
 } from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
+import { GuestHomeChoiceModal } from './components/GuestHomeChoiceModal';
+import { fetchLikedHomesApi } from 'src/swipe/infrastructure/swipe.api';
 import { VoiceMessageBubble } from './components/VoiceMessageBubble';
 import { TypingBubble } from './components/TypingBubble';
 import { BackButton } from 'src/shared/ui/BackButton';
@@ -175,6 +179,12 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [logementsCandidats, setLogementsCandidats] = useState<
+    LogementCandidat[]
+  >([]);
+  const [logementsAProposer, setLogementsAProposer] = useState<
+    LogementCandidat[]
+  >([]);
   const [reportOpen, setReportOpen] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -979,21 +989,37 @@ export function ConversationScreen({ route, navigation }: Props) {
     if (!session?.accessToken) return;
 
     try {
-      const homes = await getHomesByOwner(session.accessToken, participantId);
+      // Les logements aimes disent deja ce qui interesse : quand il y en a, ils
+      // remplacent la liste complete, qui rouvrirait un choix deja fait au
+      // swipe.
+      const aimes = await fetchLikedHomesApi(
+        session.accessToken,
+        participantId,
+      );
 
-      if (homes.length === 0) {
+      const candidats = aimes.length
+        ? aimes
+        : (await getHomesByOwner(session.accessToken, participantId)).map(
+            (home) => ({
+              id: home.id,
+              title: home.title,
+              imageUrl: home.photos?.[0]?.url ?? null,
+            }),
+          );
+
+      if (candidats.length === 0) {
         Alert.alert('', t('noHomeToExchange'));
         return;
       }
 
-      // Un seul logement : inutile de faire choisir. Sinon on ouvre le profil,
-      // ou ils sont tous presentes.
-      if (homes.length === 1) {
-        navigation.navigate('ExchangeAvailability', { homeId: homes[0].id });
+      if (candidats.length === 1) {
+        navigation.navigate('ExchangeAvailability', {
+          homeId: candidats[0].id,
+        });
         return;
       }
 
-      navigation.navigate('PublicProfile', { userId: participantId });
+      setLogementsAProposer(candidats);
     } catch (loadError) {
       console.log('Load participant homes error:', loadError);
       Alert.alert('', t('actionUnavailable'));
@@ -1222,6 +1248,38 @@ export function ConversationScreen({ route, navigation }: Props) {
         </TouchableOpacity>
       </View>
 
+      <GuestHomeChoiceModal
+        logements={logementsAProposer}
+        titre={t('exchange:chooseStayTitle')}
+        aide={t('exchange:chooseStayHint')}
+        libelleValidation={t('exchange:chooseStayConfirm')}
+        onFermer={() => setLogementsAProposer([])}
+        onConfirmer={async (logementId) => {
+          setLogementsAProposer([]);
+          navigation.navigate('ExchangeAvailability', { homeId: logementId });
+        }}
+      />
+
+      <GuestHomeChoiceModal
+        logements={logementsCandidats}
+        onFermer={() => setLogementsCandidats([])}
+        onConfirmer={async (logementId) => {
+          const session = await getSession();
+
+          if (!session?.accessToken || !exchange) return;
+
+          await respondToExchangeApi(
+            session.accessToken,
+            exchange.id,
+            'ACCEPT',
+            logementId,
+          );
+
+          setLogementsCandidats([]);
+          setExchange(null);
+        }}
+      />
+
       {exchange?.status === 'PENDING' ? (
         <ExchangeBanner
           exchange={exchange}
@@ -1229,6 +1287,16 @@ export function ConversationScreen({ route, navigation }: Props) {
             const session = await getSession();
 
             if (!session?.accessToken) return;
+
+            const candidats = await fetchGuestHomesApi(
+              session.accessToken,
+              exchange.id,
+            );
+
+            if (candidats.length > 1) {
+              setLogementsCandidats(candidats);
+              return;
+            }
 
             await respondToExchangeApi(
               session.accessToken,

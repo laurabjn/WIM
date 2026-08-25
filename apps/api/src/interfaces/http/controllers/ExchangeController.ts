@@ -15,6 +15,7 @@ import {
   ExchangeResponse,
   RespondToExchangeUseCase,
   UpdateExchangeDatesUseCase,
+  ListGuestHomesUseCase,
 } from 'src/application/exchange/use-cases/respond-to-exchange.usecase';
 import { GetChatExchangeUseCase } from 'src/application/exchange/use-cases/get-chat-exchange.usecase';
 import {
@@ -36,6 +37,7 @@ export class ExchangeController {
   constructor(
     private readonly listMyExchangesUseCase: ListMyExchangesUseCase,
     private readonly respondToExchangeUseCase: RespondToExchangeUseCase,
+    private readonly listGuestHomesUseCase: ListGuestHomesUseCase,
     private readonly getChatExchangeUseCase: GetChatExchangeUseCase,
     private readonly requestExchangeUseCase: RequestExchangeUseCase,
     private readonly updateExchangeDatesUseCase: UpdateExchangeDatesUseCase,
@@ -127,16 +129,25 @@ export class ExchangeController {
     );
   }
 
+  @Get(':exchangeId/guest-homes')
+  async guestHomes(
+    @Req() req: any,
+    @Param('exchangeId') exchangeId: string,
+  ) {
+    return this.listGuestHomesUseCase.execute(exchangeId, req.user.sub);
+  }
+
   @Patch(':exchangeId/respond')
   async respond(
     @Req() req: any,
     @Param('exchangeId') exchangeId: string,
-    @Body() body: { response: ExchangeResponse },
+    @Body() body: { response: ExchangeResponse; guestHomeId?: string },
   ) {
     return this.respondToExchangeUseCase.execute(
       exchangeId,
       req.user.sub,
       body?.response === 'DECLINE' ? 'DECLINE' : 'ACCEPT',
+      body?.guestHomeId,
     );
   }
 
