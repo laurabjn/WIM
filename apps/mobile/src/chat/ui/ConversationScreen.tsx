@@ -1268,7 +1268,7 @@ export function ConversationScreen({ route, navigation }: Props) {
 
           if (!session?.accessToken || !exchange) return;
 
-          await respondToExchangeApi(
+          const accepte = await respondToExchangeApi(
             session.accessToken,
             exchange.id,
             'ACCEPT',
@@ -1276,11 +1276,12 @@ export function ConversationScreen({ route, navigation }: Props) {
           );
 
           setLogementsCandidats([]);
-          setExchange(null);
+          setExchange(accepte ?? null);
         }}
       />
 
-      {exchange?.status === 'PENDING' ? (
+      {exchange &&
+      ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status) ? (
         <ExchangeBanner
           exchange={exchange}
           onAccept={async () => {
@@ -1298,13 +1299,13 @@ export function ConversationScreen({ route, navigation }: Props) {
               return;
             }
 
-            await respondToExchangeApi(
+            const accepte = await respondToExchangeApi(
               session.accessToken,
               exchange.id,
               'ACCEPT',
             );
 
-            setExchange(null);
+            setExchange(accepte ?? null);
           }}
           onChangeDates={async (start, end) => {
             const session = await getSession();

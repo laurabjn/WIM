@@ -872,6 +872,7 @@
     "openConversation": "Ouvrir la conversation"
   },
   "chat": {
+      "exchangeConfirmed": "Échange confirmé",
     "title": "Messages",
     "empty": "Aucune conversation",
     "emptyDescription": "Vos conversations apparaîtront ici dès que vous aurez un match.",

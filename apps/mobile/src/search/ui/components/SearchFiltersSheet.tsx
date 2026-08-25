@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
@@ -43,7 +44,6 @@ export function compterFiltres(filtres: FiltresRecherche): number {
   return (
     (filtres.homeType ? 1 : 0) +
     (filtres.category ? 1 : 0) +
-    (filtres.capacity ? 1 : 0) +
     (filtres.bedrooms ? 1 : 0) +
     filtres.amenities.length
   );
@@ -63,6 +63,7 @@ export const SearchFiltersSheet: React.FC<Props> = ({
   onAppliquer,
 }) => {
   const { t } = useTranslation(['search']);
+  const insets = useSafeAreaInsets();
   const themeColors = useThemeColors();
   const styles = useMemo(() => creerStyles(themeColors), [themeColors]);
 
@@ -112,7 +113,12 @@ export const SearchFiltersSheet: React.FC<Props> = ({
     >
       <Pressable style={styles.fond} onPress={onFermer} />
 
-      <View style={styles.feuille}>
+      <View
+        style={[
+          styles.feuille,
+          { paddingBottom: Math.max(insets.bottom, 16) + 12 },
+        ]}
+      >
         <View style={styles.poignee} />
 
         <Text style={styles.titre}>{t('search:filters.title')}</Text>
@@ -165,37 +171,29 @@ export const SearchFiltersSheet: React.FC<Props> = ({
             ))}
           </View>
 
-          {(['capacity', 'bedrooms'] as const).map((champ) => (
-            <View key={champ} style={styles.compteurLigne}>
-              <Text style={styles.section}>
-                {t(
-                  champ === 'capacity'
-                    ? 'search:filters.travellers'
-                    : 'search:filters.bedrooms',
-                )}
+          <View style={styles.compteurLigne}>
+            <Text style={styles.section}>{t('search:filters.bedrooms')}</Text>
+
+            <View style={styles.compteur}>
+              <TouchableOpacity
+                style={styles.rond}
+                onPress={() => ajuster('bedrooms', -1)}
+              >
+                <Text style={styles.rondTexte}>-</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.compteurValeur}>
+                {libelleCompteur(brouillon.bedrooms)}
               </Text>
 
-              <View style={styles.compteur}>
-                <TouchableOpacity
-                  style={styles.rond}
-                  onPress={() => ajuster(champ, -1)}
-                >
-                  <Text style={styles.rondTexte}>-</Text>
-                </TouchableOpacity>
-
-                <Text style={styles.compteurValeur}>
-                  {libelleCompteur(brouillon[champ])}
-                </Text>
-
-                <TouchableOpacity
-                  style={styles.rond}
-                  onPress={() => ajuster(champ, 1)}
-                >
-                  <Text style={styles.rondTexte}>+</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                style={styles.rond}
+                onPress={() => ajuster('bedrooms', 1)}
+              >
+                <Text style={styles.rondTexte}>+</Text>
+              </TouchableOpacity>
             </View>
-          ))}
+          </View>
 
           <Text style={styles.section}>{t('search:filters.amenities')}</Text>
           <View style={styles.pastilles}>
@@ -224,7 +222,11 @@ export const SearchFiltersSheet: React.FC<Props> = ({
         </ScrollView>
 
         <View style={styles.pied}>
-          <TouchableOpacity onPress={() => setBrouillon(FILTRES_VIDES)}>
+          <TouchableOpacity
+            onPress={() =>
+              setBrouillon({ ...FILTRES_VIDES, capacity: valeurs.capacity })
+            }
+          >
             <Text style={styles.effacer}>{t('search:filters.reset')}</Text>
           </TouchableOpacity>
 

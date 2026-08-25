@@ -87,6 +87,7 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
         <ScrollView
           contentContainerStyle={[
             styles.content,
+            styles.contentCentre,
             { paddingBottom: insets.bottom + 110 },
           ]}
           keyboardShouldPersistTaps="handled"
@@ -148,6 +149,10 @@ const createStyles = (c: ThemeColors) =>
   content: {
     paddingHorizontal: 10,
     paddingTop: 8,
+  },
+  contentCentre: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   title: {
     fontSize: 20,
