@@ -16,7 +16,9 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
       city,
       country,
       capacity,
+      bedrooms,
       homeType,
+      amenities,
       category,
       startDate,
       endDate,
@@ -49,8 +51,22 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
             }
           : undefined,
 
+        bedrooms: bedrooms
+          ? {
+              gte: bedrooms,
+            }
+          : undefined,
+
         homeType: homeType || undefined,
         category: category || undefined,
+
+        ...(amenities?.length
+          ? {
+              amenities: {
+                array_contains: amenities,
+              },
+            }
+          : {}),
 
         ...(startDate && endDate
           ? {

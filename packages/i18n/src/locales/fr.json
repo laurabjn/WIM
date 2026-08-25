@@ -805,6 +805,39 @@
     "remindersDone": "{{envoyes}} rappel(s) envoyé(s), {{termines}} séjour(s) passé(s) en terminé."
   },
   "search": {
+    "filters": {
+      "title": "Filtres",
+      "homeType": "Type de logement",
+      "category": "Ambiance",
+      "travellers": "Voyageurs",
+      "bedrooms": "Chambres",
+      "amenities": "Équipements",
+      "any": "Peu importe",
+      "reset": "Tout effacer",
+      "apply": "Voir les résultats",
+      "types": {
+        "HOUSE": "Maison",
+        "APARTMENT": "Appartement",
+        "STUDIO": "Studio",
+        "VILLA": "Villa"
+      },
+      "categories": {
+        "NATURE": "Nature",
+        "BEACH": "Plage",
+        "CITY": "Ville",
+        "CULTURE": "Culture"
+      },
+      "equipments": {
+        "wifi": "Wifi",
+        "kitchen": "Cuisine",
+        "parking": "Parking",
+        "tv": "Télévision",
+        "washingMachine": "Lave-linge",
+        "workspace": "Espace de travail",
+        "airConditioning": "Climatisation",
+        "pool": "Piscine"
+      }
+    },
     "search": "Recherche",
     "toSearch": "Rechercher",
     "toExplore": "Explorer",

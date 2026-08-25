@@ -806,6 +806,39 @@
     "remindersDone": "{{envoyes}} reminder(s) sent, {{termines}} stay(s) marked completed."
   },
   "search": {
+    "filters": {
+      "title": "Filters",
+      "homeType": "Home type",
+      "category": "Setting",
+      "travellers": "Travellers",
+      "bedrooms": "Bedrooms",
+      "amenities": "Amenities",
+      "any": "Any",
+      "reset": "Clear all",
+      "apply": "Show results",
+      "types": {
+        "HOUSE": "House",
+        "APARTMENT": "Apartment",
+        "STUDIO": "Studio",
+        "VILLA": "Villa"
+      },
+      "categories": {
+        "NATURE": "Nature",
+        "BEACH": "Beach",
+        "CITY": "City",
+        "CULTURE": "Culture"
+      },
+      "equipments": {
+        "wifi": "Wifi",
+        "kitchen": "Kitchen",
+        "parking": "Parking",
+        "tv": "TV",
+        "washingMachine": "Washing machine",
+        "workspace": "Workspace",
+        "airConditioning": "Air conditioning",
+        "pool": "Pool"
+      }
+    },
     "search": "Search",
     "toSearch": "Search",
     "toExplore": "Explore",
