@@ -939,5 +939,28 @@
     "searchMessages": "Rechercher dans la discussion",
     "searchPlaceholder": "Rechercher un message…",
     "searchNoResult": "Aucun message ne correspond."
+  },
+  "onboarding": {
+    "skip": "Passer",
+    "continue": "Continuer",
+    "start": "Commencer",
+    "slides": [
+      {
+        "title": "Trouvez un logement",
+        "body": "Utilisez notre réseau de 15 000 logements dans le monde entier et échangez le vôtre."
+      },
+      {
+        "title": "Facile et rapide",
+        "body": "Avec la recherche rapide, trouvez un logement en quelques swipes."
+      },
+      {
+        "title": "Créez des liens",
+        "body": "Gardez contact avec vos précédents échanges pour créer des liens avec le monde entier."
+      },
+      {
+        "title": "Personnalisable",
+        "body": "Ajustez vos préférences afin de recevoir des annonces d'échange adaptées."
+      }
+    ]
   }
 }

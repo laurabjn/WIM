@@ -6,16 +6,23 @@ import { AdminStackNavigator } from './AdminStack';
 type Props = {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  introductionVue: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const RootNavigator: React.FC<Props> = ({
   isAuthenticated,
   isAdmin,
+  introductionVue,
   setIsAuthenticated,
 }) => {
   if (!isAuthenticated) {
-    return <AuthStackNavigator setIsAuthenticated={setIsAuthenticated} />;
+    return (
+      <AuthStackNavigator
+        setIsAuthenticated={setIsAuthenticated}
+        introductionVue={introductionVue}
+      />
+    );
   }
 
   if (isAdmin) {
