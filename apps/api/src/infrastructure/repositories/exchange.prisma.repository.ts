@@ -195,14 +195,49 @@ export class ExchangeRepositoryPrisma {
     exchangeId: string,
     status: string,
     viewerId?: string,
+    guestHomeId?: string | null,
   ): Promise<PendingExchange> {
     const exchange = await this.prisma.exchange.update({
       where: { id: exchangeId },
-      data: { status: status as any },
+      data: {
+        status: status as any,
+        ...(guestHomeId === undefined ? {} : { guestHomeId }),
+      },
       include: this.pendingInclude,
     });
 
     return this.mapPending(exchange, viewerId);
+  }
+
+  async findGuestHomes(
+    exchangeId: string,
+  ): Promise<{ id: string; title: string; imageUrl: string | null }[]> {
+    const exchange = await this.prisma.exchange.findUnique({
+      where: { id: exchangeId },
+      select: { guestId: true },
+    });
+
+    if (!exchange) return [];
+
+    const homes = await this.prisma.home.findMany({
+      where: { ownerId: exchange.guestId },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        photos: {
+          orderBy: { position: 'asc' },
+          take: 1,
+          select: { url: true },
+        },
+      },
+    });
+
+    return homes.map((home) => ({
+      id: home.id,
+      title: home.title,
+      imageUrl: home.photos[0]?.url ?? null,
+    }));
   }
 
   async updateDates(

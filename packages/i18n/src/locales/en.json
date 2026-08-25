@@ -732,6 +732,9 @@
     "offeredHomeHint": "An exchange involves two homes. Pick the one you offer in return, or leave it for later."
   },
   "exchange": {
+      "chooseHomeTitle": "Which home will you stay in?",
+      "chooseHomeHint": "This member offers several homes. Pick the one you will stay in.",
+      "chooseHomeConfirm": "Accept the exchange",
     "currentExchanges": "Current exchanges",
     "pastExchanges": "Past exchanges",
     "upcomingExchanges": "Upcoming exchanges",

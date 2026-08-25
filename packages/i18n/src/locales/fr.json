@@ -731,6 +731,9 @@
     "offeredHomeHint": "L'échange porte sur deux logements. Choisissez celui que vous offrez en retour, ou laissez vide pour en décider plus tard."
   },
   "exchange": {
+      "chooseHomeTitle": "Quel logement recevez-vous ?",
+      "chooseHomeHint": "Cette personne propose plusieurs logements. Choisissez celui où vous séjournerez.",
+      "chooseHomeConfirm": "Accepter l'échange",
     "currentExchanges": "Échanges actuel",
     "pastExchanges": "Échanges passés",
     "upcomingExchanges": "Échanges à venir",

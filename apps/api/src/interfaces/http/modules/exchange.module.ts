@@ -13,6 +13,7 @@ import { EMAIL_SENDER } from '../tokens/token';
 import { ListMyExchangesUseCase } from 'src/application/exchange/use-cases/list-my-exchanges.usecase';
 import {
   CancelExchangeUseCase,
+  ListGuestHomesUseCase,
   RespondToExchangeUseCase,
   UpdateExchangeDatesUseCase,
 } from 'src/application/exchange/use-cases/respond-to-exchange.usecase';
@@ -68,7 +69,8 @@ import {
         new ListMyExchangesUseCase(repository),
       inject: [ExchangeRepositoryPrisma],
     },
-    RespondToExchangeUseCase,
+    ListGuestHomesUseCase,
+  RespondToExchangeUseCase,
     UpdateExchangeDatesUseCase,
     CancelExchangeUseCase,
     GetChatExchangeUseCase,

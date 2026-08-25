@@ -92,10 +92,33 @@ export async function getChatExchangeApi(
   return parseOptional(response);
 }
 
+export type LogementCandidat = {
+  id: string;
+  title: string;
+  imageUrl: string | null;
+};
+
+export async function fetchGuestHomesApi(
+  token: string,
+  exchangeId: string,
+): Promise<LogementCandidat[]> {
+  const result = await fetch(
+    `${API_URL}/exchanges/${exchangeId}/guest-homes`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+
+  if (!result.ok) return [];
+
+  return (await result.json().catch(() => [])) as LogementCandidat[];
+}
+
 export async function respondToExchangeApi(
   token: string,
   exchangeId: string,
   response: 'ACCEPT' | 'DECLINE',
+  guestHomeId?: string,
 ): Promise<PendingExchange> {
   const result = await fetch(`${API_URL}/exchanges/${exchangeId}/respond`, {
     method: 'PATCH',
@@ -103,7 +126,7 @@ export async function respondToExchangeApi(
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ response }),
+    body: JSON.stringify({ response, guestHomeId }),
   });
 
   return parseOptional(result);

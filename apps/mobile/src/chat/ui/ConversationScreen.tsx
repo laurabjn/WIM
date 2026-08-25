@@ -61,7 +61,9 @@ import { getChatSocket } from '../infrastructure/chatSocket';
 import {
   cancelExchangeApi,
   getChatExchangeApi,
+  fetchGuestHomesApi,
   respondToExchangeApi,
+  type LogementCandidat,
   updateExchangeDatesApi,
 } from '../infrastructure/exchange.api';
 import { getHomesByOwner } from 'src/home/infrastructure/home.api';
@@ -70,6 +72,7 @@ import {
   reportUserApi,
 } from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
+import { GuestHomeChoiceModal } from './components/GuestHomeChoiceModal';
 import { VoiceMessageBubble } from './components/VoiceMessageBubble';
 import { TypingBubble } from './components/TypingBubble';
 import { BackButton } from 'src/shared/ui/BackButton';
@@ -175,6 +178,9 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [logementsCandidats, setLogementsCandidats] = useState<
+    LogementCandidat[]
+  >([]);
   const [reportOpen, setReportOpen] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -1222,6 +1228,26 @@ export function ConversationScreen({ route, navigation }: Props) {
         </TouchableOpacity>
       </View>
 
+      <GuestHomeChoiceModal
+        logements={logementsCandidats}
+        onFermer={() => setLogementsCandidats([])}
+        onConfirmer={async (logementId) => {
+          const session = await getSession();
+
+          if (!session?.accessToken || !exchange) return;
+
+          await respondToExchangeApi(
+            session.accessToken,
+            exchange.id,
+            'ACCEPT',
+            logementId,
+          );
+
+          setLogementsCandidats([]);
+          setExchange(null);
+        }}
+      />
+
       {exchange?.status === 'PENDING' ? (
         <ExchangeBanner
           exchange={exchange}
@@ -1229,6 +1255,16 @@ export function ConversationScreen({ route, navigation }: Props) {
             const session = await getSession();
 
             if (!session?.accessToken) return;
+
+            const candidats = await fetchGuestHomesApi(
+              session.accessToken,
+              exchange.id,
+            );
+
+            if (candidats.length > 1) {
+              setLogementsCandidats(candidats);
+              return;
+            }
 
             await respondToExchangeApi(
               session.accessToken,

@@ -16,7 +16,11 @@ export interface ExchangeRepository {
     exchangeId: string,
     status: string,
     viewerId?: string,
+    guestHomeId?: string | null,
   ): Promise<PendingExchange>;
+  findGuestHomes(
+    exchangeId: string,
+  ): Promise<{ id: string; title: string; imageUrl: string | null }[]>;
   updateDates(
     exchangeId: string,
     startDate: Date,
