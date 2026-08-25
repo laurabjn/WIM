@@ -16,6 +16,8 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import 'src/search/infrastructure/map/mapbox.config';
 import { getSession } from 'src/auth/infrastructure/authStorage';
+import { fetchIdentityStatus } from 'src/auth/infrastructure/identity.api';
+import { IdentityStatus } from 'src/auth/dtos/identityStatus';
 import {
   navigationRef,
   useNotificationNavigation,
@@ -30,10 +32,14 @@ const Stack = createNativeStackNavigator();
 function Coquille({
   isAuthenticated,
   isAdmin,
+  identiteVerifiee,
+  onIdentiteVerifiee,
   setIsAuthenticated,
 }: {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  identiteVerifiee: boolean | null;
+  onIdentiteVerifiee: () => void;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { isDark, colors } = useAppTheme();
@@ -59,6 +65,8 @@ function Coquille({
       <RootNavigator
         isAuthenticated={isAuthenticated}
         isAdmin={isAdmin}
+        identiteVerifiee={identiteVerifiee}
+        onIdentiteVerifiee={onIdentiteVerifiee}
         setIsAuthenticated={setIsAuthenticated}
       />
     </NavigationContainer>
@@ -68,6 +76,7 @@ function Coquille({
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [identiteVerifiee, setIdentiteVerifiee] = useState<boolean | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -91,6 +100,7 @@ export default function App() {
   useEffect(() => {
     if (!isAuthenticated) {
       setIsAdmin(false);
+      setIdentiteVerifiee(null);
       return;
     }
 
@@ -98,6 +108,28 @@ export default function App() {
       .then((session) => setIsAdmin(session?.user.isAdmin === true))
       .catch(() => setIsAdmin(false));
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated || isAdmin) {
+      return;
+    }
+
+    let abandonne = false;
+
+    fetchIdentityStatus()
+      .then((status) => {
+        if (!abandonne) {
+          setIdentiteVerifiee(status === IdentityStatus.VERIFIED);
+        }
+      })
+      .catch(() => {
+        if (!abandonne) setIdentiteVerifiee(null);
+      });
+
+    return () => {
+      abandonne = true;
+    };
+  }, [isAuthenticated, isAdmin]);
 
   if (!ready) return null;
 
@@ -107,6 +139,8 @@ export default function App() {
         <SafeAreaProvider>
         <ThemeProvider>
           <Coquille
+            identiteVerifiee={identiteVerifiee}
+            onIdentiteVerifiee={() => setIdentiteVerifiee(true)}
             isAuthenticated={isAuthenticated}
             isAdmin={isAdmin}
             setIsAuthenticated={setIsAuthenticated}
