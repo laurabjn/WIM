@@ -39,7 +39,9 @@ export type MatchRecord = {
 export interface SwipeRepository {
   create(input: CreateSwipeInput): Promise<SwipeRecord>;
   hasLike(swiperId: string, targetUserId: string): Promise<boolean>;
+  likedHomeIds(swiperId: string, targetUserId: string): Promise<string[]>;
   createMatch(firstUserId: string, secondUserId: string): Promise<MatchRecord>;
+  hasMatch(firstUserId: string, secondUserId: string): Promise<boolean>;
   homeBelongsToUser(homeId: string, userId: string): Promise<boolean>;
   hasOpenConversation(firstUserId: string, secondUserId: string): Promise<boolean>;
 }

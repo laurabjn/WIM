@@ -732,6 +732,9 @@
     "offeredHomeHint": "An exchange involves two homes. Pick the one you offer in return, or leave it for later."
   },
   "exchange": {
+      "chooseStayTitle": "Where would you like to stay?",
+      "chooseStayHint": "You liked several homes from this member. Pick the one you are asking for.",
+      "chooseStayConfirm": "Continue",
       "chooseHomeTitle": "Which home will you stay in?",
       "chooseHomeHint": "This member offers several homes. Pick the one you will stay in.",
       "chooseHomeConfirm": "Accept the exchange",
@@ -825,6 +828,7 @@
     "results": "Results"
   },
   "swipe": {
+      "alreadyMatchedOtherHome": "You had already liked another home from {{name}}: you will pick which one when proposing an exchange.",
     "noMoreHome": "No more home available",
     "homeNotFound": "Home not found",
     "homenotAvailable": "This home is no longer available",

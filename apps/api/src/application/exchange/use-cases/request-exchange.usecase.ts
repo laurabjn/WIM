@@ -100,6 +100,24 @@ export class RequestExchangeUseCase {
       );
     }
 
+    // Un match dit deja qui sejourne ou : si l'hote n'a aime qu'un seul des
+    // logements du demandeur, la contrepartie est connue et personne n'a de
+    // choix a refaire. Plusieurs, ou aucun, laissent la question ouverte
+    // jusqu'a l'acceptation.
+    const logementsAimesParLHote = await this.prisma.swipe.findMany({
+      where: {
+        swiperId: home.ownerId,
+        targetUserId: input.requesterId,
+        direction: 'LIKE',
+      },
+      select: { homeId: true },
+    });
+
+    const contrepartie =
+      logementsAimesParLHote.length === 1
+        ? logementsAimesParLHote[0].homeId
+        : null;
+
     const startDate = input.startDate
       ? new Date(input.startDate)
       : defaultStart();
@@ -138,7 +156,7 @@ export class RequestExchangeUseCase {
           guestId: input.requesterId,
           startDate,
           endDate,
-          guestHomeId: null,
+          guestHomeId: contrepartie,
           travelersCount: input.travelersCount ?? 1,
           status: 'PENDING',
         },

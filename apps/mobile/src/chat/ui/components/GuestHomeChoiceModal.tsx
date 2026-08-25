@@ -17,12 +17,18 @@ import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   logements: LogementCandidat[];
+  titre?: string;
+  aide?: string;
+  libelleValidation?: string;
   onFermer: () => void;
   onConfirmer: (logementId: string) => Promise<void>;
 };
 
 export const GuestHomeChoiceModal: React.FC<Props> = ({
   logements,
+  titre,
+  aide,
+  libelleValidation,
   onFermer,
   onConfirmer,
 }) => {
@@ -60,8 +66,12 @@ export const GuestHomeChoiceModal: React.FC<Props> = ({
 
       <View style={styles.centre} pointerEvents="box-none">
         <View style={styles.carte}>
-          <Text style={styles.titre}>{t('exchange:chooseHomeTitle')}</Text>
-          <Text style={styles.aide}>{t('exchange:chooseHomeHint')}</Text>
+          <Text style={styles.titre}>
+            {titre ?? t('exchange:chooseHomeTitle')}
+          </Text>
+          <Text style={styles.aide}>
+            {aide ?? t('exchange:chooseHomeHint')}
+          </Text>
 
           <ScrollView style={styles.liste}>
             {logements.map((logement) => {
@@ -99,7 +109,7 @@ export const GuestHomeChoiceModal: React.FC<Props> = ({
             disabled={envoi || !choisi}
           >
             <Text style={styles.validerTexte}>
-              {t('exchange:chooseHomeConfirm')}
+              {libelleValidation ?? t('exchange:chooseHomeConfirm')}
             </Text>
           </TouchableOpacity>
         </View>

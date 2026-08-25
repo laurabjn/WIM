@@ -24,6 +24,42 @@ export class SwipeController {
     private readonly prisma: PrismaService,
   ) { }
 
+  @Get('liked-homes')
+  async likedHomes(
+    @Req() req: AuthenticatedRequest,
+    @Query('ownerId') ownerId: string,
+  ) {
+    const swiperId = req.user?.sub ?? req.user?.userId ?? req.user?.id;
+
+    if (!swiperId) {
+      throw new UnauthorizedException('Utilisateur non authentifié');
+    }
+
+    const swipes = await this.prisma.swipe.findMany({
+      where: { swiperId, targetUserId: ownerId, direction: 'LIKE' },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        home: {
+          select: {
+            id: true,
+            title: true,
+            photos: {
+              orderBy: { position: 'asc' },
+              take: 1,
+              select: { url: true },
+            },
+          },
+        },
+      },
+    });
+
+    return swipes.map((swipe) => ({
+      id: swipe.home.id,
+      title: swipe.home.title,
+      imageUrl: swipe.home.photos[0]?.url ?? null,
+    }));
+  }
+
   @Post()
   async create(@Req() req: any, @Body() dto: CreateSwipeDto) {
     const swiperId = req.user?.sub ?? req.user?.userId ?? req.user?.id;

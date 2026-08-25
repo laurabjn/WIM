@@ -731,6 +731,9 @@
     "offeredHomeHint": "L'échange porte sur deux logements. Choisissez celui que vous offrez en retour, ou laissez vide pour en décider plus tard."
   },
   "exchange": {
+      "chooseStayTitle": "Où voulez-vous séjourner ?",
+      "chooseStayHint": "Vous avez aimé plusieurs logements de cette personne. Choisissez celui que vous demandez.",
+      "chooseStayConfirm": "Continuer",
       "chooseHomeTitle": "Quel logement recevez-vous ?",
       "chooseHomeHint": "Cette personne propose plusieurs logements. Choisissez celui où vous séjournerez.",
       "chooseHomeConfirm": "Accepter l'échange",
@@ -824,6 +827,7 @@
     "results": "Résultats"
   },
   "swipe": {
+      "alreadyMatchedOtherHome": "Vous aviez déjà aimé un autre logement de {{name}} : vous choisirez lequel au moment de proposer un échange.",
     "noMoreHome": "Plus aucun logement à afficher",
     "homeNotFound": "Logement introuvable",
     "homenotAvailable": "Ce logement n'est plus disponible",
