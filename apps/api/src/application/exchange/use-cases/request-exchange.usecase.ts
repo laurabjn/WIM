@@ -1,10 +1,12 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
+import { SubscriptionService } from 'src/application/subscription/subscription.service';
 import { BlockedUsersService } from 'src/application/moderation/blocked-users.service';
 import { mapMessage } from 'src/application/message/message.mapper';
 import type { ChatMessages } from '@wim/shared';
@@ -34,6 +36,7 @@ export class RequestExchangeUseCase {
     private readonly prisma: PrismaService,
     private readonly blockedUsers: BlockedUsersService,
     private readonly staysToReview: ListStaysToReviewUseCase,
+    private readonly subscriptions: SubscriptionService,
   ) {}
 
   async execute(input: RequestExchangeInput): Promise<RequestExchangeResult> {
@@ -41,6 +44,15 @@ export class RequestExchangeUseCase {
 
     if (!content) {
       throw new BadRequestException('Le message ne peut pas être vide.');
+    }
+
+    // Demander un echange engage un sejour : c'est l'acte que l'abonnement
+    // ouvre. Publier, explorer et discuter restent libres.
+    if (!(await this.subscriptions.estActif(input.requesterId))) {
+      throw new ForbiddenException({
+        code: 'SUBSCRIPTION_REQUIRED',
+        message: "Un abonnement est nécessaire pour demander un échange.",
+      });
     }
 
     const home = await this.prisma.home.findUnique({
