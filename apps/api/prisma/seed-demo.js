@@ -1102,6 +1102,73 @@ async function main() {
 
   console.log('[seed] 1 match non ouvert : aucune conversation entamee.');
 
+  await prisma.referral.deleteMany({
+    where: { referrer: { email: { endsWith: DEMO_DOMAIN } } },
+  });
+
+  await prisma.subscription.deleteMany({
+    where: { user: { email: { endsWith: DEMO_DOMAIN } } },
+  });
+
+  const JOUR = 24 * 60 * 60 * 1000;
+  const dans = (jours) => new Date(Date.now() + jours * JOUR);
+
+  const abonnements = [
+    { cle: 'sophie', plan: 'MONTHLY', status: 'ACTIVE', fin: 20 },
+    { cle: 'thomas', plan: 'YEARLY', status: 'ACTIVE', fin: 300 },
+    { cle: 'ines', plan: 'MONTHLY', status: 'ACTIVE', fin: 3 },
+    { cle: 'marc', plan: 'MONTHLY', status: 'CANCELLED', fin: 12 },
+    { cle: 'elena', plan: 'MONTHLY', status: 'EXPIRED', fin: -5 },
+    { cle: 'hugo', plan: 'YEARLY', status: 'PENDING', fin: null },
+  ];
+
+  for (const abonnement of abonnements) {
+    const personne = ownersByKey[abonnement.cle];
+
+    if (!personne) continue;
+
+    await prisma.subscription.create({
+      data: {
+        userId: personne.id,
+        plan: abonnement.plan,
+        status: abonnement.status,
+        startedAt: abonnement.status === 'PENDING' ? null : dans(-40),
+        currentPeriodEnd: abonnement.fin === null ? null : dans(abonnement.fin),
+        cancelledAt: abonnement.status === 'CANCELLED' ? dans(-2) : null,
+        externalId: `demo_${abonnement.cle}`,
+      },
+    });
+  }
+
+  await prisma.user.update({
+    where: { id: ownersByKey.sophie.id },
+    data: { referralCode: 'WIMSOPH' },
+  });
+
+  const filleuls = [
+    { cle: 'thomas', recompense: true },
+    { cle: 'lucia', recompense: false },
+  ];
+
+  for (const filleul of filleuls) {
+    const personne = ownersByKey[filleul.cle];
+
+    if (!personne) continue;
+
+    await prisma.referral.create({
+      data: {
+        referrerId: ownersByKey.sophie.id,
+        refereeId: personne.id,
+        rewardedAt: filleul.recompense ? dans(-30) : null,
+      },
+    });
+  }
+
+  console.log(
+    '[seed] abonnements : 3 actifs, 1 resilie encore valable, 1 expire, 1 en attente, le reste sans abonnement.',
+  );
+  console.log('[seed] parrainage : code WIMSOPH, 2 filleuls dont 1 recompense.');
+
   // Sans marque de lecture, une conversation ou l'on a deja repondu affichait
   // quand meme ses anciens messages comme non lus. On considere donc que chacun
   // a lu jusqu'a son propre dernier message : ne restent non lus que ceux
