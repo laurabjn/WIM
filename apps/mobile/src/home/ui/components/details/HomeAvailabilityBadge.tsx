@@ -81,17 +81,19 @@ export function HomeAvailabilityBadge({
 
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
+  // Meme pastille que sur les fiches de logement du compte : un etat se lit
+  // pareil d'un ecran a l'autre.
   exchangeTag: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 16,
-    backgroundColor: c.surface,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    backgroundColor: '#D8F5DF',
   },
 
   exchangeTagText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: c.primary,
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#267A40',
   },
 
   availabilityCard: {
