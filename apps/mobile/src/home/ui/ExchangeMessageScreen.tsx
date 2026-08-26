@@ -24,7 +24,7 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeMessage'>;
 
 export function ExchangeMessageScreen({ navigation, route }: any) {
-  const { t } = useTranslation("contact");
+  const { t } = useTranslation(['contact', 'common', 'subscription']);
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
@@ -69,10 +69,25 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
     } catch (error) {
       console.log('Request exchange error:', error);
 
-      Alert.alert(
-        '',
-        error instanceof Error ? error.message : t('sendError'),
-      );
+      const message = error instanceof Error ? error.message : t('sendError');
+
+      // Un refus faute d'abonnement n'est pas une panne : il a une suite.
+      if (message.includes('abonnement')) {
+        Alert.alert('', message, [
+          { text: t('common:cancel'), style: 'cancel' },
+          {
+            text: t('subscription:title'),
+            onPress: () =>
+              navigation
+                .getParent?.()
+                ?.navigate('ProfileTab', { screen: 'Subscription' }),
+          },
+        ]);
+
+        return;
+      }
+
+      Alert.alert('', message);
     } finally {
       setSending(false);
     }

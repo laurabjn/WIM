@@ -1007,5 +1007,31 @@
         "body": "Ajustez vos préférences afin de recevoir des annonces d'échange adaptées."
       }
     ]
+  },
+  "subscription": {
+    "title": "Abonnement",
+    "subtitle": "Publier, explorer et discuter restent libres. L'abonnement ouvre les échanges.",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "monthlyHint": "Sans engagement",
+    "yearlyHint": "Deux mois offerts",
+    "subscribe": "S'abonner",
+    "activeUntil": "Actif jusqu’au {{date}}",
+    "cancelled": "Résilié, actif jusqu’au {{date}}",
+    "cancel": "Résilier",
+    "cancelConfirm": "Votre abonnement restera actif jusqu’à la fin de la période déjà réglée.",
+    "pending": "Paiement en attente",
+    "simulate": "Simuler le paiement",
+    "simulateHint": "Aucun prestataire de paiement n'est encore branché : ce bouton confirme l'abonnement sans rien débiter.",
+    "referralTitle": "Parrainage",
+    "referralHint": "Un mois offert à vous deux dès que votre filleul s’abonne.",
+    "yourCode": "Votre code",
+    "share": "Partager mon code",
+    "godchildren": "Filleuls",
+    "rewarded": "Mois gagnés",
+    "enterCode": "J’ai un code",
+    "apply": "Valider",
+    "alreadyReferred": "Vous avez déjà été parrainé.",
+    "error": "Action impossible pour le moment."
   }
 }

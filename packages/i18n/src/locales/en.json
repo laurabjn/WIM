@@ -1008,5 +1008,31 @@
         "body": "Adjust your preferences to receive exchange offers that suit you."
       }
     ]
+  },
+  "subscription": {
+    "title": "Subscription",
+    "subtitle": "Listing, browsing and chatting stay free. A subscription unlocks exchanges.",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "monthlyHint": "No commitment",
+    "yearlyHint": "Two months free",
+    "subscribe": "Subscribe",
+    "activeUntil": "Active until {{date}}",
+    "cancelled": "Cancelled, active until {{date}}",
+    "cancel": "Cancel",
+    "cancelConfirm": "Your subscription stays active until the end of the period you already paid for.",
+    "pending": "Payment pending",
+    "simulate": "Simulate the payment",
+    "simulateHint": "No payment provider is connected yet: this button confirms the subscription without charging anything.",
+    "referralTitle": "Referral",
+    "referralHint": "One month free for both of you as soon as your friend subscribes.",
+    "yourCode": "Your code",
+    "share": "Share my code",
+    "godchildren": "Referred",
+    "rewarded": "Months earned",
+    "enterCode": "I have a code",
+    "apply": "Apply",
+    "alreadyReferred": "You have already been referred.",
+    "error": "This is not possible right now."
   }
 }

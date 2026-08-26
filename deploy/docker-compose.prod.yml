@@ -73,6 +73,7 @@ services:
       DEEPL_API_KEY: ${DEEPL_API_KEY:-}
       MAIL_FROM: ${MAIL_FROM}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-}
     volumes:
       # Les fichiers uploadés survivent aux redéploiements et rebuilds d'image.
       - wim_uploads:/app/apps/api/uploads

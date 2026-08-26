@@ -133,11 +133,14 @@ type Props = {
   navigation: {
     goBack: () => void;
     navigate: (screen: string, params?: Record<string, unknown>) => void;
+    getParent?: () => {
+      navigate: (screen: string, params?: Record<string, unknown>) => void;
+    } | undefined;
   };
 };
 
 export function ConversationScreen({ route, navigation }: Props) {
-  const { t, i18n } = useTranslation('chat');
+  const { t, i18n } = useTranslation(['chat', 'common', 'subscription']);
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
@@ -987,6 +990,26 @@ export function ConversationScreen({ route, navigation }: Props) {
     return true;
   }
 
+  function signalerRefus(message?: string) {
+    const texte = message ?? t('actionUnavailable');
+
+    if (!texte.includes('abonnement')) {
+      Alert.alert('', texte);
+      return;
+    }
+
+    Alert.alert('', texte, [
+      { text: t('common:cancel'), style: 'cancel' },
+      {
+        text: t('subscription:title'),
+        onPress: () =>
+          navigation
+            .getParent?.()
+            ?.navigate('ProfileTab', { screen: 'Subscription' }),
+      },
+    ]);
+  }
+
   async function proposeExchange() {
     setMenuOpen(false);
 
@@ -1299,23 +1322,29 @@ export function ConversationScreen({ route, navigation }: Props) {
 
             if (!session?.accessToken) return;
 
-            const candidats = await fetchGuestHomesApi(
-              session.accessToken,
-              exchange.id,
-            );
+            try {
+              const candidats = await fetchGuestHomesApi(
+                session.accessToken,
+                exchange.id,
+              );
 
-            if (candidats.length > 1) {
-              setLogementsCandidats(candidats);
-              return;
+              if (candidats.length > 1) {
+                setLogementsCandidats(candidats);
+                return;
+              }
+
+              const accepte = await respondToExchangeApi(
+                session.accessToken,
+                exchange.id,
+                'ACCEPT',
+              );
+
+              setExchange(accepte ?? null);
+            } catch (acceptError: any) {
+              // Sans ce filet, un refus — abonnement manquant, sejour a noter —
+              // ne produisait rien du tout a l'ecran.
+              signalerRefus(acceptError?.message);
             }
-
-            const accepte = await respondToExchangeApi(
-              session.accessToken,
-              exchange.id,
-              'ACCEPT',
-            );
-
-            setExchange(accepte ?? null);
           }}
           onChangeDates={async (start, end) => {
             const session = await getSession();

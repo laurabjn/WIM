@@ -23,7 +23,12 @@ import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
 
 export function SettingsScreen({ route, navigation }: Props) {
-  const { t, i18n } = useTranslation(['profile', 'common', 'auth']);
+  const { t, i18n } = useTranslation([
+    'profile',
+    'common',
+    'auth',
+    'subscription',
+  ]);
   const { profile } = route.params;
 
   // Le theme vient du fournisseur : ecrire dans le stockage sans le prevenir
@@ -464,6 +469,13 @@ export function SettingsScreen({ route, navigation }: Props) {
             label={t('profile:blocked.title')}
             value={t('profile:blocked.manage')}
             onPress={() => navigation.navigate('BlockedUsers')}
+          />
+
+          <SettingsRow
+            icon="★"
+            label={t('subscription:title')}
+            value={t('subscription:referralTitle')}
+            onPress={() => navigation.navigate('Subscription')}
           />
         </SettingsSection>
 
