@@ -11,11 +11,16 @@ type Props = {
   exchangeStatus?: 'PENDING' | 'FUTURE' | 'CURRENT' | null;
 };
 
-function formatJour(valeur: string) {
-  return new Date(valeur).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
+function formatPeriode(startDate: string, endDate: string): string {
+  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+
+  const debut = new Date(startDate).toLocaleDateString(undefined, options);
+  const fin = new Date(endDate).toLocaleDateString(undefined, {
+    ...options,
+    year: 'numeric',
   });
+
+  return `${debut} — ${fin}`;
 }
 
 export function HomeAvailabilityBadge({
@@ -26,55 +31,47 @@ export function HomeAvailabilityBadge({
   const { t } = useTranslation("common");
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
-  // Annoncer « disponibilité libre » a tout le monde ne dit rien : ce sont les
-  // periodes reellement ouvertes qui interessent celui qui demande.
-  function getAvailabilityLabel(home: Home) {
-    const maintenant = Date.now();
+  // Les periodes se lisent comme sur son propre logement : meme carte, memes
+  // pastilles, meme format de date. Un « disponibilite libre » ne disait rien.
+  const periodes = (home.availabilities ?? [])
+    .filter((availability) => availability.type === 'AVAILABLE')
+    .filter((availability) => Date.parse(availability.endDate) >= Date.now())
+    .sort((a, b) => Date.parse(a.startDate) - Date.parse(b.startDate));
 
-    const periodes = (home.availabilities ?? [])
-      .filter((availability) => availability.type === 'AVAILABLE')
-      .filter((availability) => Date.parse(availability.endDate) >= maintenant)
-      .sort((a, b) => Date.parse(a.startDate) - Date.parse(b.startDate));
-
-    if (periodes.length === 0) {
-      return t('noAvailability');
-    }
-
-    const prochaine = periodes[0];
-
-    const fenetre = t('availableBetween', {
-      debut: formatJour(prochaine.startDate),
-      fin: formatJour(prochaine.endDate),
-    });
-
-    return periodes.length > 1
-      ? `${fenetre} +${periodes.length - 1}`
-      : fenetre;
-  }
-    
   return (
     <View style={styles.availabilityCard}>
-        <View style={styles.availabilityLeft}>
-            <Text style={styles.availabilityIcon}>▦</Text>
-            <Text style={styles.availabilityText}>
-            {getAvailabilityLabel(home)}
-            </Text>
-        </View>
+      <View style={styles.entete}>
+        <Text style={styles.titre}>{t('availabilityPeriodsTitle')}</Text>
 
         {exchangeStatus ? (
-            <View style={styles.exchangeTag}>
-                <Text style={styles.exchangeTagText}>
-                    {t(`exchangeState.${exchangeStatus}`)}
-                </Text>
-            </View>
+          <View style={styles.exchangeTag}>
+            <Text style={styles.exchangeTagText}>
+              {t(`exchangeState.${exchangeStatus}`)}
+            </Text>
+          </View>
         ) : (
-            <TouchableOpacity
-                style={styles.contactButton}
-                onPress={onPressContact}
-            >
-                <Text style={styles.contactText}>{t("contact")}</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.contactButton}
+            onPress={onPressContact}
+          >
+            <Text style={styles.contactText}>{t('contact')}</Text>
+          </TouchableOpacity>
         )}
+      </View>
+
+      {periodes.length === 0 ? (
+        <Text style={styles.vide}>{t('noAvailability')}</Text>
+      ) : (
+        periodes.map((availability) => (
+          <View key={availability.id} style={styles.ligne}>
+            <View style={styles.pastille} />
+
+            <Text style={styles.ligneTexte}>
+              {formatPeriode(availability.startDate, availability.endDate)}
+            </Text>
+          </View>
+        ))
+      )}
     </View>
   );
 }
@@ -98,32 +95,51 @@ const createStyles = (c: ThemeColors) =>
 
   availabilityCard: {
     marginHorizontal: 12,
-    marginTop: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    marginTop: 4,
+    marginBottom: 12,
+    padding: 16,
     borderRadius: 18,
     backgroundColor: c.surfaceAlt,
+  },
+
+  entete: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 10,
+    gap: 12,
   },
 
-  availabilityLeft: {
+  titre: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: c.text,
+    flexShrink: 1,
+  },
+
+  vide: {
+    fontSize: 13,
+    color: c.textMuted,
+  },
+
+  ligne: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
+    paddingVertical: 4,
+  },
+
+  pastille: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: c.accent,
+  },
+
+  ligneTexte: {
     flex: 1,
-  },
-
-  availabilityIcon: {
-    fontSize: 16,
-    marginRight: 8,
-    color: c.text,
-  },
-
-  availabilityText: {
     fontSize: 13,
     color: c.text,
-    fontWeight: '500',
   },
 
   contactButton: {

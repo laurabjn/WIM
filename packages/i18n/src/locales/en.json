@@ -1,6 +1,6 @@
 {
   "common": {
-    "availableBetween": "From {{debut}} to {{fin}}",
+    "availabilityPeriodsTitle": "Availability periods",
     "appName": "World Is Mine",
     "continue": "Next",
     "cancel": "Cancel",
