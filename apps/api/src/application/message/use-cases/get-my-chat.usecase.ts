@@ -89,7 +89,10 @@ export class GetMyChatsUseCase {
             : null,
 
           unreadCount,
-          isRequest: lastMessage !== null && !hasReplied,
+          // Une conversation nee d'un match n'est pas une sollicitation : les
+          // deux personnes se sont deja choisies.
+          isRequest:
+            chat.matchId === null && lastMessage !== null && !hasReplied,
           createdAt: chat.createdAt.toISOString(),
           updatedAt: chat.updatedAt.toISOString(),
         };

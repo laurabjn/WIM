@@ -309,6 +309,16 @@ export function ConversationScreen({ route, navigation }: Props) {
 
           setParticipantLastReadAt(page.participantLastReadAt ?? null);
 
+          // L'echange suit le meme sort que les messages : accepte ou propose
+          // ailleurs, le bandeau restait fige sur l'etat du premier chargement.
+          getChatExchangeApi(session.accessToken, chatId)
+            .then((pending) => {
+              if (!cancelled) setExchange(pending);
+            })
+            .catch((exchangeError) =>
+              console.log('Refresh exchange error:', exchangeError),
+            );
+
           setMessages((current) => {
             const connus = new Set(current.map((message) => message.id));
 

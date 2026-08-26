@@ -15,7 +15,6 @@ import {
 
   ArrowRight,
   Send,
-  SlidersHorizontal,
   Zap,
 } from 'lucide-react-native';
 import type { MyRequestListItem } from '@wim/shared';
@@ -90,9 +89,7 @@ export function RequestsScreen({ navigation }: Props) {
 
         <Text style={styles.headerTitle}>{t('requestsTitle')}</Text>
 
-        <View style={styles.circleButton}>
-          <SlidersHorizontal size={20} color={themeColors.text} />
-        </View>
+        <View style={styles.circleButton} />
       </View>
 
       <TouchableOpacity

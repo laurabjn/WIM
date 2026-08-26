@@ -28,7 +28,7 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
-  const { homeId } = route.params;
+  const { homeId, startDate, endDate } = route.params;
     
   const DEFAULT_MESSAGE = t("defaultMessageContent");
     
@@ -49,6 +49,8 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
       const result = await requestExchangeApi(session.accessToken, {
         homeId,
         message: message.trim(),
+        startDate,
+        endDate,
       });
 
       // La conversation vit dans l'onglet Messages : depuis les piles Logements

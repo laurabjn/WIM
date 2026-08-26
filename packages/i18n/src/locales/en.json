@@ -1,5 +1,6 @@
 {
   "common": {
+    "availabilityPeriodsTitle": "Availability periods",
     "appName": "World Is Mine",
     "continue": "Next",
     "cancel": "Cancel",
@@ -716,6 +717,8 @@
     "availabilityAdd": "Add a period"
   },
   "availability": {
+    "startDate": "Start date",
+    "endDate": "End date",
     "when": "When are you available for exchange ?",
     "exchangerDates": "On exchanger's dates",
     "specificDates": "Specific dates",
@@ -873,6 +876,7 @@
     "openConversation": "Open conversation"
   },
   "chat": {
+      "changeDates": "Change the dates",
       "exchangeConfirmed": "Exchange confirmed",
     "title": "Messages",
     "empty": "No conversations",

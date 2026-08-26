@@ -59,10 +59,13 @@ export function ExchangesScreen({ navigation }: any) {
     }
   }, []);
 
+  // Seuls les sejours a noter etaient recharges : un echange accepte ailleurs
+  // n'apparaissait qu'apres avoir quitte puis rouvert l'onglet.
   useFocusEffect(
     useCallback(() => {
       chargerSejoursANoter();
-    }, [chargerSejoursANoter]),
+      refresh();
+    }, [chargerSejoursANoter, refresh]),
   );
 
   function goToReview(sejour: StayToReview) {

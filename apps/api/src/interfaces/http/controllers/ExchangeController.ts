@@ -106,6 +106,26 @@ export class ExchangeController {
       );
     }
 
+    // Une demande arrivait sans bruit : rien ne prevenait la personne qui la
+    // recoit tant qu'elle n'ouvrait pas l'application.
+    const destinataire = chat?.participants.find(
+      (participant) => participant.userId !== req.user.sub,
+    );
+
+    if (destinataire) {
+      await this.pushSender
+        .sendToUser(
+          destinataire.userId,
+          {
+            title: "Demande d'échange",
+            body: String(result.message?.content ?? '').slice(0, 140),
+            data: { chatId: result.chatId },
+          },
+          { categorie: 'exchanges' },
+        )
+        .catch(() => undefined);
+    }
+
     return result;
   }
 
