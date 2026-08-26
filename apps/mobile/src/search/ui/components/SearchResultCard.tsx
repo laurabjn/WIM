@@ -123,7 +123,7 @@ export function SearchResultCard({
           activeOpacity={0.8}
           onPress={handleToggleFavorite}
         >
-          <Text style={styles.favorite}>
+          <Text style={[styles.favorite, isFavorite && styles.favoriteActif]}>
             {isFavorite ? '★' : '☆'}
           </Text>
         </TouchableOpacity>
@@ -235,10 +235,13 @@ const createStyles = (c: ThemeColors) =>
   },
 
   favorite: {
-    fontSize: 22,
+    fontSize: 20,
     lineHeight: 24,
-    color: c.primary,
+    color: c.text,
     fontWeight: '400',
+  },
+  favoriteActif: {
+    color: '#F59E0B',
   },
 
   pagination: {

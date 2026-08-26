@@ -11,6 +11,13 @@ type Props = {
   exchangeStatus?: 'PENDING' | 'FUTURE' | 'CURRENT' | null;
 };
 
+function formatJour(valeur: string) {
+  return new Date(valeur).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+  });
+}
+
 export function HomeAvailabilityBadge({
   home,
   onPressContact,
@@ -19,30 +26,30 @@ export function HomeAvailabilityBadge({
   const { t } = useTranslation("common");
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+  // Annoncer « disponibilité libre » a tout le monde ne dit rien : ce sont les
+  // periodes reellement ouvertes qui interessent celui qui demande.
   function getAvailabilityLabel(home: Home) {
-    const availabilities = home.availabilities ?? [];
+    const maintenant = Date.now();
 
-    if (availabilities.length === 0) {
-        return t("noAvailability");
+    const periodes = (home.availabilities ?? [])
+      .filter((availability) => availability.type === 'AVAILABLE')
+      .filter((availability) => Date.parse(availability.endDate) >= maintenant)
+      .sort((a, b) => Date.parse(a.startDate) - Date.parse(b.startDate));
+
+    if (periodes.length === 0) {
+      return t('noAvailability');
     }
 
-    const hasFreeAvailability = availabilities.some(
-        (availability) => availability.type === 'AVAILABLE',
-    );
+    const prochaine = periodes[0];
 
-    const hasBlockedDates = availabilities.some(
-        (availability) => availability.type === 'BLOCKED',
-    );
+    const fenetre = t('availableBetween', {
+      debut: formatJour(prochaine.startDate),
+      fin: formatJour(prochaine.endDate),
+    });
 
-    if (hasFreeAvailability && !hasBlockedDates) {
-        return t("available");
-    }
-
-    if (hasFreeAvailability && hasBlockedDates) {
-        return t("availableWithBlockDates");
-    }
-
-    return t("specificDates");
+    return periodes.length > 1
+      ? `${fenetre} +${periodes.length - 1}`
+      : fenetre;
   }
     
   return (

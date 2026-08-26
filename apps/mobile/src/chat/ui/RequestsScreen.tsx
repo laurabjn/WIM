@@ -40,7 +40,6 @@ export function RequestsScreen({ navigation }: Props) {
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [requests, setRequests] = useState<MyRequestListItem[]>([]);
-  const [onlyRelevant, setOnlyRelevant] = useState(false);
   const [newMatches, setNewMatches] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -63,19 +62,6 @@ export function RequestsScreen({ navigation }: Props) {
       setLoading(false);
     }
   }, []);
-
-  const bestScore = requests.reduce(
-    (best, request) => Math.max(best, request.relevanceScore),
-    0,
-  );
-
-  const visibleRequests = onlyRelevant
-    ? requests.filter(
-        (request) => request.relevanceScore >= Math.max(1, bestScore * 0.6),
-      )
-    : [...requests].sort(
-        (a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt),
-      );
 
   useFocusEffect(
     useCallback(() => {
@@ -111,28 +97,11 @@ export function RequestsScreen({ navigation }: Props) {
         </View>
       </TouchableOpacity>
 
-      <View style={styles.filterRow}>
-        <TouchableOpacity
-          style={[styles.filterPill, onlyRelevant && styles.filterPillActive]}
-          activeOpacity={0.85}
-          onPress={() => setOnlyRelevant((current) => !current)}
-        >
-          <Text
-            style={[
-              styles.filterLabel,
-              onlyRelevant && styles.filterLabelActive,
-            ]}
-          >
-            {onlyRelevant ? t('allRequests') : t('relevantRequests')}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
       {loading ? (
         <ActivityIndicator style={styles.loader} color="#087EBE" />
       ) : (
         <FlatList
-          data={visibleRequests}
+          data={requests}
           keyExtractor={(chat) => chat.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
@@ -253,35 +222,6 @@ const createStyles = (c: ThemeColors) =>
   matchesCount: {
     fontSize: 15,
     color: c.textMuted,
-  },
-
-  filterRow: {
-    alignItems: 'center',
-    paddingBottom: 14,
-  },
-
-  filterPill: {
-    paddingHorizontal: 22,
-    paddingVertical: 9,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: c.border,
-    backgroundColor: c.surface,
-  },
-
-  filterPillActive: {
-    borderColor: c.accent,
-    backgroundColor: c.accent,
-  },
-
-  filterLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: c.text,
-  },
-
-  filterLabelActive: {
-    color: '#FFFFFF',
   },
 
   loader: {

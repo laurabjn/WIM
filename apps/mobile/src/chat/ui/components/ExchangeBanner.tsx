@@ -121,11 +121,13 @@ export function ExchangeBanner({
           ) : null}
 
           <TouchableOpacity
-            style={styles.datesButton}
+            style={[styles.datesButton, !enAttente && styles.datesButtonSeul]}
             onPress={() => setEditing('start')}
             activeOpacity={0.85}
           >
-            <CalendarDays size={18} color={themeColors.text} />
+            <CalendarDays size={17} color={themeColors.text} />
+
+            <Text style={styles.datesLabel}>{t('changeDates')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -209,11 +211,22 @@ const createStyles = (c: ThemeColors) =>
   },
 
   datesButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: c.surface,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
+    height: 44,
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    backgroundColor: c.surface,
+  },
+  datesButtonSeul: {
+    alignSelf: 'stretch',
+    flex: 1,
+  },
+  datesLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: c.text,
   },
 });

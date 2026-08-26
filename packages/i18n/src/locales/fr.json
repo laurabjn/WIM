@@ -1,5 +1,6 @@
 {
   "common": {
+    "availableBetween": "Du {{debut}} au {{fin}}",
     "appName": "World Is Mine",
     "continue": "Continuer",
     "cancel": "Annuler",
@@ -715,6 +716,8 @@
     "availabilityAdd": "Ajouter une période"
   },
   "availability": {
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
     "when": "Quand êtes-vous disponible pour échanger ?",
     "exchangerDates": "Aux dates de l’échangeur",
     "specificDates": "Dates précises",
@@ -872,6 +875,7 @@
     "openConversation": "Ouvrir la conversation"
   },
   "chat": {
+      "changeDates": "Modifier les dates",
       "exchangeConfirmed": "Échange confirmé",
     "title": "Messages",
     "empty": "Aucune conversation",
