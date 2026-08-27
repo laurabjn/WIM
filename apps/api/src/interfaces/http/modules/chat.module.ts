@@ -23,6 +23,7 @@ import {
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { MessageTranslationService } from 'src/application/message/services/message-translation.service';
 import { DeeplTranslator } from 'src/infrastructure/translation/deepl.translator';
+import { MessageReminderService } from 'src/application/message/services/message-reminder.service';
 import { NotificationModule } from './notification.module';
 import {
   DeleteMessageUseCase,
@@ -43,6 +44,7 @@ import {
       UserRecommendationProfileBuilder,
       HomeRecommendationScorer,
     RecommendationWeightsService,
+      MessageReminderService,
       GetChatMessagesUseCase,
       SendMessageUseCase,
       MarkChatAsReadUseCase,

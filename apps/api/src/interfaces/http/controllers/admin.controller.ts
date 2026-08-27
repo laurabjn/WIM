@@ -19,6 +19,7 @@ import {
 } from 'src/application/admin/admin-moderation.usecases';
 import { ReviewReminderService } from 'src/application/exchange/services/review-reminder.service';
 import { StayLifecycleService } from 'src/application/exchange/services/stay-lifecycle.service';
+import { MessageReminderService } from 'src/application/message/services/message-reminder.service';
 import { RecommendationWeightsService } from 'src/application/swipe/services/recommendation-weights.service';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { AdminGuard } from '../admin.guard';
@@ -37,6 +38,7 @@ export class AdminController {
     private readonly reviewReminders: ReviewReminderService,
     private readonly stayLifecycle: StayLifecycleService,
     private readonly weights: RecommendationWeightsService,
+    private readonly messageReminders: MessageReminderService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -129,7 +131,9 @@ export class AdminController {
 
     const envoyes = await this.reviewReminders.appliquer();
 
-    return { commences, termines, envoyes };
+    const messages = await this.messageReminders.appliquer();
+
+    return { commences, termines, envoyes, messages };
   }
 
   @Get('reports')

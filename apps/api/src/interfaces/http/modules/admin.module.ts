@@ -8,6 +8,7 @@ import {
 } from 'src/application/admin/admin-moderation.usecases';
 import { ReviewReminderService } from 'src/application/exchange/services/review-reminder.service';
 import { StayLifecycleService } from 'src/application/exchange/services/stay-lifecycle.service';
+import { MessageReminderService } from 'src/application/message/services/message-reminder.service';
 import { RecommendationWeightsService } from 'src/application/swipe/services/recommendation-weights.service';
 import { ConsoleEmailSender } from 'src/infrastructure/notifications/console-email.sender';
 import {
@@ -27,6 +28,7 @@ import { AdminController } from '../controllers/admin.controller';
     ReviewReminderService,
     StayLifecycleService,
     RecommendationWeightsService,
+    MessageReminderService,
     ConsoleEmailSender,
     NodemailerEmailSender,
     {

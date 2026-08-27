@@ -345,7 +345,8 @@ model ChatParticipant {
   lastReadMessageId String?
   lastReadAt        DateTime?
 
-  hiddenAt DateTime? @map("hidden_at")
+  hiddenAt       DateTime? @map("hidden_at")
+  reminderSentAt DateTime? @map("reminder_sent_at")
 
   chatId String
   userId String
