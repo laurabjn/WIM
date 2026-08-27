@@ -73,6 +73,57 @@ export class SubscriptionService {
     return this.estEnCours(abonnement);
   }
 
+  // Ce que l'administration a besoin de savoir : combien paient, combien sont
+  // partis, et si le parrainage rapporte autre chose que des codes generes.
+  async analyse() {
+    const maintenant = new Date();
+
+    const [parStatut, actifs, parPlan, parrainages, recompenses, codes] =
+      await Promise.all([
+        this.prisma.subscription.groupBy({
+          by: ['status'],
+          _count: { _all: true },
+        }),
+        this.prisma.subscription.count({
+          where: {
+            status: { in: ['ACTIVE', 'CANCELLED'] },
+            currentPeriodEnd: { gt: maintenant },
+          },
+        }),
+        this.prisma.subscription.groupBy({
+          by: ['plan'],
+          where: {
+            status: { in: ['ACTIVE', 'CANCELLED'] },
+            currentPeriodEnd: { gt: maintenant },
+          },
+          _count: { _all: true },
+        }),
+        this.prisma.referral.count(),
+        this.prisma.referral.count({ where: { rewardedAt: { not: null } } }),
+        this.prisma.user.count({ where: { referralCode: { not: null } } }),
+      ]);
+
+    return {
+      abonnes: actifs,
+      parStatut: Object.fromEntries(
+        parStatut.map((ligne) => [ligne.status, ligne._count._all]),
+      ),
+      parPlan: Object.fromEntries(
+        parPlan.map((ligne) => [ligne.plan, ligne._count._all]),
+      ),
+      parrainage: {
+        codesGeneres: codes,
+        filleuls: parrainages,
+        recompenses,
+        // Un code partage qui n'aboutit jamais coute autant qu'aucun code.
+        tauxConversion:
+          parrainages === 0
+            ? 0
+            : Math.round((recompenses / parrainages) * 100),
+      },
+    };
+  }
+
   async demarrer(
     userId: string,
     plan: PlanAbonnement,

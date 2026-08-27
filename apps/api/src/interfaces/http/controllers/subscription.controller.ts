@@ -19,6 +19,7 @@ import { ReferralService } from 'src/application/subscription/referral.service';
 import { SubscriptionService } from 'src/application/subscription/subscription.service';
 import type { PlanAbonnement } from 'src/application/subscription/ports/payment-provider.port';
 import { isPaymentProviderConfigured } from 'src/infrastructure/payment/simulated-payment.provider';
+import { AdminGuard } from '../admin.guard';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 import { PAYMENT_PROVIDER } from '../tokens/token';
 import { Inject } from '@nestjs/common';
@@ -38,6 +39,14 @@ export class SubscriptionController {
     @Inject(PAYMENT_PROVIDER)
     private readonly provider: PaymentProviderPort,
   ) {}
+
+  // Reservee a l'administration : ces chiffres n'ont rien a faire dans
+  // l'application de qui que ce soit d'autre.
+  @Get('analytics')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async analyse() {
+    return this.subscriptions.analyse();
+  }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
