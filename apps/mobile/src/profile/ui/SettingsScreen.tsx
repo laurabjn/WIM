@@ -19,17 +19,30 @@ import {
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { clearSession } from 'src/auth/infrastructure/authStorage';
 import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
+import { fetchUnreadNotificationsApi } from 'src/notifications/infrastructure/notificationCenter.api';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
 
 export function SettingsScreen({ route, navigation }: Props) {
-  const { t, i18n } = useTranslation(['profile', 'common', 'auth']);
+  const { t, i18n } = useTranslation([
+    'profile',
+    'common',
+    'auth',
+    'notifications',
+  ]);
+  const [nonLues, setNonLues] = useState(0);
   const { profile } = route.params;
 
   // Le theme vient du fournisseur : ecrire dans le stockage sans le prevenir
   // enregistrait le choix sans jamais l'appliquer.
   const { theme, setAppTheme } = useAppTheme();
   const colors = useThemeColors();
+
+  useEffect(() => {
+    fetchUnreadNotificationsApi()
+      .then((reponse) => setNonLues(reponse.count))
+      .catch(() => setNonLues(0));
+  }, []);
 
   // Rien n'etait charge ni enregistre : chaque reglage revenait a sa valeur par
   // defaut au retour sur l'ecran.
@@ -464,6 +477,13 @@ export function SettingsScreen({ route, navigation }: Props) {
             label={t('profile:blocked.title')}
             value={t('profile:blocked.manage')}
             onPress={() => navigation.navigate('BlockedUsers')}
+          />
+
+          <SettingsRow
+            icon="🔔"
+            label={t('notifications:title')}
+            value={nonLues > 0 ? String(nonLues) : ''}
+            onPress={() => navigation.navigate('NotificationCenter')}
           />
         </SettingsSection>
 

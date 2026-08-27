@@ -1008,5 +1008,14 @@
         "body": "Adjust your preferences to receive exchange offers that suit you."
       }
     ]
+  },
+  "notifications": {
+    "title": "Notifications",
+    "readAll": "Mark all read",
+    "empty": "No notifications",
+    "emptyHint": "Requests, matches and reminders will show up here.",
+    "now": "just now",
+    "minutes": "{{count}} min ago",
+    "hours": "{{count}} h ago"
   }
 }
