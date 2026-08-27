@@ -195,6 +195,16 @@ export function AdminDashboardScreen({
             <TouchableOpacity
               style={[styles.bouton, styles.boutonSecondaire]}
               activeOpacity={0.85}
+              onPress={() => navigation.navigate('AdminAnalytics')}
+            >
+              <Text style={styles.boutonSecondaireTexte}>
+                {t('openAnalytics')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.bouton, styles.boutonSecondaire]}
+              activeOpacity={0.85}
               onPress={() => navigation.navigate('AdminUsers')}
             >
               <Text style={styles.boutonSecondaireTexte}>

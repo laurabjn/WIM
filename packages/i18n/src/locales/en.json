@@ -770,6 +770,33 @@
     }
   },
   "admin": {
+  "openAnalytics": "Analytics",
+  "analyticsTitle": "Analytics",
+  "exchangeStatus": {
+    "PENDING": "pending",
+    "FUTURE": "upcoming",
+    "CURRENT": "ongoing",
+    "PAST": "past",
+    "CANCELLED": "cancelled",
+    "DECLINED": "declined"
+  },
+  "analytics": {
+    "signups": "Sign-ups",
+    "last7": "Last 7 days",
+    "last30": "Last 30 days",
+    "total": "Total",
+    "activity": "Activity",
+    "active7": "Seen in the last 7 days",
+    "neverReturned": "Never came back",
+    "verification": "Identity verification",
+    "homes": "Homes",
+    "open": "Open to exchange",
+    "withoutPhoto": "Without a photo",
+    "exchanges": "Exchanges",
+    "conversations": "Conversations",
+    "neverStarted": "Never started",
+    "topCities": "Most searched cities"
+  },
   "setIdentity": {
     "VERIFIED": "Mark verified",
     "REFUSED": "Refuse verification"

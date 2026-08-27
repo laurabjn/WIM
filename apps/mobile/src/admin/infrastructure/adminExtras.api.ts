@@ -59,6 +59,20 @@ export function setIdentityStatusApi(
   );
 }
 
+export type AnalyseAdmin = {
+  inscriptions: { septJours: number; trenteJours: number; total: number };
+  activite: { actifsSeptJours: number; jamaisRevenus: number };
+  verification: Record<string, number>;
+  logements: { total: number; ouverts: number; sansPhoto: number };
+  echanges: Record<string, number>;
+  conversations: { total: number; sansReponse: number };
+  villesRecherchees: { ville: string; recherches: number }[];
+};
+
+export function getAnalyticsApi(token: string) {
+  return appeler<AnalyseAdmin>(token, '/admin/analytics');
+}
+
 export function getWeightsApi(token: string) {
   return appeler<PoidsRecommandation>(token, '/admin/recommendation-weights');
 }

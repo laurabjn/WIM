@@ -769,6 +769,33 @@
     }
   },
   "admin": {
+  "openAnalytics": "Analyses",
+  "analyticsTitle": "Analyses",
+  "exchangeStatus": {
+    "PENDING": "en attente",
+    "FUTURE": "à venir",
+    "CURRENT": "en cours",
+    "PAST": "passés",
+    "CANCELLED": "annulés",
+    "DECLINED": "refusés"
+  },
+  "analytics": {
+    "signups": "Inscriptions",
+    "last7": "7 derniers jours",
+    "last30": "30 derniers jours",
+    "total": "Total",
+    "activity": "Activité",
+    "active7": "Vus ces 7 jours",
+    "neverReturned": "Jamais revenus",
+    "verification": "Vérification d'identité",
+    "homes": "Logements",
+    "open": "Ouverts à l’échange",
+    "withoutPhoto": "Sans photo",
+    "exchanges": "Échanges",
+    "conversations": "Conversations",
+    "neverStarted": "Jamais entamées",
+    "topCities": "Villes les plus recherchées"
+  },
   "setIdentity": {
     "VERIFIED": "Marquer vérifié",
     "REFUSED": "Refuser la vérification"
