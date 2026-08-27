@@ -195,6 +195,26 @@ export function AdminDashboardScreen({
             <TouchableOpacity
               style={[styles.bouton, styles.boutonSecondaire]}
               activeOpacity={0.85}
+              onPress={() => navigation.navigate('AdminUsers')}
+            >
+              <Text style={styles.boutonSecondaireTexte}>
+                {t('openUsers')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.bouton, styles.boutonSecondaire]}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate('AdminWeights')}
+            >
+              <Text style={styles.boutonSecondaireTexte}>
+                {t('openWeights')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.bouton, styles.boutonSecondaire]}
+              activeOpacity={0.85}
               disabled={rappelsEnCours}
               onPress={lancerLesRappels}
             >

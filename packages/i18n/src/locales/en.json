@@ -770,6 +770,45 @@
     }
   },
   "admin": {
+  "setIdentity": {
+    "VERIFIED": "Mark verified",
+    "REFUSED": "Refuse verification"
+  },
+  "openUsers": "Accounts",
+  "openWeights": "Recommendation tuning",
+  "usersTitle": "Accounts",
+  "searchPlaceholder": "Name or email address",
+  "noUser": "No account found.",
+  "admin": "ADMIN",
+  "homesCount": "{{count}} home(s)",
+  "reportsCount": "{{count}} report(s)",
+  "actionError": "This action failed.",
+  "weightsTitle": "Recommendations",
+  "weightsHint": "These values weight how homes are ranked in quick search. A higher value counts more; 0 disables the criterion.",
+  "weightsSaved": "Weights saved.",
+  "identity": {
+    "NOT_VERIFIED": "not verified",
+    "IN_PROGRESS": "verification in progress",
+    "VERIFIED": "verified",
+    "REFUSED": "verification refused"
+  },
+  "weights": {
+    "rechercheVille": "City already searched",
+    "recherchePays": "Country already searched",
+    "distanceProche": "Within 10 km",
+    "distanceMoyenne": "Within 50 km",
+    "distanceLointaine": "Within 150 km",
+    "plafondRecherche": "Cap — search history",
+    "typeAime": "Liked home type",
+    "equipementAime": "Liked amenity",
+    "plafondEquipements": "Cap — amenities",
+    "plafondPreferences": "Cap — preferences",
+    "villeRejetee": "Rejected city",
+    "typeRejete": "Rejected type",
+    "equipementRejete": "Rejected amenity",
+    "plafondEquipementsRejetes": "Cap — rejected amenities",
+    "plafondRejet": "Cap — rejection penalty"
+  },
     "adminTitle": "Admin dashboard",
     "adminSubtitle": "Admin-only view.",
     "adminTableHeaderName": "Feature",

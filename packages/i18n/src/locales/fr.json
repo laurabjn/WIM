@@ -769,6 +769,45 @@
     }
   },
   "admin": {
+  "setIdentity": {
+    "VERIFIED": "Marquer vérifié",
+    "REFUSED": "Refuser la vérification"
+  },
+  "openUsers": "Comptes",
+  "openWeights": "Réglage des recommandations",
+  "usersTitle": "Comptes",
+  "searchPlaceholder": "Nom ou adresse e-mail",
+  "noUser": "Aucun compte trouvé.",
+  "admin": "ADMIN",
+  "homesCount": "{{count}} logement(s)",
+  "reportsCount": "{{count}} signalement(s)",
+  "actionError": "Action impossible.",
+  "weightsTitle": "Recommandations",
+  "weightsHint": "Ces valeurs pondèrent le classement des logements dans la recherche rapide. Une valeur plus haute pèse plus lourd ; 0 neutralise le critère.",
+  "weightsSaved": "Pondérations enregistrées.",
+  "identity": {
+    "NOT_VERIFIED": "non vérifié",
+    "IN_PROGRESS": "vérification en cours",
+    "VERIFIED": "vérifié",
+    "REFUSED": "vérification refusée"
+  },
+  "weights": {
+    "rechercheVille": "Ville déjà recherchée",
+    "recherchePays": "Pays déjà recherché",
+    "distanceProche": "À moins de 10 km",
+    "distanceMoyenne": "À moins de 50 km",
+    "distanceLointaine": "À moins de 150 km",
+    "plafondRecherche": "Plafond — historique de recherche",
+    "typeAime": "Type de logement apprécié",
+    "equipementAime": "Équipement apprécié",
+    "plafondEquipements": "Plafond — équipements",
+    "plafondPreferences": "Plafond — préférences",
+    "villeRejetee": "Ville rejetée",
+    "typeRejete": "Type rejeté",
+    "equipementRejete": "Équipement rejeté",
+    "plafondEquipementsRejetes": "Plafond — équipements rejetés",
+    "plafondRejet": "Plafond — pénalité de rejet"
+  },
     "adminTitle": "Tableau de bord administrateur",
     "adminSubtitle": "Vue réservée aux administrateurs.",
     "adminTableHeaderName": "Fonctionnalité",
