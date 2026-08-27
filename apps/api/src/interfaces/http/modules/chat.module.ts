@@ -5,6 +5,7 @@ import { GetChatMessagesUseCase } from 'src/application/message/use-cases/get-ch
 import { GetMyChatsUseCase } from 'src/application/message/use-cases/get-my-chat.usecase';
 import { GetMyRequestsUseCase } from 'src/application/message/use-cases/get-my-requests.usecase';
 import { HomeRecommendationScorer } from 'src/application/swipe/services/home-recommendation-scorer';
+import { RecommendationWeightsService } from 'src/application/swipe/services/recommendation-weights.service';
 import { UserRecommendationProfileBuilder } from 'src/application/swipe/services/user-recommendation-profile.builder';
 import { SendMessageUseCase } from 'src/application/message/use-cases/send-message.usecase';
 import { MarkChatAsReadUseCase } from 'src/application/message/use-cases/mark-chat-as-read.usecase';
@@ -41,6 +42,7 @@ import {
       GetMyRequestsUseCase,
       UserRecommendationProfileBuilder,
       HomeRecommendationScorer,
+    RecommendationWeightsService,
       GetChatMessagesUseCase,
       SendMessageUseCase,
       MarkChatAsReadUseCase,

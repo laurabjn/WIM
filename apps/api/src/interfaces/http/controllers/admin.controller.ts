@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -17,6 +18,7 @@ import {
 } from 'src/application/admin/admin-moderation.usecases';
 import { ReviewReminderService } from 'src/application/exchange/services/review-reminder.service';
 import { StayLifecycleService } from 'src/application/exchange/services/stay-lifecycle.service';
+import { RecommendationWeightsService } from 'src/application/swipe/services/recommendation-weights.service';
 import { AdminGuard } from '../admin.guard';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 
@@ -32,7 +34,18 @@ export class AdminController {
     private readonly suspendUser: SuspendUserUseCase,
     private readonly reviewReminders: ReviewReminderService,
     private readonly stayLifecycle: StayLifecycleService,
+    private readonly weights: RecommendationWeightsService,
   ) {}
+
+  @Get('recommendation-weights')
+  async ponderations() {
+    return this.weights.valeurs();
+  }
+
+  @Patch('recommendation-weights')
+  async reglerLesPonderations(@Body() body: Record<string, number>) {
+    return this.weights.remplacer(body ?? {});
+  }
 
   @Get('stats')
   async statistiques() {

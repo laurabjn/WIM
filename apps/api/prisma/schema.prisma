@@ -69,6 +69,7 @@ model User {
   blocksReceived   BlockedUser[]     @relation("BlocksReceived")
   reportsMade      UserReport[]      @relation("ReportsMade")
   reportsReceived  UserReport[]      @relation("ReportsReceived")
+  notifications    Notification[]
 
   @@map("users")
 }
@@ -490,4 +491,36 @@ model UserReport {
   @@index([reportedId])
   @@index([handledAt])
   @@map("user_reports")
+}
+
+enum NotificationCategory {
+  MESSAGES
+  EXCHANGES
+}
+
+model Notification {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+
+  category NotificationCategory @default(MESSAGES)
+  title    String
+  body     String
+  data     Json?
+
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model AppSetting {
+  key   String @id
+  value Json
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
 }
