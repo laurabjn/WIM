@@ -12,6 +12,12 @@ export type AnalyseAdmin = {
   echanges: Record<string, number>;
   conversations: { total: number; sansReponse: number };
   villesRecherchees: { ville: string; recherches: number }[];
+  series: {
+    semaine: string;
+    inscriptions: number;
+    echanges: number;
+    messages: number;
+  }[];
 };
 
 @Injectable()
@@ -63,7 +69,10 @@ export class GetAdminAnalyticsUseCase {
       where: { messages: { none: {} } },
     });
 
+    const series = await this.series();
+
     return {
+      series,
       inscriptions: { septJours, trenteJours, total },
       activite: { actifsSeptJours, jamaisRevenus },
       verification: Object.fromEntries(
@@ -84,5 +93,55 @@ export class GetAdminAnalyticsUseCase {
           recherches: ligne._count._all,
         })),
     };
+  }
+
+  // Douze semaines : assez pour voir une tendance, assez court pour tenir sur
+  // un ecran de telephone sans devenir illisible.
+  private async series() {
+    const compter = async (table: string, colonne: string) =>
+      this.prisma.$queryRawUnsafe<{ semaine: Date; nombre: bigint }[]>(
+        `SELECT date_trunc('week', "${colonne}") AS semaine, count(*) AS nombre
+         FROM "${table}"
+         WHERE "${colonne}" >= now() - interval '12 weeks'
+         GROUP BY 1 ORDER BY 1`,
+      );
+
+    const [inscriptions, echanges, messages] = await Promise.all([
+      compter('users', 'created_at'),
+      compter('exchanges', 'created_at'),
+      compter('Message', 'createdAt'),
+    ]);
+
+    const semaines = new Map<
+      string,
+      { semaine: string; inscriptions: number; echanges: number; messages: number }
+    >();
+
+    const ajouter = (
+      lignes: { semaine: Date; nombre: bigint }[],
+      champ: 'inscriptions' | 'echanges' | 'messages',
+    ) => {
+      for (const ligne of lignes) {
+        const cle = ligne.semaine.toISOString().slice(0, 10);
+
+        const existante = semaines.get(cle) ?? {
+          semaine: cle,
+          inscriptions: 0,
+          echanges: 0,
+          messages: 0,
+        };
+
+        existante[champ] = Number(ligne.nombre);
+        semaines.set(cle, existante);
+      }
+    };
+
+    ajouter(inscriptions, 'inscriptions');
+    ajouter(echanges, 'echanges');
+    ajouter(messages, 'messages');
+
+    return [...semaines.values()].sort((a, b) =>
+      a.semaine.localeCompare(b.semaine),
+    );
   }
 }

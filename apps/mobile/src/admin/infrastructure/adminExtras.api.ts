@@ -67,6 +67,12 @@ export type AnalyseAdmin = {
   echanges: Record<string, number>;
   conversations: { total: number; sansReponse: number };
   villesRecherchees: { ville: string; recherches: number }[];
+  series: {
+    semaine: string;
+    inscriptions: number;
+    echanges: number;
+    messages: number;
+  }[];
 };
 
 export function getAnalyticsApi(token: string) {

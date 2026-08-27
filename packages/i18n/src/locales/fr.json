@@ -780,6 +780,9 @@
     "DECLINED": "refusés"
   },
   "analytics": {
+        "weeklySignups": "Inscriptions par semaine",
+        "weeklyExchanges": "Échanges par semaine",
+        "weeklyMessages": "Messages par semaine",
     "signups": "Inscriptions",
     "last7": "7 derniers jours",
     "last30": "30 derniers jours",

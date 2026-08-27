@@ -17,6 +17,7 @@ import {
   getAnalyticsApi,
   type AnalyseAdmin,
 } from '../infrastructure/adminExtras.api';
+import { WeeklyBars } from './components/WeeklyBars';
 
 type Props = {
   navigation: { goBack: () => void };
@@ -78,6 +79,33 @@ export const AdminAnalyticsScreen: React.FC<Props> = ({ navigation }) => {
         <ActivityIndicator style={styles.chargement} color={themeColors.text} />
       ) : (
         <ScrollView contentContainerStyle={styles.contenu}>
+          <WeeklyBars
+            titre={t('admin:analytics.weeklySignups')}
+            couleur={themeColors.accent}
+            valeurs={analyse.series.map((point) => ({
+              semaine: point.semaine,
+              valeur: point.inscriptions,
+            }))}
+          />
+
+          <WeeklyBars
+            titre={t('admin:analytics.weeklyExchanges')}
+            couleur={themeColors.info}
+            valeurs={analyse.series.map((point) => ({
+              semaine: point.semaine,
+              valeur: point.echanges,
+            }))}
+          />
+
+          <WeeklyBars
+            titre={t('admin:analytics.weeklyMessages')}
+            couleur={themeColors.primary}
+            valeurs={analyse.series.map((point) => ({
+              semaine: point.semaine,
+              valeur: point.messages,
+            }))}
+          />
+
           <Section
             titre={t('admin:analytics.signups')}
             lignes={[
