@@ -81,7 +81,7 @@ const createStyles = (c: ThemeColors) =>
     marginBottom: 10,
   },
   destination: {
-    width: 110,
+    width: 96,
   },
   flags: {
     flexDirection: 'row',
@@ -104,10 +104,13 @@ const createStyles = (c: ThemeColors) =>
   photos: {
     flexDirection: 'row',
     flex: 1,
-    marginLeft: 18,
+    marginLeft: 10,
+    marginRight: 10,
+    gap: 4,
   },
   photo: {
-    width: 68,
+    flex: 1,
+    maxWidth: 68,
     height: 78,
     borderRadius: 10,
     borderWidth: 2,

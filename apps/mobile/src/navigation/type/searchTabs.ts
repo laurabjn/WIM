@@ -31,4 +31,10 @@ export type SearchStackParamList = {
     homeId: string;
     swipeIndex: number;
   };
+  CityDetails: {
+    city: string;
+    country: string;
+    latitude?: number | null;
+    longitude?: number | null;
+  };
 };

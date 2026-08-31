@@ -714,7 +714,9 @@
     "availabilityPeriods": "Your available periods",
     "availabilityPeriodsHint": "The dates your home can be exchanged. Without a period, it appears in no date search.",
     "availabilityNone": "No period opened yet.",
-    "availabilityAdd": "Add a period"
+    "availabilityAdd": "Add a period",
+    "readOnWikipedia": "Read the full article on Wikipedia",
+    "cityNoDescription": "No description is available for this city."
   },
   "availability": {
     "startDate": "Start date",
