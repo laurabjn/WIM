@@ -25,6 +25,10 @@
     "turbo": "^2.8.9",
     "typescript": "5.9.2"
   },
+  "overrides": {
+    "react-native-worklets": "0.5.1",
+    "react-native-svg": "15.12.1"
+  },
   "engines": {
     "node": ">=18"
   },
