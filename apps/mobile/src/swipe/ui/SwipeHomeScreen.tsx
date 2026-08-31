@@ -204,10 +204,7 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
         />
       </View>
 
-      <SwipeTopPreview
-        home={home}
-        onInfoPress={openHomeDetails}
-      />
+      <SwipeTopPreview home={home} />
 
       <SwipeHomeCard
         key={home.id}
