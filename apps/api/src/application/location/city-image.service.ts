@@ -7,6 +7,7 @@ export type ImageDeVille = { id: string; url: string; grande: string };
 const MAXIMUM = 3;
 const FRAICHEUR_MS = 30 * 24 * 60 * 60 * 1000;
 const FRAICHEUR_SANS_RESULTAT_MS = 24 * 60 * 60 * 1000;
+const DELAI_MAXIMUM_MS = 8000;
 
 type PhotoUnsplash = {
   id?: string;
@@ -115,6 +116,7 @@ export class CityImageService {
     try {
       const reponse = await fetch(adresse, {
         headers: { Authorization: `Client-ID ${cle}` },
+        signal: AbortSignal.timeout(DELAI_MAXIMUM_MS),
       });
 
       if (!reponse.ok) {
