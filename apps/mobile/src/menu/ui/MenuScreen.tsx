@@ -25,6 +25,7 @@ import { searchHomesApi } from 'src/home/infrastructure/searchHome.api';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { SearchToggle } from './components/SearchToggle';
+import { getCityImagesApi } from 'src/utils/cityImages';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
@@ -118,7 +119,31 @@ export function MenuScreen({ navigation }: Props) {
     ? sourceHomes.filter((home) => home.city === featuredCity)
     : [];
 
-  const featuredHome = featuredHomes[0];
+  // L'affiche annonce un lieu : elle montre la ville, pas un salon. Unsplash
+  // fournit deja les photos de la bande de localisation, on lui redemande la
+  // meme chose en plus grand.
+  const [affiche, setAffiche] = useState<string | null>(null);
+
+  useEffect(() => {
+    let abandonne = false;
+
+    if (!featuredCity) {
+      setAffiche(null);
+      return;
+    }
+
+    getCityImagesApi(featuredCity, featuredCountry ?? '', 1)
+      .then((images) => {
+        if (!abandonne) setAffiche(images[0]?.grande ?? null);
+      })
+      .catch(() => {
+        if (!abandonne) setAffiche(null);
+      });
+
+    return () => {
+      abandonne = true;
+    };
+  }, [featuredCity, featuredCountry]);
 
   const heroTitle = featuredCity
     ? featuredCity.toUpperCase()
@@ -143,14 +168,11 @@ export function MenuScreen({ navigation }: Props) {
         />
 
         <View style={styles.heroCard}>
-          <Image
-            source={{
-              uri:
-                featuredHome?.photos?.[0]?.url ??
-                'https://images.unsplash.com/photo-1501594907352-04cda38ebc29',
-            }}
-            style={styles.heroImage}
-          />
+          {affiche ? (
+            <Image source={{ uri: affiche }} style={styles.heroImage} />
+          ) : (
+            <View style={[styles.heroImage, styles.heroImageVide]} />
+          )}
 
           <View style={styles.heroOverlay}>
             <Text style={styles.heroTitle}>{heroTitle}</Text>
@@ -243,7 +265,7 @@ const createStyles = (c: ThemeColors) =>
     paddingBottom: 90,
   },
   heroCard: {
-    height: 180,
+    aspectRatio: 1,
     borderRadius: 22,
     overflow: 'hidden',
     marginBottom: 14,
@@ -251,6 +273,9 @@ const createStyles = (c: ThemeColors) =>
   heroImage: {
     width: '100%',
     height: '100%',
+  },
+  heroImageVide: {
+    backgroundColor: c.surfaceAlt,
   },
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,

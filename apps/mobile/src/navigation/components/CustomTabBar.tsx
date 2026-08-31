@@ -65,7 +65,7 @@ export function CustomTabBar({
             <View style={[styles.iconBubble, isHomeFocused && styles.iconBubbleActive]}>
               <Ionicons
                 name={isHomeFocused ? 'home' : 'home-outline'}
-                size={18}
+                size={21}
                 color={themeColors.text}
               />
             </View>
@@ -79,7 +79,7 @@ export function CustomTabBar({
             <View style={[styles.iconBubble, isExchangeFocused && styles.iconBubbleActive]}>
               <Ionicons
                 name={isExchangeFocused ? 'swap-horizontal' : 'swap-horizontal-outline'}
-                size={15}
+                size={18}
                 color={themeColors.text}
               />
             </View>
@@ -92,7 +92,7 @@ export function CustomTabBar({
           >
             <Ionicons
               name={isSearchFocused ? 'search' : 'search-outline'}
-              size={16}
+              size={17}
               color={themeColors.text}
               style={styles.searchIcon}
             />
@@ -109,7 +109,7 @@ export function CustomTabBar({
             <View style={[styles.iconBubble, isMessagesFocused && styles.iconBubbleActive]}>
               <Ionicons
                 name={isMessagesFocused ? 'chatbubbles' : 'chatbubbles-outline'}
-                size={17}
+                size={20}
                 color={themeColors.text}
               />
 
@@ -131,7 +131,7 @@ export function CustomTabBar({
             <View style={[styles.iconBubble, isProfileFocused && styles.iconBubbleActive]}>
               <Ionicons
                 name={isProfileFocused ? 'person' : 'person-outline'}
-                size={18}
+                size={21}
                 color={themeColors.text}
               />
             </View>
@@ -153,30 +153,32 @@ const createStyles = (c: ThemeColors) =>
   },
 
   outer: {
-    paddingHorizontal: 10,
-    paddingBottom: 8,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
   },
 
   inner: {
-    height: 58,
+    height: 66,
     borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
   },
 
   sideButton: {
-    width: 42,
+    width: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   iconBubble: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: c.surfaceAlt,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: c.border,
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -207,9 +209,9 @@ const createStyles = (c: ThemeColors) =>
   },
 
   searchPill: {
-    height: 38,
-    minWidth: 118,
-    maxWidth: 128,
+    height: 44,
+    minWidth: 124,
+    maxWidth: 138,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: c.border,

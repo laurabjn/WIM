@@ -40,6 +40,11 @@ export function SwipeHomeCard({
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [photoIndex, setPhotoIndex] = useState(0);
+  // Un etat React se met a jour trop tard pour un geste : le responder est
+  // consulte au premier mouvement, avant que le rendu suivant ait eu lieu.
+  // La reference, elle, est lue a l'instant meme.
+  const toucheSurImage = useRef(false);
+
   const [isCarouselDragging, setIsCarouselDragging] =
     useState(false);
 
@@ -67,7 +72,9 @@ export function SwipeHomeCard({
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gesture) => {
-        if (isCarouselDragging) {
+        // Un geste parti du bloc image ne fait que changer de photo : il ne
+        // doit ni accepter ni refuser le logement.
+        if (toucheSurImage.current || isCarouselDragging) {
           return false;
         }
 
@@ -168,9 +175,16 @@ export function SwipeHomeCard({
           nestedScrollEnabled
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
-          onTouchStart={() =>
-            setIsCarouselDragging(true)
-          }
+          onTouchStart={() => {
+            toucheSurImage.current = true;
+            setIsCarouselDragging(true);
+          }}
+          onTouchEnd={() => {
+            toucheSurImage.current = false;
+          }}
+          onTouchCancel={() => {
+            toucheSurImage.current = false;
+          }}
           onMomentumScrollEnd={
             handleCarouselScrollEnd
           }
