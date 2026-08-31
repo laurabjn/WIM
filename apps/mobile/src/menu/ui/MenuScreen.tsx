@@ -25,6 +25,7 @@ import { searchHomesApi } from 'src/home/infrastructure/searchHome.api';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { SearchToggle } from './components/SearchToggle';
+import { couvertureDeVille } from './components/cityCover';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
@@ -118,8 +119,6 @@ export function MenuScreen({ navigation }: Props) {
     ? sourceHomes.filter((home) => home.city === featuredCity)
     : [];
 
-  const featuredHome = featuredHomes[0];
-
   const heroTitle = featuredCity
     ? featuredCity.toUpperCase()
     : t('search:toExplore');
@@ -144,11 +143,7 @@ export function MenuScreen({ navigation }: Props) {
 
         <View style={styles.heroCard}>
           <Image
-            source={{
-              uri:
-                featuredHome?.photos?.[0]?.url ??
-                'https://images.unsplash.com/photo-1501594907352-04cda38ebc29',
-            }}
+            source={{ uri: couvertureDeVille(featuredCity) }}
             style={styles.heroImage}
           />
 
@@ -243,7 +238,7 @@ const createStyles = (c: ThemeColors) =>
     paddingBottom: 90,
   },
   heroCard: {
-    height: 180,
+    aspectRatio: 1,
     borderRadius: 22,
     overflow: 'hidden',
     marginBottom: 14,

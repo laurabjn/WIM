@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo, useState } from 'react';
 import {
   Easing,
   StyleSheet,
@@ -19,7 +19,7 @@ type Props = {
 };
 
 const CIRCLE_SIZE = 22;
-const TOGGLE_WIDTH = 145;
+const TOGGLE_LARGEUR_MINIMALE = 145;
 const TOGGLE_PADDING = 4;
 
 export function SearchToggle({
@@ -31,6 +31,10 @@ export function SearchToggle({
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const progress = useRef(new Animated.Value(quickSearch ? 1 : 0)).current;
+
+  // La piste prend toute la place que les libelles laissent : elle s'allonge
+  // donc avec l'ecran, au lieu d'une largeur fixe qui deborde sur les petits.
+  const [largeur, setLargeur] = useState(TOGGLE_LARGEUR_MINIMALE);
 
   useEffect(() => {
     Animated.timing(progress, {
@@ -52,20 +56,39 @@ export function SearchToggle({
     inputRange: [0, 1],
     outputRange: [
       0,
-      TOGGLE_WIDTH - CIRCLE_SIZE - TOGGLE_PADDING * 2,
+      Math.max(0, largeur - CIRCLE_SIZE - TOGGLE_PADDING * 2),
     ],
   });
 
+  // Le libelle designe un cote : on y va, on n'inverse pas aveuglement.
+  function choisir(rapide: boolean) {
+    if (rapide !== quickSearch) onToggle();
+  }
+
   return (
     <View style={styles.header}>
-      <Text
-        numberOfLines={1}
-        style={[styles.headerText, !quickSearch && styles.headerTextActive]}
+      <TouchableOpacity
+        onPress={() => choisir(false)}
+        activeOpacity={0.7}
+        hitSlop={8}
+        style={styles.libelle}
       >
-        {exploreLabel}
-      </Text>
+        <Text
+          numberOfLines={1}
+          style={[styles.headerText, !quickSearch && styles.headerTextActive]}
+        >
+          {exploreLabel}
+        </Text>
+      </TouchableOpacity>
 
-      <TouchableOpacity activeOpacity={0.9} onPress={onToggle}>
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={onToggle}
+        style={styles.pisteBouton}
+        onLayout={(evenement) =>
+          setLargeur(evenement.nativeEvent.layout.width)
+        }
+      >
         <View style={styles.toggle}>
           <Animated.View
             style={[StyleSheet.absoluteFill, { opacity: opaciteExplorer }]}
@@ -102,16 +125,23 @@ export function SearchToggle({
         </View>
       </TouchableOpacity>
 
-      <Text
-        numberOfLines={1}
-        style={[
-          styles.headerText,
-          styles.headerTextEnd,
-          quickSearch && styles.headerTextActive,
-        ]}
+      <TouchableOpacity
+        onPress={() => choisir(true)}
+        activeOpacity={0.7}
+        hitSlop={8}
+        style={styles.libelle}
       >
-        {quickSearchLabel}
-      </Text>
+        <Text
+          numberOfLines={1}
+          style={[
+            styles.headerText,
+            styles.headerTextEnd,
+            quickSearch && styles.headerTextActive,
+          ]}
+        >
+          {quickSearchLabel}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -138,9 +168,15 @@ const createStyles = (c: ThemeColors) =>
     color: c.text,
     fontWeight: '800',
   },
+  pisteBouton: {
+    flex: 1,
+    minWidth: TOGGLE_LARGEUR_MINIMALE,
+  },
+  libelle: {
+    flexShrink: 1,
+  },
   toggle: {
-    width: TOGGLE_WIDTH,
-    height: 28,
+    height: 32,
     borderRadius: 20,
     overflow: 'hidden',
     justifyContent: 'center',

@@ -73,7 +73,7 @@ export function SwipeTopPreview({
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
   container: {
-    height: 62,
+    height: 86,
     paddingHorizontal: 18,
     flexDirection: 'row',
     alignItems: 'center',
@@ -81,7 +81,7 @@ const createStyles = (c: ThemeColors) =>
     marginBottom: 10,
   },
   destination: {
-    width: 105,
+    width: 110,
   },
   flags: {
     flexDirection: 'row',
@@ -96,26 +96,26 @@ const createStyles = (c: ThemeColors) =>
     fontSize: 12,
   },
   destinationText: {
-    fontSize: 10,
-    lineHeight: 12,
+    fontSize: 11,
+    lineHeight: 14,
     fontWeight: '800',
     color: c.text,
   },
   photos: {
     flexDirection: 'row',
     flex: 1,
-    marginLeft: 25,
+    marginLeft: 18,
   },
   photo: {
-    width: 50,
-    height: 58,
-    borderRadius: 8,
+    width: 68,
+    height: 78,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: '#fff',
   },
   infoCard: {
-    width: 38,
-    height: 58,
+    width: 42,
+    height: 78,
     borderRadius: 12,
     backgroundColor: c.surface,
     alignItems: 'center',
