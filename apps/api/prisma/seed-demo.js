@@ -88,6 +88,7 @@ const CONVERSATIONS = [
   },
   {
     // Marc ecrit, Sophie ne repond pas : la conversation reste une demande.
+    sansMatch: true,
     between: ['sophie', 'marc'],
     messages: [
       { from: 'marc', content: 'Bonjour Sophie, je serais intéressé par un échange avec votre studio à Lyon en octobre. Mon chalet est libre à ces dates.', daysAgo: 2 },
@@ -104,12 +105,14 @@ const CONVERSATIONS = [
   {
     // Trois demandes sans reponse, de pertinence differente : de quoi voir le
     // bouton "Demandes pertinentes" trier vraiment.
+    sansMatch: true,
     between: ['sophie', 'yara'],
     messages: [
       { from: 'yara', content: 'Bonjour Sophie, votre appartement lyonnais me plairait beaucoup pour un long week-end en octobre.', daysAgo: 4 },
     ],
   },
   {
+    sansMatch: true,
     between: ['sophie', 'tom'],
     messages: [
       { from: 'tom', content: 'Salut ! Un échange Nantes-Lyon te dirait ? Mon studio est libre presque tout l\'automne.', daysAgo: 1 },
@@ -923,6 +926,28 @@ async function main() {
     where: { id: { in: previousMatchIds } },
   });
 
+  const chatsSansMatch = await prisma.chat.findMany({
+    where: {
+      matchId: null,
+      participants: { some: { userId: { in: ownerIds } } },
+    },
+    select: { id: true, participants: { select: { userId: true } } },
+  });
+
+  await prisma.chat.deleteMany({
+    where: {
+      id: {
+        in: chatsSansMatch
+          .filter((chat) =>
+            chat.participants.every((participant) =>
+              ownerIds.includes(participant.userId),
+            ),
+          )
+          .map((chat) => chat.id),
+      },
+    },
+  });
+
   let totalMessages = 0;
 
   for (const conversation of CONVERSATIONS) {
@@ -930,24 +955,26 @@ async function main() {
     const first = ownersByKey[firstKey];
     const second = ownersByKey[secondKey];
 
-    const match = await prisma.match.create({
-      data: {
-        user1Id: first.id,
-        user2Id: second.id,
-        status: 'ACCEPTED',
-        chat: {
-          create: {
-            participants: {
-              create: [
-                { userId: first.id },
-                { userId: second.id },
-              ],
+    const participants = {
+      create: [
+        { userId: first.id },
+        { userId: second.id },
+      ],
+    };
+
+    const chat = conversation.sansMatch
+      ? await prisma.chat.create({ data: { participants } })
+      : (
+          await prisma.match.create({
+            data: {
+              user1Id: first.id,
+              user2Id: second.id,
+              status: 'ACCEPTED',
+              chat: { create: { participants } },
             },
-          },
-        },
-      },
-      include: { chat: true },
-    });
+            include: { chat: true },
+          })
+        ).chat;
 
     for (const [index, message] of conversation.messages.entries()) {
       const sentAt = daysFromNow(-message.daysAgo);
@@ -955,7 +982,7 @@ async function main() {
 
       await prisma.message.create({
         data: {
-          chatId: match.chat.id,
+          chatId: chat.id,
           senderId: ownersByKey[message.from].id,
           content: message.content,
           createdAt: sentAt,
