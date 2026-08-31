@@ -101,8 +101,6 @@ export function MenuScreen({ navigation }: Props) {
 
   const sourceHomes = homes;
 
-  // Une categorie ouvre la page de resultats, carte comprise, plutot que de
-  // filtrer en silence une liste que rien n'affichait.
   const openCategory = (category: Exclude<CategoryFilter, 'ALL'>) =>
     navigation.navigate('SearchResults', {
       city: '',
@@ -110,8 +108,6 @@ export function MenuScreen({ navigation }: Props) {
       capacity: undefined,
     });
 
-  // Un logement sans theme ne doit pas disparaitre de l'accueil : il reste
-  // visible tant qu'aucun filtre n'est actif.
   const featuredCity = sourceHomes[0]?.city;
   const featuredCountry = sourceHomes[0]?.country;
 
@@ -119,9 +115,6 @@ export function MenuScreen({ navigation }: Props) {
     ? sourceHomes.filter((home) => home.city === featuredCity)
     : [];
 
-  // L'affiche annonce un lieu : elle montre la ville, pas un salon. Unsplash
-  // fournit deja les photos de la bande de localisation, on lui redemande la
-  // meme chose en plus grand.
   const [affiche, setAffiche] = useState<string | null>(null);
 
   useEffect(() => {
@@ -150,8 +143,6 @@ export function MenuScreen({ navigation }: Props) {
     : t('search:toExplore');
   
   const toggleSearch = () => {
-    // On laisse le curseur glisser avant de changer d'ecran : sinon
-    // l'animation etait remplacee par la navigation.
     setQuickSearch(true);
 
     setTimeout(() => navigation.navigate('Swipe'), 260);
@@ -284,7 +275,6 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: 'rgba(0,0,0,0.15)',
   },
   heroTitle: {
-    // Pose sur la photo : toujours blanc, quel que soit le theme.
     color: '#FFFFFF',
     fontSize: 36,
     fontWeight: '900',

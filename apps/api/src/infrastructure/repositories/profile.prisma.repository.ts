@@ -81,8 +81,6 @@ export class PrismaProfileRepository implements ProfileRepository {
       }),
     ]);
 
-    // Un reglage de confidentialite ne vaut que si le serveur l'applique :
-    // laisser le tri a l'affichage reviendrait a envoyer la donnee quand meme.
     const masque = !user.profileVisible;
 
     return {
@@ -101,7 +99,6 @@ export class PrismaProfileRepository implements ProfileRepository {
       bio: masque ? null : user.bio,
       country: masque ? null : user.country,
       nationality: masque ? null : user.nationality,
-      // Le telephone n'a jamais a sortir d'un profil public.
       phone: null,
       birthDate: user.showAge && !masque && user.birthDate
         ? user.birthDate.toISOString()

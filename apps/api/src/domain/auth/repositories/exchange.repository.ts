@@ -6,8 +6,6 @@ export interface ExchangeRepository {
     firstUserId: string,
     secondUserId: string,
   ): Promise<PendingExchange | null>;
-  // viewerId sert a savoir de quel cote se place le lecteur : sans lui,
-  // isHost vaut faux pour tout le monde.
   findById(
     exchangeId: string,
     viewerId?: string,

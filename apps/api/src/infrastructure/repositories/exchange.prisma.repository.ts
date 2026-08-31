@@ -37,8 +37,6 @@ export class ExchangeRepositoryPrisma {
       },
     });
 
-    // Exchange ne porte que des identifiants, sans relation vers User : on
-    // charge donc les personnes a part.
     const partnerIds = exchanges.map((exchange) =>
       exchange.hostId === userId ? exchange.guestId : exchange.hostId,
     );
@@ -105,8 +103,6 @@ export class ExchangeRepositoryPrisma {
     startDate: Date,
     endDate: Date,
   ): Exchange['status'] {
-    // Un echange non accepte reste en attente : le classer sur ses dates le
-    // ferait passer pour un sejour confirme dans la liste des echanges.
     if (stored === 'PENDING' || stored === 'DECLINED') {
       return stored;
     }
@@ -157,9 +153,6 @@ export class ExchangeRepositoryPrisma {
     };
   }
 
-  // Les trois etats vivants d'un echange : en attente d'acceptation, a venir,
-  // ou en cours. La conversation en a besoin pour proposer l'annulation, pas
-  // seulement pour afficher le bandeau d'acceptation.
   async findActiveBetween(
     firstUserId: string,
     secondUserId: string,

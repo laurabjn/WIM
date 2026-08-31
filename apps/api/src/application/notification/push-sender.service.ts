@@ -41,9 +41,6 @@ export class PushSenderService {
   ): Promise<void> {
     const { categorie = 'messages' } = options;
 
-    // Le centre de notifications garde trace de tout, meme de ce qui ne part
-    // pas en push : couper les notifications systeme ne doit pas effacer ce
-    // qui s'est passe dans l'application.
     await this.prisma.notification
       .create({
         data: {

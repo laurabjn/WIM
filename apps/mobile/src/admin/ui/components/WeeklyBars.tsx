@@ -36,8 +36,6 @@ export const WeeklyBars: React.FC<Props> = ({ titre, valeurs, couleur }) => {
         <>
           <Svg height={HAUTEUR} width="100%" viewBox="0 0 100 100">
             {valeurs.map((point, index) => {
-              // Une barre a zero reste visible : un creux se lit, une absence
-              // de barre se confond avec une donnee manquante.
               const hauteur = Math.max(2, (point.valeur / maximum) * 96);
 
               return (

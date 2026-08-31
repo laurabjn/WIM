@@ -130,9 +130,6 @@ export class CancelExchangeUseCase {
       throw new ForbiddenException('Cet échange ne vous concerne pas.');
     }
 
-    // Un sejour passe appartient a l'historique des deux personnes : l'annuler
-    // reecrirait ce qui a eu lieu. Seul ce qui n'a pas encore eu lieu, ou court
-    // encore, peut etre annule.
     const annulable = ['PENDING', 'FUTURE', 'CURRENT'];
 
     if (!annulable.includes(exchange.status)) {
@@ -168,8 +165,6 @@ export class UpdateExchangeDatesUseCase {
       throw new ForbiddenException("Cet échange ne vous concerne pas.");
     }
 
-    // Un sejour commence ou termine ne se redate pas : il a eu lieu. Tant qu'il
-    // est a venir, meme accepte, le calendrier reste negociable.
     if (!['PENDING', 'FUTURE'].includes(exchange.status)) {
       throw new BadRequestException(
         'Les dates ne peuvent plus être modifiées.',

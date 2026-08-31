@@ -31,8 +31,6 @@ export function HomeAvailabilityBadge({
   const { t } = useTranslation("common");
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
-  // Les periodes se lisent comme sur son propre logement : meme carte, memes
-  // pastilles, meme format de date. Un « disponibilite libre » ne disait rien.
   const periodes = (home.availabilities ?? [])
     .filter((availability) => availability.type === 'AVAILABLE')
     .filter((availability) => Date.parse(availability.endDate) >= Date.now())
@@ -78,8 +76,6 @@ export function HomeAvailabilityBadge({
 
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
-  // Meme pastille que sur les fiches de logement du compte : un etat se lit
-  // pareil d'un ecran a l'autre.
   exchangeTag: {
     paddingHorizontal: 10,
     paddingVertical: 5,

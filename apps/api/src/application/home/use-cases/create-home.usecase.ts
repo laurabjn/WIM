@@ -15,8 +15,6 @@ export class CreateHomeUseCase {
   ) {}
 
   async execute(input: CreateHomeInput) {
-    // Une donnee manquante est une faute de la requete, pas du serveur : sans
-    // cela l'ecran ne recevait qu'une 500 muette.
     if (!input.title?.trim()) {
       throw new BadRequestException('Le titre est obligatoire.');
     }

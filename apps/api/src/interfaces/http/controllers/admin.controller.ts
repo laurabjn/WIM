@@ -44,8 +44,6 @@ export class AdminController {
     private readonly prisma: PrismaService,
   ) {}
 
-  // Un signalement designe un compte, mais l'administration doit aussi
-  // pouvoir en chercher un qui n'a jamais ete signale.
   @Get('analytics')
   async analyses() {
     return this.analytics.execute();
@@ -96,8 +94,6 @@ export class AdminController {
     }));
   }
 
-  // Un prestataire de verification peut tomber, refuser a tort, ou n'etre pas
-  // encore branche : l'administration doit pouvoir trancher a la main.
   @Patch('users/:userId/identity')
   async reglerLIdentite(
     @Param('userId') userId: string,

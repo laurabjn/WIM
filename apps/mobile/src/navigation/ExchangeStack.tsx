@@ -18,8 +18,6 @@ export type ExchangeStackParamList = {
     participantName?: string;
     participantAvatar?: string | null;
   };
-  // Le menu de la conversation propose un echange : les ecrans du parcours
-  // doivent exister ici aussi, sinon la navigation echouerait.
   ExchangeAvailability: { homeId: string };
   ReviewStay: {
     exchangeId: string;
@@ -37,8 +35,6 @@ export type ExchangeStackParamList = {
 
 const Stack = createStackNavigator<ExchangeStackParamList>();
 
-// Sans pile propre, l'onglet Echanges empruntait celle d'un autre onglet pour
-// afficher un logement : le retour ramenait alors sur le profil.
 export function ExchangeStackNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

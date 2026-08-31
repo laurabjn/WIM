@@ -49,9 +49,6 @@ const ACCESS_TOKEN_TTL = '30m';
       useExisting: JwtPasswordResetTokenAdapter,
     },
     {
-      // Sans SMTP configure, les mails restent affiches dans la console : le
-      // developpement local n'a pas a dependre d'un serveur de messagerie, et
-      // la production n'a pas a se contenter d'un journal.
       provide: EMAIL_SENDER,
       useFactory: (
         nodemailer: NodemailerEmailSender,

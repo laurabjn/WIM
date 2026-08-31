@@ -50,7 +50,6 @@ export const AdminUsersScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, []);
 
-  // Une recherche par frappe interrogerait le serveur a chaque lettre.
   useEffect(() => {
     const minuteur = setTimeout(() => charger(recherche), 350);
 

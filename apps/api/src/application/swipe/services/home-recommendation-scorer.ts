@@ -246,8 +246,6 @@ export class HomeRecommendationScorer {
     return Math.min(this.poids.plafondRejet, penalty);
   }
 
-  // Ce que l'utilisateur a declare dans ses preferences de voyage. Une
-  // demande explicite compte davantage qu'un gout devine par les swipes.
   private calculateProfileScore(
     home: RecommendationHome,
     profile: UserRecommendationProfile,
@@ -270,8 +268,6 @@ export class HomeRecommendationScorer {
     }
 
     if (profile.desiredCapacity !== null) {
-      // Un logement trop petit pour le groupe annonce ne convient pas ;
-      // legerement plus grand ne derange personne.
       if (home.capacity >= profile.desiredCapacity) {
         score += 3;
       } else {

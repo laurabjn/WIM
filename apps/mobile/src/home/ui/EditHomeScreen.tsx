@@ -47,8 +47,6 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { homeId } = route.params ?? {};
 
-  // Le meme ecran sert a creer : sans identifiant, il n'y a rien a charger et
-  // l'enregistrement cree au lieu de mettre a jour.
   const isCreating = !homeId;
     
   const [activeTab, setActiveTab] = useState('Général');
@@ -215,7 +213,6 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     const unsubscribe = navigation.addListener('beforeRemove', (event) => {
       if (!token || isSaving) return;
       if (!isCreating && !home) return;
-      // Quitter un formulaire de creation reste vide ne doit rien creer.
       if (isCreating && (!title.trim() || !city.trim() || !country.trim())) {
         return;
       }

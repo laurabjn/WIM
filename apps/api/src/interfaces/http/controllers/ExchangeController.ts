@@ -82,8 +82,6 @@ export class ExchangeController {
       requesterId: req.user.sub,
     });
 
-    // Le message d'introduction etait ecrit directement en base : sans cette
-    // annonce, ni l'auteur ni le destinataire ne le voyaient arriver.
     this.gateway.emitMessageCreated(result.chatId, result.message);
 
     const chat = await this.chatRepository.findById(result.chatId);
@@ -106,8 +104,6 @@ export class ExchangeController {
       );
     }
 
-    // Une demande arrivait sans bruit : rien ne prevenait la personne qui la
-    // recoit tant qu'elle n'ouvrait pas l'application.
     const destinataire = chat?.participants.find(
       (participant) => participant.userId !== req.user.sub,
     );
@@ -152,8 +148,6 @@ export class ExchangeController {
       body?.endDate,
     );
 
-    // Rien ne distinguait un changement de dates d'un silence : l'autre
-    // personne ne le decouvrait qu'en rouvrant l'echange.
     const annonce = await this.annonce.nouvellesDates(exchangeId, req.user.sub);
 
     if (annonce) {
@@ -198,8 +192,6 @@ export class ExchangeController {
       body?.guestHomeId,
     );
 
-    // Une acceptation ne laissait aucune trace : la conversation restait
-    // classee en demande, et l'autre personne n'apprenait rien.
     if (reponse === 'ACCEPT') {
       const annonce = await this.annonce.acceptation(exchangeId);
 
