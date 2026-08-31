@@ -713,9 +713,7 @@
     "availabilityPeriods": "Vos périodes de disponibilité",
     "availabilityPeriodsHint": "Les dates où votre logement peut être échangé. Sans période, il n'apparaît dans aucune recherche par dates.",
     "availabilityNone": "Aucune période ouverte pour le moment.",
-    "availabilityAdd": "Ajouter une période",
-    "readOnWikipedia": "Lire l'article complet sur Wikipedia",
-    "cityNoDescription": "Aucune description n'est disponible pour cette ville."
+    "availabilityAdd": "Ajouter une période"
   },
   "availability": {
     "startDate": "Date de début",

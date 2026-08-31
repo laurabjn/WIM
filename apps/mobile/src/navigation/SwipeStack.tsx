@@ -4,7 +4,6 @@ import { View, Text } from 'react-native';
 import { MenuScreen } from "src/menu/ui/MenuScreen";
 import { SwipeDetailHomeScreen } from "src/swipe/ui/components/SwipeDetailsHomeScreen";
 import { SwipeHomeScreen } from "src/swipe/ui/SwipeHomeScreen";
-import { CityScreen } from "src/home/ui/CityScreen";
 import { ProfilePublicScreen } from "src/profile/ui/ProfilePublicScreen";
 import { FONDU_ENCHAINE } from "./transitions";
 
@@ -29,7 +28,6 @@ export function SwipeStackNavigator() {
           />
           <Stack.Screen name="SwipeHomeDetails" component={SwipeDetailHomeScreen} />
           <Stack.Screen name="PublicProfile" component={ProfilePublicScreen} />
-          <Stack.Screen name="CityDetails" component={CityScreen} />
         </Stack.Navigator>
     );
 }

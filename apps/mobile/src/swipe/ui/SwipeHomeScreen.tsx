@@ -159,15 +159,6 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
     setTimeout(() => navigation.navigate('Menu'), 260);
   };
 
-  function openCityDetails() {
-    navigation.navigate('CityDetails', {
-      city: home.city,
-      country: home.country,
-      latitude: home.latitude,
-      longitude: home.longitude,
-    });
-  }
-
   function openHomeDetails() {
     navigation.navigate('SwipeHomeDetails', {
       homeId: home.id,
@@ -215,10 +206,7 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
         />
       </View>
 
-      <SwipeTopPreview
-        home={home}
-        onInfoPress={openCityDetails}
-      />
+      <SwipeTopPreview home={home} />
 
       <SwipeHomeCard
         key={home.id}
