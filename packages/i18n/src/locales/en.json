@@ -770,6 +770,75 @@
     }
   },
   "admin": {
+  "openAnalytics": "Analytics",
+  "analyticsTitle": "Analytics",
+  "exchangeStatus": {
+    "PENDING": "pending",
+    "FUTURE": "upcoming",
+    "CURRENT": "ongoing",
+    "PAST": "past",
+    "CANCELLED": "cancelled",
+    "DECLINED": "declined"
+  },
+  "analytics": {
+        "weeklySignups": "Sign-ups per week",
+        "weeklyExchanges": "Exchanges per week",
+        "weeklyMessages": "Messages per week",
+    "signups": "Sign-ups",
+    "last7": "Last 7 days",
+    "last30": "Last 30 days",
+    "total": "Total",
+    "activity": "Activity",
+    "active7": "Seen in the last 7 days",
+    "neverReturned": "Never came back",
+    "verification": "Identity verification",
+    "homes": "Homes",
+    "open": "Open to exchange",
+    "withoutPhoto": "Without a photo",
+    "exchanges": "Exchanges",
+    "conversations": "Conversations",
+    "neverStarted": "Never started",
+    "topCities": "Most searched cities"
+  },
+  "setIdentity": {
+    "VERIFIED": "Mark verified",
+    "REFUSED": "Refuse verification"
+  },
+  "openUsers": "Accounts",
+  "openWeights": "Recommendation tuning",
+  "usersTitle": "Accounts",
+  "searchPlaceholder": "Name or email address",
+  "noUser": "No account found.",
+  "admin": "ADMIN",
+  "homesCount": "{{count}} home(s)",
+  "reportsCount": "{{count}} report(s)",
+  "actionError": "This action failed.",
+  "weightsTitle": "Recommendations",
+  "weightsHint": "These values weight how homes are ranked in quick search. A higher value counts more; 0 disables the criterion.",
+  "weightsSaved": "Weights saved.",
+  "identity": {
+    "NOT_VERIFIED": "not verified",
+    "IN_PROGRESS": "verification in progress",
+    "VERIFIED": "verified",
+    "REFUSED": "verification refused"
+  },
+  "weights": {
+    "rechercheVille": "City already searched",
+    "recherchePays": "Country already searched",
+    "distanceProche": "Within 10 km",
+    "distanceMoyenne": "Within 50 km",
+    "distanceLointaine": "Within 150 km",
+    "plafondRecherche": "Cap — search history",
+    "typeAime": "Liked home type",
+    "equipementAime": "Liked amenity",
+    "plafondEquipements": "Cap — amenities",
+    "plafondPreferences": "Cap — preferences",
+    "villeRejetee": "Rejected city",
+    "typeRejete": "Rejected type",
+    "equipementRejete": "Rejected amenity",
+    "plafondEquipementsRejetes": "Cap — rejected amenities",
+    "plafondRejet": "Cap — rejection penalty"
+  },
     "adminTitle": "Admin dashboard",
     "adminSubtitle": "Admin-only view.",
     "adminTableHeaderName": "Feature",
@@ -1008,5 +1077,14 @@
         "body": "Adjust your preferences to receive exchange offers that suit you."
       }
     ]
+  },
+  "notifications": {
+    "title": "Notifications",
+    "readAll": "Mark all read",
+    "empty": "No notifications",
+    "emptyHint": "Requests, matches and reminders will show up here.",
+    "now": "just now",
+    "minutes": "{{count}} min ago",
+    "hours": "{{count}} h ago"
   }
 }

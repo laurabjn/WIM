@@ -41,6 +41,27 @@ export class PushSenderService {
   ): Promise<void> {
     const { categorie = 'messages' } = options;
 
+    // Le centre de notifications garde trace de tout, meme de ce qui ne part
+    // pas en push : couper les notifications systeme ne doit pas effacer ce
+    // qui s'est passe dans l'application.
+    await this.prisma.notification
+      .create({
+        data: {
+          userId,
+          category: categorie === 'exchanges' ? 'EXCHANGES' : 'MESSAGES',
+          title: notification.title,
+          body: notification.body,
+          data: (notification.data ?? {}) as object,
+        },
+      })
+      .catch((error) =>
+        this.logger.warn(
+          `Notification non conservee : ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        ),
+      );
+
     const destinataire = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
