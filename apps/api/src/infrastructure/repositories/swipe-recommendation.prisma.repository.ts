@@ -40,12 +40,7 @@ export class SwipeRecommendationPrismaRepository {
     const homes =
       await this.prisma.home.findMany({
         where: {
-          // Un profil masque ne se decouvre pas au swipe : le reglage serait
-          // sans effet s'il continuait d'apparaitre dans les cartes.
           owner: { profileVisible: true },
-          // Seuls les logements deja vus sortent du paquet, pas leur
-          // proprietaire : un autre de ses logements reste une proposition
-          // nouvelle, meme quand la conversation est ouverte.
           ownerId: {
             not: userId,
             notIn: masques,

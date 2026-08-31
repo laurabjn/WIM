@@ -130,8 +130,6 @@ model HomePhoto {
   @@map("home_photos")
 }
 
-// Theme d'un sejour, choisi par l'hote. Distinct de homeType, qui decrit le
-// bati : un chalet peut etre montagne comme culture selon ce qu'on vient y faire.
 enum HomeCategory {
   NATURE
   BEACH
@@ -212,9 +210,6 @@ enum ExchangeStatus {
 model Exchange {
   id String @id @default(uuid())
 
-  // Un echange de maison porte deux logements : celui de l'hote, ou l'invite se
-  // rend, et celui de l'invite, ou l'hote sejourne en retour. Le second reste
-  // facultatif : on peut demander un echange sans encore proposer de logement.
   homeId String @map("home_id")
   home   Home   @relation("ExchangeHostHome", fields: [homeId], references: [id], onDelete: Cascade)
 
@@ -395,8 +390,6 @@ model Message {
   @@index([chatId, createdAt])
 }
 
-// La traduction est facturee au caractere : on la conserve pour ne jamais
-// repayer la traduction d'un message deja vu.
 model MessageTranslation {
   id        String @id @default(uuid())
   messageId String

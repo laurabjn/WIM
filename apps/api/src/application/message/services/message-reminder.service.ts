@@ -66,15 +66,12 @@ export class MessageReminderService {
 
       if (!dernier || dernier.createdAt >= limite) continue;
 
-      // Le dernier mot appartient a l'autre : c'est celui qui n'a pas repondu
-      // qu'on relance, et lui seul.
       const destinataire = conversation.participants.find(
         (participant) => participant.userId !== dernier.senderId,
       );
 
       if (!destinataire) continue;
 
-      // Un rappel deja envoye depuis ce message serait le meme rappel.
       if (
         destinataire.reminderSentAt &&
         destinataire.reminderSentAt >= dernier.createdAt

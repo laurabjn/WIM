@@ -32,8 +32,6 @@ export function SearchToggle({
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const progress = useRef(new Animated.Value(quickSearch ? 1 : 0)).current;
 
-  // La piste prend toute la place que les libelles laissent : elle s'allonge
-  // donc avec l'ecran, au lieu d'une largeur fixe qui deborde sur les petits.
   const [largeur, setLargeur] = useState(TOGGLE_LARGEUR_MINIMALE);
 
   useEffect(() => {
@@ -60,7 +58,6 @@ export function SearchToggle({
     ],
   });
 
-  // Le libelle designe un cote : on y va, on n'inverse pas aveuglement.
   function choisir(rapide: boolean) {
     if (rapide !== quickSearch) onToggle();
   }

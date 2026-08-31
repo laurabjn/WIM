@@ -63,8 +63,6 @@ export class GetAdminAnalyticsUseCase {
       }),
     ]);
 
-    // Une conversation sans le moindre message n'a jamais commence : elle dit
-    // qu'un match n'a rien produit, ce qui interesse autant que le reste.
     const sansReponse = await this.prisma.chat.count({
       where: { messages: { none: {} } },
     });
@@ -95,8 +93,6 @@ export class GetAdminAnalyticsUseCase {
     };
   }
 
-  // Douze semaines : assez pour voir une tendance, assez court pour tenir sur
-  // un ecran de telephone sans devenir illisible.
   private async series() {
     const compter = async (table: string, colonne: string) =>
       this.prisma.$queryRawUnsafe<{ semaine: Date; nombre: bigint }[]>(

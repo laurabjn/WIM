@@ -33,8 +33,6 @@ export function SettingsScreen({ route, navigation }: Props) {
   const [nonLues, setNonLues] = useState(0);
   const { profile } = route.params;
 
-  // Le theme vient du fournisseur : ecrire dans le stockage sans le prevenir
-  // enregistrait le choix sans jamais l'appliquer.
   const { theme, setAppTheme } = useAppTheme();
   const colors = useThemeColors();
 
@@ -44,8 +42,6 @@ export function SettingsScreen({ route, navigation }: Props) {
       .catch(() => setNonLues(0));
   }, []);
 
-  // Rien n'etait charge ni enregistre : chaque reglage revenait a sa valeur par
-  // defaut au retour sur l'ecran.
   useEffect(() => {
     let cancelled = false;
 
@@ -65,8 +61,6 @@ export function SettingsScreen({ route, navigation }: Props) {
     };
   }, []);
 
-  // Les reglages de confidentialite viennent du serveur : lui seul peut les
-  // faire respecter aupres des autres utilisateurs.
   const [profileVisibleServeur, setProfileVisibleServeur] = useState(
     profile.profileVisible ?? true,
   );
@@ -100,8 +94,6 @@ export function SettingsScreen({ route, navigation }: Props) {
     } catch (error) {
       console.log('Update settings error:', error);
 
-      // On remet le commutateur ou il etait : le montrer actif alors que le
-      // serveur l'ignore serait pire que l'echec lui-meme.
       revenir();
 
       Alert.alert('', t('profile:settings.saveError'));
@@ -143,8 +135,6 @@ export function SettingsScreen({ route, navigation }: Props) {
 
   const displayedEmail = profile.email || t('common:notProvided');
   const displayedPhone = profile.phone || t('common:notProvided');
-  // La langue affichee suivait le profil recu en parametre, jamais rafraichi :
-  // elle restait sur l'ancienne apres le changement. i18n, lui, est a jour.
   const displayedLocale =
     i18n.language?.startsWith('en') ? 'English' : 'Français';
 
@@ -234,8 +224,6 @@ export function SettingsScreen({ route, navigation }: Props) {
   async function changerLangue(locale: 'fr' | 'en') {
     const precedente = i18n.language;
 
-    // On bascule l'affichage aussitot, puis on enregistre : le serveur en a
-    // besoin pour les mails, qui partent dans la langue du compte.
     await i18n.changeLanguage(locale);
 
     await enregistrerProfil({ preferredLocale: locale }, () => {

@@ -34,8 +34,6 @@ export type ChatMessagesPage = {
   messages: ChatMessages[];
   nextCursor: string | null;
   hasMore: boolean;
-  // Date du dernier message lu par l'autre participant : elle seule permet de
-  // dire "Vu" avec justesse, plutot que de l'afficher des l'envoi.
   participantLastReadAt: string | null;
 };
 

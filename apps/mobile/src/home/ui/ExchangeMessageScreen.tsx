@@ -53,9 +53,6 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
         endDate,
       });
 
-      // La conversation vit dans l'onglet Messages : depuis les piles Logements
-      // ou Profil, y aller directement echouait, et l'erreur renvoyait sur la
-      // fiche du logement en laissant croire que le message n'etait pas parti.
       const parent = navigation.getParent?.();
 
       if (parent) {
@@ -193,7 +190,6 @@ const createStyles = (c: ThemeColors) =>
     opacity: 0.5,
   },
   buttonText: {
-    // Pose sur un aplat bleu, ce libelle reste blanc dans les deux themes.
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '800',
@@ -216,8 +212,6 @@ const createStyles = (c: ThemeColors) =>
   input: {
     minHeight: 180,
     fontSize: 14,
-    // Un texte que l'on modifie n'est pas un texte secondaire : il etait
-    // devenu gris lors du passage au theme.
     color: c.text,
     lineHeight: 20,
   },

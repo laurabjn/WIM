@@ -49,8 +49,6 @@ export class RecommendationWeightsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  // Le scoreur classe chaque logement a chaque carte : relire la table a
-  // chaque appel couterait plus que le reglage ne rapporte.
   async valeurs(): Promise<PoidsRecommandation> {
     if (this.cache && this.cache.expire > Date.now()) {
       return this.cache.valeurs;
@@ -102,8 +100,6 @@ export class RecommendationWeightsService {
     }
   }
 
-  // Une ponderation negative ou absurde renverserait le classement sans que
-  // personne ne comprenne pourquoi : on ne garde que des nombres tenables.
   private nettoyer(
     modifications: Partial<PoidsRecommandation>,
   ): Partial<PoidsRecommandation> {

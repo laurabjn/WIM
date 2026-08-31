@@ -80,8 +80,6 @@ export const NotificationCenterScreen: React.FC<Props> = ({ navigation }) => {
     }, [charger]),
   );
 
-  // Ouvrir une notification vaut lecture : la marquer a la main serait une
-  // corvee pour une information qu'on vient de consulter.
   async function ouvrir(notification: NotificationItem) {
     if (!notification.lu) {
       setNotifications((actuelles) =>
