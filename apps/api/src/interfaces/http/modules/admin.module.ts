@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import {
+  GetAccountFileUseCase,
   GetAdminStatsUseCase,
   ListReportsUseCase,
   MarkReportHandledUseCase,
@@ -31,6 +32,7 @@ import { AdminController } from '../controllers/admin.controller';
     RecommendationWeightsService,
     MessageReminderService,
     GetAdminAnalyticsUseCase,
+    GetAccountFileUseCase,
     ConsoleEmailSender,
     NodemailerEmailSender,
     {
