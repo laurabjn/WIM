@@ -770,6 +770,29 @@
     }
   },
   "admin": {
+    "account": {
+      "title": "Account file",
+      "study": "Review this account",
+      "memberSince": "Joined on",
+      "lastSeen": "Last seen on",
+      "neverSeen": "never came back",
+      "identity": "Identity",
+      "homes": "Homes",
+      "messages": "Messages",
+      "reviews": "Reviews written",
+      "reportsReceived": "Reports received",
+      "reportsMade": "Reports filed",
+      "distinctReporters": "Different people",
+      "reportsHeading": "What they are accused of",
+      "noDetail": "No detail given by the reporter",
+      "reportedReview": "Reported review",
+      "homesHeading": "Their homes",
+      "noHomes": "No home published",
+      "handled": "handled",
+      "pending": "pending",
+      "openToExchange": "open to exchanges",
+      "closedToExchange": "closed to exchanges"
+    },
   "openAnalytics": "Analytics",
   "analyticsTitle": "Analytics",
   "exchangeStatus": {

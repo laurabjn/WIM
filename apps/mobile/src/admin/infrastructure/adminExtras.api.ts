@@ -89,3 +89,57 @@ export function setWeightsApi(token: string, poids: PoidsRecommandation) {
     body: poids,
   });
 }
+
+export type SignalementRecu = {
+  id: string;
+  reason: string;
+  message: string | null;
+  createdAt: string;
+  handledAt: string | null;
+  reporter: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+  };
+  review: {
+    id: string;
+    score: number;
+    comment: string;
+    createdAt: string;
+  } | null;
+};
+
+export type DossierCompte = {
+  compte: {
+    id: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+    avatarUrl: string | null;
+    bio: string | null;
+    createdAt: string;
+    lastSeenAt: string | null;
+    suspendedAt: string | null;
+    identityStatus: string;
+    logements: number;
+    messages: number;
+    avis: number;
+    signalementsEmis: number;
+    signalementsRecus: number;
+    auteursDistincts: number;
+  };
+  signalements: SignalementRecu[];
+  logements: {
+    id: string;
+    title: string;
+    city: string;
+    country: string;
+    ouvert: boolean;
+    photo: string | null;
+  }[];
+};
+
+export function getAccountFileApi(token: string, userId: string) {
+  return appeler<DossierCompte>(token, `/admin/users/${userId}/file`);
+}

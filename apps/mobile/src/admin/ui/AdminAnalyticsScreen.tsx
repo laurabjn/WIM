@@ -68,7 +68,7 @@ export const AdminAnalyticsScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.screen} edges={['top']}>
+    <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
       <View style={styles.entete}>
         <BackButton onPress={navigation.goBack} style={styles.rond} />
         <Text style={styles.titre}>{t('admin:analyticsTitle')}</Text>

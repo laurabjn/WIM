@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 
 import {
+  GetAccountFileUseCase,
   GetAdminStatsUseCase,
   ListReportsUseCase,
   MarkReportHandledUseCase,
@@ -41,6 +42,7 @@ export class AdminController {
     private readonly weights: RecommendationWeightsService,
     private readonly messageReminders: MessageReminderService,
     private readonly analytics: GetAdminAnalyticsUseCase,
+    private readonly accountFile: GetAccountFileUseCase,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -121,6 +123,11 @@ export class AdminController {
   @Patch('recommendation-weights')
   async reglerLesPonderations(@Body() body: Record<string, number>) {
     return this.weights.remplacer(body ?? {});
+  }
+
+  @Get('users/:userId/file')
+  async dossierDuCompte(@Param('userId') userId: string) {
+    return this.accountFile.execute(userId);
   }
 
   @Get('stats')

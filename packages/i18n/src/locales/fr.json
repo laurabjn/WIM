@@ -769,6 +769,29 @@
     }
   },
   "admin": {
+    "account": {
+      "title": "Dossier du compte",
+      "study": "Etudier le compte",
+      "memberSince": "Inscrit le",
+      "lastSeen": "Vu la derniere fois le",
+      "neverSeen": "jamais revenu",
+      "identity": "Identite",
+      "homes": "Logements",
+      "messages": "Messages",
+      "reviews": "Avis publies",
+      "reportsReceived": "Signalements recus",
+      "reportsMade": "Signalements emis",
+      "distinctReporters": "Personnes differentes",
+      "reportsHeading": "Ce qui lui est reproche",
+      "noDetail": "Aucune precision donnee par la personne",
+      "reportedReview": "Avis signale",
+      "homesHeading": "Ses logements",
+      "noHomes": "Aucun logement publie",
+      "handled": "traite",
+      "pending": "a traiter",
+      "openToExchange": "ouvert aux echanges",
+      "closedToExchange": "ferme aux echanges"
+    },
   "openAnalytics": "Analyses",
   "analyticsTitle": "Analyses",
   "exchangeStatus": {
