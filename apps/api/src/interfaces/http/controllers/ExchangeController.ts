@@ -15,6 +15,7 @@ import {
   ExchangeResponse,
   RespondToExchangeUseCase,
   UpdateExchangeDatesUseCase,
+  ListGuestHomesUseCase,
 } from 'src/application/exchange/use-cases/respond-to-exchange.usecase';
 import { GetChatExchangeUseCase } from 'src/application/exchange/use-cases/get-chat-exchange.usecase';
 import {
@@ -26,6 +27,8 @@ import {
   ReviewStayUseCase,
 } from 'src/application/exchange/use-cases/review-stay.usecase';
 import { JwtAuthGuard } from '../jwt-auth.guard';
+import { AnnounceExchangeUseCase } from 'src/application/exchange/use-cases/announce-exchange.usecase';
+import { PushSenderService } from 'src/application/notification/push-sender.service';
 import { AppGateway } from 'src/interfaces/websocket/app.gateway';
 import { ChatRepository } from 'src/domain/auth/repositories/chat.repository';
 import { CHAT_REPOSITORY } from '../tokens/token';
@@ -36,12 +39,15 @@ export class ExchangeController {
   constructor(
     private readonly listMyExchangesUseCase: ListMyExchangesUseCase,
     private readonly respondToExchangeUseCase: RespondToExchangeUseCase,
+    private readonly listGuestHomesUseCase: ListGuestHomesUseCase,
     private readonly getChatExchangeUseCase: GetChatExchangeUseCase,
     private readonly requestExchangeUseCase: RequestExchangeUseCase,
     private readonly updateExchangeDatesUseCase: UpdateExchangeDatesUseCase,
     private readonly cancelExchangeUseCase: CancelExchangeUseCase,
     private readonly listStaysToReview: ListStaysToReviewUseCase,
     private readonly reviewStay: ReviewStayUseCase,
+    private readonly annonce: AnnounceExchangeUseCase,
+    private readonly pushSender: PushSenderService,
     private readonly gateway: AppGateway,
     @Inject(CHAT_REPOSITORY)
     private readonly chatRepository: ChatRepository,
@@ -76,8 +82,6 @@ export class ExchangeController {
       requesterId: req.user.sub,
     });
 
-    // Le message d'introduction etait ecrit directement en base : sans cette
-    // annonce, ni l'auteur ni le destinataire ne le voyaient arriver.
     this.gateway.emitMessageCreated(result.chatId, result.message);
 
     const chat = await this.chatRepository.findById(result.chatId);
@@ -100,6 +104,24 @@ export class ExchangeController {
       );
     }
 
+    const destinataire = chat?.participants.find(
+      (participant) => participant.userId !== req.user.sub,
+    );
+
+    if (destinataire) {
+      await this.pushSender
+        .sendToUser(
+          destinataire.userId,
+          {
+            title: "Demande d'échange",
+            body: String(result.message?.content ?? '').slice(0, 140),
+            data: { chatId: result.chatId },
+          },
+          { categorie: 'exchanges' },
+        )
+        .catch(() => undefined);
+    }
+
     return result;
   }
 
@@ -119,25 +141,100 @@ export class ExchangeController {
     @Param('exchangeId') exchangeId: string,
     @Body() body: { startDate: string; endDate: string },
   ) {
-    return this.updateExchangeDatesUseCase.execute(
+    const exchange = await this.updateExchangeDatesUseCase.execute(
       exchangeId,
       req.user.sub,
       body?.startDate,
       body?.endDate,
     );
+
+    const annonce = await this.annonce.nouvellesDates(exchangeId, req.user.sub);
+
+    if (annonce) {
+      await this.diffuser(annonce.chatId, annonce.message);
+
+      await this.pushSender
+        .sendToUser(
+          annonce.destinataire,
+          {
+            title: 'Dates modifiées',
+            body: annonce.message.content.slice(0, 140),
+            data: { chatId: annonce.chatId },
+          },
+          { categorie: 'exchanges' },
+        )
+        .catch(() => undefined);
+    }
+
+    return exchange;
+  }
+
+  @Get(':exchangeId/guest-homes')
+  async guestHomes(
+    @Req() req: any,
+    @Param('exchangeId') exchangeId: string,
+  ) {
+    return this.listGuestHomesUseCase.execute(exchangeId, req.user.sub);
   }
 
   @Patch(':exchangeId/respond')
   async respond(
     @Req() req: any,
     @Param('exchangeId') exchangeId: string,
-    @Body() body: { response: ExchangeResponse },
+    @Body() body: { response: ExchangeResponse; guestHomeId?: string },
   ) {
-    return this.respondToExchangeUseCase.execute(
+    const reponse = body?.response === 'DECLINE' ? 'DECLINE' : 'ACCEPT';
+
+    const exchange = await this.respondToExchangeUseCase.execute(
       exchangeId,
       req.user.sub,
-      body?.response === 'DECLINE' ? 'DECLINE' : 'ACCEPT',
+      reponse,
+      body?.guestHomeId,
     );
+
+    if (reponse === 'ACCEPT') {
+      const annonce = await this.annonce.acceptation(exchangeId);
+
+      if (annonce) {
+        await this.diffuser(annonce.chatId, annonce.message);
+
+        await this.pushSender
+          .sendToUser(
+            annonce.guestId,
+            {
+              title: 'Échange accepté',
+              body: annonce.message.content.slice(0, 140),
+              data: { chatId: annonce.chatId },
+            },
+            { categorie: 'exchanges' },
+          )
+          .catch(() => undefined);
+      }
+    }
+
+    return exchange;
+  }
+
+  private async diffuser(chatId: string, message: any) {
+    this.gateway.emitMessageCreated(chatId, message);
+
+    const chat = await this.chatRepository.findById(chatId);
+
+    for (const participant of chat?.participants ?? []) {
+      this.gateway.emitChatUpdated(participant.userId, {
+        chatId,
+        lastMessage: message,
+        unreadCount: await this.chatRepository.countUnreadMessages(
+          chatId,
+          participant.userId,
+        ),
+      });
+
+      this.gateway.emitUnreadCount(
+        participant.userId,
+        await this.chatRepository.countAllUnreadMessages(participant.userId),
+      );
+    }
   }
 
   @Patch(':exchangeId/cancel')

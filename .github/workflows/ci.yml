@@ -7,27 +7,34 @@ on:
   pull_request:
 
 jobs:
-  build:
+  verification:
+    name: Types et tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Installer Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Installer les dépendances
         run: npm ci
 
-      - name: Lint
-        run: npm run lint || echo "No lint script"
+      # Le typage de l'API dépend du client Prisma, qui est généré et non
+      # versionné : sans cette étape, la vérification échoue sur des types
+      # absents plutôt que sur le code.
+      - name: Générer le client Prisma
+        run: npx prisma generate --schema=apps/api/prisma/schema.prisma
 
-      - name: Run tests
-        run: npm run test || echo "No test script"
+      - name: Vérifier les types
+        run: npm run check-types
 
-      - name: Build
-        run: npm run build || echo "No build script"
+      - name: Analyser le code
+        run: npm run lint
+
+      - name: Lancer les tests
+        run: npm run test

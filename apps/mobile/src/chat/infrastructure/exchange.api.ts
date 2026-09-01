@@ -5,8 +5,6 @@ async function parseOptional(response: Response) {
   const raw = await response.text();
 
   if (!response.ok) {
-    // L'API explique pourquoi elle refuse : le taire priverait l'ecran du seul
-    // message utile a montrer.
     let message = 'Une erreur est survenue';
 
     try {
@@ -18,7 +16,6 @@ async function parseOptional(response: Response) {
           : body.message;
       }
     } catch {
-      // Corps non lisible : on garde le message generique.
     }
 
     throw new Error(message);
@@ -92,10 +89,33 @@ export async function getChatExchangeApi(
   return parseOptional(response);
 }
 
+export type LogementCandidat = {
+  id: string;
+  title: string;
+  imageUrl: string | null;
+};
+
+export async function fetchGuestHomesApi(
+  token: string,
+  exchangeId: string,
+): Promise<LogementCandidat[]> {
+  const result = await fetch(
+    `${API_URL}/exchanges/${exchangeId}/guest-homes`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
+
+  if (!result.ok) return [];
+
+  return (await result.json().catch(() => [])) as LogementCandidat[];
+}
+
 export async function respondToExchangeApi(
   token: string,
   exchangeId: string,
   response: 'ACCEPT' | 'DECLINE',
+  guestHomeId?: string,
 ): Promise<PendingExchange> {
   const result = await fetch(`${API_URL}/exchanges/${exchangeId}/respond`, {
     method: 'PATCH',
@@ -103,7 +123,7 @@ export async function respondToExchangeApi(
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ response }),
+    body: JSON.stringify({ response, guestHomeId }),
   });
 
   return parseOptional(result);

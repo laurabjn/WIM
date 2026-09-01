@@ -28,22 +28,6 @@ export class SwipeRecommendationPrismaRepository {
         (swipe) => swipe.homeId,
       );
 
-    // Les personnes avec qui la conversation est deja entamee sortent du paquet :
-    // les redecouvrir par un swipe n'aurait aucun sens.
-    const openChats = await this.prisma.chat.findMany({
-      where: {
-        participants: { some: { userId } },
-        messages: { some: {} },
-      },
-      select: {
-        participants: { select: { userId: true } },
-      },
-    });
-
-    const alreadyTalkingTo = openChats
-      .flatMap((chat) => chat.participants.map((p) => p.userId))
-      .filter((id) => id !== userId);
-
     const blocages = await this.prisma.blockedUser.findMany({
       where: { OR: [{ blockerId: userId }, { blockedId: userId }] },
       select: { blockerId: true, blockedId: true },
@@ -56,12 +40,10 @@ export class SwipeRecommendationPrismaRepository {
     const homes =
       await this.prisma.home.findMany({
         where: {
-          // Un profil masque ne se decouvre pas au swipe : le reglage serait
-          // sans effet s'il continuait d'apparaitre dans les cartes.
           owner: { profileVisible: true },
           ownerId: {
             not: userId,
-            notIn: [...alreadyTalkingTo, ...masques],
+            notIn: masques,
           },
 
           id: {

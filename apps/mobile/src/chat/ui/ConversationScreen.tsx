@@ -61,7 +61,9 @@ import { getChatSocket } from '../infrastructure/chatSocket';
 import {
   cancelExchangeApi,
   getChatExchangeApi,
+  fetchGuestHomesApi,
   respondToExchangeApi,
+  type LogementCandidat,
   updateExchangeDatesApi,
 } from '../infrastructure/exchange.api';
 import { getHomesByOwner } from 'src/home/infrastructure/home.api';
@@ -70,6 +72,8 @@ import {
   reportUserApi,
 } from '../infrastructure/moderation.api';
 import { ExchangeBanner } from './components/ExchangeBanner';
+import { GuestHomeChoiceModal } from './components/GuestHomeChoiceModal';
+import { fetchLikedHomesApi } from 'src/swipe/infrastructure/swipe.api';
 import { VoiceMessageBubble } from './components/VoiceMessageBubble';
 import { TypingBubble } from './components/TypingBubble';
 import { BackButton } from 'src/shared/ui/BackButton';
@@ -139,9 +143,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { chatId } = route.params;
 
-  // L'ecran ne peut pas dependre de ce que l'appelant lui passe : ouvert depuis
-  // les echanges ou une notification, il n'a que l'identifiant de la
-  // conversation. Il retrouve donc lui-meme son interlocuteur.
   const [participant, setParticipant] = useState<{
     id?: string;
     firstName?: string;
@@ -175,6 +176,12 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [logementsCandidats, setLogementsCandidats] = useState<
+    LogementCandidat[]
+  >([]);
+  const [logementsAProposer, setLogementsAProposer] = useState<
+    LogementCandidat[]
+  >([]);
   const [reportOpen, setReportOpen] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -277,9 +284,6 @@ export function ConversationScreen({ route, navigation }: Props) {
     };
   }, [chatId, t, translationEpoch]);
 
-  // Revenir sur une conversation deja montee ne relance pas le chargement
-  // initial : sans ce rafraichissement, un message ecrit ailleurs (une demande
-  // d'echange, par exemple) n'apparaissait qu'apres etre ressorti de l'ecran.
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
@@ -299,6 +303,14 @@ export function ConversationScreen({ route, navigation }: Props) {
 
           setParticipantLastReadAt(page.participantLastReadAt ?? null);
 
+          getChatExchangeApi(session.accessToken, chatId)
+            .then((pending) => {
+              if (!cancelled) setExchange(pending);
+            })
+            .catch((exchangeError) =>
+              console.log('Refresh exchange error:', exchangeError),
+            );
+
           setMessages((current) => {
             const connus = new Set(current.map((message) => message.id));
 
@@ -308,8 +320,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
             if (nouveaux.length === 0) return current;
 
-            // On fusionne au lieu de remplacer : les messages plus anciens
-            // deja charges ne doivent pas disparaitre.
             return [...nouveaux, ...current].sort(
               (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt),
             );
@@ -340,8 +350,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   const handleRead = useCallback(
     (payload: MessagesReadSocketPayload) => {
-      // L'autre vient d'ouvrir la conversation : le "Vu" apparait sans avoir a
-      // recharger la page.
       if (payload.userId !== currentUserId) {
         setParticipantLastReadAt(payload.readAt);
       }
@@ -484,8 +492,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
       setReplyTo(null);
 
-      // Le serveur renvoie aussi le message par websocket : sans ce garde-fou,
-      // l'echo arrive avant la reponse HTTP et le message s'affiche deux fois.
       setMessages((current) =>
         current.some((item) => item.id === message.id)
           ? current
@@ -979,21 +985,34 @@ export function ConversationScreen({ route, navigation }: Props) {
     if (!session?.accessToken) return;
 
     try {
-      const homes = await getHomesByOwner(session.accessToken, participantId);
+      const aimes = await fetchLikedHomesApi(
+        session.accessToken,
+        participantId,
+      );
 
-      if (homes.length === 0) {
+      const candidats = aimes.length
+        ? aimes
+        : (await getHomesByOwner(session.accessToken, participantId)).map(
+            (home) => ({
+              id: home.id,
+              title: home.title,
+              imageUrl: home.photos?.[0]?.url ?? null,
+            }),
+          );
+
+      if (candidats.length === 0) {
         Alert.alert('', t('noHomeToExchange'));
         return;
       }
 
-      // Un seul logement : inutile de faire choisir. Sinon on ouvre le profil,
-      // ou ils sont tous presentes.
-      if (homes.length === 1) {
-        navigation.navigate('ExchangeAvailability', { homeId: homes[0].id });
+      if (candidats.length === 1) {
+        navigation.navigate('ExchangeAvailability', {
+          homeId: candidats[0].id,
+        });
         return;
       }
 
-      navigation.navigate('PublicProfile', { userId: participantId });
+      setLogementsAProposer(candidats);
     } catch (loadError) {
       console.log('Load participant homes error:', loadError);
       Alert.alert('', t('actionUnavailable'));
@@ -1040,8 +1059,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   const showTranslationNotice =
     translated && messages.some((message) => message.translatedContent);
 
-  // "Vu" ne s'affiche que sous le dernier message que l'autre a reellement lu,
-  // et non des l'envoi.
   const lastSeenOwnMessageId = participantLastReadAt
     ? messages.find(
         (message) =>
@@ -1222,7 +1239,40 @@ export function ConversationScreen({ route, navigation }: Props) {
         </TouchableOpacity>
       </View>
 
-      {exchange?.status === 'PENDING' ? (
+      <GuestHomeChoiceModal
+        logements={logementsAProposer}
+        titre={t('exchange:chooseStayTitle')}
+        aide={t('exchange:chooseStayHint')}
+        libelleValidation={t('exchange:chooseStayConfirm')}
+        onFermer={() => setLogementsAProposer([])}
+        onConfirmer={async (logementId) => {
+          setLogementsAProposer([]);
+          navigation.navigate('ExchangeAvailability', { homeId: logementId });
+        }}
+      />
+
+      <GuestHomeChoiceModal
+        logements={logementsCandidats}
+        onFermer={() => setLogementsCandidats([])}
+        onConfirmer={async (logementId) => {
+          const session = await getSession();
+
+          if (!session?.accessToken || !exchange) return;
+
+          const accepte = await respondToExchangeApi(
+            session.accessToken,
+            exchange.id,
+            'ACCEPT',
+            logementId,
+          );
+
+          setLogementsCandidats([]);
+          setExchange(accepte ?? null);
+        }}
+      />
+
+      {exchange &&
+      ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status) ? (
         <ExchangeBanner
           exchange={exchange}
           onAccept={async () => {
@@ -1230,13 +1280,23 @@ export function ConversationScreen({ route, navigation }: Props) {
 
             if (!session?.accessToken) return;
 
-            await respondToExchangeApi(
+            const candidats = await fetchGuestHomesApi(
+              session.accessToken,
+              exchange.id,
+            );
+
+            if (candidats.length > 1) {
+              setLogementsCandidats(candidats);
+              return;
+            }
+
+            const accepte = await respondToExchangeApi(
               session.accessToken,
               exchange.id,
               'ACCEPT',
             );
 
-            setExchange(null);
+            setExchange(accepte ?? null);
           }}
           onChangeDates={async (start, end) => {
             const session = await getSession();
@@ -2024,8 +2084,6 @@ menuBackdrop: {
     color: c.textMuted,
   },
 
-  // Rendu hors de la liste inversee : a l'interieur, il heritait du
-  // retournement et s'affichait a l'envers.
   empty: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',

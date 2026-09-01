@@ -87,7 +87,7 @@ const CONVERSATIONS = [
     ],
   },
   {
-    // Marc ecrit, Sophie ne repond pas : la conversation reste une demande.
+    sansMatch: true,
     between: ['sophie', 'marc'],
     messages: [
       { from: 'marc', content: 'Bonjour Sophie, je serais intéressé par un échange avec votre studio à Lyon en octobre. Mon chalet est libre à ces dates.', daysAgo: 2 },
@@ -102,14 +102,14 @@ const CONVERSATIONS = [
     ],
   },
   {
-    // Trois demandes sans reponse, de pertinence differente : de quoi voir le
-    // bouton "Demandes pertinentes" trier vraiment.
+    sansMatch: true,
     between: ['sophie', 'yara'],
     messages: [
       { from: 'yara', content: 'Bonjour Sophie, votre appartement lyonnais me plairait beaucoup pour un long week-end en octobre.', daysAgo: 4 },
     ],
   },
   {
+    sansMatch: true,
     between: ['sophie', 'tom'],
     messages: [
       { from: 'tom', content: 'Salut ! Un échange Nantes-Lyon te dirait ? Mon studio est libre presque tout l\'automne.', daysAgo: 1 },
@@ -800,9 +800,6 @@ async function main() {
   }
   console.log(`[seed] ${OWNERS.length} comptes de démonstration prêts.`);
 
-  // Sophie declare ses gouts : sans cela l'algorithme n'a rien a exploiter et
-  // toutes les recommandations se valent. C'est aussi ce qui differencie les
-  // demandes entre elles.
   await prisma.user.update({
     where: { id: ownersByKey.sophie.id },
     data: {
@@ -923,6 +920,28 @@ async function main() {
     where: { id: { in: previousMatchIds } },
   });
 
+  const chatsSansMatch = await prisma.chat.findMany({
+    where: {
+      matchId: null,
+      participants: { some: { userId: { in: ownerIds } } },
+    },
+    select: { id: true, participants: { select: { userId: true } } },
+  });
+
+  await prisma.chat.deleteMany({
+    where: {
+      id: {
+        in: chatsSansMatch
+          .filter((chat) =>
+            chat.participants.every((participant) =>
+              ownerIds.includes(participant.userId),
+            ),
+          )
+          .map((chat) => chat.id),
+      },
+    },
+  });
+
   let totalMessages = 0;
 
   for (const conversation of CONVERSATIONS) {
@@ -930,24 +949,26 @@ async function main() {
     const first = ownersByKey[firstKey];
     const second = ownersByKey[secondKey];
 
-    const match = await prisma.match.create({
-      data: {
-        user1Id: first.id,
-        user2Id: second.id,
-        status: 'ACCEPTED',
-        chat: {
-          create: {
-            participants: {
-              create: [
-                { userId: first.id },
-                { userId: second.id },
-              ],
+    const participants = {
+      create: [
+        { userId: first.id },
+        { userId: second.id },
+      ],
+    };
+
+    const chat = conversation.sansMatch
+      ? await prisma.chat.create({ data: { participants } })
+      : (
+          await prisma.match.create({
+            data: {
+              user1Id: first.id,
+              user2Id: second.id,
+              status: 'ACCEPTED',
+              chat: { create: { participants } },
             },
-          },
-        },
-      },
-      include: { chat: true },
-    });
+            include: { chat: true },
+          })
+        ).chat;
 
     for (const [index, message] of conversation.messages.entries()) {
       const sentAt = daysFromNow(-message.daysAgo);
@@ -955,7 +976,7 @@ async function main() {
 
       await prisma.message.create({
         data: {
-          chatId: match.chat.id,
+          chatId: chat.id,
           senderId: ownersByKey[message.from].id,
           content: message.content,
           createdAt: sentAt,
@@ -987,9 +1008,6 @@ async function main() {
 
   const sophie = ownersByKey.sophie;
 
-  // Ceux-la ont deja like Sophie : quand elle swipe leur logement, le match part
-  // aussitot. Bruno et Mila ne l'ont pas likee : leur carte se passe sans rien
-  // declencher, pour que les deux issues soient testables.
   const ADMIRATEURS = ['chloe', 'karim', 'ines'];
 
   const sophieHomeId = firstHomeOf.get(sophie.id);
@@ -1022,17 +1040,10 @@ async function main() {
     },
   });
 
-  // Un etat par paire, pour que chaque cas de l'application soit visible depuis
-  // le compte de Sophie. Un seul echange vivant par paire : c'est aussi la
-  // regle que l'API applique.
   const PLANNED_EXCHANGES = [
-    // En cours : commence il y a trois jours, se termine dans quatre.
     { host: 'thomas', guest: 'sophie', status: 'CURRENT', from: -3, to: 4 },
-    // Termine il y a un mois : Sophie peut donc en proposer un nouveau.
     { host: 'elena', guest: 'sophie', status: 'PAST', from: -40, to: -30 },
-    // En attente : le bandeau d'acceptation s'affiche pour les deux.
     { host: 'sophie', guest: 'marc', status: 'PENDING', from: 21, to: 31 },
-    // Accepte, pas encore commence.
     { host: 'lucia', guest: 'sophie', status: 'FUTURE', from: 60, to: 70 },
   ];
 
@@ -1048,8 +1059,6 @@ async function main() {
       orderBy: { createdAt: 'asc' },
     });
 
-    // Un echange porte deux logements : celui ou l'invite se rend, et celui
-    // qu'il offre en retour.
     const guestHome = await prisma.home.findFirst({
       where: { ownerId: guest.id },
       select: { id: true },
@@ -1078,8 +1087,6 @@ async function main() {
     `[seed] ${createdExchanges} echanges : un en cours, un passe, un en attente, un a venir.`,
   );
 
-  // Un match que personne n'a ouvert : il appartient a Demandes > Matchs, et
-  // n'apparait pas dans la liste des conversations.
   const hugo = ownersByKey.hugo;
 
   await prisma.match.create({
@@ -1102,10 +1109,6 @@ async function main() {
 
   console.log('[seed] 1 match non ouvert : aucune conversation entamee.');
 
-  // Sans marque de lecture, une conversation ou l'on a deja repondu affichait
-  // quand meme ses anciens messages comme non lus. On considere donc que chacun
-  // a lu jusqu'a son propre dernier message : ne restent non lus que ceux
-  // arrives apres sa derniere reponse.
   const tousLesChats = await prisma.chat.findMany({
     where: { participants: { some: { userId: { in: ownerIds } } } },
     select: {
@@ -1131,7 +1134,6 @@ async function main() {
     }
   }
 
-  // Thomas, lui, a tout lu : Sophie voit donc "Vu" sous son dernier message.
   const thomasChat = tousLesChats.find(
     (chat) =>
       chat.participants.some((p) => p.userId === ownersByKey.thomas.id) &&

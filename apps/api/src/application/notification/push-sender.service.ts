@@ -41,6 +41,24 @@ export class PushSenderService {
   ): Promise<void> {
     const { categorie = 'messages' } = options;
 
+    await this.prisma.notification
+      .create({
+        data: {
+          userId,
+          category: categorie === 'exchanges' ? 'EXCHANGES' : 'MESSAGES',
+          title: notification.title,
+          body: notification.body,
+          data: (notification.data ?? {}) as object,
+        },
+      })
+      .catch((error) =>
+        this.logger.warn(
+          `Notification non conservee : ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        ),
+      );
+
     const destinataire = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {

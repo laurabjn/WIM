@@ -9,6 +9,7 @@ type Props = {
   isAdmin: boolean;
   identiteVerifiee: boolean | null;
   onIdentiteVerifiee: () => void;
+  introductionVue: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -17,10 +18,16 @@ export const RootNavigator: React.FC<Props> = ({
   isAdmin,
   identiteVerifiee,
   onIdentiteVerifiee,
+  introductionVue,
   setIsAuthenticated,
 }) => {
   if (!isAuthenticated) {
-    return <AuthStackNavigator setIsAuthenticated={setIsAuthenticated} />;
+    return (
+      <AuthStackNavigator
+        setIsAuthenticated={setIsAuthenticated}
+        introductionVue={introductionVue}
+      />
+    );
   }
 
   if (isAdmin) {

@@ -15,8 +15,6 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getSession } from 'src/auth/infrastructure/authStorage';
-import { listMyHomes } from 'src/home/infrastructure/home.api';
-import type { Home } from '@wim/shared/home/home.type';
 import { requestExchangeApi } from 'src/chat/infrastructure/exchange.api';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
@@ -30,46 +28,13 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
-  const { homeId } = route.params;
+  const { homeId, startDate, endDate } = route.params;
     
   const DEFAULT_MESSAGE = t("defaultMessageContent");
     
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
 
   const [sending, setSending] = useState(false);
-
-  // Un echange porte deux logements : celui qu'on demande, et celui qu'on
-  // propose en retour. Un seul logement est choisi d'office.
-  const [myHomes, setMyHomes] = useState<Home[]>([]);
-  const [offeredHomeId, setOfferedHomeId] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadMyHomes() {
-      try {
-        const session = await getSession();
-
-        if (!session?.accessToken || cancelled) return;
-
-        const homes = await listMyHomes(session.accessToken);
-
-        if (cancelled) return;
-
-        setMyHomes(homes);
-
-        if (homes.length === 1) setOfferedHomeId(homes[0].id);
-      } catch (loadError) {
-        console.log('Load my homes error:', loadError);
-      }
-    }
-
-    loadMyHomes();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   async function sendMessage() {
     if (sending || !message.trim()) return;
@@ -83,13 +48,11 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
 
       const result = await requestExchangeApi(session.accessToken, {
         homeId,
-        guestHomeId: offeredHomeId ?? undefined,
         message: message.trim(),
+        startDate,
+        endDate,
       });
 
-      // La conversation vit dans l'onglet Messages : depuis les piles Logements
-      // ou Profil, y aller directement echouait, et l'erreur renvoyait sur la
-      // fiche du logement en laissant croire que le message n'etait pas parti.
       const parent = navigation.getParent?.();
 
       if (parent) {
@@ -123,42 +86,12 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
         <ScrollView
           contentContainerStyle={[
             styles.content,
+            styles.contentCentre,
             { paddingBottom: insets.bottom + 110 },
           ]}
           keyboardShouldPersistTaps="handled"
         >
         <Text style={styles.title}>{t("messagePlaceholder")}</Text>
-
-        {myHomes.length > 0 ? (
-          <View style={styles.offerBox}>
-            <Text style={styles.label}>{t('offeredHome')}</Text>
-
-            <Text style={styles.offerHint}>{t('offeredHomeHint')}</Text>
-
-            {myHomes.map((home) => {
-              const selected = offeredHomeId === home.id;
-
-              return (
-                <TouchableOpacity
-                  key={home.id}
-                  style={[styles.offerRow, selected && styles.offerRowSelected]}
-                  activeOpacity={0.8}
-                  onPress={() =>
-                    setOfferedHomeId(selected ? null : home.id)
-                  }
-                >
-                  <View
-                    style={[styles.radio, selected && styles.radioSelected]}
-                  />
-
-                  <Text style={styles.offerText} numberOfLines={1}>
-                    {home.title}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        ) : null}
 
         <View style={styles.messageBox}>
           <Text style={styles.label}>{t("defaultMessage")}</Text>
@@ -216,6 +149,10 @@ const createStyles = (c: ThemeColors) =>
     paddingHorizontal: 10,
     paddingTop: 8,
   },
+  contentCentre: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
   title: {
     fontSize: 20,
     fontWeight: '800',
@@ -253,51 +190,9 @@ const createStyles = (c: ThemeColors) =>
     opacity: 0.5,
   },
   buttonText: {
-    // Pose sur un aplat bleu, ce libelle reste blanc dans les deux themes.
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '800',
-  },
-  offerBox: {
-    marginBottom: 18,
-  },
-  offerHint: {
-    marginTop: -4,
-    marginBottom: 10,
-    fontSize: 12,
-    lineHeight: 17,
-    color: c.textMuted,
-  },
-  offerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingVertical: 11,
-    paddingHorizontal: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: c.border,
-    marginBottom: 8,
-  },
-  offerRowSelected: {
-    borderColor: c.accent,
-    backgroundColor: c.surfaceAlt,
-  },
-  radio: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 2,
-    borderColor: c.border,
-  },
-  radioSelected: {
-    borderColor: c.accent,
-    backgroundColor: c.accent,
-  },
-  offerText: {
-    flex: 1,
-    fontSize: 14,
-    color: c.text,
   },
   flex: {
     flex: 1,
@@ -317,8 +212,6 @@ const createStyles = (c: ThemeColors) =>
   input: {
     minHeight: 180,
     fontSize: 14,
-    // Un texte que l'on modifie n'est pas un texte secondaire : il etait
-    // devenu gris lors du passage au theme.
     color: c.text,
     lineHeight: 20,
   },

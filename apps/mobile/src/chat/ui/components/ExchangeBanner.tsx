@@ -16,7 +16,7 @@ import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   exchange: PendingExchange;
-  onAccept: () => Promise<void>;
+  onAccept?: () => Promise<void>;
   onChangeDates: (startDate: Date, endDate: Date) => Promise<void>;
 };
 
@@ -38,9 +38,13 @@ export function ExchangeBanner({
 
   const [pending, setPending] = useState(false);
   const [editing, setEditing] = useState<'start' | 'end' | null>(null);
+
+  const enAttente = exchange.status === 'PENDING';
   const [startDate, setStartDate] = useState(new Date(exchange.startDate));
 
   async function accept() {
+    if (!onAccept) return;
+
     setPending(true);
 
     try {
@@ -79,7 +83,9 @@ export function ExchangeBanner({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t('exchangePending')}</Text>
+      <Text style={styles.title}>
+        {enAttente ? t('exchangePending') : t('exchangeConfirmed')}
+      </Text>
 
       <Text style={styles.home} numberOfLines={1}>
         {t('bannerYouGo')}{' '}
@@ -104,20 +110,24 @@ export function ExchangeBanner({
         <ActivityIndicator style={styles.loader} color={themeColors.text} />
       ) : (
         <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.acceptButton}
-            onPress={accept}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.acceptText}>{t('exchangeAccept')}</Text>
-          </TouchableOpacity>
+          {enAttente && onAccept ? (
+            <TouchableOpacity
+              style={styles.acceptButton}
+              onPress={accept}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.acceptText}>{t('exchangeAccept')}</Text>
+            </TouchableOpacity>
+          ) : null}
 
           <TouchableOpacity
-            style={styles.datesButton}
+            style={[styles.datesButton, !enAttente && styles.datesButtonSeul]}
             onPress={() => setEditing('start')}
             activeOpacity={0.85}
           >
-            <CalendarDays size={18} color={themeColors.text} />
+            <CalendarDays size={17} color={themeColors.text} />
+
+            <Text style={styles.datesLabel}>{t('changeDates')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -201,11 +211,22 @@ const createStyles = (c: ThemeColors) =>
   },
 
   datesButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: c.surface,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
+    height: 44,
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    backgroundColor: c.surface,
+  },
+  datesButtonSeul: {
+    alignSelf: 'stretch',
+    flex: 1,
+  },
+  datesLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: c.text,
   },
 });

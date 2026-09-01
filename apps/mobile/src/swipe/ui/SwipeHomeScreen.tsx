@@ -64,6 +64,7 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
   const [quickSearch, setQuickSearch] = useState(true);
   const [matchedName, setMatchedName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
   const home = homes[index];
 
@@ -95,8 +96,6 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
 
   useFocusEffect(
     useCallback(() => {
-      // Une seule fois : revenir du detail d'un logement ne doit pas rebattre
-      // les cartes ni ramener l'utilisateur au debut de la pile.
       if (homes.length === 0) loadRecommendations();
     }, [homes.length, loadRecommendations]),
   );
@@ -124,6 +123,14 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
       if (result.match) {
         setMatchedName(home.owner?.firstName ?? '');
         return;
+      }
+
+      if (result.autreLogementDejaLike) {
+        setInfo(
+          t('swipe:alreadyMatchedOtherHome', {
+            name: home.owner?.firstName ?? '',
+          }),
+        );
       }
 
       next();
@@ -197,10 +204,7 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
         />
       </View>
 
-      <SwipeTopPreview
-        home={home}
-        onInfoPress={openHomeDetails}
-      />
+      <SwipeTopPreview home={home} />
 
       <SwipeHomeCard
         key={home.id}
@@ -234,6 +238,8 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
       </View>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      {info ? <Text style={styles.info}>{info}</Text> : null}
 
       {matchedName !== null && (
         <View style={styles.matchOverlay}>
@@ -288,6 +294,13 @@ const createStyles = (c: ThemeColors) =>
     fontSize: 14,
     fontWeight: '700',
     color: c.text,
+  },
+  info: {
+    textAlign: 'center',
+    marginTop: 6,
+    marginHorizontal: 18,
+    fontSize: 13,
+    color: c.textMuted,
   },
   error: {
     position: 'absolute',

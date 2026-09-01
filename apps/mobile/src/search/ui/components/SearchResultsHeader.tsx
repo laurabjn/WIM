@@ -12,12 +12,14 @@ import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
   title: string;
+  filtersCount?: number;
   onBack: () => void;
   onOpenFilters: () => void;
 };
 
 export function SearchResultsHeader({
   title,
+  filtersCount = 0,
   onBack,
   onOpenFilters,
 }: Props) {
@@ -34,6 +36,12 @@ export function SearchResultsHeader({
         onPress={onOpenFilters}
       >
         <SlidersHorizontal size={18} color={themeColors.text} />
+
+        {filtersCount > 0 ? (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{filtersCount}</Text>
+          </View>
+        ) : null}
       </TouchableOpacity>
     </View>
   );
@@ -41,6 +49,23 @@ export function SearchResultsHeader({
 
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    backgroundColor: c.contrast,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    color: c.onContrast,
+    fontSize: 10,
+    fontWeight: '700',
+  },
   header: {
     height: 64,
     paddingHorizontal: 18,

@@ -62,7 +62,8 @@ export function ExchangesScreen({ navigation }: any) {
   useFocusEffect(
     useCallback(() => {
       chargerSejoursANoter();
-    }, [chargerSejoursANoter]),
+      refresh();
+    }, [chargerSejoursANoter, refresh]),
   );
 
   function goToReview(sejour: StayToReview) {
@@ -81,8 +82,6 @@ export function ExchangesScreen({ navigation }: any) {
   function goToMessages(exchange: Exchange) {
     if (!exchange.chatId) return;
 
-    // La conversation s'ouvre dans la pile des echanges : sauter dans l'onglet
-    // Messages faisait revenir ailleurs, le retour d'onglet ramenant au premier.
     navigation.navigate('Conversation', {
       chatId: exchange.chatId,
       participantId: exchange.partner?.id,

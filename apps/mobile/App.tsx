@@ -18,6 +18,7 @@ import 'src/search/infrastructure/map/mapbox.config';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { fetchIdentityStatus } from 'src/auth/infrastructure/identity.api';
 import { IdentityStatus } from 'src/auth/dtos/identityStatus';
+import { introductionDejaVue } from 'src/onboarding/infrastructure/onboardingStorage';
 import {
   navigationRef,
   useNotificationNavigation,
@@ -27,19 +28,19 @@ enableScreens();
 
 const Stack = createNativeStackNavigator();
 
-// La coquille de navigation doit connaitre le theme : sans elle, le fond des
-// transitions entre ecrans reste blanc dans le mode sombre.
 function Coquille({
   isAuthenticated,
   isAdmin,
   identiteVerifiee,
   onIdentiteVerifiee,
+  introductionVue,
   setIsAuthenticated,
 }: {
   isAuthenticated: boolean;
   isAdmin: boolean;
   identiteVerifiee: boolean | null;
   onIdentiteVerifiee: () => void;
+  introductionVue: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { isDark, colors } = useAppTheme();
@@ -67,6 +68,7 @@ function Coquille({
         isAdmin={isAdmin}
         identiteVerifiee={identiteVerifiee}
         onIdentiteVerifiee={onIdentiteVerifiee}
+        introductionVue={introductionVue}
         setIsAuthenticated={setIsAuthenticated}
       />
     </NavigationContainer>
@@ -77,6 +79,7 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [identiteVerifiee, setIdentiteVerifiee] = useState<boolean | null>(null);
+  const [introductionVue, setIntroductionVue] = useState(true);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -84,6 +87,8 @@ export default function App() {
       await initI18n();
 
       try {
+        setIntroductionVue(await introductionDejaVue());
+
         const session = await getSession();
 
         setIsAuthenticated(Boolean(session?.accessToken));
@@ -141,6 +146,7 @@ export default function App() {
           <Coquille
             identiteVerifiee={identiteVerifiee}
             onIdentiteVerifiee={() => setIdentiteVerifiee(true)}
+            introductionVue={introductionVue}
             isAuthenticated={isAuthenticated}
             isAdmin={isAdmin}
             setIsAuthenticated={setIsAuthenticated}

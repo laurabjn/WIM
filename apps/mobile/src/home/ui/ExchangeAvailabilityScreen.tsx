@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -16,6 +18,10 @@ import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeAvailability'>;
 
+function formatJour(valeur: Date) {
+  return valeur.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+}
+
 export function ExchangeAvailabilityScreen({ navigation, route }: any) {
   const { t } = useTranslation(["availability", "common"]);
   const themeColors = useThemeColors();
@@ -25,14 +31,41 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
   const [selected, setSelected] = useState<
     'FREE' | 'EXCHANGER_DATES' | 'SPECIFIC_DATES' | null
   >(null);
+  const [debut, setDebut] = useState<Date | null>(null);
+  const [fin, setFin] = useState<Date | null>(null);
+  const [edition, setEdition] = useState<'debut' | 'fin' | null>(null);
 
   function goNext() {
     if (!selected) return;
 
+    if (selected === 'SPECIFIC_DATES' && (!debut || !fin)) return;
+
     navigation.navigate('ExchangeMessage', {
       homeId,
       availabilityType: selected,
+      startDate: selected === 'SPECIFIC_DATES' ? debut?.toISOString() : undefined,
+      endDate: selected === 'SPECIFIC_DATES' ? fin?.toISOString() : undefined,
     });
+  }
+
+  function surDateChoisie(valeur?: Date) {
+    const etape = edition;
+
+    setEdition(null);
+
+    if (!valeur || !etape) return;
+
+    if (etape === 'debut') {
+      setDebut(valeur);
+
+      if (fin && fin <= valeur) setFin(null);
+
+      return;
+    }
+
+    if (debut && valeur <= debut) return;
+
+    setFin(valeur);
   }
 
   return (
@@ -70,7 +103,51 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
         >
           <Text style={styles.optionText}> {t("specificDates")} </Text>
         </Pressable>
+
+        {selected === 'SPECIFIC_DATES' ? (
+          <View style={styles.datesLigne}>
+            <Pressable
+              style={styles.dateChamp}
+              onPress={() => setEdition('debut')}
+            >
+              <Text style={styles.dateTexte}>
+                {debut ? formatJour(debut) : t('startDate')}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.dateChamp, !debut && styles.dateChampInactif]}
+              onPress={() => debut && setEdition('fin')}
+            >
+              <Text style={styles.dateTexte}>
+                {fin ? formatJour(fin) : t('endDate')}
+              </Text>
+            </Pressable>
+          </View>
+        ) : null}
       </View>
+
+      {edition ? (
+        <DateTimePicker
+          value={
+            edition === 'debut'
+              ? debut ?? new Date()
+              : fin ?? new Date((debut ?? new Date()).getTime() + 86400000)
+          }
+          mode="date"
+          display={Platform.OS === 'ios' ? 'inline' : 'default'}
+          minimumDate={
+            edition === 'debut'
+              ? new Date()
+              : new Date((debut ?? new Date()).getTime() + 86400000)
+          }
+          onChange={(evenement, valeur) =>
+            surDateChoisie(
+              evenement.type === 'dismissed' ? undefined : valeur ?? undefined,
+            )
+          }
+        />
+      ) : null}
 
       <TouchableOpacity
         style={[
@@ -78,9 +155,12 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
           {
             bottom: insets.bottom + 90,
           },
-          !selected && styles.buttonDisabled,
+          (!selected || (selected === 'SPECIFIC_DATES' && (!debut || !fin))) &&
+            styles.buttonDisabled,
         ]}
-        disabled={!selected}
+        disabled={
+          !selected || (selected === 'SPECIFIC_DATES' && (!debut || !fin))
+        }
         onPress={goNext}
       >
         <Text style={styles.buttonText}>{t("common:continue")}</Text>
@@ -95,6 +175,27 @@ const createStyles = (c: ThemeColors) =>
     flex: 1,
     backgroundColor: c.surface,
     paddingHorizontal: 8,
+  },
+  datesLigne: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 12,
+  },
+  dateChamp: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: c.border,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  dateChampInactif: {
+    opacity: 0.5,
+  },
+  dateTexte: {
+    fontSize: 13,
+    color: c.text,
+    fontWeight: '600',
   },
   backButton: {
     width: 36,

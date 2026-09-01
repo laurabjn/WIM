@@ -29,6 +29,8 @@ export async function initI18n() {
           swipe: fr.swipe,
           chat: fr.chat,
           admin: fr.admin,
+          onboarding: fr.onboarding,
+          notifications: fr.notifications,
         },
         en: {
           common: en.common,
@@ -42,11 +44,13 @@ export async function initI18n() {
           swipe: en.swipe,
           chat: en.chat,
           admin: en.admin,
+          onboarding: en.onboarding,
+          notifications: en.notifications,
         },
       },
       lng: locale,
       fallbackLng: "fr",
-      ns: ["common", "auth", "profile", "home", "availability", "contact", "exchange", "search", "swipe", "chat", "admin"],
+      ns: ["common", "auth", "profile", "home", "availability", "contact", "exchange", "search", "swipe", "chat", "admin", "onboarding", "notifications"],
       defaultNS: "common",
       interpolation: {escapeValue: false}
     });

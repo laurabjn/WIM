@@ -25,7 +25,10 @@ import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
 type Props = {
-  navigation: { goBack: () => void };
+  navigation: {
+    goBack: () => void;
+    navigate: (ecran: string, params?: Record<string, unknown>) => void;
+  };
 };
 
 export function AdminScreen({ navigation }: Props) {
@@ -135,7 +138,13 @@ export function AdminScreen({ navigation }: Props) {
       `${item.reporter.firstName} ${item.reporter.lastName}`.trim();
 
     return (
-      <View style={[styles.carte, item.handledAt ? styles.carteTraitee : null]}>
+      <TouchableOpacity
+        style={[styles.carte, item.handledAt ? styles.carteTraitee : null]}
+        activeOpacity={0.85}
+        onPress={() =>
+          navigation.navigate('AdminAccount', { userId: item.reported.id })
+        }
+      >
         <View style={styles.entete}>
           {item.reported.avatarUrl ? (
             <Image
@@ -173,6 +182,8 @@ export function AdminScreen({ navigation }: Props) {
           {new Date(item.createdAt).toLocaleDateString()}
         </Text>
 
+        <Text style={styles.etudier}>{t('account.study')}</Text>
+
         <View style={styles.actions}>
           <TouchableOpacity
             style={styles.action}
@@ -198,12 +209,12 @@ export function AdminScreen({ navigation }: Props) {
             )}
           </TouchableOpacity>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <BackButton onPress={navigation.goBack} style={styles.headerButton} />
 
@@ -295,7 +306,7 @@ const createStyles = (c: ThemeColors) =>
     filtreTexte: { fontSize: 13, fontWeight: '600', color: c.text },
     filtreTexteActif: { color: c.onContrast },
     loader: { marginTop: 40 },
-    liste: { padding: 16, gap: 12, flexGrow: 1 },
+    liste: { padding: 16, paddingBottom: 32, gap: 12, flexGrow: 1 },
     carte: {
       padding: 14,
       borderRadius: 16,
@@ -325,6 +336,11 @@ const createStyles = (c: ThemeColors) =>
       color: c.text,
     },
     message: { marginTop: 4, fontSize: 13, color: c.textMuted },
+    etudier: {
+      fontSize: 12,
+      fontWeight: '800',
+      color: c.primary,
+    },
     meta: { marginTop: 8, fontSize: 11, color: c.textMuted },
     actions: { flexDirection: 'row', gap: 8, marginTop: 12 },
     action: {

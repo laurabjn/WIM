@@ -14,10 +14,7 @@ type Props = {
   color?: string;
 };
 
-// L'application melangeait quatre fleches de retour : deux icones et deux
-// caracteres typographiques. Celle-ci est la seule.
 export function BackButton({ onPress, style, color }: Props) {
-  // La fleche est posee sur le fond de l'ecran : elle doit virer avec lui.
   const themeColors = useThemeColors();
   return (
     <TouchableOpacity

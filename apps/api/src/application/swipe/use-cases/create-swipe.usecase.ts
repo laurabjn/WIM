@@ -50,8 +50,21 @@ export class CreateSwipeUseCase {
       };
     }
 
-    // Un match ouvre une conversation : si elle existe deja et vit, il n'a rien
-    // a ouvrir. Le like reste enregistre, il n'affiche simplement pas de match.
+    const logementsLikes =
+      await this.swipeRepository.likedHomeIds(
+        input.swiperId,
+        input.targetUserId,
+      );
+
+    const dejaMatche =
+      await this.swipeRepository.hasMatch(
+        input.swiperId,
+        input.targetUserId,
+      );
+
+    const autreLogementDejaLike =
+      dejaMatche && logementsLikes.length > 1;
+
     const alreadyTalking =
       await this.swipeRepository.hasOpenConversation(
         input.swiperId,
@@ -64,6 +77,7 @@ export class CreateSwipeUseCase {
         swipeId: swipe.id,
         match: false,
         matchId: null,
+        autreLogementDejaLike,
       };
     }
 
@@ -79,6 +93,7 @@ export class CreateSwipeUseCase {
         swipeId: swipe.id,
         match: false,
         matchId: null,
+        autreLogementDejaLike,
       };
     }
 
@@ -94,6 +109,7 @@ export class CreateSwipeUseCase {
       match: true,
       matchId: match.id,
       chatId: match.chat.id,
+      autreLogementDejaLike,
     };
   }
 }

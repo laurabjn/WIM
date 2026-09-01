@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Exchange } from '@wim/shared';
 import { getMyExchanges } from '../exchange.api';
 import { resolveImageUrl } from '../home.api';
@@ -8,7 +8,7 @@ export function useMyExchanges(token: string | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadExchanges() {
+  const loadExchanges = useCallback(async () => {
     if (!token) {
       setLoading(false);
       setError('Utilisateur non connecté');
@@ -35,11 +35,11 @@ export function useMyExchanges(token: string | null) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [token]);
 
   useEffect(() => {
     loadExchanges();
-  }, [token]);
+  }, [loadExchanges]);
 
   const currentExchanges = useMemo(
     () => exchanges.filter((exchange) => exchange.status === 'CURRENT'),

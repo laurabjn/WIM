@@ -1,17 +1,66 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "globalEnv": [
+    "ADMIN_EMAIL",
+    "CORS_ORIGINS",
+    "DATABASE_URL",
+    "DEEPL_API_KEY",
+    "DEEPL_API_URL",
+    "EXPO_PUBLIC_API_URL",
+    "EXPO_PUBLIC_MAPBOX_TOKEN",
+    "EXPO_PUBLIC_WS_NAMESPACE",
+    "FRONTEND_URL",
+    "JWT_ACCESS_SECRET",
+    "JWT_ACCESS_TTL",
+    "JWT_REFRESH_SECRET",
+    "JWT_REFRESH_TTL",
+    "JWT_RESET_SECRET",
+    "JWT_RESET_TTL",
+    "MAIL_FROM",
+    "MOCK_IDENTITY_VERIFICATION_URL",
+    "NEXT_PUBLIC_API_URL",
+    "NODE_ENV",
+    "PORT",
+    "SMTP_HOST",
+    "SMTP_PASS",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "UNSPLASH_ACCESS_KEY",
+    "UPLOADS_DIR",
+    "WS_CORS_ORIGIN",
+    "WS_NAMESPACE"
+  ],
   "ui": "tui",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
+    },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": [
+        "^check-types"
+      ]
     },
     "dev": {
       "cache": false,

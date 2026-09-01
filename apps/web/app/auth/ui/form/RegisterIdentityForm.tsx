@@ -18,7 +18,6 @@ export const RegisterIdentityForm: React.FC<Props> = ({
   sectionTitle,
   continueLabel,
   onBack,
-  onOpenIdentity,
   onContinue,
 }) => {
   return (

@@ -18,6 +18,12 @@ import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import {
+  FILTRES_VIDES,
+  SearchFiltersSheet,
+  compterFiltres,
+  type FiltresRecherche,
+} from './components/SearchFiltersSheet';
 
 type Props = NativeStackScreenProps<SearchStackParamList, 'Search'>;
 
@@ -29,6 +35,8 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [travelers, setTravelers] = useState('');
+  const [filtres, setFiltres] = useState<FiltresRecherche>(FILTRES_VIDES);
+  const [filtresOuverts, setFiltresOuverts] = useState(false);
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [isDestinationFocused, setIsDestinationFocused] = useState(false);
@@ -55,7 +63,11 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
       city: destination,
       startDate: toLocalApiDate(startDate),
       endDate: toLocalApiDate(endDate),
-      capacity: travelers ? Number(travelers) : undefined,
+      capacity: travelers ? Number(travelers) : filtres.capacity,
+      category: filtres.category,
+      bedrooms: filtres.bedrooms,
+      homeType: filtres.homeType,
+      amenities: filtres.amenities,
     });
   }
 
@@ -67,6 +79,16 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <SearchFiltersSheet
+        visible={filtresOuverts}
+        valeurs={filtres}
+        onFermer={() => setFiltresOuverts(false)}
+        onAppliquer={(choix) => {
+          setFiltres(choix);
+          setFiltresOuverts(false);
+        }}
+      />
+
       <KeyboardAvoidingView
         style={styles.container}
         behavior="padding"
@@ -80,8 +102,19 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
 
                 <Text style={styles.title}>{t("search")}</Text>
 
-                <TouchableOpacity style={styles.iconButton}>
-                <SlidersHorizontal size={18} color={themeColors.text} />
+                <TouchableOpacity
+                  style={styles.iconButton}
+                  onPress={() => setFiltresOuverts(true)}
+                >
+                  <SlidersHorizontal size={18} color={themeColors.text} />
+
+                  {compterFiltres(filtres) > 0 ? (
+                    <View style={styles.filtersBadge}>
+                      <Text style={styles.filtersBadgeText}>
+                        {compterFiltres(filtres)}
+                      </Text>
+                    </View>
+                  ) : null}
                 </TouchableOpacity>
             </View>
 
@@ -218,6 +251,23 @@ const createStyles = (c: ThemeColors) =>
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  filtersBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    backgroundColor: c.contrast,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filtersBadgeText: {
+    color: c.onContrast,
+    fontSize: 10,
+    fontWeight: '700',
   },
   iconButton: {
     width: 42,

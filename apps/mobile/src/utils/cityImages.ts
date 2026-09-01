@@ -1,41 +1,36 @@
-const UNSPLASH_ACCESS_KEY = 't_hMb8hidPrr-1MDKOzTY5v6FY36k3Xh9iVOaQ_TtO0';
+import { API_URL } from 'src/config/api';
+import { getSession } from 'src/auth/infrastructure/authStorage';
 
-export async function getCityImagesApi(city: string, country: string) {
-  const query = encodeURIComponent(`${city} travel`);
+export type ImageDeVille = { id: string; url: string; grande: string };
 
-  const response = await fetch(
-    `https://api.unsplash.com/search/photos?query=${query}&per_page=3&orientation=landscape`,
-    {
-      headers: {
-        Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
-      },
-    },
-  );
+export async function getCityImagesApi(
+  city: string,
+  country: string,
+  nombre = 3,
+): Promise<ImageDeVille[]> {
+  if (!city?.trim()) return [];
 
-  const data = await response.json();
+  try {
+    const session = await getSession();
 
-  if (!response.ok || !data.results?.length) {
-    const fallbackQuery = encodeURIComponent(country);
+    if (!session?.accessToken) return [];
 
-    const fallbackResponse = await fetch(
-      `https://api.unsplash.com/search/photos?query=${fallbackQuery}&per_page=3&orientation=landscape`,
-      {
-        headers: {
-          Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
-        },
-      },
+    const parametres = new URLSearchParams({
+      country: country ?? '',
+      count: String(nombre),
+    });
+
+    const response = await fetch(
+      `${API_URL}/locations/${encodeURIComponent(city)}/images?${parametres}`,
+      { headers: { Authorization: `Bearer ${session.accessToken}` } },
     );
 
-    const fallbackData = await fallbackResponse.json();
+    if (!response.ok) return [];
 
-    return fallbackData.results.map((image: any) => ({
-      id: image.id,
-      url: image.urls.small,
-    }));
+    const data = (await response.json()) as { images?: ImageDeVille[] };
+
+    return data.images ?? [];
+  } catch {
+    return [];
   }
-
-  return data.results.map((image: any) => ({
-    id: image.id,
-    url: image.urls.small,
-  }));
 }

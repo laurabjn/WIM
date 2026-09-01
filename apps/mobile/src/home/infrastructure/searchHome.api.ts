@@ -6,7 +6,9 @@ type SearchHomesParams = {
   city?: string;
   country?: string;
   capacity?: number;
+  bedrooms?: number;
   homeType?: string;
+  amenities?: string[];
   category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
   startDate?: string;
   endDate?: string;
@@ -19,9 +21,14 @@ export async function searchHomesApi(
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== '') {
-      searchParams.append(key, String(value));
+    if (value === undefined || value === '') return;
+
+    if (Array.isArray(value)) {
+      if (value.length > 0) searchParams.append(key, value.join(','));
+      return;
     }
+
+    searchParams.append(key, String(value));
   });
 
   const response = await fetch(`${API_URL}/homes/search?${searchParams.toString()}`, {

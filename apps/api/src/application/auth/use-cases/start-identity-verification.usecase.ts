@@ -1,3 +1,5 @@
+import { ConflictException, NotFoundException } from '@nestjs/common';
+
 import { UserRepository } from 'src/domain/auth/repositories/user.repository';
 import { IdentityVerificationProviderPort } from '../ports/identity-verification-provider.port';
 import {
@@ -18,11 +20,11 @@ export class StartIdentityVerificationUseCase {
     const user = await this.userRepository.findById(input.userId);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     if (user.identityStatus === IdentityStatus.VERIFIED) {
-      throw new Error('Identity already verified');
+      throw new ConflictException('Identity already verified');
     }
 
     const { redirectUrl } = await this.provider.startVerification({

@@ -11,6 +11,9 @@ export type SearchStackParamList = {
     startDate?: string;
     endDate?: string;
     capacity: number | undefined;
+    bedrooms?: number;
+    homeType?: string;
+    amenities?: string[];
   };
   Swipe:
     | {

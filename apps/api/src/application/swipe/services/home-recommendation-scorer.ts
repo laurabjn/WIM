@@ -7,13 +7,22 @@ import {
   WeightedPreference,
 } from '../../../domain/auth/entities/recommendation.entity';
 import { normalizeValue } from './preference-calculator';
+import {
+  POIDS_PAR_DEFAUT,
+  type PoidsRecommandation,
+} from './recommendation-weights.service';
 
 @Injectable()
 export class HomeRecommendationScorer {
+  private poids: PoidsRecommandation = POIDS_PAR_DEFAUT;
+
   score(
     home: RecommendationHome,
     profile: UserRecommendationProfile,
+    poids: PoidsRecommandation = POIDS_PAR_DEFAUT,
   ): ScoredHome {
+    this.poids = poids;
+
     const searchScore =
       this.calculateSearchScore(
         home,
@@ -101,8 +110,8 @@ export class HomeRecommendationScorer {
       home.country,
     );
 
-    score += cityWeight * 15;
-    score += countryWeight * 5;
+    score += cityWeight * this.poids.rechercheVille;
+    score += countryWeight * this.poids.recherchePays;
 
     if (
       profile.lastSearchLatitude !== null &&
@@ -118,15 +127,15 @@ export class HomeRecommendationScorer {
       );
 
       if (distance <= 10) {
-        score += 10;
+        score += this.poids.distanceProche;
       } else if (distance <= 50) {
-        score += 7;
+        score += this.poids.distanceMoyenne;
       } else if (distance <= 150) {
-        score += 3;
+        score += this.poids.distanceLointaine;
       }
     }
 
-    return Math.min(25, score);
+    return Math.min(this.poids.plafondRecherche, score);
   }
 
   private calculatePositivePreferenceScore(
@@ -140,7 +149,7 @@ export class HomeRecommendationScorer {
       home.homeType,
     );
 
-    score += typeWeight * 15;
+    score += typeWeight * this.poids.typeAime;
 
     const matchedAmenities =
       home.amenities.reduce(
@@ -157,11 +166,11 @@ export class HomeRecommendationScorer {
       );
 
     score += Math.min(
-      15,
-      matchedAmenities * 5,
+      this.poids.plafondEquipements,
+      matchedAmenities * this.poids.equipementAime,
     );
 
-    return Math.min(30, score);
+    return Math.min(this.poids.plafondPreferences, score);
   }
 
   private calculateCapacityScore(
@@ -212,8 +221,8 @@ export class HomeRecommendationScorer {
       home.homeType,
     );
 
-    penalty += cityWeight * 10;
-    penalty += typeWeight * 20;
+    penalty += cityWeight * this.poids.villeRejetee;
+    penalty += typeWeight * this.poids.typeRejete;
 
     const dislikedAmenityWeight =
       home.amenities.reduce(
@@ -230,15 +239,13 @@ export class HomeRecommendationScorer {
       );
 
     penalty += Math.min(
-      10,
-      dislikedAmenityWeight * 3,
+      this.poids.plafondEquipementsRejetes,
+      dislikedAmenityWeight * this.poids.equipementRejete,
     );
 
-    return Math.min(40, penalty);
+    return Math.min(this.poids.plafondRejet, penalty);
   }
 
-  // Ce que l'utilisateur a declare dans ses preferences de voyage. Une
-  // demande explicite compte davantage qu'un gout devine par les swipes.
   private calculateProfileScore(
     home: RecommendationHome,
     profile: UserRecommendationProfile,
@@ -261,8 +268,6 @@ export class HomeRecommendationScorer {
     }
 
     if (profile.desiredCapacity !== null) {
-      // Un logement trop petit pour le groupe annonce ne convient pas ;
-      // legerement plus grand ne derange personne.
       if (home.capacity >= profile.desiredCapacity) {
         score += 3;
       } else {

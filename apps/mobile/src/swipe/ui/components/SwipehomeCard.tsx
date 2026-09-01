@@ -40,6 +40,8 @@ export function SwipeHomeCard({
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   const [photoIndex, setPhotoIndex] = useState(0);
+  const toucheSurImage = useRef(false);
+
   const [isCarouselDragging, setIsCarouselDragging] =
     useState(false);
 
@@ -67,7 +69,7 @@ export function SwipeHomeCard({
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gesture) => {
-        if (isCarouselDragging) {
+        if (toucheSurImage.current || isCarouselDragging) {
           return false;
         }
 
@@ -168,9 +170,16 @@ export function SwipeHomeCard({
           nestedScrollEnabled
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
-          onTouchStart={() =>
-            setIsCarouselDragging(true)
-          }
+          onTouchStart={() => {
+            toucheSurImage.current = true;
+            setIsCarouselDragging(true);
+          }}
+          onTouchEnd={() => {
+            toucheSurImage.current = false;
+          }}
+          onTouchCancel={() => {
+            toucheSurImage.current = false;
+          }}
           onMomentumScrollEnd={
             handleCarouselScrollEnd
           }

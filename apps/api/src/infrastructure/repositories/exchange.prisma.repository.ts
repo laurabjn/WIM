@@ -37,8 +37,6 @@ export class ExchangeRepositoryPrisma {
       },
     });
 
-    // Exchange ne porte que des identifiants, sans relation vers User : on
-    // charge donc les personnes a part.
     const partnerIds = exchanges.map((exchange) =>
       exchange.hostId === userId ? exchange.guestId : exchange.hostId,
     );
@@ -105,8 +103,6 @@ export class ExchangeRepositoryPrisma {
     startDate: Date,
     endDate: Date,
   ): Exchange['status'] {
-    // Un echange non accepte reste en attente : le classer sur ses dates le
-    // ferait passer pour un sejour confirme dans la liste des echanges.
     if (stored === 'PENDING' || stored === 'DECLINED') {
       return stored;
     }
@@ -157,9 +153,6 @@ export class ExchangeRepositoryPrisma {
     };
   }
 
-  // Les trois etats vivants d'un echange : en attente d'acceptation, a venir,
-  // ou en cours. La conversation en a besoin pour proposer l'annulation, pas
-  // seulement pour afficher le bandeau d'acceptation.
   async findActiveBetween(
     firstUserId: string,
     secondUserId: string,
@@ -195,14 +188,49 @@ export class ExchangeRepositoryPrisma {
     exchangeId: string,
     status: string,
     viewerId?: string,
+    guestHomeId?: string | null,
   ): Promise<PendingExchange> {
     const exchange = await this.prisma.exchange.update({
       where: { id: exchangeId },
-      data: { status: status as any },
+      data: {
+        status: status as any,
+        ...(guestHomeId === undefined ? {} : { guestHomeId }),
+      },
       include: this.pendingInclude,
     });
 
     return this.mapPending(exchange, viewerId);
+  }
+
+  async findGuestHomes(
+    exchangeId: string,
+  ): Promise<{ id: string; title: string; imageUrl: string | null }[]> {
+    const exchange = await this.prisma.exchange.findUnique({
+      where: { id: exchangeId },
+      select: { guestId: true },
+    });
+
+    if (!exchange) return [];
+
+    const homes = await this.prisma.home.findMany({
+      where: { ownerId: exchange.guestId },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        photos: {
+          orderBy: { position: 'asc' },
+          take: 1,
+          select: { url: true },
+        },
+      },
+    });
+
+    return homes.map((home) => ({
+      id: home.id,
+      title: home.title,
+      imageUrl: home.photos[0]?.url ?? null,
+    }));
   }
 
   async updateDates(

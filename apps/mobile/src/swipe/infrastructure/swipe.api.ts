@@ -2,6 +2,26 @@ import { API_URL } from '../../config/api';
 
 export type SwipeDirection = 'LIKE' | 'DISLIKE';
 
+export type LogementAime = {
+  id: string;
+  title: string;
+  imageUrl: string | null;
+};
+
+export async function fetchLikedHomesApi(
+  token: string,
+  ownerId: string,
+): Promise<LogementAime[]> {
+  const response = await fetch(
+    `${API_URL}/swipes/liked-homes?ownerId=${encodeURIComponent(ownerId)}`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+
+  if (!response.ok) return [];
+
+  return (await response.json().catch(() => [])) as LogementAime[];
+}
+
 export type SwipeResponse = {
   success: boolean;
   match: boolean;
@@ -21,6 +41,7 @@ export type SwipeApiResult = {
   match: boolean;
   matchId: string | null;
   chatId?: string | null;
+  autreLogementDejaLike?: boolean;
 };
 
 export type SwipeRecommendation = {

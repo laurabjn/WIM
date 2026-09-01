@@ -1,5 +1,6 @@
 {
   "common": {
+    "availabilityPeriodsTitle": "Périodes de disponibilité",
     "appName": "World Is Mine",
     "continue": "Continuer",
     "cancel": "Annuler",
@@ -720,6 +721,8 @@
     "availabilityAdd": "Ajouter une période"
   },
   "availability": {
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
     "when": "Quand êtes-vous disponible pour échanger ?",
     "exchangerDates": "Aux dates de l’échangeur",
     "specificDates": "Dates précises",
@@ -736,6 +739,12 @@
     "offeredHomeHint": "L'échange porte sur deux logements. Choisissez celui que vous offrez en retour, ou laissez vide pour en décider plus tard."
   },
   "exchange": {
+      "chooseStayTitle": "Où voulez-vous séjourner ?",
+      "chooseStayHint": "Vous avez aimé plusieurs logements de cette personne. Choisissez celui que vous demandez.",
+      "chooseStayConfirm": "Continuer",
+      "chooseHomeTitle": "Quel logement recevez-vous ?",
+      "chooseHomeHint": "Cette personne propose plusieurs logements. Choisissez celui où vous séjournerez.",
+      "chooseHomeConfirm": "Accepter l'échange",
     "currentExchanges": "Échanges actuel",
     "pastExchanges": "Échanges passés",
     "upcomingExchanges": "Échanges à venir",
@@ -765,6 +774,98 @@
     }
   },
   "admin": {
+    "account": {
+      "title": "Dossier du compte",
+      "study": "Etudier le compte",
+      "memberSince": "Inscrit le",
+      "lastSeen": "Vu la derniere fois le",
+      "neverSeen": "jamais revenu",
+      "identity": "Identite",
+      "homes": "Logements",
+      "messages": "Messages",
+      "reviews": "Avis publies",
+      "reportsReceived": "Signalements recus",
+      "reportsMade": "Signalements emis",
+      "distinctReporters": "Personnes differentes",
+      "reportsHeading": "Ce qui lui est reproche",
+      "noDetail": "Aucune precision donnee par la personne",
+      "reportedReview": "Avis signale",
+      "homesHeading": "Ses logements",
+      "noHomes": "Aucun logement publie",
+      "handled": "traite",
+      "pending": "a traiter",
+      "openToExchange": "ouvert aux echanges",
+      "closedToExchange": "ferme aux echanges"
+    },
+  "openAnalytics": "Analyses",
+  "analyticsTitle": "Analyses",
+  "exchangeStatus": {
+    "PENDING": "en attente",
+    "FUTURE": "à venir",
+    "CURRENT": "en cours",
+    "PAST": "passés",
+    "CANCELLED": "annulés",
+    "DECLINED": "refusés"
+  },
+  "analytics": {
+        "weeklySignups": "Inscriptions par semaine",
+        "weeklyExchanges": "Échanges par semaine",
+        "weeklyMessages": "Messages par semaine",
+    "signups": "Inscriptions",
+    "last7": "7 derniers jours",
+    "last30": "30 derniers jours",
+    "total": "Total",
+    "activity": "Activité",
+    "active7": "Vus ces 7 jours",
+    "neverReturned": "Jamais revenus",
+    "verification": "Vérification d'identité",
+    "homes": "Logements",
+    "open": "Ouverts à l’échange",
+    "withoutPhoto": "Sans photo",
+    "exchanges": "Échanges",
+    "conversations": "Conversations",
+    "neverStarted": "Jamais entamées",
+    "topCities": "Villes les plus recherchées"
+  },
+  "setIdentity": {
+    "VERIFIED": "Marquer vérifié",
+    "REFUSED": "Refuser la vérification"
+  },
+  "openUsers": "Comptes",
+  "openWeights": "Réglage des recommandations",
+  "usersTitle": "Comptes",
+  "searchPlaceholder": "Nom ou adresse e-mail",
+  "noUser": "Aucun compte trouvé.",
+  "admin": "ADMIN",
+  "homesCount": "{{count}} logement(s)",
+  "reportsCount": "{{count}} signalement(s)",
+  "actionError": "Action impossible.",
+  "weightsTitle": "Recommandations",
+  "weightsHint": "Ces valeurs pondèrent le classement des logements dans la recherche rapide. Une valeur plus haute pèse plus lourd ; 0 neutralise le critère.",
+  "weightsSaved": "Pondérations enregistrées.",
+  "identity": {
+    "NOT_VERIFIED": "non vérifié",
+    "IN_PROGRESS": "vérification en cours",
+    "VERIFIED": "vérifié",
+    "REFUSED": "vérification refusée"
+  },
+  "weights": {
+    "rechercheVille": "Ville déjà recherchée",
+    "recherchePays": "Pays déjà recherché",
+    "distanceProche": "À moins de 10 km",
+    "distanceMoyenne": "À moins de 50 km",
+    "distanceLointaine": "À moins de 150 km",
+    "plafondRecherche": "Plafond — historique de recherche",
+    "typeAime": "Type de logement apprécié",
+    "equipementAime": "Équipement apprécié",
+    "plafondEquipements": "Plafond — équipements",
+    "plafondPreferences": "Plafond — préférences",
+    "villeRejetee": "Ville rejetée",
+    "typeRejete": "Type rejeté",
+    "equipementRejete": "Équipement rejeté",
+    "plafondEquipementsRejetes": "Plafond — équipements rejetés",
+    "plafondRejet": "Plafond — pénalité de rejet"
+  },
     "adminTitle": "Tableau de bord administrateur",
     "adminSubtitle": "Vue réservée aux administrateurs.",
     "adminTableHeaderName": "Fonctionnalité",
@@ -810,6 +911,39 @@
     "remindersDone": "{{envoyes}} rappel(s) envoyé(s), {{termines}} séjour(s) passé(s) en terminé."
   },
   "search": {
+    "filters": {
+      "title": "Filtres",
+      "homeType": "Type de logement",
+      "category": "Ambiance",
+      "travellers": "Voyageurs",
+      "bedrooms": "Chambres",
+      "amenities": "Équipements",
+      "any": "Peu importe",
+      "reset": "Tout effacer",
+      "apply": "Voir les résultats",
+      "types": {
+        "HOUSE": "Maison",
+        "APARTMENT": "Appartement",
+        "STUDIO": "Studio",
+        "VILLA": "Villa"
+      },
+      "categories": {
+        "NATURE": "Nature",
+        "BEACH": "Plage",
+        "CITY": "Ville",
+        "CULTURE": "Culture"
+      },
+      "equipments": {
+        "wifi": "Wifi",
+        "kitchen": "Cuisine",
+        "parking": "Parking",
+        "tv": "Télévision",
+        "washingMachine": "Lave-linge",
+        "workspace": "Espace de travail",
+        "airConditioning": "Climatisation",
+        "pool": "Piscine"
+      }
+    },
     "search": "Recherche",
     "toSearch": "Rechercher",
     "toExplore": "Explorer",
@@ -826,6 +960,7 @@
     "results": "Résultats"
   },
   "swipe": {
+      "alreadyMatchedOtherHome": "Vous aviez déjà aimé un autre logement de {{name}} : vous choisirez lequel au moment de proposer un échange.",
     "noMoreHome": "Plus aucun logement à afficher",
     "homeNotFound": "Logement introuvable",
     "homenotAvailable": "Ce logement n'est plus disponible",
@@ -837,6 +972,8 @@
     "openConversation": "Ouvrir la conversation"
   },
   "chat": {
+      "changeDates": "Modifier les dates",
+      "exchangeConfirmed": "Échange confirmé",
     "title": "Messages",
     "empty": "Aucune conversation",
     "emptyDescription": "Vos conversations apparaîtront ici dès que vous aurez un match.",
@@ -944,5 +1081,37 @@
     "searchMessages": "Rechercher dans la discussion",
     "searchPlaceholder": "Rechercher un message…",
     "searchNoResult": "Aucun message ne correspond."
+  },
+  "onboarding": {
+    "skip": "Passer",
+    "continue": "Continuer",
+    "start": "Commencer",
+    "slides": [
+      {
+        "title": "Trouvez un logement",
+        "body": "Échangez votre logement avec des membres du monde entier, sans jamais payer de nuitée."
+      },
+      {
+        "title": "Facile et rapide",
+        "body": "Avec la recherche rapide, trouvez un logement en quelques swipes."
+      },
+      {
+        "title": "Créez des liens",
+        "body": "Gardez contact avec vos précédents échanges pour créer des liens avec le monde entier."
+      },
+      {
+        "title": "Personnalisable",
+        "body": "Ajustez vos préférences afin de recevoir des annonces d'échange adaptées."
+      }
+    ]
+  },
+  "notifications": {
+    "title": "Notifications",
+    "readAll": "Tout lire",
+    "empty": "Aucune notification",
+    "emptyHint": "Les demandes, matchs et rappels arriveront ici.",
+    "now": "à l'instant",
+    "minutes": "il y a {{count}} min",
+    "hours": "il y a {{count}} h"
   }
 }

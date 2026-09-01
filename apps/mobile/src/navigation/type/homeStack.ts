@@ -13,5 +13,7 @@ export type HomesStackParamList = {
   ExchangeMessage: {
     homeId: string;
     availabilityType: 'FREE' | 'EXCHANGER_DATES' | 'SPECIFIC_DATES';
+    startDate?: string;
+    endDate?: string;
   };
 };

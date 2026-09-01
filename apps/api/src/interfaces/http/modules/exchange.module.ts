@@ -13,6 +13,7 @@ import { EMAIL_SENDER } from '../tokens/token';
 import { ListMyExchangesUseCase } from 'src/application/exchange/use-cases/list-my-exchanges.usecase';
 import {
   CancelExchangeUseCase,
+  ListGuestHomesUseCase,
   RespondToExchangeUseCase,
   UpdateExchangeDatesUseCase,
 } from 'src/application/exchange/use-cases/respond-to-exchange.usecase';
@@ -26,6 +27,7 @@ import { CHAT_REPOSITORY, EXCHANGE_REPOSITORY } from '../tokens/token';
 import { ModerationModule } from './moderation.module';
 import { WebsocketModule } from 'src/interfaces/websocket/websocket.module';
 import { StayLifecycleService } from 'src/application/exchange/services/stay-lifecycle.service';
+import { AnnounceExchangeUseCase } from 'src/application/exchange/use-cases/announce-exchange.usecase';
 import {
   ListStaysToReviewUseCase,
   ReviewStayUseCase,
@@ -68,7 +70,9 @@ import {
         new ListMyExchangesUseCase(repository),
       inject: [ExchangeRepositoryPrisma],
     },
-    RespondToExchangeUseCase,
+    ListGuestHomesUseCase,
+  AnnounceExchangeUseCase,
+  RespondToExchangeUseCase,
     UpdateExchangeDatesUseCase,
     CancelExchangeUseCase,
     GetChatExchangeUseCase,

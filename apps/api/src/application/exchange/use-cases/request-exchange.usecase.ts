@@ -13,9 +13,6 @@ import { ListStaysToReviewUseCase } from './review-stay.usecase';
 export type RequestExchangeInput = {
   requesterId: string;
   homeId: string;
-  // Le logement que le demandeur propose en retour. Facultatif : on peut
-  // ecrire sans encore avoir de logement a offrir.
-  guestHomeId?: string;
   message: string;
   startDate?: string;
   endDate?: string;
@@ -25,7 +22,6 @@ export type RequestExchangeInput = {
 export type RequestExchangeResult = {
   exchangeId: string;
   chatId: string;
-  // Le message d'introduction, pour que l'appelant puisse l'annoncer en direct.
   message: ChatMessages;
 };
 
@@ -72,10 +68,6 @@ export class RequestExchangeUseCase {
       );
     }
 
-    // Un seul echange vivant a la fois entre deux personnes. Sans ce garde-fou,
-    // les demandes s'empilent et le bandeau n'en montre qu'une, les autres
-    // devenant invisibles. Une fois l'echange termine, refuse ou annule, un
-    // nouveau peut etre propose.
     const active = await this.prisma.exchange.findFirst({
       where: {
         status: { in: ['PENDING', 'CURRENT', 'FUTURE'] },
@@ -101,22 +93,19 @@ export class RequestExchangeUseCase {
       );
     }
 
-    if (input.guestHomeId) {
-      const offered = await this.prisma.home.findUnique({
-        where: { id: input.guestHomeId },
-        select: { ownerId: true },
-      });
+    const logementsAimesParLHote = await this.prisma.swipe.findMany({
+      where: {
+        swiperId: home.ownerId,
+        targetUserId: input.requesterId,
+        direction: 'LIKE',
+      },
+      select: { homeId: true },
+    });
 
-      if (!offered) {
-        throw new NotFoundException('Logement propose introuvable.');
-      }
-
-      if (offered.ownerId !== input.requesterId) {
-        throw new BadRequestException(
-          'Vous ne pouvez proposer qu un de vos propres logements.',
-        );
-      }
-    }
+    const contrepartie =
+      logementsAimesParLHote.length === 1
+        ? logementsAimesParLHote[0].homeId
+        : null;
 
     const startDate = input.startDate
       ? new Date(input.startDate)
@@ -156,7 +145,7 @@ export class RequestExchangeUseCase {
           guestId: input.requesterId,
           startDate,
           endDate,
-          guestHomeId: input.guestHomeId ?? null,
+          guestHomeId: contrepartie,
           travelersCount: input.travelersCount ?? 1,
           status: 'PENDING',
         },

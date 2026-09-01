@@ -70,7 +70,6 @@ export function EditHomeDetailsTab({
             <TouchableOpacity
               key={value}
               style={[styles.chip, selected && styles.chipSelected]}
-              // Retaper le theme actif le retire : un logement peut n'en avoir aucun.
               onPress={() => onChangeCategory(selected ? null : value)}
             >
               <Text

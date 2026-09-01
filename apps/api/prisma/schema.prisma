@@ -8,19 +8,19 @@ datasource db {
 }
 
 model User {
-  id                String         @id @default(uuid())
-  email             String         @unique
-  passwordHash      String?        @map("password_hash")
-  firstName         String?        @map("first_name")
-  lastName          String?        @map("last_name")
-  avatarUrl         String?        @map("avatar_url")
-  bio               String?
-  country           String?
-  languages         Json?
-  rating            Int            @default(0)
-  isAdmin           Boolean        @default(false) @map("is_admin")
+  id           String  @id @default(uuid())
+  email        String  @unique
+  passwordHash String? @map("password_hash")
+  firstName    String? @map("first_name")
+  lastName     String? @map("last_name")
+  avatarUrl    String? @map("avatar_url")
+  bio          String?
+  country      String?
+  languages    Json?
+  rating       Int     @default(0)
+  isAdmin      Boolean @default(false) @map("is_admin")
 
-  suspendedAt DateTime? @map("suspended_at")
+  suspendedAt       DateTime?      @map("suspended_at")
   createdAt         DateTime       @default(now()) @map("created_at")
   updatedAt         DateTime       @updatedAt @map("updated_at")
   identityStatus    IdentityStatus @default(NOT_VERIFIED)
@@ -69,6 +69,7 @@ model User {
   blocksReceived   BlockedUser[]     @relation("BlocksReceived")
   reportsMade      UserReport[]      @relation("ReportsMade")
   reportsReceived  UserReport[]      @relation("ReportsReceived")
+  notifications    Notification[]
 
   @@map("users")
 }
@@ -85,10 +86,10 @@ model Home {
   latitude    Float?
   longitude   Float?
   capacity    Int
-  beds        Int     @default(1)
-  bedrooms    Int     @default(1)
-  bathrooms   Int     @default(1)
-  homeType    String  @map("home_type")
+  beds        Int           @default(1)
+  bedrooms    Int           @default(1)
+  bathrooms   Int           @default(1)
+  homeType    String        @map("home_type")
   category    HomeCategory?
   amenities   Json?
 
@@ -129,8 +130,6 @@ model HomePhoto {
   @@map("home_photos")
 }
 
-// Theme d'un sejour, choisi par l'hote. Distinct de homeType, qui decrit le
-// bati : un chalet peut etre montagne comme culture selon ce qu'on vient y faire.
 enum HomeCategory {
   NATURE
   BEACH
@@ -211,9 +210,6 @@ enum ExchangeStatus {
 model Exchange {
   id String @id @default(uuid())
 
-  // Un echange de maison porte deux logements : celui de l'hote, ou l'invite se
-  // rend, et celui de l'invite, ou l'hote sejourne en retour. Le second reste
-  // facultatif : on peut demander un echange sans encore proposer de logement.
   homeId String @map("home_id")
   home   Home   @relation("ExchangeHostHome", fields: [homeId], references: [id], onDelete: Cascade)
 
@@ -267,7 +263,7 @@ model Swipe {
 
   home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
-  @@unique([swiperId, targetUserId])
+  @@unique([swiperId, homeId])
 }
 
 model SearchHistory {
@@ -344,7 +340,8 @@ model ChatParticipant {
   lastReadMessageId String?
   lastReadAt        DateTime?
 
-  hiddenAt DateTime? @map("hidden_at")
+  hiddenAt       DateTime? @map("hidden_at")
+  reminderSentAt DateTime? @map("reminder_sent_at")
 
   chatId String
   userId String
@@ -378,8 +375,8 @@ model Message {
 
   editedAt DateTime? @map("edited_at")
 
-  replyToId String?  @map("reply_to_id")
-  replyTo   Message? @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
+  replyToId String?   @map("reply_to_id")
+  replyTo   Message?  @relation("MessageReply", fields: [replyToId], references: [id], onDelete: SetNull)
   replies   Message[] @relation("MessageReply")
 
   chat               Chat                 @relation(fields: [chatId], references: [id], onDelete: Cascade)
@@ -393,8 +390,6 @@ model Message {
   @@index([chatId, createdAt])
 }
 
-// La traduction est facturee au caractere : on la conserve pour ne jamais
-// repayer la traduction d'un message deja vu.
 model MessageTranslation {
   id        String @id @default(uuid())
   messageId String
@@ -423,8 +418,8 @@ model Review {
   score   Int
   comment String
 
-  reply     String?
-  replyAt   DateTime? @map("reply_at")
+  reply   String?
+  replyAt DateTime? @map("reply_at")
 
   reports UserReport[]
 
@@ -442,7 +437,7 @@ model PushToken {
   userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  token    String @unique
+  token    String  @unique
   platform String?
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -490,4 +485,48 @@ model UserReport {
   @@index([reportedId])
   @@index([handledAt])
   @@map("user_reports")
+}
+
+enum NotificationCategory {
+  MESSAGES
+  EXCHANGES
+}
+
+model Notification {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+
+  category NotificationCategory @default(MESSAGES)
+  title    String
+  body     String
+  data     Json?
+
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model AppSetting {
+  key   String @id
+  value Json
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
+
+model CityImage {
+  city    String
+  country String
+
+  images Json
+
+  fetchedAt DateTime @default(now()) @map("fetched_at")
+
+  @@id([city, country])
+  @@map("city_images")
 }

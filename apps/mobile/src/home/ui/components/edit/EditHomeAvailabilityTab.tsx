@@ -46,8 +46,6 @@ export function EditHomeAvailabilityTab({
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
-  // Une periode se saisit en deux temps : le debut, puis la fin, qui ne peut
-  // pas lui etre anterieure.
   const [etape, setEtape] = useState<'start' | 'end' | null>(null);
   const [debut, setDebut] = useState(new Date());
   const [enCours, setEnCours] = useState(false);
