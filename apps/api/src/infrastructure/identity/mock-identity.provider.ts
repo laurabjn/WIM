@@ -9,7 +9,11 @@ export class MockIdentityProvider implements IdentityVerificationProviderPort {
   async startVerification(params: {
     userId: string;
     email: string;
-  }): Promise<{ redirectUrl: string; sessionId: string }> {
+  }): Promise<{
+    redirectUrl: string;
+    returnUrl: string;
+    sessionId: string;
+  }> {
     const sessionId = `mock_${params.userId.slice(0, 8)}`;
 
     this.logger.warn(
@@ -20,6 +24,10 @@ export class MockIdentityProvider implements IdentityVerificationProviderPort {
       redirectUrl:
         process.env.MOCK_IDENTITY_VERIFICATION_URL?.trim() ||
         'https://example.com/identity/mock',
+      returnUrl:
+        process.env.IDENTITY_RETURN_URL?.trim() ||
+        process.env.FRONTEND_URL?.trim() ||
+        'https://worldismine.fr',
       sessionId,
     };
   }

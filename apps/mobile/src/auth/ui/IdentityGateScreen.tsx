@@ -110,12 +110,17 @@ export const IdentityGateScreen: React.FC<Props> = ({
     setMessage(null);
 
     try {
-      const url = await startIdentityVerification();
+      const { redirectUrl, returnUrl } = await startIdentityVerification();
 
       ouverte.current = true;
       setLancee(true);
 
-      await WebBrowser.openBrowserAsync(url);
+      if (returnUrl) {
+        await WebBrowser.openAuthSessionAsync(redirectUrl, returnUrl);
+      } else {
+        await WebBrowser.openBrowserAsync(redirectUrl);
+      }
+
       await attendreLeVerdict();
     } catch (e: any) {
       setMessage(e?.message ?? t('auth:identity.error'));

@@ -6,6 +6,7 @@ export interface StartIdentityVerificationInput {
 
 export interface StartIdentityVerificationResult {
   redirectUrl: string;
+  returnUrl: string;
 }
 
 export interface GetIdentityStatusInput {

@@ -27,7 +27,7 @@ export class StartIdentityVerificationUseCase {
       throw new ConflictException('Identity already verified');
     }
 
-    const { redirectUrl } = await this.provider.startVerification({
+    const { redirectUrl, returnUrl } = await this.provider.startVerification({
       userId: user.id,
       email: user.email,
     });
@@ -37,6 +37,6 @@ export class StartIdentityVerificationUseCase {
       IdentityStatus.IN_PROGRESS,
     );
 
-    return { redirectUrl };
+    return { redirectUrl, returnUrl };
   }
 }
