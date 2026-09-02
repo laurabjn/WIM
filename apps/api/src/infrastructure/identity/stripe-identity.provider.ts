@@ -86,8 +86,10 @@ export class StripeIdentityProvider implements IdentityVerificationProviderPort 
   }
 
   private urlDeRetour(): string {
-    const base = process.env.FRONTEND_URL?.trim() || 'https://worldismine.fr';
+    const dediee = process.env.IDENTITY_RETURN_URL?.trim();
 
-    return `${base}/verification-identite`;
+    if (dediee) return dediee;
+
+    return process.env.FRONTEND_URL?.trim() || 'https://worldismine.fr';
   }
 }
