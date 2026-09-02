@@ -387,3 +387,31 @@ par `WS_CORS_ORIGIN`.
    et écrira des données utilisateur dans les logs du conteneur.
 5. **Sauvegardes hors du VPS** : le cron écrit dans `/var/backups/wim`, sur le
    même disque que la base. Les répliquer ailleurs (§8).
+
+## Lien universel Android (retour depuis Stripe Identity)
+
+Après une vérification d'identité, Stripe renvoie la personne sur
+`https://worldismine.fr/verification-identite`. Pour qu'Android rende la main à
+l'application au lieu d'ouvrir un navigateur, le domaine doit déclarer qu'il
+appartient à l'application. C'est le rôle de `site/.well-known/assetlinks.json`.
+
+Ce fichier n'est pas servi par le VPS : `worldismine.fr` tourne sur un
+hébergement Apache séparé. Il faut l'y déposer par FTP, à la racine du site :
+
+    www/.well-known/assetlinks.json
+
+Il doit répondre en HTTP 200, sans redirection, à l'adresse
+`https://worldismine.fr/.well-known/assetlinks.json`.
+
+Deux pièges :
+
+- Android vérifie ce fichier **à l'installation**. S'il n'est pas en ligne
+  avant, le lien restera ordinaire jusqu'à la réinstallation suivante.
+- L'empreinte est celle du certificat de build EAS. Le jour d'une publication
+  sur le Play Store, Google resigne l'application : il faudra **ajouter** son
+  empreinte à la liste, sans retirer celle-ci tant que des APK directs
+  circulent.
+
+Vérifier depuis un poste :
+
+    curl -s https://worldismine.fr/.well-known/assetlinks.json
