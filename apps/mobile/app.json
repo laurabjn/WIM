@@ -50,7 +50,8 @@
           "icon": "./assets/notification-icon.png",
           "color": "#3FC0BF"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

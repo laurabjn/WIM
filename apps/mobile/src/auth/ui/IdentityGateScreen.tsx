@@ -2,13 +2,13 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   AppState,
-  Linking,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as WebBrowser from 'expo-web-browser';
 import { useTranslation } from 'react-i18next';
 
 import { useThemeColors } from 'src/theme/ThemeContext';
@@ -85,6 +85,26 @@ export const IdentityGateScreen: React.FC<Props> = ({
     return () => abonnement.remove();
   }, [verifier]);
 
+  const attendreLeVerdict = useCallback(async () => {
+    setOccupe(true);
+    setMessage(t('auth:identity.pending'));
+
+    for (let essai = 0; essai < 10; essai += 1) {
+      const status = await fetchIdentityStatus().catch(() => null);
+
+      if (status === IdentityStatus.VERIFIED) {
+        onVerified();
+        return;
+      }
+
+      if (status && status !== IdentityStatus.IN_PROGRESS) break;
+
+      await new Promise((resoudre) => setTimeout(resoudre, 1500));
+    }
+
+    await verifier(false);
+  }, [onVerified, t, verifier]);
+
   async function ouvrirLaVerification() {
     setOccupe(true);
     setMessage(null);
@@ -94,7 +114,9 @@ export const IdentityGateScreen: React.FC<Props> = ({
 
       ouverte.current = true;
       setLancee(true);
-      await Linking.openURL(url);
+
+      await WebBrowser.openBrowserAsync(url);
+      await attendreLeVerdict();
     } catch (e: any) {
       setMessage(e?.message ?? t('auth:identity.error'));
     } finally {
