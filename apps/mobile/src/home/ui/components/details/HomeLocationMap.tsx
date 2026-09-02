@@ -8,6 +8,43 @@ import {
   Linking
 } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
+
+const RAYON_KM = 5;
+
+function zoneApprochee(longitude: number, latitude: number) {
+  const degresParKmEnLongitude =
+    1 / (111.32 * Math.cos((latitude * Math.PI) / 180));
+  const degresParKmEnLatitude = 1 / 110.574;
+
+  const anneau: number[][] = [];
+
+  for (let pas = 0; pas < 72; pas += 1) {
+    const angle = (pas / 72) * 2 * Math.PI;
+
+    anneau.push([
+      longitude + RAYON_KM * degresParKmEnLongitude * Math.cos(angle),
+      latitude + RAYON_KM * degresParKmEnLatitude * Math.sin(angle),
+    ]);
+  }
+
+  anneau.push(anneau[0]);
+
+  return {
+    contour: {
+      type: 'Feature' as const,
+      properties: {},
+      geometry: { type: 'Polygon' as const, coordinates: [anneau] },
+    },
+    coinNordEst: [
+      longitude + RAYON_KM * degresParKmEnLongitude,
+      latitude + RAYON_KM * degresParKmEnLatitude,
+    ] as [number, number],
+    coinSudOuest: [
+      longitude - RAYON_KM * degresParKmEnLongitude,
+      latitude - RAYON_KM * degresParKmEnLatitude,
+    ] as [number, number],
+  };
+}
 import { MapPin } from 'lucide-react-native';
 import { Home } from '@wim/shared/home/home.type';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +79,11 @@ export function HomeLocationMap({ home }: Props) {
     hasCoordinates
       ? [home.longitude!, home.latitude!]
       : null;
+
+  const zone = useMemo(
+    () => (coordinate ? zoneApprochee(coordinate[0], coordinate[1]) : null),
+    [coordinate],
+  );
 
   const locationLabel = [home.city, home.country]
     .filter(Boolean)
@@ -101,7 +143,7 @@ export function HomeLocationMap({ home }: Props) {
         {t('locationTitle')}
       </Text>
 
-      {coordinate ? (
+      {coordinate && zone ? (
         <View style={styles.mapContainer}>
           <Mapbox.MapView
             style={styles.map}
@@ -117,28 +159,28 @@ export function HomeLocationMap({ home }: Props) {
             requestDisallowInterceptTouchEvent
           >
             <Mapbox.Camera
-              centerCoordinate={coordinate}
-              zoomLevel={13}
+              bounds={{
+                ne: zone.coinNordEst,
+                sw: zone.coinSudOuest,
+                paddingTop: 24,
+                paddingBottom: 24,
+                paddingLeft: 24,
+                paddingRight: 24,
+              }}
               animationMode="flyTo"
               animationDuration={600}
             />
 
-            <Mapbox.MarkerView
-              coordinate={coordinate}
-              anchor={{ x: 0.5, y: 1 }}
-              allowOverlap
-            >
-              <View style={styles.markerWrapper}>
-                <View style={styles.marker}>
-                  <MapPin
-                    size={18}
-                    color="#FFFFFF"
-                  />
-                </View>
-
-                <View style={styles.markerArrow} />
-              </View>
-            </Mapbox.MarkerView>
+            <Mapbox.ShapeSource id="zoneDuLogement" shape={zone.contour}>
+              <Mapbox.FillLayer
+                id="zoneDuLogementFond"
+                style={{ fillColor: '#087EBE', fillOpacity: 0.14 }}
+              />
+              <Mapbox.LineLayer
+                id="zoneDuLogementBord"
+                style={{ lineColor: '#087EBE', lineWidth: 2, lineOpacity: 0.6 }}
+              />
+            </Mapbox.ShapeSource>
           </Mapbox.MapView>
         </View>
       ) : (
@@ -224,39 +266,6 @@ const createStyles = (c: ThemeColors) =>
   map: {
     flex: 1,
     width: '100%',
-  },
-  markerWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  marker: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#25AEEB',
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 6,
-    shadowColor: '#000000',
-    shadowOpacity: 0.22,
-    shadowRadius: 5,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-  },
-  markerArrow: {
-    width: 0,
-    height: 0,
-    marginTop: -3,
-    borderLeftWidth: 7,
-    borderRightWidth: 7,
-    borderTopWidth: 11,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: '#25AEEB',
   },
   mapUnavailable: {
     height: 160,

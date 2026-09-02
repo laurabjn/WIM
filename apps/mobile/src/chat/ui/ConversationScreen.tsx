@@ -2114,7 +2114,7 @@ menuBackdrop: {
   },
 
   composerArea: {
-    backgroundColor: c.screen,
+    backgroundColor: 'transparent',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
@@ -2198,7 +2198,13 @@ menuBackdrop: {
   },
 
   translationNotice: {
-    paddingBottom: 10,
+    alignSelf: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: c.surfaceAlt,
     fontSize: 11,
     color: c.textMuted,
     textAlign: 'center',

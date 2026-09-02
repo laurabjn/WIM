@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, SlidersHorizontal } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { SelecteurDeDate } from './components/SelecteurDeDate';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BackButton } from 'src/shared/ui/BackButton';
@@ -169,39 +169,31 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
 
                     <Calendar size={16} color="#D0D0D0" />
                   </TouchableOpacity>
-                  
-                  {showStartPicker && (
-                    <DateTimePicker
-                      value={startDate ?? new Date()}
-                      mode="date"
-                      display="default"
-                      minimumDate={new Date()}
-                      onChange={(_, selectedDate) => {
-                        setShowStartPicker(false);
-
-                        if (selectedDate) {
-                          setStartDate(selectedDate);
-                        }
-                      }}
-                    />
-                  )}
-
-                  {showEndPicker && (
-                    <DateTimePicker
-                      value={endDate ?? startDate ?? new Date()}
-                      mode="date"
-                      display="default"
-                      minimumDate={startDate ?? new Date()}
-                      onChange={(_, selectedDate) => {
-                        setShowEndPicker(false);
-
-                        if (selectedDate) {
-                          setEndDate(selectedDate);
-                        }
-                      }}
-                    />
-                  )}
                 </View>
+
+                {showStartPicker ? (
+                  <SelecteurDeDate
+                    valeur={startDate ?? new Date()}
+                    minimum={new Date()}
+                    libelleFin={t('dateDone')}
+                    onChoisir={(choisie) => {
+                      if (choisie) setStartDate(choisie);
+                    }}
+                    onFermer={() => setShowStartPicker(false)}
+                  />
+                ) : null}
+
+                {showEndPicker ? (
+                  <SelecteurDeDate
+                    valeur={endDate ?? startDate ?? new Date()}
+                    minimum={startDate ?? new Date()}
+                    libelleFin={t('dateDone')}
+                    onChoisir={(choisie) => {
+                      if (choisie) setEndDate(choisie);
+                    }}
+                    onFermer={() => setShowEndPicker(false)}
+                  />
+                ) : null}
 
                 <TextInput
                   value={travelers}

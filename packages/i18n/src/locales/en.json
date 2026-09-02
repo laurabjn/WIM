@@ -958,7 +958,8 @@
     "travelers": "Number of travelers",
     "noDestination": "No destination found",
     "noRecentDestination": "No recent searches",
-    "results": "Results"
+    "results": "Results",
+    "dateDone": "Done"
   },
   "swipe": {
       "alreadyMatchedOtherHome": "You had already liked another home from {{name}}: you will pick which one when proposing an exchange.",
