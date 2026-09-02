@@ -176,6 +176,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hauteurEntete, setHauteurEntete] = useState(0);
   const [logementsCandidats, setLogementsCandidats] = useState<
     LogementCandidat[]
   >([]);
@@ -1191,7 +1192,12 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
+      <View
+        style={styles.header}
+        onLayout={(evenement) =>
+          setHauteurEntete(evenement.nativeEvent.layout.height)
+        }
+      >
         <BackButton onPress={navigation.goBack} style={styles.headerButton} />
 
         <TouchableOpacity
@@ -1273,6 +1279,10 @@ export function ConversationScreen({ route, navigation }: Props) {
 
       {exchange &&
       ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status) ? (
+        <View
+          style={[styles.bandeauFlottant, { top: hauteurEntete }]}
+          pointerEvents="box-none"
+        >
         <ExchangeBanner
           exchange={exchange}
           onAccept={async () => {
@@ -1313,6 +1323,7 @@ export function ConversationScreen({ route, navigation }: Props) {
             setExchange(updated);
           }}
         />
+        </View>
       ) : null}
 
       {loading ? (
@@ -1753,6 +1764,13 @@ const createStyles = (c: ThemeColors) =>
   container: {
     flex: 1,
     backgroundColor: c.surface,
+  },
+
+  bandeauFlottant: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 10,
   },
 
   flex: {
