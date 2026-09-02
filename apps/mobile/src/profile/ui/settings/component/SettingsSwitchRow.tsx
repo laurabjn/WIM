@@ -25,7 +25,9 @@ export function SettingsSwitchRow({
         <Text style={styles.label}>{label}</Text>
       </View>
 
-      <Switch value={value} onValueChange={onValueChange} />
+      <View style={styles.interrupteur}>
+        <Switch value={value} onValueChange={onValueChange} />
+      </View>
     </View>
   );
 }
@@ -33,7 +35,7 @@ export function SettingsSwitchRow({
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
   row: {
-    minHeight: 52,
+    minHeight: 56,
     paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
@@ -47,6 +49,11 @@ const createStyles = (c: ThemeColors) =>
     gap: 10,
     flex: 1,
     paddingRight: 8,
+  },
+  interrupteur: {
+    height: 32,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   icon: {
     color: c.text,

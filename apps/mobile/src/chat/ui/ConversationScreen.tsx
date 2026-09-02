@@ -176,6 +176,8 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hauteurEntete, setHauteurEntete] = useState(0);
+  const [hauteurBandeau, setHauteurBandeau] = useState(0);
   const [logementsCandidats, setLogementsCandidats] = useState<
     LogementCandidat[]
   >([]);
@@ -1189,9 +1191,18 @@ export function ConversationScreen({ route, navigation }: Props) {
     );
   }
 
+  const bandeauVisible = Boolean(
+    exchange && ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status),
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
+      <View
+        style={styles.header}
+        onLayout={(evenement) =>
+          setHauteurEntete(evenement.nativeEvent.layout.height)
+        }
+      >
         <BackButton onPress={navigation.goBack} style={styles.headerButton} />
 
         <TouchableOpacity
@@ -1271,8 +1282,14 @@ export function ConversationScreen({ route, navigation }: Props) {
         }}
       />
 
-      {exchange &&
-      ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status) ? (
+      {exchange && bandeauVisible ? (
+        <View
+          style={[styles.bandeauFlottant, { top: hauteurEntete }]}
+          pointerEvents="box-none"
+          onLayout={(evenement) =>
+            setHauteurBandeau(evenement.nativeEvent.layout.height)
+          }
+        >
         <ExchangeBanner
           exchange={exchange}
           onAccept={async () => {
@@ -1313,6 +1330,7 @@ export function ConversationScreen({ route, navigation }: Props) {
             setExchange(updated);
           }}
         />
+        </View>
       ) : null}
 
       {loading ? (
@@ -1340,9 +1358,18 @@ export function ConversationScreen({ route, navigation }: Props) {
             onEndReached={loadEarlier}
             onEndReachedThreshold={0.4}
             ListFooterComponent={
-              loadingMore ? (
-                <ActivityIndicator style={styles.moreLoader} color="#087EBE" />
-              ) : null
+              <View>
+                {loadingMore ? (
+                  <ActivityIndicator
+                    style={styles.moreLoader}
+                    color="#087EBE"
+                  />
+                ) : null}
+
+                {bandeauVisible ? (
+                  <View style={{ height: hauteurBandeau }} />
+                ) : null}
+              </View>
             }
           />
 
@@ -1755,6 +1782,13 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
   },
 
+  bandeauFlottant: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+
   flex: {
     flex: 1,
   },
@@ -2114,7 +2148,7 @@ menuBackdrop: {
   },
 
   composerArea: {
-    backgroundColor: c.screen,
+    backgroundColor: 'transparent',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
@@ -2198,7 +2232,13 @@ menuBackdrop: {
   },
 
   translationNotice: {
-    paddingBottom: 10,
+    alignSelf: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: c.surfaceAlt,
     fontSize: 11,
     color: c.textMuted,
     textAlign: 'center',

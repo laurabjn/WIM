@@ -957,7 +957,8 @@
     "travelers": "Nombre de voyageurs",
     "noDestination": "Aucune destination trouvée",
     "noRecentDestination": "Aucune destination récente",
-    "results": "Résultats"
+    "results": "Résultats",
+    "dateDone": "Terminé"
   },
   "swipe": {
       "alreadyMatchedOtherHome": "Vous aviez déjà aimé un autre logement de {{name}} : vous choisirez lequel au moment de proposer un échange.",

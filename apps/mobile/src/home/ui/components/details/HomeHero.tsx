@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { Share } from 'react-native';
 import { BackButton } from 'src/shared/ui/BackButton';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
@@ -39,6 +40,7 @@ export function HomeHero({
 }: Props) {
   const { t } = useTranslation('home');
   const themeColors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const [photoIndex, setPhotoIndex] = useState(0);
 
@@ -76,9 +78,12 @@ export function HomeHero({
         </View>
       )}
 
-      <BackButton onPress={onBack} style={[styles.circleButton, styles.backButton]} />
+      <BackButton
+        onPress={onBack}
+        style={[styles.circleButton, styles.backButton, { top: 16 + insets.top }]}
+      />
 
-      <View style={styles.topActions}>
+      <View style={[styles.topActions, { top: 16 + insets.top }]}>
         <TouchableOpacity style={styles.circleButton} onPress={onShare}>
           <Text style={styles.icon}>↗</Text>
         </TouchableOpacity>
@@ -107,7 +112,7 @@ export function HomeHero({
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
   hero: {
-    height: 300,
+    aspectRatio: 1,
     position: 'relative',
   },
   heroImage: {

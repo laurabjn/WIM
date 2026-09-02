@@ -18,7 +18,8 @@ type Props = {
   quickSearchLabel: string;
 };
 
-const CIRCLE_SIZE = 22;
+const BOUTON_LARGEUR = 34;
+const BOUTON_HAUTEUR = 22;
 const TOGGLE_LARGEUR_MINIMALE = 145;
 const TOGGLE_PADDING = 4;
 
@@ -54,7 +55,7 @@ export function SearchToggle({
     inputRange: [0, 1],
     outputRange: [
       0,
-      Math.max(0, largeur - CIRCLE_SIZE - TOGGLE_PADDING * 2),
+      Math.max(0, largeur - BOUTON_LARGEUR - TOGGLE_PADDING * 2),
     ],
   });
 
@@ -180,10 +181,10 @@ const createStyles = (c: ThemeColors) =>
     paddingHorizontal: TOGGLE_PADDING,
   },
   toggleCircle: {
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
-    borderRadius: CIRCLE_SIZE / 2,
-    backgroundColor: c.surface,
+    width: BOUTON_LARGEUR,
+    height: BOUTON_HAUTEUR,
+    borderRadius: BOUTON_HAUTEUR / 2,
+    backgroundColor: '#FFFFFF',
         shadowColor: '#000',
     shadowOpacity: 0.15,
     shadowRadius: 3,

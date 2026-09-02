@@ -161,6 +161,11 @@ const createStyles = (c: ThemeColors) =>
     borderRadius: 20,
     backgroundColor: c.surfaceAlt,
     alignItems: 'center',
+    shadowColor: '#000000',
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
   },
 
   title: {
