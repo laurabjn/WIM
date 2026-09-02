@@ -74,11 +74,10 @@ export class AuthController {
         expiresIn: '7d',
       });
 
-      /*const { redirectUrl } =
+      const { redirectUrl } =
         await this.startIdentityVerificationUseCase.execute({
           userId: user.id,
-        });*/
-      const redirectUrl = 'https://example.com/identity/mock';
+        });
 
       return {
         accessToken,
@@ -100,8 +99,6 @@ export class AuthController {
         identityRedirectUrl: redirectUrl,
       };
     } catch (error) {
-      console.error('REGISTER ERROR FULL =', error);
-
       if (error instanceof UserAlreadyExistsError) {
         throw new BadRequestException(
           'Un compte existe déjà avec cette adresse.',

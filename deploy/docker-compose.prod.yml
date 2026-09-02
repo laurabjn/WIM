@@ -74,6 +74,9 @@ services:
       UNSPLASH_ACCESS_KEY: ${UNSPLASH_ACCESS_KEY:-}
       MAIL_FROM: ${MAIL_FROM}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      IDENTITY_RETURN_URL: ${IDENTITY_RETURN_URL:-}
     volumes:
       # Les fichiers uploadés survivent aux redéploiements et rebuilds d'image.
       - wim_uploads:/app/apps/api/uploads

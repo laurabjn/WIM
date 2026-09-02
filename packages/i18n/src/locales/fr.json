@@ -508,7 +508,12 @@
       "rejected": "Votre vérification a été refusée. Veuillez recommencer la procédure.",
       "error": "Erreur lors de la vérification du statut.",
       "retry": "Votre vérification n'a pas pu démarré. Lancez-la puis revenez ici une fois terminée.",
-      "identityVerification": "Faites la vérification d’identité"
+      "identityVerification": "Faites la vérification d’identité",
+      "gateTitle": "Vérification requise",
+      "gateBody": "Votre identité doit être vérifiée pour accéder à Wim. Comptez deux minutes : une pièce d'identité et un selfie.",
+      "gateAction": "Vérifier mon identité",
+      "gateRecheck": "J'ai terminé, vérifier",
+      "gateLogout": "Se déconnecter"
     },
     "login": {
       "title": "Connectez-vous à Wim",

@@ -50,6 +50,7 @@ describe('StartIdentityVerificationUseCase', () => {
     userRepository.findById.mockResolvedValue(user);
     provider.startVerification.mockResolvedValue({
       redirectUrl: 'https://mock-kyc.com/session/abc',
+      sessionId: 'vs_abc',
     });
 
     const result = await useCase.execute({ userId: 'user-1' });

@@ -22,4 +22,10 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },
+  {
+    files: ['src/infrastructure/identity/stripe-identity.provider.ts'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
 ];

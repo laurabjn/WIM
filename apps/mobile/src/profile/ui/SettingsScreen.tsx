@@ -297,7 +297,7 @@ export function SettingsScreen({ route, navigation }: Props) {
             value={
               profile.identityStatus === IdentityStatus.VERIFIED
                 ? t('profile:settings.verified')
-                : profile.identityStatus === IdentityStatus.REJECTED
+                : profile.identityStatus === IdentityStatus.REFUSED
                   ? t('profile:settings.refused')
                   : profile.identityStatus === IdentityStatus.IN_PROGRESS
                     ? t('profile:settings.inProgress')
@@ -306,7 +306,7 @@ export function SettingsScreen({ route, navigation }: Props) {
             valueColor={
               profile.identityStatus === IdentityStatus.VERIFIED
                 ? '#35B77C'
-                : profile.identityStatus === IdentityStatus.REJECTED
+                : profile.identityStatus === IdentityStatus.REFUSED
                   ? '#DC2626'
                   : '#D88500'
             }

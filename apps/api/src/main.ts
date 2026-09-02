@@ -10,7 +10,9 @@ const DEFAULT_CORS_ORIGINS = ['http://localhost:3000', 'http://localhost:3001'];
 const UPLOAD_SUBDIRS = ['avatars', 'homes', 'messages'];
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
 
   const corsOrigins = process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
