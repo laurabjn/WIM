@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.usecase';
+import { SignInWithProviderUseCase } from 'src/application/auth/use-cases/sign-in-with-provider.usecase';
 import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.usecase';
 import { InvalidCredentialsError } from 'src/domain/auth/errors/invalid-credentiels.errors';
 import { UserAlreadyExistsError } from 'src/domain/auth/errors/user-already-exist.error';
@@ -32,6 +33,7 @@ export class AuthController {
     private readonly requestPasswordResetUseCase: RequestPasswordResetUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
     private readonly startIdentityVerificationUseCase: StartIdentityVerificationUseCase,
+    private readonly signInWithProviderUseCase: SignInWithProviderUseCase,
   ) {}
 
   @Post('register')
@@ -143,6 +145,52 @@ export class AuthController {
     });
 
     return { accessToken, refreshToken };
+  }
+
+  @Post('social')
+  @HttpCode(HttpStatus.OK)
+  async social(
+    @Body()
+    dto: {
+      provider?: string;
+      idToken?: string;
+      firstName?: string;
+      lastName?: string;
+    },
+  ) {
+    const fournisseur =
+      dto?.provider === 'GOOGLE' || dto?.provider === 'APPLE'
+        ? dto.provider
+        : null;
+
+    if (!fournisseur || !dto?.idToken) {
+      throw new BadRequestException('Fournisseur ou jeton manquant.');
+    }
+
+    const user = await this.signInWithProviderUseCase.execute({
+      provider: fournisseur,
+      idToken: dto.idToken,
+      firstName: dto.firstName ?? null,
+      lastName: dto.lastName ?? null,
+    });
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      isAdmin: user.isAdmin === true,
+    };
+
+    return {
+      user,
+      accessToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '15m',
+        secret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret',
+      }),
+      refreshToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '30d',
+        secret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',
+      }),
+    };
   }
 
   @Post('login')
