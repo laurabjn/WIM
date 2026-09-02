@@ -177,6 +177,7 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [hauteurEntete, setHauteurEntete] = useState(0);
+  const [hauteurBandeau, setHauteurBandeau] = useState(0);
   const [logementsCandidats, setLogementsCandidats] = useState<
     LogementCandidat[]
   >([]);
@@ -1190,6 +1191,10 @@ export function ConversationScreen({ route, navigation }: Props) {
     );
   }
 
+  const bandeauVisible = Boolean(
+    exchange && ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status),
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View
@@ -1277,11 +1282,13 @@ export function ConversationScreen({ route, navigation }: Props) {
         }}
       />
 
-      {exchange &&
-      ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status) ? (
+      {exchange && bandeauVisible ? (
         <View
           style={[styles.bandeauFlottant, { top: hauteurEntete }]}
           pointerEvents="box-none"
+          onLayout={(evenement) =>
+            setHauteurBandeau(evenement.nativeEvent.layout.height)
+          }
         >
         <ExchangeBanner
           exchange={exchange}
@@ -1351,9 +1358,18 @@ export function ConversationScreen({ route, navigation }: Props) {
             onEndReached={loadEarlier}
             onEndReachedThreshold={0.4}
             ListFooterComponent={
-              loadingMore ? (
-                <ActivityIndicator style={styles.moreLoader} color="#087EBE" />
-              ) : null
+              <View>
+                {loadingMore ? (
+                  <ActivityIndicator
+                    style={styles.moreLoader}
+                    color="#087EBE"
+                  />
+                ) : null}
+
+                {bandeauVisible ? (
+                  <View style={{ height: hauteurBandeau }} />
+                ) : null}
+              </View>
             }
           />
 
