@@ -27,7 +27,24 @@
       "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.wim.mobile"
+      "package": "com.wim.mobile",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "worldismine.fr",
+              "pathPrefix": "/verification-identite"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -57,6 +74,7 @@
       "eas": {
         "projectId": "b59c258a-7edd-41c4-a766-8b8ea9dabc9e"
       }
-    }
+    },
+    "scheme": "wim"
   }
 }

@@ -44,7 +44,13 @@ export class StripeIdentityProvider implements IdentityVerificationProviderPort 
   async startVerification(params: {
     userId: string;
     email: string;
-  }): Promise<{ redirectUrl: string; sessionId: string }> {
+  }): Promise<{
+    redirectUrl: string;
+    returnUrl: string;
+    sessionId: string;
+  }> {
+    const retour = this.urlDeRetour();
+
     const session = await this.stripe.identity.verificationSessions.create({
       type: 'document',
       metadata: { userId: params.userId },
@@ -55,14 +61,18 @@ export class StripeIdentityProvider implements IdentityVerificationProviderPort 
           require_matching_selfie: true,
         },
       },
-      return_url: this.urlDeRetour(),
+      return_url: retour,
     });
 
     if (!session.url) {
       throw new Error("Stripe n'a pas renvoye d'URL de verification.");
     }
 
-    return { redirectUrl: session.url, sessionId: session.id };
+    return {
+      redirectUrl: session.url,
+      returnUrl: retour,
+      sessionId: session.id,
+    };
   }
 
   lireEvenement(corps: Buffer, signature: string): VerdictIdentite | null {

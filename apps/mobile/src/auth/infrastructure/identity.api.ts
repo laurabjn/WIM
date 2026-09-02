@@ -26,7 +26,12 @@ export async function fetchIdentityStatus(): Promise<IdentityStatus> {
   return data.status as IdentityStatus;
 }
 
-export async function startIdentityVerification(): Promise<string> {
+export type DemarrageVerification = {
+  redirectUrl: string;
+  returnUrl: string;
+};
+
+export async function startIdentityVerification(): Promise<DemarrageVerification> {
   const session = await getSession();
 
   if (!session) {
@@ -47,5 +52,8 @@ export async function startIdentityVerification(): Promise<string> {
     throw new Error(data?.message || 'Failed to start identity verification');
   }
 
-  return data.redirectUrl as string;
+  return {
+    redirectUrl: data.redirectUrl as string,
+    returnUrl: data.returnUrl as string,
+  };
 }
