@@ -17,9 +17,20 @@ export type VerdictIdentite = {
 const VERDICTS: Record<string, IdentityStatus> = {
   'identity.verification_session.verified': IdentityStatus.VERIFIED,
   'identity.verification_session.processing': IdentityStatus.IN_PROGRESS,
-  'identity.verification_session.requires_input': IdentityStatus.REFUSED,
   'identity.verification_session.canceled': IdentityStatus.NOT_VERIFIED,
 };
+
+const REFUS_DEFINITIFS = new Set([
+  'consent_declined',
+  'under_supported_age',
+  'country_not_supported',
+]);
+
+export function verdictApresEchec(code?: string | null): IdentityStatus {
+  return REFUS_DEFINITIFS.has(code ?? '')
+    ? IdentityStatus.REFUSED
+    : IdentityStatus.NOT_VERIFIED;
+}
 
 @Injectable()
 export class StripeIdentityProvider implements IdentityVerificationProviderPort {
@@ -67,11 +78,15 @@ export class StripeIdentityProvider implements IdentityVerificationProviderPort 
       secret,
     );
 
-    const status = VERDICTS[evenement.type];
+    const session = evenement.data.object as Stripe.Identity.VerificationSession;
+
+    const status =
+      evenement.type === 'identity.verification_session.requires_input'
+        ? this.verdictDeLEchec(session)
+        : VERDICTS[evenement.type];
 
     if (!status) return null;
 
-    const session = evenement.data.object as Stripe.Identity.VerificationSession;
     const userId = session.metadata?.userId;
 
     if (!userId) {
@@ -83,6 +98,18 @@ export class StripeIdentityProvider implements IdentityVerificationProviderPort 
     }
 
     return { userId, sessionId: session.id, status };
+  }
+
+  private verdictDeLEchec(
+    session: Stripe.Identity.VerificationSession,
+  ): IdentityStatus {
+    const code = session.last_error?.code ?? '';
+
+    this.logger.log(
+      `Verification ${session.id} interrompue : ${code || 'raison inconnue'}.`,
+    );
+
+    return verdictApresEchec(code);
   }
 
   private urlDeRetour(): string {
