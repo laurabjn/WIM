@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import * as Google from 'expo-auth-session/providers/google';
+import {
+  GoogleSignin,
+  isSuccessResponse,
+} from '@react-native-google-signin/google-signin';
 
 import { saveSession } from 'src/auth/infrastructure/authStorage';
 import {
@@ -20,11 +23,14 @@ export function useConnexionSociale({ onConnecte, onErreur }: Options) {
 
   const identifiantWeb = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
-  const [requete, reponse, demanderGoogle] = Google.useIdTokenAuthRequest({
-    clientId: identifiantWeb,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-  });
+  useEffect(() => {
+    if (!identifiantWeb) return;
+
+    GoogleSignin.configure({
+      webClientId: identifiantWeb,
+      iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    });
+  }, [identifiantWeb]);
 
   const connecter = useCallback(
     async (
@@ -73,17 +79,37 @@ export function useConnexionSociale({ onConnecte, onErreur }: Options) {
       .catch(() => setAppleDisponible(false));
   }, []);
 
-  useEffect(() => {
-    if (reponse?.type !== 'success') return;
+  const connecterGoogle = useCallback(async () => {
+    try {
+      setEnCours('GOOGLE');
 
-    const jeton = reponse.params?.id_token;
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
 
-    if (jeton) {
-      void connecter('GOOGLE', jeton);
-    } else {
-      onErreur('La connexion a echoue');
+      const reponse = await GoogleSignin.signIn();
+
+      if (!isSuccessResponse(reponse)) return;
+
+      const jeton = reponse.data.idToken;
+
+      if (!jeton) {
+        onErreur('La connexion a echoue');
+        return;
+      }
+
+      await connecter(
+        'GOOGLE',
+        jeton,
+        reponse.data.user.givenName,
+        reponse.data.user.familyName,
+      );
+    } catch (erreur: any) {
+      onErreur(erreur?.message ?? 'La connexion a echoue');
+    } finally {
+      setEnCours(null);
     }
-  }, [reponse, connecter, onErreur]);
+  }, [connecter, onErreur]);
 
   const connecterApple = useCallback(async () => {
     try {
@@ -118,9 +144,9 @@ export function useConnexionSociale({ onConnecte, onErreur }: Options) {
 
   return {
     enCours,
-    googleDisponible: Boolean(identifiantWeb) && Boolean(requete),
+    googleDisponible: Boolean(identifiantWeb),
     appleDisponible,
-    connecterGoogle: () => demanderGoogle(),
+    connecterGoogle,
     connecterApple,
   };
 }
