@@ -1,7 +1,6 @@
-import { createPublicKey } from 'node:crypto';
+import { createPublicKey, createVerify } from 'node:crypto';
 
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 
 import type {
   IdentiteExterne,
@@ -44,6 +43,69 @@ export function estConfigure(fournisseur: Fournisseur): boolean {
 
 type CleJwk = { kid?: string; kty?: string; [autre: string]: unknown };
 
+export function verifierJeton(
+  jeton: string,
+  cle: Record<string, unknown>,
+  emetteurs: string[],
+  audiences: string[],
+): Record<string, unknown> {
+  const [entete, charge, signature] = jeton.split('.');
+
+  if (!entete || !charge || !signature) {
+    throw new Error('Jeton mal forme.');
+  }
+
+  const enteteLue = JSON.parse(
+    Buffer.from(entete, 'base64url').toString('utf8'),
+  ) as { alg?: string };
+
+  if (enteteLue.alg !== 'RS256') {
+    throw new Error(`Algorithme refuse : ${enteteLue.alg}`);
+  }
+
+  const verificateur = createVerify('RSA-SHA256');
+  verificateur.update(`${entete}.${charge}`);
+  verificateur.end();
+
+  const valide = verificateur.verify(
+    createPublicKey({ key: cle as never, format: 'jwk' }),
+    Buffer.from(signature, 'base64url'),
+  );
+
+  if (!valide) {
+    throw new Error('Signature invalide.');
+  }
+
+  const contenu = JSON.parse(
+    Buffer.from(charge, 'base64url').toString('utf8'),
+  ) as Record<string, unknown>;
+
+  const maintenant = Math.floor(Date.now() / 1000);
+
+  if (typeof contenu.exp !== 'number' || contenu.exp <= maintenant) {
+    throw new Error('Jeton expire.');
+  }
+
+  if (typeof contenu.nbf === 'number' && contenu.nbf > maintenant + 60) {
+    throw new Error('Jeton pas encore valide.');
+  }
+
+  if (!emetteurs.includes(String(contenu.iss))) {
+    throw new Error(`Emetteur inattendu : ${String(contenu.iss)}`);
+  }
+
+  const destinataires = Array.isArray(contenu.aud)
+    ? contenu.aud.map(String)
+    : [String(contenu.aud)];
+
+  if (!destinataires.some((destinataire) => audiences.includes(destinataire))) {
+    throw new Error(`Destinataire inattendu : ${destinataires.join(', ')}`);
+  }
+
+  return contenu;
+}
+
+
 @Injectable()
 export class SocialIdentityVerifier implements SocialIdentityPort {
   private readonly logger = new Logger(SocialIdentityVerifier.name);
@@ -52,8 +114,6 @@ export class SocialIdentityVerifier implements SocialIdentityPort {
     Fournisseur,
     { cles: CleJwk[]; obtenuA: number }
   >();
-
-  constructor(private readonly jwt: JwtService) {}
 
   async verifier(
     fournisseur: Fournisseur,
@@ -74,17 +134,13 @@ export class SocialIdentityVerifier implements SocialIdentityPort {
     let charge: Record<string, unknown>;
 
     try {
-      charge = await this.jwt.verifyAsync(jeton, {
-        publicKey: createPublicKey({ key: cle as never, format: 'jwk' }).export({
-          type: 'spki',
-          format: 'pem',
-        }) as string,
-        algorithms: ['RS256'],
-        issuer: reglage.emetteurs as [string, ...string[]],
-        audience: audiences as [string, ...string[]],
-      });
+      charge = verifierJeton(jeton, cle, reglage.emetteurs, audiences);
     } catch (erreur: unknown) {
-      this.logger.warn(`Jeton ${fournisseur} refuse : ${erreur}`);
+      this.logger.warn(
+        `Jeton ${fournisseur} refuse : ${
+          erreur instanceof Error ? erreur.message : erreur
+        }`,
+      );
 
       throw new UnauthorizedException('Jeton de connexion invalide.');
     }
