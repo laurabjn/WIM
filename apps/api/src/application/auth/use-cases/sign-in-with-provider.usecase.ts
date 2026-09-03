@@ -9,6 +9,9 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
 import { SOCIAL_IDENTITY } from 'src/interfaces/http/tokens/token';
 import type { SocialIdentityPort } from '../ports/social-identity.port';
 
+const REFUS_ADMINISTRATION =
+  "Les comptes d'administration se connectent avec leur mot de passe.";
+
 export type SignInWithProviderInput = {
   provider: 'GOOGLE' | 'APPLE';
   idToken: string;
@@ -54,8 +57,12 @@ export class SignInWithProviderUseCase {
 
     const parEmail = await this.prisma.user.findUnique({
       where: { email },
-      select: { id: true },
+      select: { id: true, isAdmin: true },
     });
+
+    if (parEmail?.isAdmin) {
+      throw new ForbiddenException(REFUS_ADMINISTRATION);
+    }
 
     const userId = parEmail
       ? parEmail.id
@@ -99,6 +106,10 @@ export class SignInWithProviderUseCase {
 
     if (!user) {
       throw new UnauthorizedException('Compte introuvable.');
+    }
+
+    if (user.isAdmin) {
+      throw new ForbiddenException(REFUS_ADMINISTRATION);
     }
 
     if (user.suspendedAt) {

@@ -100,6 +100,27 @@ describe('SignInWithProviderUseCase', () => {
     ).rejects.toThrow("Ce compte ne fournit pas d'adresse e-mail verifiee.");
   });
 
+  it('refuse un compte d administration deja rattache', async () => {
+    const { prisma, useCase } = creer();
+    prisma.authIdentity.findUnique.mockResolvedValue({ userId: 'user-1' });
+    prisma.user.findUnique.mockResolvedValue({ ...compte, isAdmin: true });
+
+    await expect(
+      useCase.execute({ provider: 'GOOGLE', idToken: 'jeton' }),
+    ).rejects.toThrow('mot de passe');
+  });
+
+  it('refuse de rattacher un fournisseur a un compte d administration', async () => {
+    const { prisma, useCase } = creer();
+    prisma.user.findUnique.mockResolvedValue({ id: 'user-1', isAdmin: true });
+
+    await expect(
+      useCase.execute({ provider: 'GOOGLE', idToken: 'jeton' }),
+    ).rejects.toThrow('mot de passe');
+
+    expect(prisma.authIdentity.create).not.toHaveBeenCalled();
+  });
+
   it('refuse un compte suspendu', async () => {
     const { prisma, useCase } = creer();
     prisma.user.findUnique.mockResolvedValue({
