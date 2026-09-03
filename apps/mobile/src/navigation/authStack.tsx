@@ -94,7 +94,14 @@ export const AuthStackNavigator: React.FC<Props> = ({
   >
     <Stack.Screen name="Onboarding" component={OnboardingScreen} />
     <Stack.Screen name="WelcomeEntry" component={WelcomeEntryScreen} />
-    <Stack.Screen name="RegisterStart" component={RegisterStartScreen} />
+    <Stack.Screen name="RegisterStart">
+      {(props) => (
+        <RegisterStartScreen
+          {...props}
+          setIsAuthenticated={setIsAuthenticated}
+        />
+      )}
+    </Stack.Screen>
     <Stack.Screen name="Login">
       {(props) => (
         <LoginScreen

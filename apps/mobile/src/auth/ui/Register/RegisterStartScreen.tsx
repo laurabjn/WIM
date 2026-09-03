@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../../navigation/authStack';
@@ -8,13 +8,24 @@ import { FontAwesome } from '@expo/vector-icons';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { useConnexionSociale } from '../useConnexionSociale';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStart'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStart'> & {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
+export const RegisterStartScreen: React.FC<Props> = ({
+  navigation,
+  setIsAuthenticated,
+}) => {
     const { t } = useTranslation('auth');
     const themeColors = useThemeColors();
     const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+
+    const social = useConnexionSociale({
+      onConnecte: () => setIsAuthenticated(true),
+      onErreur: (message) => Alert.alert('', message),
+    });
     
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -38,7 +49,11 @@ export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.legalText}>
               {t('register.usageConditions')}
             </Text>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={social.connecterGoogle}
+              disabled={!social.googleDisponible || social.enCours !== null}
+            >
               <View style={styles.socialContent}>
                 <FontAwesome name="google" size={18} color={themeColors.text} style={styles.icon} />
                 <Text style={styles.socialButtonText}>
@@ -46,7 +61,11 @@ export const RegisterStartScreen: React.FC<Props> = ({ navigation }) => {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={social.connecterApple}
+              disabled={!social.appleDisponible || social.enCours !== null}
+            >
               <View style={styles.socialContent}>
                 <FontAwesome name="apple" size={20} color={themeColors.text} style={styles.icon} />
                 <Text style={styles.socialButtonText}>
