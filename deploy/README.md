@@ -415,3 +415,29 @@ Deux pièges :
 Vérifier depuis un poste :
 
     curl -s https://worldismine.fr/.well-known/assetlinks.json
+
+## Pages legales du site
+
+`site/confidentialite.html` et `site/conditions.html` sont des **premiers jets**,
+rediges a partir de ce que l'application collecte reellement. Ils ne remplacent pas
+une relecture juridique.
+
+Chaque passage surligne en jaune porte la mention `A COMPLETER` : identite de
+l'editeur, adresse de contact, durees de conservation, mediateur de la consommation.
+Tant qu'il en reste un, les pages ne sont pas publiables.
+
+Elles se deposent sur l'hebergement Apache, au meme endroit que le fichier
+d'association Android :
+
+    www/confidentialite.html
+    www/conditions.html
+
+Elles doivent repondre en HTTP 200 aux adresses
+`https://worldismine.fr/confidentialite.html` et
+`https://worldismine.fr/conditions.html`, qui sont exigees par :
+
+- Google, pour publier l'ecran de consentement OAuth et sortir du mode test
+- l'App Store et le Play Store, avant toute mise en ligne
+
+A mettre a jour quand les abonnements seront actifs : le paiement, la facturation et
+la resiliation ne figurent dans aucune des deux pages.

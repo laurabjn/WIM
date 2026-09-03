@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Politique de confidentialité — WIM</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 6rem;
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1a1a1a;
+    background: #ffffff;
+  }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin-bottom: .25rem; }
+  h2 { font-size: 1.2rem; margin-top: 2.5rem; }
+  .date { color: #6b6b6b; font-size: .9rem; margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .95rem; }
+  th, td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid #e6e6e6; vertical-align: top; }
+  th { font-weight: 600; }
+  .acompleter {
+    background: #fff3cd;
+    border-left: 3px solid #d39e00;
+    padding: .15rem .4rem;
+    font-weight: 600;
+  }
+  footer { margin-top: 3rem; font-size: .9rem; color: #6b6b6b; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #e8e8e8; background: #121212; }
+    th, td { border-bottom-color: #2a2a2a; }
+    .date, footer { color: #9a9a9a; }
+    .acompleter { background: #4a3c00; border-left-color: #d39e00; color: #ffe9a8; }
+  }
+</style>
+</head>
+<body>
+<h1>Politique de confidentialité</h1>
+<p class="date">Dernière mise à jour : <span class="acompleter">À COMPLÉTER — date de publication</span></p>
+
+<p>WIM (World Is Mine) est une application d’échange de logements entre particuliers.
+Ce document explique quelles données nous collectons, pourquoi, avec qui nous les
+partageons et comment vous en gardez le contrôle.</p>
+
+<h2>Qui est responsable de vos données</h2>
+<p><span class="acompleter">À COMPLÉTER — raison sociale, forme juridique, numéro SIREN,
+adresse du siège</span>, éditeur de l’application WIM.</p>
+<p>Contact pour toute question relative à vos données :
+<span class="acompleter">À COMPLÉTER — adresse e-mail de contact</span>.</p>
+
+<h2>Les données que nous collectons</h2>
+
+<table>
+  <tr><th>Catégorie</th><th>Détail</th><th>Pourquoi</th></tr>
+  <tr>
+    <td>Compte</td>
+    <td>Adresse e-mail, mot de passe chiffré, prénom, nom, photo de profil,
+        description, pays, langues parlées, date de naissance, nationalité,
+        numéro de téléphone, langue de l’interface, préférences de voyage</td>
+    <td>Créer votre compte, vous identifier, permettre aux autres membres de savoir
+        à qui ils ont affaire</td>
+  </tr>
+  <tr>
+    <td>Logements</td>
+    <td>Titre, description, ville, pays, coordonnées géographiques, capacité, type,
+        équipements, photos, véhicule éventuel, périodes de disponibilité</td>
+    <td>Publier votre annonce et permettre les recherches</td>
+  </tr>
+  <tr>
+    <td>Activité</td>
+    <td>Logements aimés ou écartés, correspondances, favoris, historique des villes
+        recherchées, date de dernière visite</td>
+    <td>Vous proposer des logements pertinents et afficher votre présence</td>
+  </tr>
+  <tr>
+    <td>Conversations</td>
+    <td>Messages écrits, messages vocaux, images échangées, traductions générées,
+        accusés de lecture</td>
+    <td>Vous permettre de convenir d’un échange</td>
+  </tr>
+  <tr>
+    <td>Échanges et avis</td>
+    <td>Dates, logements concernés, nombre de voyageurs, notes et commentaires
+        laissés après un séjour</td>
+    <td>Organiser les séjours et informer les membres suivants</td>
+  </tr>
+  <tr>
+    <td>Modération</td>
+    <td>Signalements émis et reçus avec leur motif, comptes bloqués</td>
+    <td>Protéger les membres et traiter les abus</td>
+  </tr>
+  <tr>
+    <td>Notifications</td>
+    <td>Identifiant technique de votre appareil, préférences de notification</td>
+    <td>Vous avertir d’un message ou d’une demande d’échange</td>
+  </tr>
+  <tr>
+    <td>Vérification d’identité</td>
+    <td>Uniquement le résultat : vérifiée, en cours, refusée</td>
+    <td>Garantir aux membres que leur interlocuteur est une personne réelle</td>
+  </tr>
+</table>
+
+<p><strong>Vos pièces d’identité ne sont pas conservées par WIM.</strong> La vérification
+est effectuée par Stripe, qui reçoit directement votre document et votre photographie.
+Notre serveur n’en reçoit que le verdict — vérifiée ou non — et ne stocke ni image, ni
+numéro de document.</p>
+
+<h2>Les services qui interviennent</h2>
+
+<table>
+  <tr><th>Service</th><th>Ce qu’il reçoit</th><th>Pourquoi</th></tr>
+  <tr><td>Stripe Identity</td><td>Votre pièce d’identité et votre photographie</td><td>Vérifier votre identité</td></tr>
+  <tr><td>DeepL</td><td>Le texte des messages à traduire</td><td>Traduire les conversations entre langues différentes</td></tr>
+  <tr><td>Mapbox</td><td>Les adresses recherchées et les coordonnées affichées</td><td>Afficher les cartes et compléter les adresses</td></tr>
+  <tr><td>Google et Apple</td><td>Votre identifiant de connexion, si vous choisissez ce mode</td><td>Vous connecter sans mot de passe</td></tr>
+  <tr><td>Expo et Google Firebase</td><td>L’identifiant technique de votre appareil</td><td>Acheminer les notifications</td></tr>
+  <tr><td>OVH</td><td>L’ensemble des données, hébergées en France</td><td>Héberger le service et envoyer les courriels</td></tr>
+</table>
+
+<p>Nous ne vendons aucune donnée et n’en transmettons à aucun annonceur.</p>
+
+<h2>La localisation de votre logement</h2>
+<p>L’adresse exacte de votre logement n’est jamais montrée publiquement. La fiche
+affiche une zone d’environ cinq kilomètres de rayon autour de lui, et la recherche
+par carte un repère approximatif. Vos futurs hôtes ne reçoivent l’adresse qu’une
+fois l’échange convenu entre vous.</p>
+
+<h2>Combien de temps nous les gardons</h2>
+<table>
+  <tr><th>Donnée</th><th>Durée</th></tr>
+  <tr><td>Compte et contenus associés</td><td>Tant que votre compte existe</td></tr>
+  <tr><td>Après suppression du compte</td><td><span class="acompleter">À COMPLÉTER — 30 jours recommandés</span></td></tr>
+  <tr><td>Messages d’une conversation</td><td>Tant que l’un des deux comptes existe</td></tr>
+  <tr><td>Signalements traités</td><td><span class="acompleter">À COMPLÉTER — 1 an recommandé</span></td></tr>
+  <tr><td>Sauvegardes de la base</td><td><span class="acompleter">À COMPLÉTER — 14 jours actuellement</span></td></tr>
+</table>
+
+<h2>Vos droits</h2>
+<p>Vous pouvez à tout moment demander l’accès à vos données, leur correction, leur
+suppression, leur portabilité, ou vous opposer à certains traitements. Écrivez à
+<span class="acompleter">À COMPLÉTER — adresse e-mail de contact</span> ; nous répondons
+sous un mois.</p>
+<p>Si notre réponse ne vous satisfait pas, vous pouvez saisir la Commission nationale
+de l’informatique et des libertés (CNIL), 3 place de Fontenoy, 75007 Paris, ou déposer
+une plainte sur <a href="https://www.cnil.fr">cnil.fr</a>.</p>
+
+<h2>Sécurité</h2>
+<p>Les échanges avec l’application sont chiffrés. Les mots de passe sont stockés sous
+forme d’empreintes irréversibles. La base de données n’est joignable depuis Internet
+par aucun moyen direct, et elle est sauvegardée quotidiennement.</p>
+
+<h2>Les mineurs</h2>
+<p>WIM est réservée aux personnes majeures. Nous ne collectons pas sciemment de données
+concernant des mineurs.</p>
+
+<h2>Modifications</h2>
+<p>Toute modification substantielle de ce document vous sera signalée dans l’application
+avant son entrée en vigueur.</p>
+
+<footer>WIM — <a href="/conditions.html">Conditions d’utilisation</a></footer>
+</body>
+</html>
