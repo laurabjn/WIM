@@ -35,6 +35,12 @@
     }
   },
   "auth": {
+    "social": {
+      "or": "or",
+      "google": "Continue with Google",
+      "apple": "Continue with Apple",
+      "error": "Sign-in did not complete."
+    },
     "welcomeTitle": "Welcome to Wim!",
     "guidedTour": "Guided tour",
     "goToWim": "Go to Wim",

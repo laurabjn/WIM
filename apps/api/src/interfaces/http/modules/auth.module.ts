@@ -5,9 +5,12 @@ import { BcryptPasswordHasher } from 'src/application/auth/ports/bcrypt-password
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { UserPrismaRepository } from 'src/infrastructure/repositories/user.prisma.repository';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.usecase';
+import { SignInWithProviderUseCase } from 'src/application/auth/use-cases/sign-in-with-provider.usecase';
+import { SocialIdentityVerifier } from 'src/infrastructure/auth/social-identity.verifier';
 import {
   EMAIL_SENDER,
   PASSWORD_HASHER,
+  SOCIAL_IDENTITY,
   USER_REPOSITORY,
 } from '../tokens/token';
 import { JwtModule } from '@nestjs/jwt';
@@ -93,6 +96,12 @@ const ACCESS_TOKEN_TTL = '30m';
       useFactory: (userRepo, hasher) => new LoginUserUseCase(userRepo, hasher),
       inject: [USER_REPOSITORY, PASSWORD_HASHER],
     },
+    SocialIdentityVerifier,
+    {
+      provide: SOCIAL_IDENTITY,
+      useExisting: SocialIdentityVerifier,
+    },
+    SignInWithProviderUseCase,
   ],
   exports: [PASSWORD_HASHER, USER_REPOSITORY],
 })

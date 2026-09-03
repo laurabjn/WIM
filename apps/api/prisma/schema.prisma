@@ -63,6 +63,7 @@ model User {
   matchesAsUser2 Match[] @relation("MatchesAsUser2")
 
   chatParticipants ChatParticipant[]
+  authIdentities   AuthIdentity[]
   messages         Message[]
   reviews          Review[]
   blocksMade       BlockedUser[]     @relation("BlocksMade")
@@ -529,4 +530,25 @@ model CityImage {
 
   @@id([city, country])
   @@map("city_images")
+}
+
+enum AuthProvider {
+  GOOGLE
+  APPLE
+}
+
+model AuthIdentity {
+  id String @id @default(uuid())
+
+  provider   AuthProvider
+  providerId String       @map("provider_id")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([provider, providerId])
+  @@index([userId])
+  @@map("auth_identities")
 }

@@ -462,6 +462,12 @@
     }
   },
   "auth": {
+    "social": {
+      "or": "ou",
+      "google": "Continuer avec Google",
+      "apple": "Continuer avec Apple",
+      "error": "La connexion n'a pas abouti."
+    },
     "welcomeTitle": "Bienvenue sur Wim !",
     "guidedTour": "Visite guidée",
     "goToWim": "Accédez à Wim",
