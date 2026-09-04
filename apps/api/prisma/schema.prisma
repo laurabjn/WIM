@@ -103,7 +103,7 @@ model Home {
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
-  owner          User               @relation(fields: [ownerId], references: [id])
+  owner          User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   photos         HomePhoto[]
   favorites      Favorite[]
   availabilities HomeAvailability[]
@@ -259,8 +259,8 @@ model Swipe {
   direction    SwipeDirection
   createdAt    DateTime       @default(now())
 
-  swiper     User @relation("SwipesMade", fields: [swiperId], references: [id])
-  targetUser User @relation("SwipesReceived", fields: [targetUserId], references: [id])
+  swiper     User @relation("SwipesMade", fields: [swiperId], references: [id], onDelete: Cascade)
+  targetUser User @relation("SwipesReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
 
   home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
