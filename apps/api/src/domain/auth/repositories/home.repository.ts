@@ -15,6 +15,7 @@ export interface HomeOwnerRepositoryData {
   firstName?: string | null;
   lastName?: string | null;
   avatarUrl?: string | null;
+  identityVerified?: boolean;
   rating?: number | null;
   createdAt: Date;
 }

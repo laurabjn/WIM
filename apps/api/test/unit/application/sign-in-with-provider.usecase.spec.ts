@@ -10,6 +10,7 @@ describe('SignInWithProviderUseCase', () => {
     identityStatus: 'VERIFIED',
     isAdmin: false,
     suspendedAt: null,
+    preferredLocale: 'fr',
     createdAt: new Date(),
     updatedAt: new Date(),
   };

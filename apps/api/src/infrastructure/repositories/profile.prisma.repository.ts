@@ -96,6 +96,7 @@ export class PrismaProfileRepository implements ProfileRepository {
           ? Math.round(reviewStats._avg.score * 10) / 10
           : null,
       avatarUrl: user.avatarUrl,
+      identityVerified: user.identityStatus === 'VERIFIED',
       bio: masque ? null : user.bio,
       country: masque ? null : user.country,
       nationality: masque ? null : user.nationality,

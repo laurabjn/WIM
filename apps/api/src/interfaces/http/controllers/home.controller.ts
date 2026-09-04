@@ -72,7 +72,6 @@ export class HomeController {
   @UseGuards(JwtAuthGuard)
     @Post()
     create(@Req() req: any, @Body() dto: CreateHomeDto) {
-      console.log('CREATE HOME CALLED');
       const ownerId = req.user.sub ?? req.user.userId;
 
       if (!ownerId) {
@@ -97,7 +96,7 @@ export class HomeController {
         homeType: dto.homeType,
         category: dto.category ?? null,
         amenities: dto.amenities ?? [],
-        isAvailableForExchange: dto.isAvailableForExchange ?? false,
+        isAvailableForExchange: dto.isAvailableForExchange ?? true,
         pricePerNight: dto.pricePerNight,
         averageRating: null,
         reviewCount: 0,

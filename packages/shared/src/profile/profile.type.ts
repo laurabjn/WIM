@@ -50,6 +50,7 @@ export interface UserProfile {
   exchangesCount?: number;
   homesCount?: number;
   identityStatus?: IdentityStatus | null;
+  identityVerified?: boolean;
   profileVisible?: boolean;
   showAge?: boolean;
   dataSharing?: boolean;

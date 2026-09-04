@@ -152,6 +152,7 @@
     "genericError": "An error occurred"
   },
   "profile": {
+    "identityVerified": "Identity verified",
     "exchange": "Exchange",
     "exchanges": "Exchanges",
     "reviews": "Reviews",

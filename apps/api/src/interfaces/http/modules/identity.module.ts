@@ -10,8 +10,18 @@ import {
   isStripeIdentityConfigured,
 } from 'src/infrastructure/identity/stripe-identity.provider';
 import { UserPrismaRepository } from 'src/infrastructure/repositories/user.prisma.repository';
+import { PushSenderService } from 'src/application/notification/push-sender.service';
+import { ConsoleEmailSender } from 'src/infrastructure/notifications/console-email.sender';
+import {
+  NodemailerEmailSender,
+  isSmtpConfigured,
+} from 'src/infrastructure/notifications/nodemailer-email.sender';
 import { IdentityController } from '../controllers/identity.controller';
-import { IDENTITY_PROVIDER, USER_REPOSITORY } from '../tokens/token';
+import {
+  EMAIL_SENDER,
+  IDENTITY_PROVIDER,
+  USER_REPOSITORY,
+} from '../tokens/token';
 
 @Module({
   controllers: [IdentityController],
@@ -20,6 +30,17 @@ import { IDENTITY_PROVIDER, USER_REPOSITORY } from '../tokens/token';
     UserPrismaRepository,
     StripeIdentityProvider,
     MockIdentityProvider,
+    PushSenderService,
+    ConsoleEmailSender,
+    NodemailerEmailSender,
+    {
+      provide: EMAIL_SENDER,
+      useFactory: (
+        nodemailer: NodemailerEmailSender,
+        console_: ConsoleEmailSender,
+      ) => (isSmtpConfigured() ? nodemailer : console_),
+      inject: [NodemailerEmailSender, ConsoleEmailSender],
+    },
     {
       provide: USER_REPOSITORY,
       useExisting: UserPrismaRepository,
@@ -45,8 +66,9 @@ import { IDENTITY_PROVIDER, USER_REPOSITORY } from '../tokens/token';
     },
     {
       provide: ApplyIdentityVerdictUseCase,
-      useFactory: (userRepo) => new ApplyIdentityVerdictUseCase(userRepo),
-      inject: [USER_REPOSITORY],
+      useFactory: (userRepo, push, email) =>
+        new ApplyIdentityVerdictUseCase(userRepo, push, email),
+      inject: [USER_REPOSITORY, PushSenderService, EMAIL_SENDER],
     },
   ],
   exports: [
