@@ -514,6 +514,7 @@
       "rejected": "Votre vérification a été refusée. Veuillez recommencer la procédure.",
       "error": "Erreur lors de la vérification du statut.",
       "retry": "Votre vérification n'a pas pu démarré. Lancez-la puis revenez ici une fois terminée.",
+      "failed": "La verification n'a pas abouti. Vous pouvez la recommencer.",
       "identityVerification": "Faites la vérification d’identité",
       "gateTitle": "Vérification requise",
       "gateBody": "Votre identité doit être vérifiée pour accéder à Wim. Comptez deux minutes : une pièce d'identité et un selfie.",

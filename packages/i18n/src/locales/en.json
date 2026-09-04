@@ -87,6 +87,7 @@
       "rejected": "Your verification has been rejected. Please restart the procedure.",
       "error": "Error checking verification status.",
       "retry": "Your verification couldn't be started. Please start it and come back here once it's done.",
+      "failed": "Verification did not complete. You can try again.",
       "identityVerification": "Verify your identity",
       "gateTitle": "Verification required",
       "gateBody": "Your identity must be verified before you can use Wim. It takes about two minutes: an ID document and a selfie.",
