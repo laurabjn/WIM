@@ -520,6 +520,7 @@
       "gateBody": "Votre identité doit être vérifiée pour accéder à Wim. Comptez deux minutes : une pièce d'identité et un selfie.",
       "gateAction": "Vérifier mon identité",
       "gateRecheck": "J'ai terminé, vérifier",
+      "gateRestart": "Recommencer la verification",
       "gateLogout": "Se déconnecter"
     },
     "login": {

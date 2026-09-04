@@ -93,6 +93,7 @@
       "gateBody": "Your identity must be verified before you can use Wim. It takes about two minutes: an ID document and a selfie.",
       "gateAction": "Verify my identity",
       "gateRecheck": "I'm done, check now",
+      "gateRestart": "Start verification again",
       "gateLogout": "Log out"
     },
     "login": {
