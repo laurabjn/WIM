@@ -8,6 +8,10 @@ export function isStripeIdentityConfigured(): boolean {
   return Boolean(process.env.STRIPE_SECRET_KEY?.trim());
 }
 
+export function estUneCleDeTest(): boolean {
+  return (process.env.STRIPE_SECRET_KEY ?? '').trim().startsWith('sk_test_');
+}
+
 export type VerdictIdentite = {
   userId: string;
   sessionId: string;
@@ -57,8 +61,8 @@ export class StripeIdentityProvider implements IdentityVerificationProviderPort 
       provided_details: { email: params.email },
       options: {
         document: {
-          require_live_capture: true,
-          require_matching_selfie: true,
+          require_live_capture: !estUneCleDeTest(),
+          require_matching_selfie: !estUneCleDeTest(),
         },
       },
       return_url: retour,
