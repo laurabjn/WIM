@@ -146,18 +146,30 @@ export const IdentityGateScreen: React.FC<Props> = ({
           <TouchableOpacity
             style={[styles.bouton, occupe && styles.boutonInactif]}
             disabled={occupe}
-            onPress={() => (lancee ? verifier(false) : ouvrirLaVerification())}
+            onPress={ouvrirLaVerification}
           >
             {occupe ? (
               <ActivityIndicator color={themeColors.onContrast} />
             ) : (
               <Text style={styles.boutonTexte}>
                 {lancee
-                  ? t('auth:identity.gateRecheck')
+                  ? t('auth:identity.gateRestart')
                   : t('auth:identity.gateAction')}
               </Text>
             )}
           </TouchableOpacity>
+
+          {lancee ? (
+            <TouchableOpacity
+              onPress={() => verifier(false)}
+              disabled={occupe}
+              style={styles.lien}
+            >
+              <Text style={styles.lienTexte}>
+                {t('auth:identity.gateRecheck')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
 
           <TouchableOpacity onPress={seDeconnecter} style={styles.lien}>
             <Text style={styles.lienTexte}>{t('auth:identity.gateLogout')}</Text>
