@@ -32,6 +32,7 @@ export interface HomeOwnerEntity {
   firstName?: string | null;
   lastName?: string | null;
   avatarUrl?: string | null;
+  identityVerified?: boolean;
   rating?: number | null;
   createdAt: Date;
 }

@@ -40,6 +40,7 @@ export interface HomeOwner {
   firstName: string;
   lastName: string;
   avatarUrl?: string | null;
+  identityVerified?: boolean;
   rating?: number | null;
   createdAt: string;
 }

@@ -36,6 +36,7 @@
     }
   },
   "profile": {
+    "identityVerified": "Identite verifiee",
     "exchange": "Échange",
     "exchanges": "Échanges",
     "rate": "note",

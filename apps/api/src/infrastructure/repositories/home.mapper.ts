@@ -17,6 +17,7 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
       lastName: true,
       avatarUrl: true,
       showPreciseLocation: true,
+      identityStatus: true,
       createdAt: true,
       homes: {
         select: {
@@ -103,6 +104,7 @@ export function mapOwner(owner: PrismaHomeWithRelations['owner']) {
     firstName: owner.firstName,
     lastName: owner.lastName,
     avatarUrl: owner.avatarUrl,
+    identityVerified: owner.identityStatus === 'VERIFIED',
     rating:
       scores.length > 0
         ? Math.round(
