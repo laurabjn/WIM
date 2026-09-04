@@ -34,6 +34,7 @@ export class ApplyIdentityVerdictUseCase {
     await this.annoncer(
       input.userId,
       user.email,
+      user.preferredLocale,
       input.status as unknown as IssueIdentite,
     );
   }
@@ -41,9 +42,10 @@ export class ApplyIdentityVerdictUseCase {
   private async annoncer(
     userId: string,
     email: string,
+    locale: string,
     issue: IssueIdentite,
   ): Promise<void> {
-    const notification = buildIdentityOutcomeNotification('fr', issue);
+    const notification = buildIdentityOutcomeNotification(locale, issue);
 
     if (this.pushSender) {
       await this.pushSender
@@ -58,7 +60,7 @@ export class ApplyIdentityVerdictUseCase {
     }
 
     if (this.emailSender) {
-      const courriel = buildIdentityOutcomeEmail('fr', issue);
+      const courriel = buildIdentityOutcomeEmail(locale, issue);
 
       await this.emailSender
         .send({
