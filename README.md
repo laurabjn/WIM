@@ -1,135 +1,208 @@
-# Turborepo starter
+# WIM — World Is Mine
 
-This Turborepo starter is maintained by the Turborepo core team.
+Application mobile d'échange de logements entre particuliers. On publie son
+logement, on parcourt ceux des autres, on convient d'un échange par messagerie,
+puis on se note mutuellement après le séjour.
 
-## Using this example
+Le dépôt est un monorepo Turborepo : une API NestJS, une application mobile
+Expo, un site Next.js, et des paquets partagés entre eux.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
-```
+## Ce que fait l'application
 
-## What's inside?
+| | |
+|---|---|
+| **Comptes** | Inscription par mot de passe, Google ou Apple. Vérification d'identité obligatoire par Stripe Identity avant d'accéder au service. |
+| **Logements** | Annonce avec photos, équipements, véhicule, périodes de disponibilité. L'adresse exacte n'est jamais publique : la carte affiche une zone de 5 km. |
+| **Recherche** | Par ville et dates, ou en balayant un deck de recommandations classé selon des pondérations réglables depuis l'administration. |
+| **Échanges** | Demande, choix des logements de part et d'autre, acceptation, rappels avant et après le séjour, avis croisés. |
+| **Messagerie** | Texte, photos et messages vocaux, traduction automatique par DeepL, accusés de lecture, notifications. |
+| **Modération** | Signalement de comptes et d'avis, blocage, suspension, avec alerte par courriel à l'administration. |
+| **Administration** | Signalements, comptes, statistiques d'usage et courbes hebdomadaires, réglage du classement des recommandations. |
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## Structure
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+apps/
+  api/       NestJS, Prisma, PostgreSQL — architecture hexagonale
+  mobile/    Expo / React Native — l'application livrée
+  web/       Next.js — site, non déployé à ce jour
+  docs/      Next.js — documentation, non déployée
+packages/
+  shared/    Types et utilitaires communs à l'API et au mobile
+  i18n/      Traductions françaises et anglaises
+  ui/        Composants web partagés
+  eslint-config/ typescript-config/
+deploy/      Docker Compose de production, nginx, sauvegardes, pages légales
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+L'API suit une architecture hexagonale : `domain` (entités et interfaces de
+dépôt), `application` (cas d'usage), `infrastructure` (Prisma, Stripe, SMTP,
+Sentry), `interfaces/http` (contrôleurs et modules). Les fournisseurs sont
+choisis à l'exécution selon les variables d'environnement présentes — sans clé
+Stripe, la vérification d'identité bascule sur un fournisseur simulé.
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+---
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+## Démarrer en local
 
-### Develop
+### Prérequis
 
-To develop all apps and packages, run the following command:
+- Node 20 ou plus, npm 10
+- Docker et Docker Compose
+- Un compte Expo et `eas-cli` pour construire l'application mobile
 
-```
-cd my-turborepo
+### 1. Installer
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+git clone https://github.com/laurabjn/WIM.git
+cd WIM
+npm install
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### 2. Configurer
+
+Deux fichiers à créer, tous deux ignorés par Git.
+
+`apps/api/.env` :
 
 ```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+DATABASE_URL=postgresql://wim:wim@localhost:5432/wim?schema=public
+JWT_ACCESS_SECRET=une-valeur-aleatoire
+JWT_REFRESH_SECRET=une-autre-valeur
+JWT_RESET_SECRET=une-troisieme-valeur
+JWT_ACCESS_TTL=900
+JWT_REFRESH_TTL=2592000
+JWT_RESET_TTL=3600
+FRONTEND_URL=http://localhost:3001
+WS_CORS_ORIGIN=*
+WS_NAMESPACE=/ws
 ```
 
-### Remote Caching
+Facultatif, selon ce que l'on veut essayer : `SMTP_HOST`, `SMTP_PORT`,
+`SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` pour les courriels, `ADMIN_EMAIL` pour
+les alertes de modération, `DEEPL_API_KEY` pour la traduction,
+`UNSPLASH_ACCESS_KEY` pour les photos de ville, `STRIPE_SECRET_KEY` et
+`STRIPE_WEBHOOK_SECRET` pour la vérification d'identité réelle,
+`GOOGLE_CLIENT_IDS` et `APPLE_CLIENT_IDS` pour la connexion par fournisseur.
+Chacune absente, la fonction correspondante se désactive proprement plutôt que
+d'échouer.
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+`apps/mobile/.env` :
 
 ```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+EXPO_PUBLIC_API_URL=http://10.0.2.2:3000/api
+EXPO_PUBLIC_MAPBOX_TOKEN=votre-jeton-mapbox
 ```
 
-## Useful Links
+`10.0.2.2` est l'adresse de la machine hôte vue depuis l'émulateur Android. Sur
+un téléphone réel, mettre l'adresse IP du poste sur le réseau local.
 
-Learn more about the power of Turborepo:
+### 3. Lancer la base et l'API
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+```bash
+docker compose up -d
+```
+
+Quatre services démarrent : PostgreSQL, l'API sur le port 3000, le site sur le
+3001, et un conteneur éphémère qui applique les migrations avant de s'arrêter.
+L'API répond alors sur `http://localhost:3000/api/health`.
+
+### 4. Remplir la base
+
+```bash
+cd apps/api
+node prisma/seed-demo.js
+```
+
+Treize comptes de démonstration, seize logements, des conversations, des
+échanges à différents stades et des avis. Les identifiants s'affichent à la fin
+du script.
+
+Pour se donner un accès administrateur :
+
+```bash
+read -rsp "Mot de passe : " MDP; echo
+docker exec -e ADMIN_ACCOUNT_EMAIL=admin@local.test -e ADMIN_ACCOUNT_PASSWORD="$MDP" \
+  wim_api node prisma/create-admin.js
+unset MDP
+```
+
+### 5. Lancer l'application mobile
+
+```bash
+npm run dev:mobile
+```
+
+L'application utilise des modules natifs — Mapbox, Google Sign-In, Stripe,
+notifications — qu'Expo Go ne contient pas. Il faut donc une build de
+développement :
+
+```bash
+cd apps/mobile
+eas build --platform android --profile development
+```
+
+---
+
+## Commandes
+
+| Commande | Effet |
+|---|---|
+| `npm run dev:api` | API en mode surveillance |
+| `npm run dev:mobile` | Serveur Metro pour l'application |
+| `npm run dev:web` | Site Next.js |
+| `npm run lint` | ESLint sur tout le dépôt, zéro avertissement toléré |
+| `npm run check-types` | TypeScript sur tous les espaces de travail |
+| `npm run test` | Tests unitaires : 57 côté API, 18 côté web, 13 côté mobile |
+| `npm run format` | Prettier |
+
+L'intégration continue rejoue installation, génération Prisma, typage, analyse
+statique et tests à chaque poussée.
+
+---
+
+## Base de données
+
+Les migrations sont écrites à la main, jamais générées par `migrate dev`, et
+appliquées par `prisma migrate deploy` — y compris au démarrage du conteneur de
+production. Cinquante-deux migrations à ce jour.
+
+```bash
+cd apps/api
+npx prisma migrate deploy    # appliquer
+npx prisma studio            # inspecter
+```
+
+Après toute modification de `schema.prisma`, écrire le fichier SQL
+correspondant dans `prisma/migrations/<horodatage>_<nom>/migration.sql`.
+
+---
+
+## Déploiement
+
+L'API tourne sur un VPS OVH derrière nginx, en Docker Compose. Tout est décrit
+dans [deploy/README.md](deploy/README.md) : première installation, mise à jour,
+sauvegardes quotidiennes, dettes connues avant lancement.
+
+Le point à retenir : `deploy/docker-compose.prod.yml` transmet les variables
+d'environnement **explicitement**. Une variable absente de ce fichier
+n'atteindra jamais le conteneur, quoi qu'en dise `.env.prod`.
+
+L'application mobile se construit et se distribue par EAS. Une modification qui
+ne touche que `apps/api` ou `deploy` ne demande **aucune build** : un
+redéploiement suffit.
+
+---
+
+## Conventions
+
+- Les branches suivent `sprint-<numéro>-<sujet>` pour un sprint, `feat/` ou
+  `fix/` pour le reste, et sont fusionnées par pull request.
+- Le code ne porte pas de commentaires : les explications vont dans le message
+  de commit.
+- Les messages de commit sont rédigés en français et expliquent le pourquoi,
+  pas seulement le quoi.
