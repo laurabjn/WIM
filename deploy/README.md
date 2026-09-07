@@ -439,5 +439,10 @@ Elles doivent repondre en HTTP 200 aux adresses
 - Google, pour publier l'ecran de consentement OAuth et sortir du mode test
 - l'App Store et le Play Store, avant toute mise en ligne
 
+La page de confidentialite decrit aussi ce que l'application garde sur le
+telephone. Cette section vaut tant qu'aucun outil de mesure d'audience n'est
+ajoute : le jour ou il y en aura un, il faudra un ecran de consentement et
+reecrire ce passage.
+
 A mettre a jour quand les abonnements seront actifs : le paiement, la facturation et
 la resiliation ne figurent dans aucune des deux pages.
