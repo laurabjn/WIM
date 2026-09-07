@@ -46,6 +46,7 @@
     "goToWim": "Go to Wim",
     "alreadyHaveAccount": "Already have an account ?",
     "register": {
+      "phonePrefix": "Country code",
       "signUpTitle": "Sign up for Wim",
       "usageConditions": "By registering, you agree to the Terms of Use and Privacy Policy, including the Use of Cookies.",
       "googleSignUp": "Sign up with Google",
