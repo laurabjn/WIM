@@ -474,6 +474,7 @@
     "goToWim": "Accédez à Wim",
     "alreadyHaveAccount": "Vous avez déjà un compte ?",
     "register": {
+      "phonePrefix": "Indicatif",
       "signUpTitle": "Inscrivez-vous à Wim",
       "usageConditions": "En vous inscrivant, vous acceptez les Conditions d'utilisation et la Politique de confidentialité, notamment l'Utilisation des cookies.",
       "googleSignUp": "S'inscrire avec Google",
