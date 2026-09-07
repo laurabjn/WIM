@@ -23,7 +23,10 @@ export default [
     },
   },
   {
-    files: ['src/infrastructure/identity/stripe-identity.provider.ts'],
+    files: [
+      'src/infrastructure/identity/stripe-identity.provider.ts',
+      'src/infrastructure/payment/stripe-payment.provider.ts',
+    ],
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
     },

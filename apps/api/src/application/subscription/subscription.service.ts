@@ -186,10 +186,16 @@ export class SubscriptionService {
 
     if (!abonnement) return;
 
+    const identifiantDurable =
+      verdict.nouvelExternalId && verdict.nouvelExternalId !== abonnement.externalId
+        ? { externalId: verdict.nouvelExternalId }
+        : {};
+
     if (verdict.statut !== 'ACTIVE') {
       await this.prisma.subscription.update({
         where: { id: abonnement.id },
         data: {
+          ...identifiantDurable,
           status: verdict.statut,
           cancelledAt: verdict.statut === 'CANCELLED' ? new Date() : null,
         },
@@ -203,6 +209,7 @@ export class SubscriptionService {
     await this.prisma.subscription.update({
       where: { id: abonnement.id },
       data: {
+        ...identifiantDurable,
         status: 'ACTIVE',
         startedAt: abonnement.startedAt ?? new Date(),
         currentPeriodEnd:

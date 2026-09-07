@@ -2,6 +2,7 @@ export type PlanAbonnement = 'MONTHLY' | 'YEARLY';
 
 export type VerdictPaiement = {
   externalId: string;
+  nouvelExternalId?: string;
   statut: 'ACTIVE' | 'CANCELLED' | 'EXPIRED';
   finDePeriode: Date | null;
 };
