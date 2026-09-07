@@ -10,6 +10,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootNavigator } from 'src/navigation/rootNavigator';
 import { ThemeProvider, useAppTheme } from 'src/theme/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
+import { demarrerLaRemonteeDesErreurs } from 'src/observabilite/sentry';
 import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -25,6 +26,7 @@ import {
 } from 'src/notifications/useNotificationNavigation';
 
 enableScreens();
+demarrerLaRemonteeDesErreurs();
 
 const Stack = createNativeStackNavigator();
 
