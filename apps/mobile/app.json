@@ -70,7 +70,13 @@
       ],
       "expo-web-browser",
       "@react-native-google-signin/google-signin",
-      "@sentry/react-native"
+      [
+        "@sentry/react-native",
+        {
+          "organization": "laurabjn",
+          "project": "wim"
+        }
+      ]
     ],
     "extra": {
       "eas": {
