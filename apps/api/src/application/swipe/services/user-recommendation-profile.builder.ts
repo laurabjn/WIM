@@ -65,9 +65,6 @@ export class UserRecommendationProfileBuilder {
     const asList = (values?: string[]) =>
       Array.isArray(values) ? values.filter(Boolean) : [];
 
-    // Une preference declaree est repetee pour peser plus lourd qu'un logement
-    // aime au hasard d'un swipe : le poids etant une frequence, la repetition
-    // est la facon naturelle de l'exprimer.
     const DECLARED_WEIGHT = 3;
 
     const declared = (values?: string[]) =>

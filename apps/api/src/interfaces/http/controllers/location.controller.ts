@@ -3,7 +3,11 @@ import {
   Get,
   Param,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+
+import { CityImageService } from 'src/application/location/city-image.service';
+import { JwtAuthGuard } from '../jwt-auth.guard';
 
 type WikipediaPage = {
   pageid?: number;
@@ -28,6 +32,26 @@ type WikipediaQueryResponse = {
 
 @Controller('locations')
 export class LocationController {
+  constructor(private readonly cityImages: CityImageService) {}
+
+  @Get(':city/images')
+  @UseGuards(JwtAuthGuard)
+  async getCityImages(
+    @Param('city') city: string,
+    @Query('country') country = '',
+    @Query('count') count?: string,
+  ) {
+    const demandees = Number.parseInt(count ?? '', 10);
+
+    return {
+      images: await this.cityImages.pourVille(
+        city,
+        country,
+        Number.isFinite(demandees) && demandees > 0 ? demandees : 3,
+      ),
+    };
+  }
+
   @Get(':city/description')
   async getLocationDescription(
     @Param('city') city: string,

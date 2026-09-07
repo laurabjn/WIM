@@ -46,6 +46,7 @@ describe('LoginUserUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       suspendedAt: null,
+      preferredLocale: 'fr',
     });
 
     passwordHasher.compare.mockResolvedValue(true);
@@ -93,6 +94,7 @@ describe('LoginUserUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       suspendedAt: null,
+      preferredLocale: 'fr',
     });
 
     passwordHasher.compare.mockResolvedValue(false);

@@ -165,7 +165,6 @@ const createStyles = (c: ThemeColors) =>
   badgeUnavailable: {
     backgroundColor: '#F5D8D8',
   },
-  // Le vert de la pastille disponible s'appliquait aussi a l'indisponible.
   badgeTextUnavailable: {
     color: '#A32020',
   },

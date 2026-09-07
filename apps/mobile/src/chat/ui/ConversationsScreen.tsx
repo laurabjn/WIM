@@ -581,8 +581,6 @@ const createStyles = (c: ThemeColors) =>
     color: c.textMuted,
   },
 
-  // Un ScrollView naît avec flexGrow: 1 : sans cette bride, celui des statuts
-  // occupait toute la hauteur libre et repoussait les conversations en bas.
   statusScroll: {
     flexGrow: 0,
   },

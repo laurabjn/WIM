@@ -10,6 +10,7 @@ import { LanguagePills } from './LanguagePills';
 import { ProfileStatsRow } from './ProfileStatsRow';
 import { UserProfile } from '@wim/shared';
 import { useTranslation } from 'react-i18next';
+import { BadgeVerifie } from 'src/shared/ui/BadgeVerifie';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
@@ -64,7 +65,10 @@ export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Prop
           />
 
           <View style={styles.identityBlock}>
-            <Text style={styles.name}>{fullName}</Text>
+            <View style={styles.nameRow}>
+              <Text style={styles.name}>{fullName}</Text>
+              <BadgeVerifie verifie={profile.identityVerified} />
+            </View>
             {!!ageText && <Text style={styles.age}>{ageText}</Text>}
             <Text style={styles.rating}>
               ★ {rating.toFixed(1)} ({reviewsCount} {t('profile:reviews')})
@@ -118,6 +122,11 @@ const createStyles = (c: ThemeColors) =>
     height: 58,
     borderRadius: 29,
     backgroundColor: c.surfaceAlt,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   identityBlock: {
     marginLeft: 12,

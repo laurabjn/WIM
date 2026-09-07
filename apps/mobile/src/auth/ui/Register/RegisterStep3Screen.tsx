@@ -1,5 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import {
+  COUNTRY_DIAL_CODES,
+  composerNumeroInternational,
+} from '@wim/shared/utils/locationOptions';
+import { SelecteurIndicatif } from '../components/SelecteurIndicatif';
+import {
   View,
   Text,
   TextInput,
@@ -28,6 +33,10 @@ export const RegisterStep3Screen: React.FC<Props> = ({ route, navigation }) => {
 
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [indicatif, setIndicatif] = useState(
+    COUNTRY_DIAL_CODES[country as keyof typeof COUNTRY_DIAL_CODES]?.dial ??
+      '+33',
+  );
   const [error, setError] = useState<string | null>(null);
 
   const isFormValid = useMemo(() => {
@@ -63,7 +72,7 @@ export const RegisterStep3Screen: React.FC<Props> = ({ route, navigation }) => {
       nationality,
       country,
       email,
-      phone,
+      phone: composerNumeroInternational(indicatif, phone),
     });
   }
 
@@ -99,16 +108,23 @@ export const RegisterStep3Screen: React.FC<Props> = ({ route, navigation }) => {
                         keyboardType="email-address"
                     />
 
-                    <TextInput
-                        style={styles.input}
-                        placeholder={t('auth:register.phone')}
-                        placeholderTextColor="#C0C0C0"
-                        value={phone}
-                        onChangeText={handlePhoneChange}
-                        keyboardType="number-pad"
-                        inputMode="numeric"
-                        maxLength={15}
-                    />
+                    <View style={styles.phoneRow}>
+                        <SelecteurIndicatif
+                            indicatif={indicatif}
+                            onChoisir={setIndicatif}
+                        />
+
+                        <TextInput
+                            style={[styles.input, styles.phoneInput]}
+                            placeholder={t('auth:register.phone')}
+                            placeholderTextColor="#C0C0C0"
+                            value={phone}
+                            onChangeText={handlePhoneChange}
+                            keyboardType="number-pad"
+                            inputMode="numeric"
+                            maxLength={15}
+                        />
+                    </View>
 
                     {error && <Text style={styles.errorText}>{error}</Text>}
                     </View>
@@ -213,6 +229,14 @@ const createStyles = (c: ThemeColors) =>
     marginTop: 8,
   },
 
+  phoneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  phoneInput: {
+    flex: 1,
+  },
   input: {
     height: 48,
     borderRadius: 14,

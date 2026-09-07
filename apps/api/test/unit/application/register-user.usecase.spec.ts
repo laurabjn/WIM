@@ -49,6 +49,7 @@ describe('RegisterUserUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       suspendedAt: null,
+      preferredLocale: 'fr',
     });
 
     const result = await useCase.execute({
@@ -103,6 +104,7 @@ describe('RegisterUserUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       suspendedAt: null,
+      preferredLocale: 'fr',
     });
 
     await expect(

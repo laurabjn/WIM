@@ -25,6 +25,7 @@ import { searchHomesApi } from 'src/home/infrastructure/searchHome.api';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SearchStackParamList } from 'src/navigation/type/searchTabs';
 import { SearchToggle } from './components/SearchToggle';
+import { getCityImagesApi } from 'src/utils/cityImages';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
@@ -100,8 +101,6 @@ export function MenuScreen({ navigation }: Props) {
 
   const sourceHomes = homes;
 
-  // Une categorie ouvre la page de resultats, carte comprise, plutot que de
-  // filtrer en silence une liste que rien n'affichait.
   const openCategory = (category: Exclude<CategoryFilter, 'ALL'>) =>
     navigation.navigate('SearchResults', {
       city: '',
@@ -109,8 +108,6 @@ export function MenuScreen({ navigation }: Props) {
       capacity: undefined,
     });
 
-  // Un logement sans theme ne doit pas disparaitre de l'accueil : il reste
-  // visible tant qu'aucun filtre n'est actif.
   const featuredCity = sourceHomes[0]?.city;
   const featuredCountry = sourceHomes[0]?.country;
 
@@ -118,15 +115,34 @@ export function MenuScreen({ navigation }: Props) {
     ? sourceHomes.filter((home) => home.city === featuredCity)
     : [];
 
-  const featuredHome = featuredHomes[0];
+  const [affiche, setAffiche] = useState<string | null>(null);
+
+  useEffect(() => {
+    let abandonne = false;
+
+    if (!featuredCity) {
+      setAffiche(null);
+      return;
+    }
+
+    getCityImagesApi(featuredCity, featuredCountry ?? '', 1)
+      .then((images) => {
+        if (!abandonne) setAffiche(images[0]?.grande ?? null);
+      })
+      .catch(() => {
+        if (!abandonne) setAffiche(null);
+      });
+
+    return () => {
+      abandonne = true;
+    };
+  }, [featuredCity, featuredCountry]);
 
   const heroTitle = featuredCity
     ? featuredCity.toUpperCase()
     : t('search:toExplore');
   
   const toggleSearch = () => {
-    // On laisse le curseur glisser avant de changer d'ecran : sinon
-    // l'animation etait remplacee par la navigation.
     setQuickSearch(true);
 
     setTimeout(() => navigation.navigate('Swipe'), 260);
@@ -143,14 +159,11 @@ export function MenuScreen({ navigation }: Props) {
         />
 
         <View style={styles.heroCard}>
-          <Image
-            source={{
-              uri:
-                featuredHome?.photos?.[0]?.url ??
-                'https://images.unsplash.com/photo-1501594907352-04cda38ebc29',
-            }}
-            style={styles.heroImage}
-          />
+          {affiche ? (
+            <Image source={{ uri: affiche }} style={styles.heroImage} />
+          ) : (
+            <View style={[styles.heroImage, styles.heroImageVide]} />
+          )}
 
           <View style={styles.heroOverlay}>
             <Text style={styles.heroTitle}>{heroTitle}</Text>
@@ -243,7 +256,7 @@ const createStyles = (c: ThemeColors) =>
     paddingBottom: 90,
   },
   heroCard: {
-    height: 180,
+    aspectRatio: 1,
     borderRadius: 22,
     overflow: 'hidden',
     marginBottom: 14,
@@ -252,6 +265,9 @@ const createStyles = (c: ThemeColors) =>
     width: '100%',
     height: '100%',
   },
+  heroImageVide: {
+    backgroundColor: c.surfaceAlt,
+  },
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
     padding: 12,
@@ -259,7 +275,6 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: 'rgba(0,0,0,0.15)',
   },
   heroTitle: {
-    // Pose sur la photo : toujours blanc, quel que soit le theme.
     color: '#FFFFFF',
     fontSize: 36,
     fontWeight: '900',

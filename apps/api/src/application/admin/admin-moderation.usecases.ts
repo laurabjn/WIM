@@ -144,3 +144,111 @@ export class GetAdminStatsUseCase {
     };
   }
 }
+
+@Injectable()
+export class GetAccountFileUseCase {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async execute(userId: string) {
+    const compte = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        avatarUrl: true,
+        bio: true,
+        createdAt: true,
+        lastSeenAt: true,
+        suspendedAt: true,
+        identityStatus: true,
+        _count: {
+          select: {
+            homes: true,
+            messages: true,
+            reviews: true,
+            reportsMade: true,
+            reportsReceived: true,
+          },
+        },
+      },
+    });
+
+    if (!compte) throw new NotFoundException('Compte introuvable');
+
+    const signalements = await this.prisma.userReport.findMany({
+      where: { reportedId: userId },
+      orderBy: [{ handledAt: 'asc' }, { createdAt: 'desc' }],
+      include: {
+        reporter: RESUME_UTILISATEUR,
+        review: {
+          select: { id: true, score: true, comment: true, createdAt: true },
+        },
+      },
+    });
+
+    const logements = await this.prisma.home.findMany({
+      where: { ownerId: userId },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+      select: {
+        id: true,
+        title: true,
+        city: true,
+        country: true,
+        isAvailableForExchange: true,
+        photos: { select: { url: true }, orderBy: { position: 'asc' }, take: 1 },
+      },
+    });
+
+    const auteursDistincts = new Set(
+      signalements.map((signalement) => signalement.reporterId),
+    );
+
+    return {
+      compte: {
+        id: compte.id,
+        email: compte.email,
+        firstName: compte.firstName,
+        lastName: compte.lastName,
+        avatarUrl: compte.avatarUrl,
+        bio: compte.bio,
+        createdAt: compte.createdAt.toISOString(),
+        lastSeenAt: compte.lastSeenAt?.toISOString() ?? null,
+        suspendedAt: compte.suspendedAt?.toISOString() ?? null,
+        identityStatus: compte.identityStatus,
+        logements: compte._count.homes,
+        messages: compte._count.messages,
+        avis: compte._count.reviews,
+        signalementsEmis: compte._count.reportsMade,
+        signalementsRecus: compte._count.reportsReceived,
+        auteursDistincts: auteursDistincts.size,
+      },
+      signalements: signalements.map((signalement) => ({
+        id: signalement.id,
+        reason: signalement.reason,
+        message: signalement.message,
+        createdAt: signalement.createdAt.toISOString(),
+        handledAt: signalement.handledAt?.toISOString() ?? null,
+        reporter: signalement.reporter,
+        review: signalement.review
+          ? {
+              id: signalement.review.id,
+              score: signalement.review.score,
+              comment: signalement.review.comment,
+              createdAt: signalement.review.createdAt.toISOString(),
+            }
+          : null,
+      })),
+      logements: logements.map((logement) => ({
+        id: logement.id,
+        title: logement.title,
+        city: logement.city,
+        country: logement.country,
+        ouvert: logement.isAvailableForExchange,
+        photo: logement.photos[0]?.url ?? null,
+      })),
+    };
+  }
+}

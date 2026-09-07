@@ -5,6 +5,7 @@ import { GetChatMessagesUseCase } from 'src/application/message/use-cases/get-ch
 import { GetMyChatsUseCase } from 'src/application/message/use-cases/get-my-chat.usecase';
 import { GetMyRequestsUseCase } from 'src/application/message/use-cases/get-my-requests.usecase';
 import { HomeRecommendationScorer } from 'src/application/swipe/services/home-recommendation-scorer';
+import { RecommendationWeightsService } from 'src/application/swipe/services/recommendation-weights.service';
 import { UserRecommendationProfileBuilder } from 'src/application/swipe/services/user-recommendation-profile.builder';
 import { SendMessageUseCase } from 'src/application/message/use-cases/send-message.usecase';
 import { MarkChatAsReadUseCase } from 'src/application/message/use-cases/mark-chat-as-read.usecase';
@@ -22,6 +23,7 @@ import {
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { MessageTranslationService } from 'src/application/message/services/message-translation.service';
 import { DeeplTranslator } from 'src/infrastructure/translation/deepl.translator';
+import { MessageReminderService } from 'src/application/message/services/message-reminder.service';
 import { NotificationModule } from './notification.module';
 import {
   DeleteMessageUseCase,
@@ -41,6 +43,8 @@ import {
       GetMyRequestsUseCase,
       UserRecommendationProfileBuilder,
       HomeRecommendationScorer,
+    RecommendationWeightsService,
+      MessageReminderService,
       GetChatMessagesUseCase,
       SendMessageUseCase,
       MarkChatAsReadUseCase,

@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import {
+  AppState,
   View,
   Text,
   TouchableOpacity,
-  StyleSheet, 
+  StyleSheet,
   Linking,
   ActivityIndicator,
   ScrollView,
@@ -13,6 +14,7 @@ import { AuthStackParamList } from '../../../navigation/authStack';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { checkIdentityStatus } from '../../application/checkIdentityStatus.usecase';
+import { IdentityStatus } from '../../dtos/identityStatus';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
@@ -33,48 +35,68 @@ export const RegisterIdentityScreen: React.FC<Props> = ({
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [hasOpenedVerification, setHasOpenedVerification] = useState(false);
 
+  const verifier = useCallback(
+    async (silencieux: boolean) => {
+      if (!silencieux) setIsChecking(true);
+
+      try {
+        const status = await checkIdentityStatus();
+
+        if (status === IdentityStatus.VERIFIED) {
+          navigation.navigate('RegisterHousingStep1');
+          return;
+        }
+
+        if (silencieux) return;
+
+        if (status === IdentityStatus.IN_PROGRESS) {
+          setStatusMessage(t('auth:identity.pending'));
+          return;
+        }
+
+        if (status === IdentityStatus.REFUSED) {
+          setStatusMessage(t('auth:identity.rejected'));
+          return;
+        }
+
+        setStatusMessage(t('auth:identity.retry'));
+      } catch (e: any) {
+        if (!silencieux) setStatusMessage(e?.message ?? t('auth:identity.error'));
+      } finally {
+        if (!silencieux) setIsChecking(false);
+      }
+    },
+    [navigation, t],
+  );
+
+  const dejaOuvert = useRef(false);
+
+  useEffect(() => {
+    const abonnement = AppState.addEventListener('change', (etat) => {
+      if (etat === 'active' && dejaOuvert.current) {
+        void verifier(true);
+      }
+    });
+
+    return () => abonnement.remove();
+  }, [verifier]);
+
   async function handleContinue() {
     setStatusMessage(null);
 
-    /*if (!hasOpenedVerification) {
+    if (!hasOpenedVerification) {
       if (!identityRedirectUrl) {
         setStatusMessage(t('auth:identity.error'));
         return;
       }
 
       setHasOpenedVerification(true);
+      dejaOuvert.current = true;
       await Linking.openURL(identityRedirectUrl);
       return;
-    }*/
-
-    setIsChecking(true);
-
-    try {
-      // const status = await checkIdentityStatus();
-      const status = 'VERIFIED'; // TODO: remove mock
-      console.log('Identity verification status:', status);
-
-      if (status === 'VERIFIED') {
-        navigation.navigate('RegisterHousingStep1');
-        return;
-      }
-
-      if (status === 'IN_PROGRESS') {
-        setStatusMessage(t('auth:identity.pending'));
-        return;
-      }
-
-      if (status === 'REJECTED') {
-        setStatusMessage(t('auth:identity.rejected'));
-        return;
-      }
-
-      setStatusMessage(t('auth:identity.retry'));
-    } catch (e: any) {
-      setStatusMessage(e?.message ?? t('auth:identity.error'));
-    } finally {
-      setIsChecking(false);
     }
+
+    await verifier(false);
   }
 
   return (

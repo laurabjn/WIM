@@ -25,6 +25,7 @@ import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 import { registerPushToken } from 'src/notifications/pushRegistration';
+import { useConnexionSociale } from '../useConnexionSociale';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 function isValidEmail(email: string): boolean {
@@ -102,13 +103,10 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
     navigation.navigate('ForgotPassword');
   }
 
-    function handleGoogleLogin() {
-    console.log('Google login');
-  }
-
-  function handleAppleLogin() {
-    console.log('Apple login');
-  }
+  const social = useConnexionSociale({
+    onConnecte: () => setIsAuthenticated(true),
+    onErreur: setError,
+  });
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
@@ -142,7 +140,8 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
                 <View style={styles.socialSection}>
                   <TouchableOpacity
                     style={styles.socialButton}
-                    onPress={handleGoogleLogin}
+                    onPress={social.connecterGoogle}
+                    disabled={!social.googleDisponible || social.enCours !== null}
                     activeOpacity={0.9}
                   >
                     <View style={styles.socialContent}>
@@ -160,7 +159,8 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
 
                   <TouchableOpacity
                     style={styles.socialButton}
-                    onPress={handleAppleLogin}
+                    onPress={social.connecterApple}
+                    disabled={!social.appleDisponible || social.enCours !== null}
                     activeOpacity={0.9}
                   >
                     <View style={styles.socialContent}>

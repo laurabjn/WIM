@@ -20,8 +20,6 @@ export class DeeplTranslator implements TranslatorPort {
 
     if (override) return override;
 
-    // Les cles de l'offre gratuite se terminent par `:fx` et ne sont acceptees
-    // que par le domaine `api-free`, l'autre repondant 403.
     const host = this.apiKey.endsWith(':fx')
       ? 'api-free.deepl.com'
       : 'api.deepl.com';

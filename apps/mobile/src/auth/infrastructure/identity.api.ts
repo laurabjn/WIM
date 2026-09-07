@@ -25,3 +25,35 @@ export async function fetchIdentityStatus(): Promise<IdentityStatus> {
 
   return data.status as IdentityStatus;
 }
+
+export type DemarrageVerification = {
+  redirectUrl: string;
+  returnUrl: string;
+};
+
+export async function startIdentityVerification(): Promise<DemarrageVerification> {
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error('Not authenticated');
+  }
+
+  const response = await fetch(`${API_URL}/identity/start`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || 'Failed to start identity verification');
+  }
+
+  return {
+    redirectUrl: data.redirectUrl as string,
+    returnUrl: data.returnUrl as string,
+  };
+}

@@ -26,6 +26,7 @@ describe('StartIdentityVerificationUseCase', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     suspendedAt: null,
+    preferredLocale: 'fr',
   };
 
   beforeEach(() => {
@@ -50,6 +51,8 @@ describe('StartIdentityVerificationUseCase', () => {
     userRepository.findById.mockResolvedValue(user);
     provider.startVerification.mockResolvedValue({
       redirectUrl: 'https://mock-kyc.com/session/abc',
+      returnUrl: 'https://worldismine.fr/verification-identite',
+      sessionId: 'vs_abc',
     });
 
     const result = await useCase.execute({ userId: 'user-1' });
@@ -65,6 +68,7 @@ describe('StartIdentityVerificationUseCase', () => {
     );
     expect(result).toEqual({
       redirectUrl: 'https://mock-kyc.com/session/abc',
+      returnUrl: 'https://worldismine.fr/verification-identite',
     });
   });
 

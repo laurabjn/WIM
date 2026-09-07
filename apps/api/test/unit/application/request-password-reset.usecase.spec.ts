@@ -57,6 +57,7 @@ describe('RequestPasswordResetUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       suspendedAt: null,
+      preferredLocale: 'fr',
     });
 
     tokenRepository.sign.mockResolvedValue('jwt-reset-token');

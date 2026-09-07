@@ -146,9 +146,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { chatId } = route.params;
 
-  // L'ecran ne peut pas dependre de ce que l'appelant lui passe : ouvert depuis
-  // les echanges ou une notification, il n'a que l'identifiant de la
-  // conversation. Il retrouve donc lui-meme son interlocuteur.
   const [participant, setParticipant] = useState<{
     id?: string;
     firstName?: string;
@@ -182,6 +179,8 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hauteurEntete, setHauteurEntete] = useState(0);
+  const [hauteurBandeau, setHauteurBandeau] = useState(0);
   const [logementsCandidats, setLogementsCandidats] = useState<
     LogementCandidat[]
   >([]);
@@ -290,9 +289,6 @@ export function ConversationScreen({ route, navigation }: Props) {
     };
   }, [chatId, t, translationEpoch]);
 
-  // Revenir sur une conversation deja montee ne relance pas le chargement
-  // initial : sans ce rafraichissement, un message ecrit ailleurs (une demande
-  // d'echange, par exemple) n'apparaissait qu'apres etre ressorti de l'ecran.
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
@@ -312,8 +308,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
           setParticipantLastReadAt(page.participantLastReadAt ?? null);
 
-          // L'echange suit le meme sort que les messages : accepte ou propose
-          // ailleurs, le bandeau restait fige sur l'etat du premier chargement.
           getChatExchangeApi(session.accessToken, chatId)
             .then((pending) => {
               if (!cancelled) setExchange(pending);
@@ -331,8 +325,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
             if (nouveaux.length === 0) return current;
 
-            // On fusionne au lieu de remplacer : les messages plus anciens
-            // deja charges ne doivent pas disparaitre.
             return [...nouveaux, ...current].sort(
               (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt),
             );
@@ -363,8 +355,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   const handleRead = useCallback(
     (payload: MessagesReadSocketPayload) => {
-      // L'autre vient d'ouvrir la conversation : le "Vu" apparait sans avoir a
-      // recharger la page.
       if (payload.userId !== currentUserId) {
         setParticipantLastReadAt(payload.readAt);
       }
@@ -507,8 +497,6 @@ export function ConversationScreen({ route, navigation }: Props) {
 
       setReplyTo(null);
 
-      // Le serveur renvoie aussi le message par websocket : sans ce garde-fou,
-      // l'echo arrive avant la reponse HTTP et le message s'affiche deux fois.
       setMessages((current) =>
         current.some((item) => item.id === message.id)
           ? current
@@ -1022,9 +1010,6 @@ export function ConversationScreen({ route, navigation }: Props) {
     if (!session?.accessToken) return;
 
     try {
-      // Les logements aimes disent deja ce qui interesse : quand il y en a, ils
-      // remplacent la liste complete, qui rouvrirait un choix deja fait au
-      // swipe.
       const aimes = await fetchLikedHomesApi(
         session.accessToken,
         participantId,
@@ -1099,8 +1084,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   const showTranslationNotice =
     translated && messages.some((message) => message.translatedContent);
 
-  // "Vu" ne s'affiche que sous le dernier message que l'autre a reellement lu,
-  // et non des l'envoi.
   const lastSeenOwnMessageId = participantLastReadAt
     ? messages.find(
         (message) =>
@@ -1231,9 +1214,18 @@ export function ConversationScreen({ route, navigation }: Props) {
     );
   }
 
+  const bandeauVisible = Boolean(
+    exchange && ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status),
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
+      <View
+        style={styles.header}
+        onLayout={(evenement) =>
+          setHauteurEntete(evenement.nativeEvent.layout.height)
+        }
+      >
         <BackButton onPress={navigation.goBack} style={styles.headerButton} />
 
         <TouchableOpacity
@@ -1313,8 +1305,14 @@ export function ConversationScreen({ route, navigation }: Props) {
         }}
       />
 
-      {exchange &&
-      ['PENDING', 'FUTURE', 'CURRENT'].includes(exchange.status) ? (
+      {exchange && bandeauVisible ? (
+        <View
+          style={[styles.bandeauFlottant, { top: hauteurEntete }]}
+          pointerEvents="box-none"
+          onLayout={(evenement) =>
+            setHauteurBandeau(evenement.nativeEvent.layout.height)
+          }
+        >
         <ExchangeBanner
           exchange={exchange}
           onAccept={async () => {
@@ -1361,6 +1359,7 @@ export function ConversationScreen({ route, navigation }: Props) {
             setExchange(updated);
           }}
         />
+        </View>
       ) : null}
 
       {loading ? (
@@ -1388,9 +1387,18 @@ export function ConversationScreen({ route, navigation }: Props) {
             onEndReached={loadEarlier}
             onEndReachedThreshold={0.4}
             ListFooterComponent={
-              loadingMore ? (
-                <ActivityIndicator style={styles.moreLoader} color="#087EBE" />
-              ) : null
+              <View>
+                {loadingMore ? (
+                  <ActivityIndicator
+                    style={styles.moreLoader}
+                    color="#087EBE"
+                  />
+                ) : null}
+
+                {bandeauVisible ? (
+                  <View style={{ height: hauteurBandeau }} />
+                ) : null}
+              </View>
             }
           />
 
@@ -1803,6 +1811,13 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
   },
 
+  bandeauFlottant: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+
   flex: {
     flex: 1,
   },
@@ -2132,8 +2147,6 @@ menuBackdrop: {
     color: c.textMuted,
   },
 
-  // Rendu hors de la liste inversee : a l'interieur, il heritait du
-  // retournement et s'affichait a l'envers.
   empty: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
@@ -2164,7 +2177,7 @@ menuBackdrop: {
   },
 
   composerArea: {
-    backgroundColor: c.screen,
+    backgroundColor: 'transparent',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
@@ -2248,7 +2261,13 @@ menuBackdrop: {
   },
 
   translationNotice: {
-    paddingBottom: 10,
+    alignSelf: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: c.surfaceAlt,
     fontSize: 11,
     color: c.textMuted,
     textAlign: 'center',

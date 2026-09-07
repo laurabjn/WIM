@@ -669,7 +669,6 @@ function SectionTitle({
 }: {
   title: string;
 }) {
-  // Ce titre vit hors du composant principal : il lui faut sa propre palette.
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 

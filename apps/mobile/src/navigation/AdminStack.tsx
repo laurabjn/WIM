@@ -4,10 +4,18 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { AdminDashboardScreen } from 'src/admin/ui/AdminDashboardScreen';
 import { AdminScreen } from 'src/admin/ui/AdminScreen';
+import { AdminAccountScreen } from 'src/admin/ui/AdminAccountScreen';
+import { AdminAnalyticsScreen } from 'src/admin/ui/AdminAnalyticsScreen';
+import { AdminUsersScreen } from 'src/admin/ui/AdminUsersScreen';
+import { AdminWeightsScreen } from 'src/admin/ui/AdminWeightsScreen';
 
 export type AdminStackParamList = {
   AdminDashboard: undefined;
   AdminReports: undefined;
+  AdminAccount: { userId: string };
+  AdminUsers: undefined;
+  AdminAnalytics: undefined;
+  AdminWeights: undefined;
 };
 
 const Stack = createNativeStackNavigator<AdminStackParamList>();
@@ -31,6 +39,10 @@ export function AdminStackNavigator({ setIsAuthenticated }: Props) {
       </Stack.Screen>
 
       <Stack.Screen name="AdminReports" component={AdminScreen} />
+      <Stack.Screen name="AdminAccount" component={AdminAccountScreen} />
+      <Stack.Screen name="AdminUsers" component={AdminUsersScreen} />
+      <Stack.Screen name="AdminAnalytics" component={AdminAnalyticsScreen} />
+      <Stack.Screen name="AdminWeights" component={AdminWeightsScreen} />
     </Stack.Navigator>
   );
 }

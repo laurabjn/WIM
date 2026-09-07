@@ -63,12 +63,14 @@ model User {
   matchesAsUser2 Match[] @relation("MatchesAsUser2")
 
   chatParticipants ChatParticipant[]
+  authIdentities   AuthIdentity[]
   messages         Message[]
   reviews          Review[]
   blocksMade       BlockedUser[]     @relation("BlocksMade")
   blocksReceived   BlockedUser[]     @relation("BlocksReceived")
   reportsMade      UserReport[]      @relation("ReportsMade")
   reportsReceived  UserReport[]      @relation("ReportsReceived")
+  notifications    Notification[]
 
   referralCode String? @unique @map("referral_code")
 
@@ -107,7 +109,7 @@ model Home {
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
-  owner          User               @relation(fields: [ownerId], references: [id])
+  owner          User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   photos         HomePhoto[]
   favorites      Favorite[]
   availabilities HomeAvailability[]
@@ -135,8 +137,6 @@ model HomePhoto {
   @@map("home_photos")
 }
 
-// Theme d'un sejour, choisi par l'hote. Distinct de homeType, qui decrit le
-// bati : un chalet peut etre montagne comme culture selon ce qu'on vient y faire.
 enum HomeCategory {
   NATURE
   BEACH
@@ -217,9 +217,6 @@ enum ExchangeStatus {
 model Exchange {
   id String @id @default(uuid())
 
-  // Un echange de maison porte deux logements : celui de l'hote, ou l'invite se
-  // rend, et celui de l'invite, ou l'hote sejourne en retour. Le second reste
-  // facultatif : on peut demander un echange sans encore proposer de logement.
   homeId String @map("home_id")
   home   Home   @relation("ExchangeHostHome", fields: [homeId], references: [id], onDelete: Cascade)
 
@@ -268,8 +265,8 @@ model Swipe {
   direction    SwipeDirection
   createdAt    DateTime       @default(now())
 
-  swiper     User @relation("SwipesMade", fields: [swiperId], references: [id])
-  targetUser User @relation("SwipesReceived", fields: [targetUserId], references: [id])
+  swiper     User @relation("SwipesMade", fields: [swiperId], references: [id], onDelete: Cascade)
+  targetUser User @relation("SwipesReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
 
   home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
@@ -350,7 +347,8 @@ model ChatParticipant {
   lastReadMessageId String?
   lastReadAt        DateTime?
 
-  hiddenAt DateTime? @map("hidden_at")
+  hiddenAt       DateTime? @map("hidden_at")
+  reminderSentAt DateTime? @map("reminder_sent_at")
 
   chatId String
   userId String
@@ -399,8 +397,6 @@ model Message {
   @@index([chatId, createdAt])
 }
 
-// La traduction est facturee au caractere : on la conserve pour ne jamais
-// repayer la traduction d'un message deja vu.
 model MessageTranslation {
   id        String @id @default(uuid())
   messageId String
@@ -543,4 +539,69 @@ model Referral {
   referee  User @relation("ReferralReceived", fields: [refereeId], references: [id], onDelete: Cascade)
 
   @@map("referrals")
+}
+
+enum NotificationCategory {
+  MESSAGES
+  EXCHANGES
+}
+
+model Notification {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+
+  category NotificationCategory @default(MESSAGES)
+  title    String
+  body     String
+  data     Json?
+
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model AppSetting {
+  key   String @id
+  value Json
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
+
+model CityImage {
+  city    String
+  country String
+
+  images Json
+
+  fetchedAt DateTime @default(now()) @map("fetched_at")
+
+  @@id([city, country])
+  @@map("city_images")
+}
+
+enum AuthProvider {
+  GOOGLE
+  APPLE
+}
+
+model AuthIdentity {
+  id String @id @default(uuid())
+
+  provider   AuthProvider
+  providerId String       @map("provider_id")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([provider, providerId])
+  @@index([userId])
+  @@map("auth_identities")
 }

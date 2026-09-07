@@ -13,8 +13,6 @@ export const HOME_TYPES = [
   'all'
 ] as const;
 
-// Theme du sejour, choisi par l'hote : ce qu'on vient y faire, la ou HOME_TYPES
-// decrit le bati.
 export const HOME_CATEGORIES = [
   'NATURE',
   'BEACH',

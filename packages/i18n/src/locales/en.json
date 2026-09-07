@@ -35,11 +35,18 @@
     }
   },
   "auth": {
+    "social": {
+      "or": "or",
+      "google": "Continue with Google",
+      "apple": "Continue with Apple",
+      "error": "Sign-in did not complete."
+    },
     "welcomeTitle": "Welcome to Wim!",
     "guidedTour": "Guided tour",
     "goToWim": "Go to Wim",
     "alreadyHaveAccount": "Already have an account ?",
     "register": {
+      "phonePrefix": "Country code",
       "signUpTitle": "Sign up for Wim",
       "usageConditions": "By registering, you agree to the Terms of Use and Privacy Policy, including the Use of Cookies.",
       "googleSignUp": "Sign up with Google",
@@ -81,7 +88,14 @@
       "rejected": "Your verification has been rejected. Please restart the procedure.",
       "error": "Error checking verification status.",
       "retry": "Your verification couldn't be started. Please start it and come back here once it's done.",
-      "identityVerification": "Verify your identity"
+      "failed": "Verification did not complete. You can try again.",
+      "identityVerification": "Verify your identity",
+      "gateTitle": "Verification required",
+      "gateBody": "Your identity must be verified before you can use Wim. It takes about two minutes: an ID document and a selfie.",
+      "gateAction": "Verify my identity",
+      "gateRecheck": "I'm done, check now",
+      "gateRestart": "Start verification again",
+      "gateLogout": "Log out"
     },
     "login": {
       "title": "Log in to Wim",
@@ -139,6 +153,7 @@
     "genericError": "An error occurred"
   },
   "profile": {
+    "identityVerified": "Identity verified",
     "exchange": "Exchange",
     "exchanges": "Exchanges",
     "reviews": "Reviews",
@@ -565,6 +580,8 @@
     }
   },
   "home": {
+    "defaultTitle": "My home",
+    "defaultTitleWithCity": "Home in {{city}}",
     "notFound": "Home not found",
     "permissionRequired": "Permission required",
     "permissionDescription": "We need access to your photos.",
@@ -770,6 +787,98 @@
     }
   },
   "admin": {
+    "account": {
+      "title": "Account file",
+      "study": "Review this account",
+      "memberSince": "Joined on",
+      "lastSeen": "Last seen on",
+      "neverSeen": "never came back",
+      "identity": "Identity",
+      "homes": "Homes",
+      "messages": "Messages",
+      "reviews": "Reviews written",
+      "reportsReceived": "Reports received",
+      "reportsMade": "Reports filed",
+      "distinctReporters": "Different people",
+      "reportsHeading": "What they are accused of",
+      "noDetail": "No detail given by the reporter",
+      "reportedReview": "Reported review",
+      "homesHeading": "Their homes",
+      "noHomes": "No home published",
+      "handled": "handled",
+      "pending": "pending",
+      "openToExchange": "open to exchanges",
+      "closedToExchange": "closed to exchanges"
+    },
+  "openAnalytics": "Analytics",
+  "analyticsTitle": "Analytics",
+  "exchangeStatus": {
+    "PENDING": "pending",
+    "FUTURE": "upcoming",
+    "CURRENT": "ongoing",
+    "PAST": "past",
+    "CANCELLED": "cancelled",
+    "DECLINED": "declined"
+  },
+  "analytics": {
+        "weeklySignups": "Sign-ups per week",
+        "weeklyExchanges": "Exchanges per week",
+        "weeklyMessages": "Messages per week",
+    "signups": "Sign-ups",
+    "last7": "Last 7 days",
+    "last30": "Last 30 days",
+    "total": "Total",
+    "activity": "Activity",
+    "active7": "Seen in the last 7 days",
+    "neverReturned": "Never came back",
+    "verification": "Identity verification",
+    "homes": "Homes",
+    "open": "Open to exchange",
+    "withoutPhoto": "Without a photo",
+    "exchanges": "Exchanges",
+    "conversations": "Conversations",
+    "neverStarted": "Never started",
+    "topCities": "Most searched cities"
+  },
+  "setIdentity": {
+    "VERIFIED": "Mark verified",
+    "REFUSED": "Refuse verification"
+  },
+  "openUsers": "Accounts",
+  "openWeights": "Recommendation tuning",
+  "usersTitle": "Accounts",
+  "searchPlaceholder": "Name or email address",
+  "noUser": "No account found.",
+  "admin": "ADMIN",
+  "homesCount": "{{count}} home(s)",
+  "reportsCount": "{{count}} report(s)",
+  "actionError": "This action failed.",
+  "weightsTitle": "Recommendations",
+  "weightsHint": "These values weight how homes are ranked in quick search. A higher value counts more; 0 disables the criterion.",
+  "weightsSaved": "Weights saved.",
+  "identity": {
+    "NOT_VERIFIED": "not verified",
+    "IN_PROGRESS": "verification in progress",
+    "VERIFIED": "verified",
+    "REFUSED": "verification refused"
+  },
+  "weights": {
+    "rechercheVille": "City already searched",
+    "recherchePays": "Country already searched",
+    "distanceProche": "Within 10 km",
+    "distanceMoyenne": "Within 50 km",
+    "distanceLointaine": "Within 150 km",
+    "plafondRecherche": "Cap — search history",
+    "typeAime": "Liked home type",
+    "equipementAime": "Liked amenity",
+    "plafondEquipements": "Cap — amenities",
+    "plafondPreferences": "Cap — preferences",
+    "villeRejetee": "Rejected city",
+    "typeRejete": "Rejected type",
+    "equipementRejete": "Rejected amenity",
+    "plafondEquipementsRejetes": "Cap — rejected amenities",
+    "plafondRejet": "Cap — rejection penalty"
+  },
     "adminTitle": "Admin dashboard",
     "adminSubtitle": "Admin-only view.",
     "adminTableHeaderName": "Feature",
@@ -861,7 +970,8 @@
     "travelers": "Number of travelers",
     "noDestination": "No destination found",
     "noRecentDestination": "No recent searches",
-    "results": "Results"
+    "results": "Results",
+    "dateDone": "Done"
   },
   "swipe": {
       "alreadyMatchedOtherHome": "You had already liked another home from {{name}}: you will pick which one when proposing an exchange.",
@@ -1034,5 +1144,14 @@
     "apply": "Apply",
     "alreadyReferred": "You have already been referred.",
     "error": "This is not possible right now."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "readAll": "Mark all read",
+    "empty": "No notifications",
+    "emptyHint": "Requests, matches and reminders will show up here.",
+    "now": "just now",
+    "minutes": "{{count}} min ago",
+    "hours": "{{count}} h ago"
   }
 }

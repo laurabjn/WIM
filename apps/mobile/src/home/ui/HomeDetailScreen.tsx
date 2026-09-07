@@ -311,7 +311,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={[]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <HomeHero
           home={home}

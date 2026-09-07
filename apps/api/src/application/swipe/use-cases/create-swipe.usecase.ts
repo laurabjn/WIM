@@ -50,9 +50,6 @@ export class CreateSwipeUseCase {
       };
     }
 
-    // Chaque like porte un logement : en liker un second chez la meme personne
-    // n'ouvre pas un second match, mais le signaler evite de croire que le
-    // premier a ete oublie.
     const logementsLikes =
       await this.swipeRepository.likedHomeIds(
         input.swiperId,
@@ -68,8 +65,6 @@ export class CreateSwipeUseCase {
     const autreLogementDejaLike =
       dejaMatche && logementsLikes.length > 1;
 
-    // Un match ouvre une conversation : si elle existe deja et vit, il n'a rien
-    // a ouvrir. Le like reste enregistre, il n'affiche simplement pas de match.
     const alreadyTalking =
       await this.swipeRepository.hasOpenConversation(
         input.swiperId,

@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.wim.mobile",
+      "sha256_cert_fingerprints": [
+        "89:F5:28:90:3C:FE:D8:4B:C0:22:C5:92:4B:B0:A6:98:BF:46:02:AC:78:D5:6E:43:9C:19:13:0D:D6:AE:96:A1"
+      ]
+    }
+  }
+]

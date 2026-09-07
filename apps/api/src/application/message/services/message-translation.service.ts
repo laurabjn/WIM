@@ -65,8 +65,6 @@ export class MessageTranslationService {
         .map((pair) => ({
           messageId: pair.message.id,
           locale: targetLocale,
-          // Un message deja dans la langue du lecteur est memorise tel quel :
-          // sans cela, DeepL serait rappele a chaque ouverture de la discussion.
           content:
             pair.result.detectedSourceLocale === targetLocale.split('-')[0]
               ? pair.message.content

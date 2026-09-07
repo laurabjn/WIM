@@ -31,6 +31,7 @@ export async function initI18n() {
           admin: fr.admin,
           onboarding: fr.onboarding,
           subscription: fr.subscription,
+          notifications: fr.notifications,
         },
         en: {
           common: en.common,
@@ -46,11 +47,12 @@ export async function initI18n() {
           admin: en.admin,
           onboarding: en.onboarding,
           subscription: en.subscription,
+          notifications: en.notifications,
         },
       },
       lng: locale,
       fallbackLng: "fr",
-      ns: ["common", "auth", "profile", "home", "availability", "contact", "exchange", "search", "swipe", "chat", "admin", "onboarding", "subscription"],
+      ns: ["common", "auth", "profile", "home", "availability", "contact", "exchange", "search", "swipe", "chat", "admin", "onboarding", "notifications", "subscription"],
       defaultNS: "common",
       interpolation: {escapeValue: false}
     });

@@ -8,7 +8,7 @@ export enum IdentityStatus {
   NOT_VERIFIED = 'NOT_VERIFIED',
   IN_PROGRESS = 'IN_PROGRESS',
   VERIFIED = 'VERIFIED',
-  REJECTED = 'REJECTED',
+  REFUSED = 'REFUSED',
 }
 
 export interface TravelPreferences {
@@ -50,6 +50,7 @@ export interface UserProfile {
   exchangesCount?: number;
   homesCount?: number;
   identityStatus?: IdentityStatus | null;
+  identityVerified?: boolean;
   profileVisible?: boolean;
   showAge?: boolean;
   dataSharing?: boolean;

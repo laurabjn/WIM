@@ -19,6 +19,7 @@ import {
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { clearSession } from 'src/auth/infrastructure/authStorage';
 import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
+import { fetchUnreadNotificationsApi } from 'src/notifications/infrastructure/notificationCenter.api';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
 
@@ -28,16 +29,20 @@ export function SettingsScreen({ route, navigation }: Props) {
     'common',
     'auth',
     'subscription',
+    'notifications',
   ]);
+  const [nonLues, setNonLues] = useState(0);
   const { profile } = route.params;
 
-  // Le theme vient du fournisseur : ecrire dans le stockage sans le prevenir
-  // enregistrait le choix sans jamais l'appliquer.
   const { theme, setAppTheme } = useAppTheme();
   const colors = useThemeColors();
 
-  // Rien n'etait charge ni enregistre : chaque reglage revenait a sa valeur par
-  // defaut au retour sur l'ecran.
+  useEffect(() => {
+    fetchUnreadNotificationsApi()
+      .then((reponse) => setNonLues(reponse.count))
+      .catch(() => setNonLues(0));
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -57,8 +62,6 @@ export function SettingsScreen({ route, navigation }: Props) {
     };
   }, []);
 
-  // Les reglages de confidentialite viennent du serveur : lui seul peut les
-  // faire respecter aupres des autres utilisateurs.
   const [profileVisibleServeur, setProfileVisibleServeur] = useState(
     profile.profileVisible ?? true,
   );
@@ -92,8 +95,6 @@ export function SettingsScreen({ route, navigation }: Props) {
     } catch (error) {
       console.log('Update settings error:', error);
 
-      // On remet le commutateur ou il etait : le montrer actif alors que le
-      // serveur l'ignore serait pire que l'echec lui-meme.
       revenir();
 
       Alert.alert('', t('profile:settings.saveError'));
@@ -135,8 +136,6 @@ export function SettingsScreen({ route, navigation }: Props) {
 
   const displayedEmail = profile.email || t('common:notProvided');
   const displayedPhone = profile.phone || t('common:notProvided');
-  // La langue affichee suivait le profil recu en parametre, jamais rafraichi :
-  // elle restait sur l'ancienne apres le changement. i18n, lui, est a jour.
   const displayedLocale =
     i18n.language?.startsWith('en') ? 'English' : 'Français';
 
@@ -226,8 +225,6 @@ export function SettingsScreen({ route, navigation }: Props) {
   async function changerLangue(locale: 'fr' | 'en') {
     const precedente = i18n.language;
 
-    // On bascule l'affichage aussitot, puis on enregistre : le serveur en a
-    // besoin pour les mails, qui partent dans la langue du compte.
     await i18n.changeLanguage(locale);
 
     await enregistrerProfil({ preferredLocale: locale }, () => {
@@ -301,7 +298,7 @@ export function SettingsScreen({ route, navigation }: Props) {
             value={
               profile.identityStatus === IdentityStatus.VERIFIED
                 ? t('profile:settings.verified')
-                : profile.identityStatus === IdentityStatus.REJECTED
+                : profile.identityStatus === IdentityStatus.REFUSED
                   ? t('profile:settings.refused')
                   : profile.identityStatus === IdentityStatus.IN_PROGRESS
                     ? t('profile:settings.inProgress')
@@ -310,7 +307,7 @@ export function SettingsScreen({ route, navigation }: Props) {
             valueColor={
               profile.identityStatus === IdentityStatus.VERIFIED
                 ? '#35B77C'
-                : profile.identityStatus === IdentityStatus.REJECTED
+                : profile.identityStatus === IdentityStatus.REFUSED
                   ? '#DC2626'
                   : '#D88500'
             }
@@ -476,6 +473,13 @@ export function SettingsScreen({ route, navigation }: Props) {
             label={t('subscription:title')}
             value={t('subscription:referralTitle')}
             onPress={() => navigation.navigate('Subscription')}
+          />
+
+          <SettingsRow
+            icon="🔔"
+            label={t('notifications:title')}
+            value={nonLues > 0 ? String(nonLues) : ''}
+            onPress={() => navigation.navigate('NotificationCenter')}
           />
         </SettingsSection>
 

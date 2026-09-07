@@ -59,8 +59,6 @@ export function ExchangesScreen({ navigation }: any) {
     }
   }, []);
 
-  // Seuls les sejours a noter etaient recharges : un echange accepte ailleurs
-  // n'apparaissait qu'apres avoir quitte puis rouvert l'onglet.
   useFocusEffect(
     useCallback(() => {
       chargerSejoursANoter();
@@ -84,8 +82,6 @@ export function ExchangesScreen({ navigation }: any) {
   function goToMessages(exchange: Exchange) {
     if (!exchange.chatId) return;
 
-    // La conversation s'ouvre dans la pile des echanges : sauter dans l'onglet
-    // Messages faisait revenir ailleurs, le retour d'onglet ramenant au premier.
     navigation.navigate('Conversation', {
       chatId: exchange.chatId,
       participantId: exchange.partner?.id,

@@ -24,6 +24,7 @@ describe('GetIdentityStatusUseCase', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     suspendedAt: null,
+    preferredLocale: 'fr',
   };
 
   beforeEach(() => {

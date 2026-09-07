@@ -8,8 +8,6 @@ export function useMyExchanges(token: string | null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Memoisee : les ecrans la rappellent a chaque prise de focus, et une
-  // fonction recreee a chaque rendu y declencherait une boucle.
   const loadExchanges = useCallback(async () => {
     if (!token) {
       setLoading(false);

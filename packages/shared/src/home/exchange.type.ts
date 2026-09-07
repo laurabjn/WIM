@@ -19,7 +19,6 @@ export type PendingExchange = {
   hostId: string;
   guestId: string;
   isHost: boolean;
-  // Le logement propose en retour par l'invite. Nul tant qu'il n'en propose pas.
   guestHomeId: string | null;
   guestHomeTitle: string | null;
   guestHomeImageUrl: string | null;
@@ -42,8 +41,6 @@ export type Exchange = {
   endDate: string;
   travelersCount: number;
   status: ExchangeStatus;
-  // L'autre personne de l'echange, et la conversation qui les relie : la carte
-  // affiche son nom et le bouton y mene.
   partner: ExchangePartner | null;
   isHost: boolean;
   chatId: string | null;

@@ -42,7 +42,6 @@ const createStyles = (c: ThemeColors) =>
       justifyContent: 'center',
       marginBottom: 4,
     },
-    // Sans couleur, ce libelle tombait en noir : invisible en mode sombre.
     categoryLabel: {
       color: c.text,
       fontSize: 11,

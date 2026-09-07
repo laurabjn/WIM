@@ -18,6 +18,7 @@ export type ProfileStackParamList = {
   Favorites: undefined;
   Settings: { profile: UserProfile };
   Subscription: undefined;
+  NotificationCenter: undefined;
   BlockedUsers: undefined;
   PublicProfile: { userId: string };
   Help: undefined;

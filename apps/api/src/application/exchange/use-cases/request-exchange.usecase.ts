@@ -15,8 +15,6 @@ import { ListStaysToReviewUseCase } from './review-stay.usecase';
 export type RequestExchangeInput = {
   requesterId: string;
   homeId: string;
-  // Le logement que le demandeur propose en retour. Facultatif : on peut
-  // ecrire sans encore avoir de logement a offrir.
   message: string;
   startDate?: string;
   endDate?: string;
@@ -26,7 +24,6 @@ export type RequestExchangeInput = {
 export type RequestExchangeResult = {
   exchangeId: string;
   chatId: string;
-  // Le message d'introduction, pour que l'appelant puisse l'annoncer en direct.
   message: ChatMessages;
 };
 
@@ -83,10 +80,6 @@ export class RequestExchangeUseCase {
       );
     }
 
-    // Un seul echange vivant a la fois entre deux personnes. Sans ce garde-fou,
-    // les demandes s'empilent et le bandeau n'en montre qu'une, les autres
-    // devenant invisibles. Une fois l'echange termine, refuse ou annule, un
-    // nouveau peut etre propose.
     const active = await this.prisma.exchange.findFirst({
       where: {
         status: { in: ['PENDING', 'CURRENT', 'FUTURE'] },
@@ -112,10 +105,6 @@ export class RequestExchangeUseCase {
       );
     }
 
-    // Un match dit deja qui sejourne ou : si l'hote n'a aime qu'un seul des
-    // logements du demandeur, la contrepartie est connue et personne n'a de
-    // choix a refaire. Plusieurs, ou aucun, laissent la question ouverte
-    // jusqu'a l'acceptation.
     const logementsAimesParLHote = await this.prisma.swipe.findMany({
       where: {
         swiperId: home.ownerId,

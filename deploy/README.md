@@ -387,3 +387,52 @@ par `WS_CORS_ORIGIN`.
    et écrira des données utilisateur dans les logs du conteneur.
 5. **Sauvegardes hors du VPS** : le cron écrit dans `/var/backups/wim`, sur le
    même disque que la base. Les répliquer ailleurs (§8).
+
+## Lien universel Android (retour depuis Stripe Identity)
+
+Après une vérification d'identité, Stripe renvoie la personne sur
+`https://worldismine.fr/verification-identite`. Pour qu'Android rende la main à
+l'application au lieu d'ouvrir un navigateur, le domaine doit déclarer qu'il
+appartient à l'application. C'est le rôle de `site/.well-known/assetlinks.json`.
+
+Ce fichier n'est pas servi par le VPS : `worldismine.fr` tourne sur un
+hébergement Apache séparé. Il faut l'y déposer par FTP, à la racine du site :
+
+    www/.well-known/assetlinks.json
+
+Il doit répondre en HTTP 200, sans redirection, à l'adresse
+`https://worldismine.fr/.well-known/assetlinks.json`.
+
+Deux pièges :
+
+- Android vérifie ce fichier **à l'installation**. S'il n'est pas en ligne
+  avant, le lien restera ordinaire jusqu'à la réinstallation suivante.
+- L'empreinte est celle du certificat de build EAS. Le jour d'une publication
+  sur le Play Store, Google resigne l'application : il faudra **ajouter** son
+  empreinte à la liste, sans retirer celle-ci tant que des APK directs
+  circulent.
+
+Vérifier depuis un poste :
+
+    curl -s https://worldismine.fr/.well-known/assetlinks.json
+
+## Remontee des erreurs (Sentry)
+
+L'application envoie a Sentry le detail technique des pannes, et rien d'autre.
+Deux variables la gouvernent, de natures opposees.
+
+`EXPO_PUBLIC_SENTRY_DSN` est l'adresse d'envoi. Elle part dans le bundle, elle
+n'est donc pas secrete, et se declare en visibilite `sensitive` cote EAS. Sans
+elle, la remontee ne demarre pas du tout.
+
+`SENTRY_AUTH_TOKEN` sert uniquement pendant la build, pour televerser les
+fichiers de correspondance. Celui-la est un vrai secret : il donne le droit
+d'ecrire dans le projet Sentry, et ne doit jamais atteindre le bundle. Il se
+declare en visibilite `secret`.
+
+    cd apps/mobile
+    npx eas env:create --name SENTRY_AUTH_TOKEN --value "..."       --visibility secret --environment preview --environment production       --scope project --type string
+
+Sans ce jeton la build reussit quand meme : seules les piles d'appels restent
+minifiees. Le journal de build affiche alors un avertissement de Sentry, c'est
+la qu'il faut regarder si les erreurs remontent illisibles.

@@ -1,4 +1,5 @@
 import { HomeOwner } from '@wim/shared/home/home.type';
+import { BadgeVerifie } from 'src/shared/ui/BadgeVerifie';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -36,7 +37,13 @@ export function HostSummary({
       />
 
       <View style={styles.textWrapper}>
-        <Text style={styles.hostName}>{t('host')} : {owner.firstName} {owner.lastName}</Text>
+        <View style={styles.nameRow}>
+          <Text style={styles.hostName} numberOfLines={1}>
+            {t('host')} : {owner.firstName} {owner.lastName}
+          </Text>
+
+          <BadgeVerifie verifie={owner.identityVerified} taille={15} />
+        </View>
         <Text style={styles.hostSince}>{t('hostSince', { count: getYearsSince(owner.createdAt) })}</Text>
       </View>
 
@@ -67,6 +74,11 @@ const createStyles = (c: ThemeColors) =>
     flex: 1,
   },
 
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   hostName: {
     fontSize: 15,
     fontWeight: '700',

@@ -3,6 +3,7 @@ import { UserRecommendationProfileBuilder } from '../services/user-recommendatio
 import { HomeRecommendationScorer } from '../services/home-recommendation-scorer';
 import { SwipeRecommendationPrismaRepository } from 'src/infrastructure/repositories/swipe-recommendation.prisma.repository';
 import { ScoredHome } from 'src/domain/auth/entities/recommendation.entity';
+import { RecommendationWeightsService } from '../services/recommendation-weights.service';
 
 export type GetSwipeRecommendationsInput = {
   userId: string;
@@ -17,13 +18,15 @@ export class GetSwipeRecommendationsUseCase {
     private readonly profileBuilder: UserRecommendationProfileBuilder,
 
     private readonly scorer: HomeRecommendationScorer,
+
+    private readonly weights: RecommendationWeightsService,
   ) {}
 
   async execute({
     userId,
     limit = 20,
   }: GetSwipeRecommendationsInput) {
-    const [profile, candidates] =
+    const [profile, candidates, poids] =
       await Promise.all([
         this.profileBuilder.build(userId),
 
@@ -31,6 +34,8 @@ export class GetSwipeRecommendationsUseCase {
           userId,
           150,
         ),
+
+        this.weights.valeurs(),
       ]);
 
     const scoredHomes = candidates
@@ -38,6 +43,7 @@ export class GetSwipeRecommendationsUseCase {
         this.scorer.score(
           home,
           profile,
+          poids,
         ),
       )
       .sort(

@@ -36,6 +36,7 @@
     }
   },
   "profile": {
+    "identityVerified": "Identite verifiee",
     "exchange": "Échange",
     "exchanges": "Échanges",
     "rate": "note",
@@ -462,11 +463,18 @@
     }
   },
   "auth": {
+    "social": {
+      "or": "ou",
+      "google": "Continuer avec Google",
+      "apple": "Continuer avec Apple",
+      "error": "La connexion n'a pas abouti."
+    },
     "welcomeTitle": "Bienvenue sur Wim !",
     "guidedTour": "Visite guidée",
     "goToWim": "Accédez à Wim",
     "alreadyHaveAccount": "Vous avez déjà un compte ?",
     "register": {
+      "phonePrefix": "Indicatif",
       "signUpTitle": "Inscrivez-vous à Wim",
       "usageConditions": "En vous inscrivant, vous acceptez les Conditions d'utilisation et la Politique de confidentialité, notamment l'Utilisation des cookies.",
       "googleSignUp": "S'inscrire avec Google",
@@ -508,7 +516,14 @@
       "rejected": "Votre vérification a été refusée. Veuillez recommencer la procédure.",
       "error": "Erreur lors de la vérification du statut.",
       "retry": "Votre vérification n'a pas pu démarré. Lancez-la puis revenez ici une fois terminée.",
-      "identityVerification": "Faites la vérification d’identité"
+      "failed": "La verification n'a pas abouti. Vous pouvez la recommencer.",
+      "identityVerification": "Faites la vérification d’identité",
+      "gateTitle": "Vérification requise",
+      "gateBody": "Votre identité doit être vérifiée pour accéder à Wim. Comptez deux minutes : une pièce d'identité et un selfie.",
+      "gateAction": "Vérifier mon identité",
+      "gateRecheck": "J'ai terminé, vérifier",
+      "gateRestart": "Recommencer la verification",
+      "gateLogout": "Se déconnecter"
     },
     "login": {
       "title": "Connectez-vous à Wim",
@@ -566,6 +581,8 @@
     "LoggingIn": "Connexion en cours..."
   },
   "home": {
+    "defaultTitle": "Mon logement",
+    "defaultTitleWithCity": "Logement à {{city}}",
     "notFound": "Logement introuvable",
     "permissionRequired": "Permission requise",
     "permissionDescription": "Il faut autoriser l'accès à la galerie.",
@@ -769,6 +786,98 @@
     }
   },
   "admin": {
+    "account": {
+      "title": "Dossier du compte",
+      "study": "Etudier le compte",
+      "memberSince": "Inscrit le",
+      "lastSeen": "Vu la derniere fois le",
+      "neverSeen": "jamais revenu",
+      "identity": "Identite",
+      "homes": "Logements",
+      "messages": "Messages",
+      "reviews": "Avis publies",
+      "reportsReceived": "Signalements recus",
+      "reportsMade": "Signalements emis",
+      "distinctReporters": "Personnes differentes",
+      "reportsHeading": "Ce qui lui est reproche",
+      "noDetail": "Aucune precision donnee par la personne",
+      "reportedReview": "Avis signale",
+      "homesHeading": "Ses logements",
+      "noHomes": "Aucun logement publie",
+      "handled": "traite",
+      "pending": "a traiter",
+      "openToExchange": "ouvert aux echanges",
+      "closedToExchange": "ferme aux echanges"
+    },
+  "openAnalytics": "Analyses",
+  "analyticsTitle": "Analyses",
+  "exchangeStatus": {
+    "PENDING": "en attente",
+    "FUTURE": "à venir",
+    "CURRENT": "en cours",
+    "PAST": "passés",
+    "CANCELLED": "annulés",
+    "DECLINED": "refusés"
+  },
+  "analytics": {
+        "weeklySignups": "Inscriptions par semaine",
+        "weeklyExchanges": "Échanges par semaine",
+        "weeklyMessages": "Messages par semaine",
+    "signups": "Inscriptions",
+    "last7": "7 derniers jours",
+    "last30": "30 derniers jours",
+    "total": "Total",
+    "activity": "Activité",
+    "active7": "Vus ces 7 jours",
+    "neverReturned": "Jamais revenus",
+    "verification": "Vérification d'identité",
+    "homes": "Logements",
+    "open": "Ouverts à l’échange",
+    "withoutPhoto": "Sans photo",
+    "exchanges": "Échanges",
+    "conversations": "Conversations",
+    "neverStarted": "Jamais entamées",
+    "topCities": "Villes les plus recherchées"
+  },
+  "setIdentity": {
+    "VERIFIED": "Marquer vérifié",
+    "REFUSED": "Refuser la vérification"
+  },
+  "openUsers": "Comptes",
+  "openWeights": "Réglage des recommandations",
+  "usersTitle": "Comptes",
+  "searchPlaceholder": "Nom ou adresse e-mail",
+  "noUser": "Aucun compte trouvé.",
+  "admin": "ADMIN",
+  "homesCount": "{{count}} logement(s)",
+  "reportsCount": "{{count}} signalement(s)",
+  "actionError": "Action impossible.",
+  "weightsTitle": "Recommandations",
+  "weightsHint": "Ces valeurs pondèrent le classement des logements dans la recherche rapide. Une valeur plus haute pèse plus lourd ; 0 neutralise le critère.",
+  "weightsSaved": "Pondérations enregistrées.",
+  "identity": {
+    "NOT_VERIFIED": "non vérifié",
+    "IN_PROGRESS": "vérification en cours",
+    "VERIFIED": "vérifié",
+    "REFUSED": "vérification refusée"
+  },
+  "weights": {
+    "rechercheVille": "Ville déjà recherchée",
+    "recherchePays": "Pays déjà recherché",
+    "distanceProche": "À moins de 10 km",
+    "distanceMoyenne": "À moins de 50 km",
+    "distanceLointaine": "À moins de 150 km",
+    "plafondRecherche": "Plafond — historique de recherche",
+    "typeAime": "Type de logement apprécié",
+    "equipementAime": "Équipement apprécié",
+    "plafondEquipements": "Plafond — équipements",
+    "plafondPreferences": "Plafond — préférences",
+    "villeRejetee": "Ville rejetée",
+    "typeRejete": "Type rejeté",
+    "equipementRejete": "Équipement rejeté",
+    "plafondEquipementsRejetes": "Plafond — équipements rejetés",
+    "plafondRejet": "Plafond — pénalité de rejet"
+  },
     "adminTitle": "Tableau de bord administrateur",
     "adminSubtitle": "Vue réservée aux administrateurs.",
     "adminTableHeaderName": "Fonctionnalité",
@@ -860,7 +969,8 @@
     "travelers": "Nombre de voyageurs",
     "noDestination": "Aucune destination trouvée",
     "noRecentDestination": "Aucune destination récente",
-    "results": "Résultats"
+    "results": "Résultats",
+    "dateDone": "Terminé"
   },
   "swipe": {
       "alreadyMatchedOtherHome": "Vous aviez déjà aimé un autre logement de {{name}} : vous choisirez lequel au moment de proposer un échange.",
@@ -1033,5 +1143,14 @@
     "apply": "Valider",
     "alreadyReferred": "Vous avez déjà été parrainé.",
     "error": "Action impossible pour le moment."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "readAll": "Tout lire",
+    "empty": "Aucune notification",
+    "emptyHint": "Les demandes, matchs et rappels arriveront ici.",
+    "now": "à l'instant",
+    "minutes": "il y a {{count}} min",
+    "hours": "il y a {{count}} h"
   }
 }

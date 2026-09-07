@@ -7,6 +7,8 @@ import { CreateHomeInput } from '../dto/create-home.input';
 import { HomeRepository } from 'src/domain/auth/repositories/home.repository';
 import { HOME_REPOSITORY } from 'src/interfaces/http/tokens/token';
 
+const DELAI_DE_DOUBLON_MS = 60 * 1000;
+
 @Injectable()
 export class CreateHomeUseCase {
   constructor(
@@ -15,8 +17,6 @@ export class CreateHomeUseCase {
   ) {}
 
   async execute(input: CreateHomeInput) {
-    // Une donnee manquante est une faute de la requete, pas du serveur : sans
-    // cela l'ecran ne recevait qu'une 500 muette.
     if (!input.title?.trim()) {
       throw new BadRequestException('Le titre est obligatoire.');
     }
@@ -37,11 +37,23 @@ export class CreateHomeUseCase {
       throw new BadRequestException('La capacite doit valoir au moins 1.');
     }
 
+    const titre = input.title.trim();
+    const ville = input.city.trim();
+
+    const recent = (await this.homeRepository.findByOwnerId(input.ownerId)).find(
+      (logement) =>
+        logement.title === titre &&
+        logement.city === ville &&
+        Date.now() - logement.createdAt.getTime() < DELAI_DE_DOUBLON_MS,
+    );
+
+    if (recent) return recent;
+
     return this.homeRepository.create({
       ...input,
-      title: input.title.trim(),
+      title: titre,
       description: input.description.trim(),
-      city: input.city.trim(),
+      city: ville,
       country: input.country.trim(),
       amenities: input.amenities ?? [],
       beds: input.beds,

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  ActivityIndicator,
   StyleSheet,
   ScrollView,
   Text,
@@ -34,6 +35,7 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [envoi, setEnvoi] = useState(false);
     
   const [travelersCount, setTravelersCount] = useState<number>();
   const [category, setCategory] = useState<HomeCategory | null>(null);
@@ -82,6 +84,8 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
   }
 
   async function handleContinue() {
+    if (envoi) return;
+
     setError(null);
     
     if (!isFormValid) {
@@ -99,8 +103,12 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
     }
 
     try {
+      setEnvoi(true);
+
       const homeData = {
-        title: 'Mon logement',
+        title: location.city?.trim()
+          ? t('home:defaultTitleWithCity', { city: location.city.trim() })
+          : t('home:defaultTitle'),
         description,
         address: location.address,
         city: location.city,
@@ -138,6 +146,8 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
       }
 
       setError(t('auth:somethingWentWrong'));
+    } finally {
+      setEnvoi(false);
     }
   }
 
@@ -207,8 +217,9 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
             <View style={styles.footer}>
               <TouchableOpacity
                 activeOpacity={0.9}
-                style={styles.buttonWrapper}
+                style={[styles.buttonWrapper, envoi && styles.buttonWrapperEnvoi]}
                 onPress={handleContinue}
+                disabled={envoi}
               >
                 <LinearGradient
                   colors={
@@ -220,9 +231,13 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
                   end={{ x: 1, y: 0.5 }}
                   style={styles.primaryButton}
                 >
-                  <Text style={styles.primaryText}>
-                    {t('common:continue')}
-                  </Text>
+                  {envoi ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.primaryText}>
+                      {t('common:continue')}
+                    </Text>
+                  )}
                 </LinearGradient>
               </TouchableOpacity>
             </View>
@@ -361,6 +376,9 @@ const createStyles = (c: ThemeColors) =>
   },
   footer: {
     width: '100%',
+  },
+  buttonWrapperEnvoi: {
+    opacity: 0.7,
   },
   buttonWrapper: {
     width: '100%',

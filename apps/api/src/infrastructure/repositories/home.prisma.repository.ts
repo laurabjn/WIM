@@ -104,9 +104,6 @@ return this.mapHome(home);
   async update(id: string, data: UpdateHomeRepositoryData): Promise<HomeEntity> {
     const { vehicle, ...homeData } = data;
 
-    // Un `delete` imbrique echoue quand le logement n'a pas de vehicule, ce qui
-    // faisait planter toute modification d'un logement sans voiture. On le
-    // retire donc a part, ou l'absence est acceptee.
     if (vehicle === null) {
       await this.prisma.vehicle.deleteMany({ where: { homeId: id } });
     }

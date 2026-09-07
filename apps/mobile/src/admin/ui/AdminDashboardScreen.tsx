@@ -142,7 +142,7 @@ export function AdminDashboardScreen({
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
         contentContainerStyle={styles.contenu}
         refreshControl={
@@ -190,6 +190,36 @@ export function AdminDashboardScreen({
               onPress={() => navigation.navigate('AdminReports')}
             >
               <Text style={styles.boutonTexte}>{t('openReports')}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.bouton, styles.boutonSecondaire]}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate('AdminAnalytics')}
+            >
+              <Text style={styles.boutonSecondaireTexte}>
+                {t('openAnalytics')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.bouton, styles.boutonSecondaire]}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate('AdminUsers')}
+            >
+              <Text style={styles.boutonSecondaireTexte}>
+                {t('openUsers')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.bouton, styles.boutonSecondaire]}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate('AdminWeights')}
+            >
+              <Text style={styles.boutonSecondaireTexte}>
+                {t('openWeights')}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity

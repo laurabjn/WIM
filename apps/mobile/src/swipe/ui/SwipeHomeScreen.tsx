@@ -96,8 +96,6 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
 
   useFocusEffect(
     useCallback(() => {
-      // Une seule fois : revenir du detail d'un logement ne doit pas rebattre
-      // les cartes ni ramener l'utilisateur au debut de la pile.
       if (homes.length === 0) loadRecommendations();
     }, [homes.length, loadRecommendations]),
   );
@@ -206,10 +204,7 @@ export function SwipeHomeScreen({ navigation, route }: Props) {
         />
       </View>
 
-      <SwipeTopPreview
-        home={home}
-        onInfoPress={openHomeDetails}
-      />
+      <SwipeTopPreview home={home} />
 
       <SwipeHomeCard
         key={home.id}

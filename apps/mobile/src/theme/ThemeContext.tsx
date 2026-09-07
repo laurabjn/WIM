@@ -71,8 +71,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Raccourci le plus utilise : un ecran n'a presque jamais besoin d'autre chose
-// que de la palette.
 export function useThemeColors(): ThemeColors {
   return useAppTheme().colors;
 }

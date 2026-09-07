@@ -2,9 +2,6 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import type { EmailSenderPort } from '../../application/notifications/ports/email-sender.port';
 
-// Une configuration SMTP incomplete ne se voit qu'au premier envoi, souvent
-// des mois plus tard. On la declare complete seulement si les trois champs
-// indispensables sont la.
 export function isSmtpConfigured(): boolean {
   return Boolean(
     process.env.SMTP_HOST?.trim() &&
@@ -24,8 +21,6 @@ export class NodemailerEmailSender implements EmailSenderPort, OnModuleInit {
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port,
-      // Le port 465 parle TLS des la connexion ; 587 chiffre ensuite par
-      // STARTTLS. Se tromper fait echouer l'envoi sans message clair.
       secure: port === 465,
       auth: {
         user: process.env.SMTP_USER,
@@ -42,8 +37,6 @@ export class NodemailerEmailSender implements EmailSenderPort, OnModuleInit {
         `SMTP joignable sur ${process.env.SMTP_HOST}:${process.env.SMTP_PORT || 587}`,
       );
     } catch (error) {
-      // Un SMTP injoignable ne doit pas empecher l'API de demarrer : seuls les
-      // envois en patiraient, et le message ci-dessous dit lequel corriger.
       this.logger.warn(
         `SMTP injoignable (${process.env.SMTP_HOST}) : ${
           error instanceof Error ? error.message : String(error)

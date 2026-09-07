@@ -25,9 +25,6 @@ function formatPeriod(startDate: string, endDate: string): string {
   return `${debut} — ${fin}`;
 }
 
-// Sur son propre logement, l'utilisateur n'a rien a mettre en favori ni
-// personne a contacter : ce qui l'interesse, c'est ce qu'il a ouvert et ce qui
-// est deja engage.
 export function OwnerHomeStatus({ availabilities, exchanges }: Props) {
   const { t } = useTranslation('home');
   const themeColors = useThemeColors();

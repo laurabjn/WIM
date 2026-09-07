@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
@@ -21,6 +21,7 @@ export function CustomTabBar({
 }: Props) {
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+  const insets = useSafeAreaInsets();
   const currentRouteName = state.routes[state.index]?.name;
 
   function navigateTo(routeName: string) {
@@ -54,8 +55,8 @@ export function CustomTabBar({
       : 'Recherche';
 
   return (
-    <SafeAreaView edges={['bottom']} style={styles.safeArea}>
-      <View style={styles.outer}>
+    <View style={styles.safeArea}>
+      <View style={[styles.outer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         <View style={styles.inner}>
           <TouchableOpacity
             onPress={() => navigateTo('HomeTab')}
@@ -65,7 +66,7 @@ export function CustomTabBar({
             <View style={[styles.iconBubble, isHomeFocused && styles.iconBubbleActive]}>
               <Ionicons
                 name={isHomeFocused ? 'home' : 'home-outline'}
-                size={18}
+                size={21}
                 color={themeColors.text}
               />
             </View>
@@ -79,7 +80,7 @@ export function CustomTabBar({
             <View style={[styles.iconBubble, isExchangeFocused && styles.iconBubbleActive]}>
               <Ionicons
                 name={isExchangeFocused ? 'swap-horizontal' : 'swap-horizontal-outline'}
-                size={15}
+                size={18}
                 color={themeColors.text}
               />
             </View>
@@ -92,7 +93,7 @@ export function CustomTabBar({
           >
             <Ionicons
               name={isSearchFocused ? 'search' : 'search-outline'}
-              size={16}
+              size={17}
               color={themeColors.text}
               style={styles.searchIcon}
             />
@@ -109,7 +110,7 @@ export function CustomTabBar({
             <View style={[styles.iconBubble, isMessagesFocused && styles.iconBubbleActive]}>
               <Ionicons
                 name={isMessagesFocused ? 'chatbubbles' : 'chatbubbles-outline'}
-                size={17}
+                size={20}
                 color={themeColors.text}
               />
 
@@ -131,14 +132,14 @@ export function CustomTabBar({
             <View style={[styles.iconBubble, isProfileFocused && styles.iconBubbleActive]}>
               <Ionicons
                 name={isProfileFocused ? 'person' : 'person-outline'}
-                size={18}
+                size={21}
                 color={themeColors.text}
               />
             </View>
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -153,30 +154,31 @@ const createStyles = (c: ThemeColors) =>
   },
 
   outer: {
-    paddingHorizontal: 10,
-    paddingBottom: 8,
+    paddingHorizontal: 12,
   },
 
   inner: {
-    height: 58,
+    height: 72,
     borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
   },
 
   sideButton: {
-    width: 42,
+    width: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   iconBubble: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: c.surfaceAlt,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: c.border,
+    backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -207,9 +209,9 @@ const createStyles = (c: ThemeColors) =>
   },
 
   searchPill: {
-    height: 38,
-    minWidth: 118,
-    maxWidth: 128,
+    height: 50,
+    minWidth: 96,
+    maxWidth: 112,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: c.border,
@@ -232,6 +234,6 @@ const createStyles = (c: ThemeColors) =>
     fontSize: 11,
     fontWeight: '500',
     color: c.text,
-    maxWidth: 72,
+    maxWidth: 58,
   },
 });

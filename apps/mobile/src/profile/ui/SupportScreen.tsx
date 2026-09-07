@@ -36,8 +36,6 @@ const SUJETS: SupportTopic[] = [
   'other',
 ];
 
-// Contacter le support et signaler un probleme aboutissent au meme endroit :
-// seul le sujet propose par defaut change.
 export function SupportScreen({ navigation, route }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const themeColors = useThemeColors();

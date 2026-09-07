@@ -36,7 +36,6 @@ export async function sendSupportRequest(
   const rawText = await response.text();
 
   if (!response.ok) {
-    // On remonte le message de l'API : l'ecran n'a que celui-la a montrer.
     let message = "Votre demande n'a pas pu être envoyée.";
 
     try {
@@ -48,7 +47,6 @@ export async function sendSupportRequest(
           : body.message;
       }
     } catch {
-      // Corps illisible : on garde le message generique.
     }
 
     throw new Error(message);
