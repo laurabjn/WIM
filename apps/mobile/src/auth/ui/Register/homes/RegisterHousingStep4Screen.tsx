@@ -106,7 +106,9 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
       setEnvoi(true);
 
       const homeData = {
-        title: 'Mon logement',
+        title: location.city?.trim()
+          ? t('home:defaultTitleWithCity', { city: location.city.trim() })
+          : t('home:defaultTitle'),
         description,
         address: location.address,
         city: location.city,

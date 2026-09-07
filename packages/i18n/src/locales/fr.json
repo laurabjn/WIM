@@ -581,6 +581,8 @@
     "LoggingIn": "Connexion en cours..."
   },
   "home": {
+    "defaultTitle": "Mon logement",
+    "defaultTitleWithCity": "Logement à {{city}}",
     "notFound": "Logement introuvable",
     "permissionRequired": "Permission requise",
     "permissionDescription": "Il faut autoriser l'accès à la galerie.",
