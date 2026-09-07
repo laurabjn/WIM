@@ -50,3 +50,6 @@ yarn-error.log*
 # (google-services.json, lui, est versionne : il ne contient aucun secret.)
 *firebase-adminsdk*.json
 service-account*.json
+
+# Journaux laisses par le sorcier Sentry en cas d echec
+sentry-wizard-installation-error-*.log

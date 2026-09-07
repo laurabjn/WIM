@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { associerLeCompte } from 'src/observabilite/sentry';
 
 import { API_URL } from 'src/config/api';
 
@@ -27,6 +28,8 @@ export async function saveSession(session: AuthSession): Promise<void> {
     SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken),
     SecureStore.setItemAsync(USER_KEY, JSON.stringify(session.user)),
   ]);
+
+  associerLeCompte(session.user.id);
 }
 
 const RENEW_MARGIN_MS = 60 * 1000;
@@ -156,6 +159,8 @@ export async function clearSession(): Promise<void> {
     SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
     SecureStore.deleteItemAsync(USER_KEY),
   ]);
+
+  associerLeCompte(null);
 }
 
 export async function getIsAdmin(): Promise<boolean> {

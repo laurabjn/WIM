@@ -9,3 +9,8 @@ jest.mock('react-i18next', () => ({
   }),
   Trans: ({ children }: { children: React.ReactNode }) => children,
 }));
+
+jest.mock('@sentry/react-native', () => ({
+  init: jest.fn(),
+  setUser: jest.fn(),
+}));

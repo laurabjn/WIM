@@ -415,3 +415,24 @@ Deux pièges :
 Vérifier depuis un poste :
 
     curl -s https://worldismine.fr/.well-known/assetlinks.json
+
+## Remontee des erreurs (Sentry)
+
+L'application envoie a Sentry le detail technique des pannes, et rien d'autre.
+Deux variables la gouvernent, de natures opposees.
+
+`EXPO_PUBLIC_SENTRY_DSN` est l'adresse d'envoi. Elle part dans le bundle, elle
+n'est donc pas secrete, et se declare en visibilite `sensitive` cote EAS. Sans
+elle, la remontee ne demarre pas du tout.
+
+`SENTRY_AUTH_TOKEN` sert uniquement pendant la build, pour televerser les
+fichiers de correspondance. Celui-la est un vrai secret : il donne le droit
+d'ecrire dans le projet Sentry, et ne doit jamais atteindre le bundle. Il se
+declare en visibilite `secret`.
+
+    cd apps/mobile
+    npx eas env:create --name SENTRY_AUTH_TOKEN --value "..."       --visibility secret --environment preview --environment production       --scope project --type string
+
+Sans ce jeton la build reussit quand meme : seules les piles d'appels restent
+minifiees. Le journal de build affiche alors un avertissement de Sentry, c'est
+la qu'il faut regarder si les erreurs remontent illisibles.
