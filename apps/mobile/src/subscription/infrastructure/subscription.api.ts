@@ -3,12 +3,19 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 
 export type PlanAbonnement = 'MONTHLY' | 'YEARLY';
 
+export type TarifAffiche = {
+  montant: number;
+  devise: string;
+  libelle: string;
+};
+
 export type EtatAbonnement = {
   actif: boolean;
   plan: PlanAbonnement | null;
   statut: string;
   finDePeriode: string | null;
   annuleLe: string | null;
+  tarifs: Record<PlanAbonnement, TarifAffiche | null>;
 };
 
 export type EtatParrainage = {

@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import type {
   PaymentProviderPort,
   PlanAbonnement,
+  TarifsParPlan,
 } from 'src/application/subscription/ports/payment-provider.port';
 
 export function isPaymentProviderConfigured(): boolean {
@@ -13,6 +14,10 @@ export function isPaymentProviderConfigured(): boolean {
 @Injectable()
 export class SimulatedPaymentProvider implements PaymentProviderPort {
   private readonly logger = new Logger(SimulatedPaymentProvider.name);
+
+  async tarifs(): Promise<TarifsParPlan> {
+    return { MONTHLY: null, YEARLY: null };
+  }
 
   async creerPaiement(params: {
     userId: string;

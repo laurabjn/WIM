@@ -10,6 +10,7 @@ import { PAYMENT_PROVIDER } from 'src/interfaces/http/tokens/token';
 import type {
   PaymentProviderPort,
   PlanAbonnement,
+  TarifsParPlan,
   VerdictPaiement,
 } from './ports/payment-provider.port';
 import { ReferralService } from './referral.service';
@@ -27,6 +28,7 @@ export type EtatAbonnement = {
   statut: string;
   finDePeriode: string | null;
   annuleLe: string | null;
+  tarifs: TarifsParPlan;
 };
 
 @Injectable()
@@ -43,6 +45,10 @@ export class SubscriptionService {
       where: { userId },
     });
 
+    const tarifs = await this.provider
+      .tarifs()
+      .catch(() => ({ MONTHLY: null, YEARLY: null }) as TarifsParPlan);
+
     if (!abonnement) {
       return {
         actif: false,
@@ -50,6 +56,7 @@ export class SubscriptionService {
         statut: 'NONE',
         finDePeriode: null,
         annuleLe: null,
+        tarifs,
       };
     }
 
@@ -59,6 +66,7 @@ export class SubscriptionService {
       statut: abonnement.status,
       finDePeriode: abonnement.currentPeriodEnd?.toISOString() ?? null,
       annuleLe: abonnement.cancelledAt?.toISOString() ?? null,
+      tarifs,
     };
   }
 

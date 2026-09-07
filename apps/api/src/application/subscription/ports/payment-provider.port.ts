@@ -7,7 +7,17 @@ export type VerdictPaiement = {
   finDePeriode: Date | null;
 };
 
+export type TarifAffiche = {
+  montant: number;
+  devise: string;
+  libelle: string;
+};
+
+export type TarifsParPlan = Record<PlanAbonnement, TarifAffiche | null>;
+
 export interface PaymentProviderPort {
+  tarifs(): Promise<TarifsParPlan>;
+
   creerPaiement(params: {
     userId: string;
     email: string;

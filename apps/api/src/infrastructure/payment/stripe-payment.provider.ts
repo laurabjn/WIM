@@ -4,6 +4,8 @@ import Stripe = require('stripe');
 import type {
   PaymentProviderPort,
   PlanAbonnement,
+  TarifAffiche,
+  TarifsParPlan,
   VerdictPaiement,
 } from 'src/application/subscription/ports/payment-provider.port';
 
@@ -16,6 +18,8 @@ export function isStripePaymentConfigured(): boolean {
   );
 }
 
+const DUREE_DU_CACHE_MS = 10 * 60 * 1000;
+
 const STATUTS_ACTIFS = new Set(['active', 'trialing']);
 const STATUTS_TERMINES = new Set(['canceled', 'incomplete_expired']);
 
@@ -24,8 +28,50 @@ export class StripePaymentProvider implements PaymentProviderPort {
   private readonly logger = new Logger(StripePaymentProvider.name);
   private readonly stripe: Stripe;
 
+  private cache: { valeur: TarifsParPlan; obtenuA: number } | null = null;
+
   constructor() {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_absente');
+  }
+
+  async tarifs(): Promise<TarifsParPlan> {
+    if (this.cache && Date.now() - this.cache.obtenuA < DUREE_DU_CACHE_MS) {
+      return this.cache.valeur;
+    }
+
+    const [mensuel, annuel] = await Promise.all([
+      this.tarif(process.env.STRIPE_PRICE_MONTHLY?.trim()),
+      this.tarif(process.env.STRIPE_PRICE_YEARLY?.trim()),
+    ]);
+
+    const valeur: TarifsParPlan = { MONTHLY: mensuel, YEARLY: annuel };
+
+    this.cache = { valeur, obtenuA: Date.now() };
+
+    return valeur;
+  }
+
+  private async tarif(identifiant?: string): Promise<TarifAffiche | null> {
+    if (!identifiant) return null;
+
+    try {
+      const tarif = await this.stripe.prices.retrieve(identifiant);
+
+      if (tarif.unit_amount === null) return null;
+
+      return {
+        montant: tarif.unit_amount,
+        devise: tarif.currency,
+        libelle: new Intl.NumberFormat('fr-FR', {
+          style: 'currency',
+          currency: tarif.currency.toUpperCase(),
+        }).format(tarif.unit_amount / 100),
+      };
+    } catch (erreur: unknown) {
+      this.logger.warn(`Tarif ${identifiant} illisible : ${erreur}`);
+
+      return null;
+    }
   }
 
   async creerPaiement(params: {
