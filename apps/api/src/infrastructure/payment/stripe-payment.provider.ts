@@ -13,7 +13,6 @@ export function isStripePaymentConfigured(): boolean {
   return (
     process.env.PAYMENT_PROVIDER?.trim().toLowerCase() === 'stripe' &&
     Boolean(process.env.STRIPE_SECRET_KEY?.trim()) &&
-    Boolean(process.env.STRIPE_PRICE_MONTHLY?.trim()) &&
     Boolean(process.env.STRIPE_PRICE_YEARLY?.trim())
   );
 }
@@ -89,6 +88,7 @@ export class StripePaymentProvider implements PaymentProviderPort {
     }
 
     const retour = this.urlDeRetour();
+    const essai = this.joursDEssai();
 
     const session = await this.stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -96,8 +96,10 @@ export class StripePaymentProvider implements PaymentProviderPort {
       customer_email: params.email,
       client_reference_id: params.userId,
       metadata: { userId: params.userId, plan: params.plan },
+      payment_method_collection: 'if_required',
       subscription_data: {
         metadata: { userId: params.userId, plan: params.plan },
+        ...(essai > 0 ? { trial_period_days: essai } : {}),
       },
       success_url: `${retour}?abonnement=ok`,
       cancel_url: `${retour}?abonnement=annule`,
@@ -194,6 +196,15 @@ export class StripePaymentProvider implements PaymentProviderPort {
     const secondes = abonnement.items?.data?.[0]?.current_period_end;
 
     return typeof secondes === 'number' ? new Date(secondes * 1000) : null;
+  }
+
+  private joursDEssai(): number {
+    const declare = Number.parseInt(
+      process.env.STRIPE_TRIAL_DAYS?.trim() ?? '',
+      10,
+    );
+
+    return Number.isFinite(declare) && declare > 0 ? declare : 0;
   }
 
   private urlDeRetour(): string {

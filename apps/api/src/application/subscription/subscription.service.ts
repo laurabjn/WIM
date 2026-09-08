@@ -274,7 +274,7 @@ export class SubscriptionService {
       await this.prisma.subscription.create({
         data: {
           userId,
-          plan: 'MONTHLY',
+          plan: 'YEARLY',
           status: 'ACTIVE',
           startedAt: new Date(),
           currentPeriodEnd: fin,

@@ -142,10 +142,7 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
         ) : (
           <>
             {(
-              [
-                ['MONTHLY', 'monthly', 'monthlyHint'],
-                ['YEARLY', 'yearly', 'yearlyHint'],
-              ] as const
+              [['YEARLY', 'yearly', 'yearlyHint']] as const
             ).map(([plan, titre, aide]) => (
               <TouchableOpacity
                 key={plan}

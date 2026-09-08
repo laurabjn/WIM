@@ -29,7 +29,7 @@ interface AuthenticatedRequest extends Request {
   user: { sub: string; email: string };
 }
 
-const PLANS: PlanAbonnement[] = ['MONTHLY', 'YEARLY'];
+const PLANS: PlanAbonnement[] = ['YEARLY'];
 
 @Controller('subscriptions')
 export class SubscriptionController {

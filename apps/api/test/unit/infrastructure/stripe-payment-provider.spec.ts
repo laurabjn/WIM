@@ -124,3 +124,99 @@ describe('StripePaymentProvider.lireEvenement', () => {
     );
   });
 });
+
+describe('StripePaymentProvider.creerPaiement', () => {
+  function fournisseurAvecCaisse() {
+    const provider = new StripePaymentProvider();
+    const creer = jest.fn().mockResolvedValue({
+      id: 'cs_123',
+      url: 'https://checkout.stripe.com/abc',
+    });
+
+    (provider as unknown as { stripe: unknown }).stripe = {
+      checkout: { sessions: { create: creer } },
+    };
+
+    return { provider, creer };
+  }
+
+  beforeEach(() => {
+    process.env.STRIPE_PRICE_YEARLY = 'price_annuel';
+    delete process.env.STRIPE_TRIAL_DAYS;
+  });
+
+  it('ouvre une caisse sur le tarif annuel', async () => {
+    const { provider, creer } = fournisseurAvecCaisse();
+
+    await expect(
+      provider.creerPaiement({
+        userId: 'u1',
+        email: 'lea@exemple.fr',
+        plan: 'YEARLY',
+      }),
+    ).resolves.toEqual({
+      url: 'https://checkout.stripe.com/abc',
+      externalId: 'cs_123',
+    });
+
+    const parametres = creer.mock.calls[0][0];
+
+    expect(parametres.mode).toBe('subscription');
+    expect(parametres.line_items[0].price).toBe('price_annuel');
+    expect(parametres.client_reference_id).toBe('u1');
+  });
+
+  it("n'exige pas de carte pendant l'essai", async () => {
+    const { provider, creer } = fournisseurAvecCaisse();
+
+    await provider.creerPaiement({
+      userId: 'u1',
+      email: 'lea@exemple.fr',
+      plan: 'YEARLY',
+    });
+
+    expect(creer.mock.calls[0][0].payment_method_collection).toBe('if_required');
+  });
+
+  it("offre la premiere annee quand un essai est declare", async () => {
+    process.env.STRIPE_TRIAL_DAYS = '365';
+
+    const { provider, creer } = fournisseurAvecCaisse();
+
+    await provider.creerPaiement({
+      userId: 'u1',
+      email: 'lea@exemple.fr',
+      plan: 'YEARLY',
+    });
+
+    expect(creer.mock.calls[0][0].subscription_data.trial_period_days).toBe(365);
+  });
+
+  it("n'annonce aucun essai quand rien n'est declare", async () => {
+    const { provider, creer } = fournisseurAvecCaisse();
+
+    await provider.creerPaiement({
+      userId: 'u1',
+      email: 'lea@exemple.fr',
+      plan: 'YEARLY',
+    });
+
+    expect(
+      creer.mock.calls[0][0].subscription_data.trial_period_days,
+    ).toBeUndefined();
+  });
+
+  it('refuse un plan dont le tarif n est pas configure', async () => {
+    delete process.env.STRIPE_PRICE_MONTHLY;
+
+    const { provider } = fournisseurAvecCaisse();
+
+    await expect(
+      provider.creerPaiement({
+        userId: 'u1',
+        email: 'lea@exemple.fr',
+        plan: 'MONTHLY',
+      }),
+    ).rejects.toThrow('Aucun tarif Stripe');
+  });
+});

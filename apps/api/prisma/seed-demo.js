@@ -1122,11 +1122,11 @@ async function main() {
   const dans = (jours) => new Date(Date.now() + jours * JOUR);
 
   const abonnements = [
-    { cle: 'sophie', plan: 'MONTHLY', status: 'ACTIVE', fin: 20 },
+    { cle: 'sophie', plan: 'YEARLY', status: 'ACTIVE', fin: 20 },
     { cle: 'thomas', plan: 'YEARLY', status: 'ACTIVE', fin: 300 },
-    { cle: 'ines', plan: 'MONTHLY', status: 'ACTIVE', fin: 3 },
-    { cle: 'marc', plan: 'MONTHLY', status: 'CANCELLED', fin: 12 },
-    { cle: 'elena', plan: 'MONTHLY', status: 'EXPIRED', fin: -5 },
+    { cle: 'ines', plan: 'YEARLY', status: 'ACTIVE', fin: 3 },
+    { cle: 'marc', plan: 'YEARLY', status: 'CANCELLED', fin: 12 },
+    { cle: 'elena', plan: 'YEARLY', status: 'EXPIRED', fin: -5 },
     { cle: 'hugo', plan: 'YEARLY', status: 'PENDING', fin: null },
   ];
 
