@@ -77,6 +77,13 @@ export class SubscriptionController {
     return this.subscriptions.annuler(req.user.sub);
   }
 
+  @Post('portal')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async portail(@Req() req: AuthenticatedRequest) {
+    return this.subscriptions.portail(req.user.sub);
+  }
+
   @Post('webhook')
   @HttpCode(HttpStatus.OK)
   async webhook(

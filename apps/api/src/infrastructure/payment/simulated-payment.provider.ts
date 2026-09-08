@@ -19,6 +19,10 @@ export class SimulatedPaymentProvider implements PaymentProviderPort {
     return { MONTHLY: null, YEARLY: null };
   }
 
+  async ouvrirLePortail(): Promise<string | null> {
+    return null;
+  }
+
   async creerPaiement(params: {
     userId: string;
     email: string;

@@ -61,6 +61,10 @@ export function startCheckoutApi(plan: PlanAbonnement): Promise<{ url: string }>
   return appeler('/subscriptions/checkout', { method: 'POST', body: { plan } });
 }
 
+export function openBillingPortalApi(): Promise<{ url: string }> {
+  return appeler('/subscriptions/portal', { method: 'POST' });
+}
+
 export function cancelSubscriptionApi(): Promise<EtatAbonnement> {
   return appeler('/subscriptions/cancel', { method: 'POST' });
 }

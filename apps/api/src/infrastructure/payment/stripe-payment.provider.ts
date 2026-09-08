@@ -112,6 +112,35 @@ export class StripePaymentProvider implements PaymentProviderPort {
     return { url: session.url, externalId: session.id };
   }
 
+  async ouvrirLePortail(externalId: string): Promise<string | null> {
+    const client = await this.clientDe(externalId);
+
+    if (!client) return null;
+
+    const session = await this.stripe.billingPortal.sessions.create({
+      customer: client,
+      return_url: this.urlDeRetour(),
+    });
+
+    return session.url ?? null;
+  }
+
+  private async clientDe(externalId: string): Promise<string | null> {
+    try {
+      const objet = externalId.startsWith('cs_')
+        ? await this.stripe.checkout.sessions.retrieve(externalId)
+        : await this.stripe.subscriptions.retrieve(externalId);
+
+      const client = objet.customer;
+
+      return typeof client === 'string' ? client : (client?.id ?? null);
+    } catch (erreur: unknown) {
+      this.logger.warn(`Client introuvable pour ${externalId} : ${erreur}`);
+
+      return null;
+    }
+  }
+
   lireEvenement(corps: Buffer, signature: string): VerdictPaiement | null {
     const secret = process.env.STRIPE_SUBSCRIPTION_WEBHOOK_SECRET?.trim();
 

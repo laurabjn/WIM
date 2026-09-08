@@ -18,6 +18,8 @@ export type TarifsParPlan = Record<PlanAbonnement, TarifAffiche | null>;
 export interface PaymentProviderPort {
   tarifs(): Promise<TarifsParPlan>;
 
+  ouvrirLePortail(externalId: string): Promise<string | null>;
+
   creerPaiement(params: {
     userId: string;
     email: string;

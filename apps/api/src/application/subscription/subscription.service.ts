@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
@@ -172,6 +173,27 @@ export class SubscriptionService {
     });
 
     return { url: paiement.url };
+  }
+
+  async portail(userId: string): Promise<{ url: string }> {
+    const abonnement = await this.prisma.subscription.findUnique({
+      where: { userId },
+      select: { externalId: true },
+    });
+
+    if (!abonnement?.externalId) {
+      throw new NotFoundException("Aucun abonnement a gerer.");
+    }
+
+    const url = await this.provider.ouvrirLePortail(abonnement.externalId);
+
+    if (!url) {
+      throw new ServiceUnavailableException(
+        "La gestion de l'abonnement est indisponible.",
+      );
+    }
+
+    return { url };
   }
 
   async identifiantExterne(userId: string): Promise<string> {
