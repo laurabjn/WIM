@@ -266,6 +266,16 @@ export class SubscriptionService {
       throw new BadRequestException("Aucun abonnement à annuler.");
     }
 
+    if (abonnement.externalId) {
+      const transmise = await this.provider.resilier(abonnement.externalId);
+
+      if (!transmise) {
+        throw new ServiceUnavailableException(
+          "La résiliation n'a pas pu être transmise au prestataire de paiement.",
+        );
+      }
+    }
+
     await this.prisma.subscription.update({
       where: { id: abonnement.id },
       data: { status: 'CANCELLED', cancelledAt: new Date() },

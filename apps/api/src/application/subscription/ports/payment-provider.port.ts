@@ -20,6 +20,8 @@ export interface PaymentProviderPort {
 
   ouvrirLePortail(externalId: string): Promise<string | null>;
 
+  resilier(externalId: string): Promise<boolean>;
+
   creerPaiement(params: {
     userId: string;
     email: string;

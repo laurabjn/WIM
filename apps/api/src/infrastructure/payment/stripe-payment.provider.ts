@@ -125,6 +125,46 @@ export class StripePaymentProvider implements PaymentProviderPort {
     return session.url ?? null;
   }
 
+  async resilier(externalId: string): Promise<boolean> {
+    const abonnement = await this.abonnementDe(externalId);
+
+    if (!abonnement) return false;
+
+    try {
+      await this.stripe.subscriptions.update(abonnement, {
+        cancel_at_period_end: true,
+      });
+
+      this.logger.log(
+        `Abonnement ${abonnement} resilie a la fin de la periode.`,
+      );
+
+      return true;
+    } catch (erreur: unknown) {
+      this.logger.warn(`Resiliation refusee pour ${abonnement} : ${erreur}`);
+
+      return false;
+    }
+  }
+
+  private async abonnementDe(externalId: string): Promise<string | null> {
+    if (externalId.startsWith('sub_')) return externalId;
+
+    try {
+      const session = await this.stripe.checkout.sessions.retrieve(externalId);
+
+      const abonnement = session.subscription;
+
+      return typeof abonnement === 'string'
+        ? abonnement
+        : (abonnement?.id ?? null);
+    } catch (erreur: unknown) {
+      this.logger.warn(`Abonnement introuvable pour ${externalId} : ${erreur}`);
+
+      return null;
+    }
+  }
+
   private async clientDe(externalId: string): Promise<string | null> {
     try {
       const objet = externalId.startsWith('cs_')

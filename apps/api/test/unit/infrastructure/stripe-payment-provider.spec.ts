@@ -220,3 +220,60 @@ describe('StripePaymentProvider.creerPaiement', () => {
     ).rejects.toThrow('Aucun tarif Stripe');
   });
 });
+
+describe('StripePaymentProvider.resilier', () => {
+  function fournisseurAvecAbonnements(caisse?: { subscription?: string }) {
+    const provider = new StripePaymentProvider();
+    const modifier = jest.fn().mockResolvedValue({});
+    const lireLaCaisse = caisse
+      ? jest.fn().mockResolvedValue(caisse)
+      : jest.fn().mockRejectedValue(new Error('introuvable'));
+
+    (provider as unknown as { stripe: unknown }).stripe = {
+      subscriptions: { update: modifier },
+      checkout: { sessions: { retrieve: lireLaCaisse } },
+    };
+
+    return { provider, modifier, lireLaCaisse };
+  }
+
+  it('coupe la reconduction a la fin de la periode deja reglee', async () => {
+    const { provider, modifier } = fournisseurAvecAbonnements();
+
+    await expect(provider.resilier('sub_456')).resolves.toBe(true);
+
+    expect(modifier).toHaveBeenCalledWith('sub_456', {
+      cancel_at_period_end: true,
+    });
+  });
+
+  it('retrouve l abonnement quand seule la caisse est connue', async () => {
+    const { provider, modifier, lireLaCaisse } = fournisseurAvecAbonnements({
+      subscription: 'sub_456',
+    });
+
+    await expect(provider.resilier('cs_123')).resolves.toBe(true);
+
+    expect(lireLaCaisse).toHaveBeenCalledWith('cs_123');
+    expect(modifier).toHaveBeenCalledWith('sub_456', {
+      cancel_at_period_end: true,
+    });
+  });
+
+  it('renonce quand la caisse n a jamais donne d abonnement', async () => {
+    const { provider, modifier } = fournisseurAvecAbonnements({});
+
+    await expect(provider.resilier('cs_123')).resolves.toBe(false);
+
+    expect(modifier).not.toHaveBeenCalled();
+  });
+
+  it('signale l echec plutot que de laisser croire a une resiliation', async () => {
+    const { provider } = fournisseurAvecAbonnements();
+
+    (provider as unknown as { stripe: { subscriptions: { update: jest.Mock } } })
+      .stripe.subscriptions.update.mockRejectedValue(new Error('refus'));
+
+    await expect(provider.resilier('sub_456')).resolves.toBe(false);
+  });
+});

@@ -23,6 +23,10 @@ export class SimulatedPaymentProvider implements PaymentProviderPort {
     return null;
   }
 
+  async resilier(): Promise<boolean> {
+    return true;
+  }
+
   async creerPaiement(params: {
     userId: string;
     email: string;
