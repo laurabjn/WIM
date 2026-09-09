@@ -469,13 +469,6 @@ export function SettingsScreen({ route, navigation }: Props) {
           />
 
           <SettingsRow
-            icon="★"
-            label={t('subscription:title')}
-            value={t('subscription:referralTitle')}
-            onPress={() => navigation.navigate('Subscription')}
-          />
-
-          <SettingsRow
             icon="🔔"
             label={t('notifications:title')}
             value={nonLues > 0 ? String(nonLues) : ''}
@@ -483,6 +476,21 @@ export function SettingsScreen({ route, navigation }: Props) {
           />
         </SettingsSection>
 
+        <SettingsSection title={t('profile:settings.subscription')}>
+          <SettingsRow
+            icon="★"
+            label={t('subscription:title')}
+            value={t('subscription:offerValue')}
+            onPress={() => navigation.navigate('Subscription')}
+          />
+
+          <SettingsRow
+            icon="⚙"
+            label={t('subscription:manage')}
+            value={t('subscription:manageValue')}
+            onPress={() => navigation.navigate('SubscriptionManage')}
+          />
+        </SettingsSection>
 
         <SettingsSection title={t('profile:settings.preferences')}>
           <SettingsRow
