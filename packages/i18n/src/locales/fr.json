@@ -1133,6 +1133,8 @@
     "pending": "Paiement en attente",
     "simulate": "Simuler le paiement",
     "simulateHint": "Aucun prestataire de paiement n'est encore branché : ce bouton confirme l'abonnement sans rien débiter.",
+    "saleOutsideApp": "L’abonnement ne se souscrit pas depuis l’application. Vous pouvez le prendre depuis un navigateur, avec le même compte.",
+    "manageOutsideApp": "La gestion de votre abonnement se fait depuis un navigateur, avec le même compte.",
     "offerValue": "Formule et parrainage",
     "manage": "Gérer l’abonnement",
     "manageValue": "Facturation et résiliation",

@@ -50,8 +50,11 @@ export class SubscriptionController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async mien(@Req() req: AuthenticatedRequest) {
-    return this.subscriptions.etat(req.user.sub);
+  async mien(
+    @Req() req: AuthenticatedRequest,
+    @Headers('x-platform') plateforme?: string,
+  ) {
+    return this.subscriptions.etat(req.user.sub, plateforme);
   }
 
   @Post('checkout')
@@ -60,11 +63,18 @@ export class SubscriptionController {
   async checkout(
     @Req() req: AuthenticatedRequest,
     @Body() body: { plan?: string },
+    @Headers('x-platform') plateforme?: string,
   ) {
     const plan = PLANS.find((candidat) => candidat === body?.plan);
 
     if (!plan) {
       throw new BadRequestException('Formule inconnue.');
+    }
+
+    if (!this.subscriptions.venteAutorisee(plateforme)) {
+      throw new ForbiddenException(
+        "L'abonnement ne se souscrit pas depuis cette application.",
+      );
     }
 
     return this.subscriptions.demarrer(req.user.sub, plan);

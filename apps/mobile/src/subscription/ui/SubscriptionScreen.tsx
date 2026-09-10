@@ -109,6 +109,7 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   const enAttente = abonnement?.statut === 'PENDING';
+  const venteOuverte = abonnement?.venteDansLApp !== false;
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
@@ -138,6 +139,12 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
                 <Text style={styles.resilier}>{t('subscription:cancel')}</Text>
               </TouchableOpacity>
             )}
+          </View>
+        ) : !venteOuverte ? (
+          <View style={styles.horsApp}>
+            <Text style={styles.horsAppTexte}>
+              {t('subscription:saleOutsideApp')}
+            </Text>
           </View>
         ) : (
           <>
@@ -284,6 +291,12 @@ const creerStyles = (c: ThemeColors) =>
     formuleTitre: { fontSize: 15, fontWeight: '700', color: c.text },
     formuleAide: { fontSize: 13, color: c.textMuted },
     formuleAction: { fontSize: 14, fontWeight: '700', color: c.primary },
+    horsApp: {
+      backgroundColor: c.surfaceAlt,
+      borderRadius: 16,
+      padding: 16,
+    },
+    horsAppTexte: { fontSize: 14, lineHeight: 20, color: c.textMuted },
     carteActive: {
       backgroundColor: c.surface,
       borderRadius: 16,

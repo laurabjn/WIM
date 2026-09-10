@@ -67,6 +67,7 @@ export function SubscriptionManageScreen({ navigation }: Props) {
   }
 
   const abonne = Boolean(etat?.actif);
+  const venteOuverte = etat?.venteDansLApp !== false;
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
@@ -91,7 +92,11 @@ export function SubscriptionManageScreen({ navigation }: Props) {
           </Text>
         </View>
 
-        {abonne ? (
+        {abonne && !venteOuverte ? (
+          <Text style={styles.aide}>{t('subscription:manageOutsideApp')}</Text>
+        ) : null}
+
+        {abonne && venteOuverte ? (
           <>
             <TouchableOpacity
               style={[styles.bouton, occupe && styles.boutonInactif]}
@@ -112,17 +117,19 @@ export function SubscriptionManageScreen({ navigation }: Props) {
           </>
         ) : null}
 
-        <TouchableOpacity
-          style={styles.lien}
-          onPress={() => navigation.navigate('Subscription')}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.lienTexte}>
-            {abonne
-              ? t('subscription:changePlan')
-              : t('subscription:seeOffer')}
-          </Text>
-        </TouchableOpacity>
+        {venteOuverte || !abonne ? (
+          <TouchableOpacity
+            style={styles.lien}
+            onPress={() => navigation.navigate('Subscription')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.lienTexte}>
+              {abonne
+                ? t('subscription:changePlan')
+                : t('subscription:seeOffer')}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

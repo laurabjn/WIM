@@ -1134,6 +1134,8 @@
     "pending": "Payment pending",
     "simulate": "Simulate the payment",
     "simulateHint": "No payment provider is connected yet: this button confirms the subscription without charging anything.",
+    "saleOutsideApp": "Subscriptions cannot be purchased in the app. You can subscribe from a web browser using the same account.",
+    "manageOutsideApp": "Your subscription is managed from a web browser, using the same account.",
     "offerValue": "Plan and referral",
     "manage": "Manage subscription",
     "manageValue": "Billing and cancellation",

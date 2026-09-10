@@ -11,6 +11,7 @@ function creer(options: { verdict?: unknown; signatureValide?: boolean } = {}) {
     appliquerVerdict: jest.fn().mockResolvedValue(undefined),
     identifiantExterne: jest.fn().mockResolvedValue('cs_123'),
     analyse: jest.fn().mockResolvedValue({}),
+    venteAutorisee: jest.fn().mockReturnValue(true),
   };
 
   const referrals = {
@@ -157,6 +158,39 @@ describe('SubscriptionController.checkout', () => {
     await expect(
       controller.checkout(utilisateur as never, {}),
     ).rejects.toThrow('Formule inconnue');
+  });
+
+  it('refuse la vente sur une plateforme fermee', async () => {
+    const { controller, subscriptions } = creer();
+
+    subscriptions.venteAutorisee.mockReturnValue(false);
+
+    await expect(
+      controller.checkout(utilisateur as never, { plan: 'YEARLY' }, 'ios'),
+    ).rejects.toThrow('ne se souscrit pas depuis cette application');
+
+    expect(subscriptions.demarrer).not.toHaveBeenCalled();
+  });
+
+  it('laisse passer la vente sur une plateforme ouverte', async () => {
+    const { controller, subscriptions } = creer();
+
+    await controller.checkout(utilisateur as never, { plan: 'YEARLY' }, 'android');
+
+    expect(subscriptions.venteAutorisee).toHaveBeenCalledWith('android');
+    expect(subscriptions.demarrer).toHaveBeenCalled();
+  });
+});
+
+describe('SubscriptionController.mien', () => {
+  const utilisateur = { user: { sub: 'user-1', email: 'lea@exemple.fr' } };
+
+  it('transmet la plateforme pour que l etat sache quoi proposer', async () => {
+    const { controller, subscriptions } = creer();
+
+    await controller.mien(utilisateur as never, 'ios');
+
+    expect(subscriptions.etat).toHaveBeenCalledWith('user-1', 'ios');
   });
 });
 

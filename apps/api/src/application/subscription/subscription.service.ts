@@ -30,6 +30,7 @@ export type EtatAbonnement = {
   finDePeriode: string | null;
   annuleLe: string | null;
   tarifs: TarifsParPlan;
+  venteDansLApp: boolean;
 };
 
 @Injectable()
@@ -41,7 +42,7 @@ export class SubscriptionService {
     private readonly provider: PaymentProviderPort,
   ) {}
 
-  async etat(userId: string): Promise<EtatAbonnement> {
+  async etat(userId: string, plateforme?: string): Promise<EtatAbonnement> {
     const abonnement = await this.prisma.subscription.findUnique({
       where: { userId },
     });
@@ -58,6 +59,7 @@ export class SubscriptionService {
         finDePeriode: null,
         annuleLe: null,
         tarifs,
+        venteDansLApp: this.venteAutorisee(plateforme),
       };
     }
 
@@ -68,7 +70,19 @@ export class SubscriptionService {
       finDePeriode: abonnement.currentPeriodEnd?.toISOString() ?? null,
       annuleLe: abonnement.cancelledAt?.toISOString() ?? null,
       tarifs,
+      venteDansLApp: this.venteAutorisee(plateforme),
     };
+  }
+
+  venteAutorisee(plateforme?: string): boolean {
+    const fermees = (process.env.SUBSCRIPTION_SALE_DISABLED_PLATFORMS ?? '')
+      .split(',')
+      .map((nom) => nom.trim().toLowerCase())
+      .filter(Boolean);
+
+    if (fermees.length === 0) return true;
+
+    return !fermees.includes((plateforme ?? '').trim().toLowerCase());
   }
 
   // Une periode payee court jusqu'a son terme meme apres une annulation : c'est

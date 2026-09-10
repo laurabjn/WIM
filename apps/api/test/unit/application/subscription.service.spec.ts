@@ -109,6 +109,63 @@ describe('SubscriptionService.annuler', () => {
   });
 });
 
+describe('SubscriptionService.venteAutorisee', () => {
+  const declare = process.env.SUBSCRIPTION_SALE_DISABLED_PLATFORMS;
+
+  afterEach(() => {
+    if (declare === undefined) {
+      delete process.env.SUBSCRIPTION_SALE_DISABLED_PLATFORMS;
+    } else {
+      process.env.SUBSCRIPTION_SALE_DISABLED_PLATFORMS = declare;
+    }
+  });
+
+  it('ouvre la vente partout tant que rien n est ferme', () => {
+    delete process.env.SUBSCRIPTION_SALE_DISABLED_PLATFORMS;
+
+    const { service } = creer(null);
+
+    expect(service.venteAutorisee('ios')).toBe(true);
+    expect(service.venteAutorisee('android')).toBe(true);
+  });
+
+  it('ferme la vente sur la seule plateforme nommee', () => {
+    process.env.SUBSCRIPTION_SALE_DISABLED_PLATFORMS = 'ios';
+
+    const { service } = creer(null);
+
+    expect(service.venteAutorisee('ios')).toBe(false);
+    expect(service.venteAutorisee('android')).toBe(true);
+  });
+
+  it('accepte une liste, avec des espaces et des majuscules', () => {
+    process.env.SUBSCRIPTION_SALE_DISABLED_PLATFORMS = ' iOS , Android ';
+
+    const { service } = creer(null);
+
+    expect(service.venteAutorisee('ios')).toBe(false);
+    expect(service.venteAutorisee('android')).toBe(false);
+  });
+
+  it('laisse passer un appel sans plateforme declaree', () => {
+    process.env.SUBSCRIPTION_SALE_DISABLED_PLATFORMS = 'ios';
+
+    const { service } = creer(null);
+
+    expect(service.venteAutorisee()).toBe(true);
+  });
+
+  it('annonce dans l etat que la vente est fermee', async () => {
+    process.env.SUBSCRIPTION_SALE_DISABLED_PLATFORMS = 'ios';
+
+    const { service } = creer(null);
+
+    await expect(service.etat('user-1', 'ios')).resolves.toMatchObject({
+      venteDansLApp: false,
+    });
+  });
+});
+
 describe('SubscriptionService.etat', () => {
   it('laisse courir jusqu a son terme une periode deja reglee', async () => {
     const { service } = creer({

@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 import { API_URL } from 'src/config/api';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 
@@ -16,6 +18,7 @@ export type EtatAbonnement = {
   finDePeriode: string | null;
   annuleLe: string | null;
   tarifs: Record<PlanAbonnement, TarifAffiche | null>;
+  venteDansLApp: boolean;
 };
 
 export type EtatParrainage = {
@@ -39,6 +42,7 @@ async function appeler<T>(
     method: options.method ?? 'GET',
     headers: {
       'Content-Type': 'application/json',
+      'X-Platform': Platform.OS,
       Authorization: `Bearer ${session.accessToken}`,
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
