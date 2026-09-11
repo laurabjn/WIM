@@ -20,7 +20,6 @@ export function isStripePaymentConfigured(): boolean {
 const DUREE_DU_CACHE_MS = 10 * 60 * 1000;
 
 const STATUTS_ACTIFS = new Set(['active', 'trialing']);
-const STATUTS_TERMINES = new Set(['canceled', 'incomplete_expired']);
 
 @Injectable()
 export class StripePaymentProvider implements PaymentProviderPort {
@@ -99,7 +98,14 @@ export class StripePaymentProvider implements PaymentProviderPort {
       payment_method_collection: 'if_required',
       subscription_data: {
         metadata: { userId: params.userId, plan: params.plan },
-        ...(essai > 0 ? { trial_period_days: essai } : {}),
+        ...(essai > 0
+          ? {
+              trial_period_days: essai,
+              trial_settings: {
+                end_behavior: { missing_payment_method: 'cancel' },
+              },
+            }
+          : {}),
       },
       success_url: `${retour}?abonnement=ok`,
       cancel_url: `${retour}?abonnement=annule`,
@@ -239,13 +245,11 @@ export class StripePaymentProvider implements PaymentProviderPort {
   private verdictDeLAbonnement(
     abonnement: Stripe.Subscription,
   ): VerdictPaiement {
-    const statut = STATUTS_ACTIFS.has(abonnement.status)
-      ? 'ACTIVE'
-      : STATUTS_TERMINES.has(abonnement.status)
-        ? 'EXPIRED'
-        : 'CANCELLED';
-
-    const fin = this.finDePeriode(abonnement);
+    const statut = !STATUTS_ACTIFS.has(abonnement.status)
+      ? 'EXPIRED'
+      : abonnement.cancel_at_period_end
+        ? 'CANCELLED'
+        : 'ACTIVE';
 
     this.logger.log(
       `Abonnement ${abonnement.id} : ${abonnement.status} -> ${statut}.`,
@@ -253,11 +257,8 @@ export class StripePaymentProvider implements PaymentProviderPort {
 
     return {
       externalId: abonnement.id,
-      statut:
-        statut === 'ACTIVE' && abonnement.cancel_at_period_end
-          ? 'CANCELLED'
-          : statut,
-      finDePeriode: fin,
+      statut,
+      finDePeriode: this.finDePeriode(abonnement),
     };
   }
 

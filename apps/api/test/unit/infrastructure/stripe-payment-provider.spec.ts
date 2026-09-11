@@ -102,6 +102,40 @@ describe('StripePaymentProvider.lireEvenement', () => {
     expect(provider.lireEvenement(corps, 'signature')?.statut).toBe('EXPIRED');
   });
 
+  it('ferme l acces des qu une echeance reste impayee', () => {
+    const fin = Math.floor(Date.now() / 1000) + 3600;
+
+    const provider = fournisseurAvec({
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          id: 'sub_456',
+          status: 'past_due',
+          cancel_at_period_end: false,
+          items: { data: [{ current_period_end: fin }] },
+        },
+      },
+    });
+
+    expect(provider.lireEvenement(corps, 'signature')?.statut).toBe('EXPIRED');
+  });
+
+  it('ferme l acces d un abonnement mis en pause', () => {
+    const provider = fournisseurAvec({
+      type: 'customer.subscription.updated',
+      data: {
+        object: {
+          id: 'sub_456',
+          status: 'paused',
+          cancel_at_period_end: false,
+          items: { data: [] },
+        },
+      },
+    });
+
+    expect(provider.lireEvenement(corps, 'signature')?.statut).toBe('EXPIRED');
+  });
+
   it('ignore les evenements dont nous n avons que faire', () => {
     const provider = fournisseurAvec({
       type: 'invoice.created',
@@ -190,6 +224,23 @@ describe('StripePaymentProvider.creerPaiement', () => {
     });
 
     expect(creer.mock.calls[0][0].subscription_data.trial_period_days).toBe(365);
+  });
+
+  it("annule net a la fin de l'essai si aucune carte n'a ete ajoutee", async () => {
+    process.env.STRIPE_TRIAL_DAYS = '365';
+
+    const { provider, creer } = fournisseurAvecCaisse();
+
+    await provider.creerPaiement({
+      userId: 'u1',
+      email: 'lea@exemple.fr',
+      plan: 'YEARLY',
+    });
+
+    expect(
+      creer.mock.calls[0][0].subscription_data.trial_settings.end_behavior
+        .missing_payment_method,
+    ).toBe('cancel');
   });
 
   it("n'annonce aucun essai quand rien n'est declare", async () => {
