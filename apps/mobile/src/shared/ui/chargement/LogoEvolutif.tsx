@@ -8,15 +8,9 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
-import {
-  COULEURS,
-  ESPACE_MONOGRAMME,
-  ESPACE_MOT,
-  GROUPES,
-  HAUTEUR,
-} from './logoWim';
+import { ESPACE_MOT, GROUPES, HAUTEUR, type Forme, type Groupe } from './logoWim';
 
 type Props = {
   depart: 'monogramme' | 'mot';
@@ -44,24 +38,78 @@ function disposer(largeurDisponible: number) {
     return position;
   });
 
-  const capitales = GROUPES.filter((groupe) => groupe.capitale);
-  const largeurMonogramme =
-    capitales.reduce((total, groupe) => total + groupe.largeur, 0) +
-    ESPACE_MONOGRAMME * (capitales.length - 1);
+  const largeurMonogramme = GROUPES.reduce(
+    (max, groupe) =>
+      groupe.xMonogramme === undefined
+        ? max
+        : Math.max(max, groupe.xMonogramme + groupe.largeur),
+    0,
+  );
 
-  let curseurMonogramme = (largeurMot - largeurMonogramme) / 2;
-  const dansLeMonogramme = new Map<string, number>();
-  for (const groupe of capitales) {
-    dansLeMonogramme.set(groupe.nom, curseurMonogramme);
-    curseurMonogramme += groupe.largeur + ESPACE_MONOGRAMME;
-  }
+  const origineMonogramme = (largeurMot - largeurMonogramme) / 2;
 
-  return { largeurMot, echelle, dansLeMot, dansLeMonogramme };
+  return { largeurMot, echelle, dansLeMot, origineMonogramme };
+}
+
+function identifiant(groupe: Groupe, index: number) {
+  return `degrade-${groupe.nom}-${index}`;
+}
+
+function Formes({
+  groupe,
+  formes,
+  largeur,
+  hauteur,
+}: {
+  groupe: Groupe;
+  formes: Forme[];
+  largeur: number;
+  hauteur: number;
+}) {
+  return (
+    <Svg width={largeur} height={hauteur} viewBox={`0 0 ${groupe.largeur} ${HAUTEUR}`}>
+      <Defs>
+        {formes.map((forme, index) =>
+          typeof forme.peinture === 'string' ? null : (
+            <LinearGradient
+              key={index}
+              id={identifiant(groupe, index)}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <Stop offset="0" stopColor={forme.peinture.haut} />
+              <Stop offset="1" stopColor={forme.peinture.bas} />
+            </LinearGradient>
+          ),
+        )}
+      </Defs>
+
+      {formes.map((forme, index) => {
+        const peinture =
+          typeof forme.peinture === 'string'
+            ? forme.peinture
+            : `url(#${identifiant(groupe, index)})`;
+
+        return (
+          <Path
+            key={index}
+            d={forme.d}
+            fill={peinture}
+            stroke={forme.arrondi ? peinture : undefined}
+            strokeWidth={forme.arrondi ? forme.arrondi * 2 : undefined}
+            strokeLinejoin="round"
+          />
+        );
+      })}
+    </Svg>
+  );
 }
 
 export function LogoEvolutif({ depart, onFin }: Props) {
   const { width } = useWindowDimensions();
-  const { largeurMot, echelle, dansLeMot, dansLeMonogramme } = useMemo(
+  const { largeurMot, echelle, dansLeMot, origineMonogramme } = useMemo(
     () => disposer(width * PART_DE_LARGEUR),
     [width],
   );
@@ -80,18 +128,12 @@ export function LogoEvolutif({ depart, onFin }: Props) {
     AccessibilityInfo.isReduceMotionEnabled().then((reduit) => {
       if (arrete) return;
 
-      const mouvement = reduit
-        ? Animated.timing(ouverture, {
-            toValue: cible,
-            duration: 0,
-            useNativeDriver: true,
-          })
-        : Animated.timing(ouverture, {
-            toValue: cible,
-            duration: TRANSITION_MS,
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: true,
-          });
+      const mouvement = Animated.timing(ouverture, {
+        toValue: cible,
+        duration: reduit ? 0 : TRANSITION_MS,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      });
 
       Animated.sequence([
         Animated.delay(ATTENTE_MS),
@@ -115,9 +157,16 @@ export function LogoEvolutif({ depart, onFin }: Props) {
         const largeur = groupe.largeur * echelle;
         const positionMot = dansLeMot[index] * echelle;
 
-        if (groupe.capitale) {
+        if (groupe.xMonogramme !== undefined) {
           const positionMonogramme =
-            (dansLeMonogramme.get(groupe.nom) ?? 0) * echelle;
+            (origineMonogramme + groupe.xMonogramme) * echelle;
+
+          const permanentes = (groupe.formes ?? []).filter(
+            (forme) => !forme.disparait,
+          );
+          const passageres = (groupe.formes ?? []).filter(
+            (forme) => forme.disparait,
+          );
 
           return (
             <Animated.View
@@ -127,6 +176,7 @@ export function LogoEvolutif({ depart, onFin }: Props) {
                 {
                   width: largeur,
                   height: hauteur,
+                  zIndex: groupe.plan ?? 0,
                   transform: [
                     {
                       translateX: ouverture.interpolate({
@@ -138,15 +188,25 @@ export function LogoEvolutif({ depart, onFin }: Props) {
                 },
               ]}
             >
-              <Svg
-                width={largeur}
-                height={hauteur}
-                viewBox={`0 0 ${groupe.largeur} ${HAUTEUR}`}
-              >
-                {groupe.formes?.map((forme, i) => (
-                  <Path key={i} d={forme.d} fill={forme.couleur} />
-                ))}
-              </Svg>
+              <Formes
+                groupe={groupe}
+                formes={permanentes}
+                largeur={largeur}
+                hauteur={hauteur}
+              />
+
+              {passageres.length > 0 ? (
+                <Animated.View
+                  style={[StyleSheet.absoluteFill, { opacity: ouverture }]}
+                >
+                  <Formes
+                    groupe={groupe}
+                    formes={passageres}
+                    largeur={largeur}
+                    hauteur={hauteur}
+                  />
+                </Animated.View>
+              ) : null}
             </Animated.View>
           );
         }
@@ -170,9 +230,15 @@ export function LogoEvolutif({ depart, onFin }: Props) {
           >
             <Text
               numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.4}
               style={[
                 styles.texte,
-                { fontSize: hauteur * 1.05, lineHeight: hauteur },
+                {
+                  fontSize: hauteur,
+                  lineHeight: hauteur,
+                  color: groupe.couleur,
+                },
               ]}
             >
               {groupe.texte}
@@ -189,7 +255,6 @@ const styles = StyleSheet.create({
   minuscules: { justifyContent: 'flex-end' },
   texte: {
     fontWeight: '900',
-    color: COULEURS.encre,
     includeFontPadding: false,
   },
 });
