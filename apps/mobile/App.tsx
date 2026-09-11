@@ -20,6 +20,7 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { fetchIdentityStatus } from 'src/auth/infrastructure/identity.api';
 import { IdentityStatus } from 'src/auth/dtos/identityStatus';
 import { introductionDejaVue } from 'src/onboarding/infrastructure/onboardingStorage';
+import { ChargementScreen } from 'src/shared/ui/chargement/ChargementScreen';
 import {
   navigationRef,
   useNotificationNavigation,
@@ -83,6 +84,7 @@ export default function App() {
   const [identiteVerifiee, setIdentiteVerifiee] = useState<boolean | null>(null);
   const [introductionVue, setIntroductionVue] = useState(true);
   const [ready, setReady] = useState(false);
+  const [logoTermine, setLogoTermine] = useState(false);
 
   useEffect(() => {
     async function setup() {
@@ -138,7 +140,9 @@ export default function App() {
     };
   }, [isAuthenticated, isAdmin]);
 
-  if (!ready) return null;
+  if (!ready || !logoTermine) {
+    return <ChargementScreen onFin={() => setLogoTermine(true)} />;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
