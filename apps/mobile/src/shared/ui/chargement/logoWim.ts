@@ -4,9 +4,6 @@ export const COULEURS = {
   vert: '#52D1A6',
   bleu: '#2DA7F3',
   encre: '#2A2A2A',
-  grisFonce: '#4B4B4B',
-  gris: '#8A8A8A',
-  grisClair: '#ABABAB',
 } as const;
 
 export type Peinture = string | { haut: string; bas: string };
@@ -58,7 +55,7 @@ export const GROUPES: Groupe[] = [
       { d: barre(46), peinture: COULEURS.encre, arrondi: RAYON, disparait: true },
     ],
   },
-  { nom: 'orld', largeur: 150, texte: 'orld', couleur: COULEURS.grisFonce },
+  { nom: 'orld', largeur: 150, texte: 'orld', couleur: COULEURS.encre },
   {
     nom: 'I',
     largeur: 46,
@@ -66,7 +63,7 @@ export const GROUPES: Groupe[] = [
     plan: 1,
     formes: [{ d: barre(0), peinture: COULEURS.vert, arrondi: RAYON }],
   },
-  { nom: 's', largeur: 42, texte: 's', couleur: COULEURS.gris },
+  { nom: 's', largeur: 42, texte: 's', couleur: COULEURS.encre },
   {
     nom: 'M',
     largeur: 92,
@@ -77,5 +74,5 @@ export const GROUPES: Groupe[] = [
       { d: barre(46), peinture: BLEU_VERS_VERT, arrondi: RAYON },
     ],
   },
-  { nom: 'ine', largeur: 110, texte: 'ine', couleur: COULEURS.grisClair },
+  { nom: 'ine', largeur: 110, texte: 'ine', couleur: COULEURS.encre },
 ];
