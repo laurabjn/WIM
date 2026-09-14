@@ -1136,7 +1136,6 @@
     "simulateHint": "No payment provider is connected yet: this button confirms the subscription without charging anything.",
     "saleOutsideApp": "Subscriptions cannot be purchased in the app. You can subscribe from a web browser using the same account.",
     "manageOutsideApp": "Your subscription is managed from a web browser, using the same account.",
-    "manage": "Manage my subscription",
     "mine": "My subscription",
     "planName": "Essential",
     "statusActive": "Active",

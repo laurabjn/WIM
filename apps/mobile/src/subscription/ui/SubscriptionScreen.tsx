@@ -152,7 +152,7 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
     <SafeAreaView style={styles.screen} edges={['top']}>
       <View style={styles.entete}>
         <BackButton onPress={navigation.goBack} style={styles.rond} />
-        <Text style={styles.titre}>{t('subscription:manage')}</Text>
+        <Text style={styles.titre}>{t('subscription:mine')}</Text>
         <View style={styles.rond} />
       </View>
 
