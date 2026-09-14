@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Linking,
   ScrollView,
   Share,
   StyleSheet,
@@ -14,54 +13,69 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import * as WebBrowser from 'expo-web-browser';
+import { ChevronDown, ChevronUp, CircleCheck } from 'lucide-react-native';
 
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 import {
+  addPaymentMethodApi,
   applyReferralApi,
   cancelSubscriptionApi,
+  fetchPaymentMethodsApi,
   fetchReferralApi,
   fetchSubscriptionApi,
+  removePaymentMethodApi,
+  setPrimaryPaymentMethodApi,
   simulatePaymentApi,
   startCheckoutApi,
   type EtatAbonnement,
   type EtatParrainage,
-  type PlanAbonnement,
+  type MoyenDePaiement,
 } from '../infrastructure/subscription.api';
 
 type Props = {
   navigation: { goBack: () => void };
 };
 
-function formatDate(valeur: string | null) {
+const AVANTAGES = [
+  { titre: 'benefitsFindTitle', lignes: ['benefitsFind1', 'benefitsFind2'] },
+  { titre: 'benefitsSafeTitle', lignes: ['benefitsSafe1', 'benefitsSafe2'] },
+] as const;
+
+function formatDate(valeur: string | null, langue: string) {
   if (!valeur) return '';
 
-  return new Date(valeur).toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: 'long',
+  return new Date(valeur).toLocaleDateString(langue, {
+    day: 'numeric',
+    month: 'short',
     year: 'numeric',
   });
 }
 
 export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
-  const { t } = useTranslation(['subscription', 'common']);
+  const { t, i18n } = useTranslation(['subscription', 'common']);
   const themeColors = useThemeColors();
   const styles = useMemo(() => creerStyles(themeColors), [themeColors]);
 
   const [abonnement, setAbonnement] = useState<EtatAbonnement | null>(null);
+  const [moyens, setMoyens] = useState<MoyenDePaiement[]>([]);
   const [parrainage, setParrainage] = useState<EtatParrainage | null>(null);
   const [occupe, setOccupe] = useState(false);
+  const [avantagesOuverts, setAvantagesOuverts] = useState(false);
   const [code, setCode] = useState('');
 
   const charger = useCallback(async () => {
     try {
-      const [etat, filleuls] = await Promise.all([
+      const [etat, liste, filleuls] = await Promise.all([
         fetchSubscriptionApi(),
+        fetchPaymentMethodsApi().catch(() => []),
         fetchReferralApi(),
       ]);
 
       setAbonnement(etat);
+      setMoyens(liste);
       setParrainage(filleuls);
     } catch (error) {
       console.log('Load subscription error:', error);
@@ -89,11 +103,15 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  function souscrire(plan: PlanAbonnement) {
-    return agir(async () => {
-      const { url } = await startCheckoutApi(plan);
+  async function ouvrir(url: string) {
+    await WebBrowser.openBrowserAsync(url);
+  }
 
-      await Linking.openURL(url).catch(() => undefined);
+  function souscrire() {
+    return agir(async () => {
+      const { url } = await startCheckoutApi('YEARLY');
+
+      await ouvrir(url);
     });
   }
 
@@ -108,96 +126,275 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
     ]);
   }
 
+  function retirerLeMoyen(moyen: MoyenDePaiement) {
+    Alert.alert('', t('subscription:removeConfirm'), [
+      { text: t('common:cancel'), style: 'cancel' },
+      {
+        text: t('subscription:remove'),
+        style: 'destructive',
+        onPress: () =>
+          agir(async () => setMoyens(await removePaymentMethodApi(moyen.id))),
+      },
+    ]);
+  }
+
+  const actif = Boolean(abonnement?.actif);
+  const resilie = Boolean(abonnement?.annuleLe);
   const enAttente = abonnement?.statut === 'PENDING';
   const venteOuverte = abonnement?.venteDansLApp !== false;
+  const abonne = actif || abonnement?.statut === 'CANCELLED';
+  const prix = abonnement?.tarifs.YEARLY?.libelle ?? '';
+
+  const principal = moyens.find((moyen) => moyen.principal) ?? null;
+  const autres = moyens.filter((moyen) => !moyen.principal);
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
       <View style={styles.entete}>
         <BackButton onPress={navigation.goBack} style={styles.rond} />
-        <Text style={styles.titre}>{t('subscription:title')}</Text>
+        <Text style={styles.titre}>{t('subscription:manage')}</Text>
         <View style={styles.rond} />
       </View>
 
       <ScrollView contentContainerStyle={styles.contenu}>
-        <Text style={styles.sousTitre}>{t('subscription:subtitle')}</Text>
+        <Text style={styles.section}>{t('subscription:mine')}</Text>
 
-        {abonnement?.actif ? (
-          <View style={styles.carteActive}>
-            <Text style={styles.etat}>
-              {abonnement.annuleLe
-                ? t('subscription:cancelled', {
-                    date: formatDate(abonnement.finDePeriode),
-                  })
-                : t('subscription:activeUntil', {
-                    date: formatDate(abonnement.finDePeriode),
-                  })}
+        <View style={styles.carte}>
+          <View style={[styles.pastille, actif ? styles.pastilleActive : null]}>
+            <Text
+              style={[
+                styles.pastilleTexte,
+                actif ? styles.pastilleTexteActive : null,
+              ]}
+            >
+              {actif
+                ? t('subscription:statusActive')
+                : t('subscription:statusInactive')}
             </Text>
+          </View>
 
-            {abonnement.annuleLe ? null : (
-              <TouchableOpacity onPress={resilier} disabled={occupe}>
-                <Text style={styles.resilier}>{t('subscription:cancel')}</Text>
-              </TouchableOpacity>
+          <Text style={styles.formule}>{t('subscription:planName')}</Text>
+
+          <TouchableOpacity
+            style={styles.avantagesBouton}
+            onPress={() => setAvantagesOuverts((ouvert) => !ouvert)}
+            activeOpacity={0.7}
+          >
+            {avantagesOuverts ? (
+              <ChevronUp size={16} color={themeColors.info} />
+            ) : (
+              <ChevronDown size={16} color={themeColors.info} />
             )}
-          </View>
-        ) : !venteOuverte ? (
-          <View style={styles.horsApp}>
-            <Text style={styles.horsAppTexte}>
-              {t('subscription:saleOutsideApp')}
-            </Text>
-          </View>
-        ) : (
-          <>
-            {(
-              [['YEARLY', 'yearly', 'yearlyHint']] as const
-            ).map(([plan, titre, aide]) => (
-              <TouchableOpacity
-                key={plan}
-                style={styles.formule}
-                onPress={() => souscrire(plan)}
-                disabled={occupe}
-                activeOpacity={0.85}
-              >
-                <View style={styles.formuleTexte}>
-                  <Text style={styles.formuleTitre}>
-                    {t(`subscription:${titre}`)}
+            <Text style={styles.avantagesLien}>{t('subscription:benefits')}</Text>
+          </TouchableOpacity>
+
+          {avantagesOuverts ? (
+            <View style={styles.avantages}>
+              {AVANTAGES.map((groupe) => (
+                <View key={groupe.titre} style={styles.avantagesGroupe}>
+                  <Text style={styles.avantagesTitre}>
+                    {t(`subscription:${groupe.titre}`)}
                   </Text>
-                  <Text style={styles.formuleAide}>
-                    {t(`subscription:${aide}`)}
+
+                  {groupe.lignes.map((ligne) => (
+                    <View key={ligne} style={styles.avantage}>
+                      <CircleCheck size={14} color={themeColors.info} />
+                      <Text style={styles.avantageTexte}>
+                        {t(`subscription:${ligne}`)}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </View>
+
+        {actif ? (
+          <>
+            <Text style={styles.section}>{t('subscription:nextPayment')}</Text>
+
+            {resilie ? (
+              <Text style={styles.information}>
+                {t('subscription:cancelled', {
+                  date: formatDate(abonnement?.finDePeriode ?? null, i18n.language),
+                })}
+              </Text>
+            ) : (
+              <View style={styles.lignes}>
+                <View style={styles.ligne}>
+                  <Text style={styles.ligneLibelle}>
+                    {t('subscription:paymentDate')}
+                  </Text>
+                  <Text style={styles.ligneValeur}>
+                    {formatDate(abonnement?.finDePeriode ?? null, i18n.language)}
                   </Text>
                 </View>
 
-                <Text style={styles.formuleAction}>
-                  {t('subscription:subscribe')}
+                <View style={styles.ligne}>
+                  <Text style={styles.ligneLibelle}>{t('subscription:price')}</Text>
+                  <Text style={styles.ligneValeur}>{prix}</Text>
+                </View>
+              </View>
+            )}
+
+            {resilie ? null : (
+              <TouchableOpacity
+                style={styles.boutonContour}
+                onPress={resilier}
+                disabled={occupe}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.boutonContourTexte}>
+                  {t('subscription:cancelMine')}
                 </Text>
               </TouchableOpacity>
-            ))}
+            )}
+          </>
+        ) : venteOuverte ? (
+          <>
+            <Text style={styles.information}>{t('subscription:subtitle')}</Text>
+
+            <TouchableOpacity
+              style={styles.boutonPlein}
+              onPress={souscrire}
+              disabled={occupe}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.boutonPleinTexte}>
+                {t('subscription:subscribe')}
+                {prix ? ` · ${prix}` : ''}
+              </Text>
+            </TouchableOpacity>
+
+            <Text style={styles.aide}>{t('subscription:yearlyHint')}</Text>
 
             {enAttente ? (
-              <View style={styles.simulation}>
-                <Text style={styles.simulationAide}>
-                  {t('subscription:simulateHint')}
+              <TouchableOpacity
+                style={styles.boutonContour}
+                onPress={() => agir(simulatePaymentApi)}
+                disabled={occupe}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.boutonContourTexte}>
+                  {t('subscription:simulate')}
                 </Text>
-
-                <TouchableOpacity
-                  style={styles.simulationBouton}
-                  onPress={() => agir(simulatePaymentApi)}
-                  disabled={occupe}
-                >
-                  <Text style={styles.simulationTexte}>
-                    {t('subscription:simulate')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
             ) : null}
           </>
+        ) : (
+          <Text style={styles.information}>
+            {t('subscription:saleOutsideApp')}
+          </Text>
         )}
 
+        {abonne ? (
+          <>
+            <Text style={styles.section}>{t('subscription:paymentMethods')}</Text>
+
+            {moyens.length === 0 ? (
+              <Text style={styles.information}>
+                {t('subscription:noPaymentMethod')}
+              </Text>
+            ) : null}
+
+            {principal ? (
+              <>
+                <Text style={styles.sousSection}>{t('subscription:primary')}</Text>
+
+                <View style={styles.moyen}>
+                  <View style={styles.moyenTexte}>
+                    <Text style={styles.moyenLibelle}>
+                      <Text style={styles.moyenMarque}>{principal.libelle}</Text>
+                      {principal.type === 'paypal'
+                        ? ` ${principal.detail}`
+                        : ` ${t('subscription:endingIn', { last4: principal.detail })}`}
+                    </Text>
+
+                    <TouchableOpacity
+                      onPress={() => retirerLeMoyen(principal)}
+                      disabled={occupe}
+                    >
+                      <Text style={styles.moyenAction}>
+                        {t('subscription:remove')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </>
+            ) : null}
+
+            {autres.length > 0 ? (
+              <>
+                <Text style={styles.sousSection}>
+                  {t('subscription:otherMethods')}
+                </Text>
+
+                {autres.map((moyen) => (
+                  <View key={moyen.id} style={styles.moyen}>
+                    <View style={styles.moyenTexte}>
+                      <Text style={styles.moyenLibelle}>
+                        <Text style={styles.moyenMarque}>{moyen.libelle}</Text>
+                        {moyen.type === 'paypal'
+                          ? ` ${moyen.detail}`
+                          : ` ${t('subscription:endingIn', { last4: moyen.detail })}`}
+                      </Text>
+
+                      <View style={styles.moyenActions}>
+                        <TouchableOpacity
+                          onPress={() =>
+                            agir(async () =>
+                              setMoyens(await setPrimaryPaymentMethodApi(moyen.id)),
+                            )
+                          }
+                          disabled={occupe}
+                        >
+                          <Text style={styles.moyenAction}>
+                            {t('subscription:setPrimary')}
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          onPress={() => retirerLeMoyen(moyen)}
+                          disabled={occupe}
+                        >
+                          <Text style={styles.moyenAction}>
+                            {t('subscription:remove')}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </>
+            ) : null}
+
+            {venteOuverte ? (
+              <TouchableOpacity
+                style={styles.boutonContour}
+                onPress={() =>
+                  agir(async () => {
+                    const { url } = await addPaymentMethodApi();
+
+                    await ouvrir(url);
+                  })
+                }
+                disabled={occupe}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.boutonContourTexte}>
+                  {t('subscription:addMethod')}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+          </>
+        ) : null}
+
         <Text style={styles.section}>{t('subscription:referralTitle')}</Text>
-        <Text style={styles.sousTitre}>{t('subscription:referralHint')}</Text>
+        <Text style={styles.information}>{t('subscription:referralHint')}</Text>
 
         {parrainage ? (
-          <View style={styles.carteParrainage}>
+          <View style={styles.carte}>
             <Text style={styles.codeLibelle}>{t('subscription:yourCode')}</Text>
             <Text style={styles.code}>{parrainage.code}</Text>
 
@@ -211,14 +408,17 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
             </View>
 
             <TouchableOpacity
-              style={styles.partager}
+              style={styles.boutonContour}
               onPress={() =>
                 Share.share({
                   message: `${t('subscription:referralHint')} ${parrainage.code}`,
                 }).catch(() => undefined)
               }
+              activeOpacity={0.8}
             >
-              <Text style={styles.partagerTexte}>{t('subscription:share')}</Text>
+              <Text style={styles.boutonContourTexte}>
+                {t('subscription:share')}
+              </Text>
             </TouchableOpacity>
           </View>
         ) : null}
@@ -269,78 +469,92 @@ const creerStyles = (c: ThemeColors) =>
     },
     rond: { width: 36, height: 36 },
     titre: { fontSize: 17, fontWeight: '700', color: c.text },
-    contenu: { padding: 16, gap: 12, paddingBottom: 120 },
-    sousTitre: { fontSize: 14, lineHeight: 20, color: c.textMuted },
+    contenu: { padding: 16, gap: 10, paddingBottom: 120 },
     section: {
-      fontSize: 16,
+      fontSize: 13,
       fontWeight: '700',
       color: c.text,
-      marginTop: 24,
+      marginTop: 14,
     },
-    formule: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+    sousSection: { fontSize: 12, color: c.textMuted, marginTop: 4 },
+    information: { fontSize: 13, lineHeight: 19, color: c.textMuted },
+    aide: { fontSize: 12, color: c.textMuted, textAlign: 'center' },
+    carte: {
       backgroundColor: c.surface,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: c.border,
-      padding: 16,
-    },
-    formuleTexte: { flex: 1, gap: 2 },
-    formuleTitre: { fontSize: 15, fontWeight: '700', color: c.text },
-    formuleAide: { fontSize: 13, color: c.textMuted },
-    formuleAction: { fontSize: 14, fontWeight: '700', color: c.primary },
-    horsApp: {
-      backgroundColor: c.surfaceAlt,
-      borderRadius: 16,
-      padding: 16,
-    },
-    horsAppTexte: { fontSize: 14, lineHeight: 20, color: c.textMuted },
-    carteActive: {
-      backgroundColor: c.surface,
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: c.border,
-      padding: 16,
-      gap: 10,
-    },
-    etat: { fontSize: 15, fontWeight: '600', color: c.text },
-    resilier: { fontSize: 14, color: c.danger },
-    simulation: {
-      backgroundColor: c.surfaceAlt,
-      borderRadius: 16,
-      padding: 16,
-      gap: 10,
-    },
-    simulationAide: { fontSize: 13, lineHeight: 19, color: c.textMuted },
-    simulationBouton: {
-      backgroundColor: c.contrast,
-      borderRadius: 999,
-      paddingVertical: 13,
-      alignItems: 'center',
-    },
-    simulationTexte: { color: c.onContrast, fontWeight: '600' },
-    carteParrainage: {
-      backgroundColor: c.surface,
-      borderRadius: 16,
+      borderRadius: 14,
       borderWidth: 1,
       borderColor: c.border,
       padding: 16,
       gap: 8,
     },
+    pastille: {
+      alignSelf: 'flex-start',
+      backgroundColor: c.surfaceAlt,
+      borderRadius: 999,
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+    },
+    pastilleActive: { backgroundColor: c.accent },
+    pastilleTexte: { fontSize: 11, fontWeight: '700', color: c.textMuted },
+    pastilleTexteActive: { color: '#FFFFFF' },
+    formule: { fontSize: 18, fontWeight: '700', color: c.text },
+    avantagesBouton: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+    avantagesLien: {
+      fontSize: 12,
+      color: c.info,
+      textDecorationLine: 'underline',
+    },
+    avantages: { gap: 12, marginTop: 4 },
+    avantagesGroupe: { gap: 6 },
+    avantagesTitre: { fontSize: 13, fontWeight: '700', color: c.text },
+    avantage: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    avantageTexte: { flex: 1, fontSize: 12, color: c.text },
+    lignes: { gap: 10 },
+    ligne: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    ligneLibelle: { fontSize: 13, color: c.textMuted },
+    ligneValeur: { fontSize: 13, color: c.text },
+    boutonContour: {
+      borderWidth: 1,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+      borderRadius: 12,
+      paddingVertical: 13,
+      alignItems: 'center',
+      marginTop: 4,
+    },
+    boutonContourTexte: { fontSize: 13, fontWeight: '600', color: c.text },
+    boutonPlein: {
+      backgroundColor: c.contrast,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: 'center',
+    },
+    boutonPleinTexte: { color: c.onContrast, fontWeight: '700', fontSize: 14 },
+    moyen: {
+      backgroundColor: c.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: c.border,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    },
+    moyenTexte: { gap: 4 },
+    moyenLibelle: { fontSize: 13, color: c.text },
+    moyenMarque: { fontWeight: '700' },
+    moyenActions: { flexDirection: 'row', gap: 16 },
+    moyenAction: {
+      fontSize: 11,
+      color: c.textMuted,
+      textDecorationLine: 'underline',
+    },
     codeLibelle: { fontSize: 13, color: c.textMuted },
     code: { fontSize: 26, fontWeight: '800', letterSpacing: 3, color: c.text },
     compteurs: { flexDirection: 'row', gap: 16 },
     compteur: { fontSize: 13, color: c.textMuted },
-    partager: {
-      marginTop: 4,
-      backgroundColor: c.contrast,
-      borderRadius: 999,
-      paddingVertical: 13,
-      alignItems: 'center',
-    },
-    partagerTexte: { color: c.onContrast, fontWeight: '600' },
     saisie: { flexDirection: 'row', gap: 10, alignItems: 'center' },
     champ: {
       flex: 1,
@@ -350,6 +564,7 @@ const creerStyles = (c: ThemeColors) =>
       paddingHorizontal: 14,
       paddingVertical: 12,
       color: c.text,
+      backgroundColor: c.surface,
     },
     valider: {
       backgroundColor: c.contrast,
