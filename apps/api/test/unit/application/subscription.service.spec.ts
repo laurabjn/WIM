@@ -33,6 +33,7 @@ function creer(
     tarifs: jest.fn().mockResolvedValue({ MONTHLY: null, YEARLY: null }),
     ouvrirLePortail: jest.fn().mockResolvedValue('https://portail.stripe.com/x'),
     resilier: jest.fn().mockResolvedValue(options.resilier ?? true),
+    offrirDesJours: jest.fn().mockResolvedValue(null),
     moyensDePaiement: jest.fn().mockResolvedValue([]),
     definirLeMoyenPrincipal: jest.fn().mockResolvedValue(true),
     retirerLeMoyen: jest.fn().mockResolvedValue(true),
@@ -272,12 +273,12 @@ describe('SubscriptionService.appliquerVerdict', () => {
     );
   });
 
-  it('paie le parrainage sur la premiere activation', async () => {
+  it('paie le parrainage au premier paiement reel du filleul', async () => {
     const { referrals, service } = creer({
       id: 'ab-1',
       userId: 'user-1',
       plan: 'YEARLY',
-      startedAt: null,
+      startedAt: new Date(Date.now() - 365 * JOUR_MS),
       externalId: 'sub_456',
     });
 
@@ -285,17 +286,18 @@ describe('SubscriptionService.appliquerVerdict', () => {
       externalId: 'sub_456',
       statut: 'ACTIVE',
       finDePeriode: null,
+      paye: true,
     });
 
     expect(referrals.recompenser).toHaveBeenCalled();
   });
 
-  it('ne repaie pas le parrainage a chaque reconduction', async () => {
+  it('ne paie pas le parrainage pour une inscription encore gratuite', async () => {
     const { referrals, service } = creer({
       id: 'ab-1',
       userId: 'user-1',
       plan: 'YEARLY',
-      startedAt: new Date(Date.now() - 365 * JOUR_MS),
+      startedAt: null,
       externalId: 'sub_456',
     });
 
@@ -382,6 +384,26 @@ describe('SubscriptionService.portail', () => {
 });
 
 describe('SubscriptionService.offrirDesJours', () => {
+  it('prend la date que le prestataire a fixee quand il porte le cadeau', async () => {
+    const finStripe = new Date(Date.now() + 400 * JOUR_MS);
+
+    const { prisma, provider, service } = creer({
+      id: 'ab-1',
+      plan: 'YEARLY',
+      externalId: 'sub_456',
+      currentPeriodEnd: new Date(Date.now() + 100 * JOUR_MS),
+    });
+
+    provider.offrirDesJours.mockResolvedValue(finStripe);
+
+    await service.offrirDesJours('user-1', 30);
+
+    expect(provider.offrirDesJours).toHaveBeenCalledWith('sub_456', 30);
+    expect(prisma.subscription.update.mock.calls[0][0].data.currentPeriodEnd).toEqual(
+      finStripe,
+    );
+  });
+
   it('prolonge la periode en cours au lieu de la remplacer', async () => {
     const fin = new Date(Date.now() + 100 * JOUR_MS);
 

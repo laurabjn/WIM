@@ -147,6 +147,47 @@ describe('StripePaymentProvider.lireEvenement', () => {
     expect(provider.lireEvenement(corps, 'signature')?.statut).toBe('EXPIRED');
   });
 
+  it('signale un paiement reel a la facture reglee', () => {
+    const fin = Math.floor(Date.now() / 1000) + 365 * 24 * 3600;
+
+    const provider = fournisseurAvec({
+      type: 'invoice.paid',
+      data: {
+        object: {
+          id: 'in_1',
+          amount_paid: 2500,
+          currency: 'eur',
+          parent: { subscription_details: { subscription: 'sub_456' } },
+          lines: { data: [{ period: { end: fin } }] },
+        },
+      },
+    });
+
+    expect(provider.lireEvenement(corps, 'signature')).toEqual({
+      externalId: 'sub_456',
+      statut: 'ACTIVE',
+      finDePeriode: new Date(fin * 1000),
+      paye: true,
+    });
+  });
+
+  it('ne compte pas une facture a zero comme un paiement', () => {
+    const provider = fournisseurAvec({
+      type: 'invoice.paid',
+      data: {
+        object: {
+          id: 'in_0',
+          amount_paid: 0,
+          currency: 'eur',
+          parent: { subscription_details: { subscription: 'sub_456' } },
+          lines: { data: [] },
+        },
+      },
+    });
+
+    expect(provider.lireEvenement(corps, 'signature')).toBeNull();
+  });
+
   it('ignore les evenements dont nous n avons que faire', () => {
     const provider = fournisseurAvec({
       type: 'invoice.created',
@@ -448,5 +489,45 @@ describe('StripePaymentProvider.moyensDePaiement', () => {
     await expect(provider.retirerLeMoyen('sub_1', 'pm_paypal')).resolves.toBe(true);
 
     expect(detacher).toHaveBeenCalledWith('pm_paypal');
+  });
+});
+
+describe('StripePaymentProvider.offrirDesJours', () => {
+  function fournisseurProlongeable(finActuelle: number) {
+    const provider = new StripePaymentProvider();
+    const modifier = jest.fn().mockResolvedValue({});
+
+    (provider as unknown as { stripe: unknown }).stripe = {
+      subscriptions: {
+        retrieve: jest.fn().mockResolvedValue({
+          items: { data: [{ current_period_end: finActuelle }] },
+        }),
+        update: modifier,
+      },
+    };
+
+    return { provider, modifier };
+  }
+
+  it('repousse la prochaine echeance de trente jours sans rien facturer', async () => {
+    const fin = Math.floor(Date.now() / 1000) + 100 * 24 * 3600;
+    const { provider, modifier } = fournisseurProlongeable(fin);
+
+    const nouvelleFin = await provider.offrirDesJours('sub_456', 30);
+
+    expect(nouvelleFin).toEqual(new Date((fin + 30 * 24 * 3600) * 1000));
+    expect(modifier).toHaveBeenCalledWith('sub_456', {
+      trial_end: fin + 30 * 24 * 3600,
+      proration_behavior: 'none',
+    });
+  });
+
+  it('part d aujourd hui quand la periode est deja passee', async () => {
+    const passee = Math.floor(Date.now() / 1000) - 100 * 24 * 3600;
+    const { provider } = fournisseurProlongeable(passee);
+
+    const nouvelleFin = await provider.offrirDesJours('sub_456', 30);
+
+    expect(nouvelleFin!.getTime()).toBeGreaterThan(Date.now() + 29 * 24 * 3600 * 1000);
   });
 });

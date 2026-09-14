@@ -21,6 +21,7 @@ export function isStripePaymentConfigured(): boolean {
 const DUREE_DU_CACHE_MS = 10 * 60 * 1000;
 
 const STATUTS_ACTIFS = new Set(['active', 'trialing']);
+const JOUR_S = 24 * 60 * 60;
 
 const LIBELLES: Record<string, string> = {
   visa: 'Visa',
@@ -164,6 +165,34 @@ export class StripePaymentProvider implements PaymentProviderPort {
       this.logger.warn(`Resiliation refusee pour ${abonnement} : ${erreur}`);
 
       return false;
+    }
+  }
+
+  async offrirDesJours(externalId: string, jours: number): Promise<Date | null> {
+    const abonnement = await this.abonnementDe(externalId);
+
+    if (!abonnement) return null;
+
+    try {
+      const detail = await this.stripe.subscriptions.retrieve(abonnement);
+      const finActuelle = detail.items?.data?.[0]?.current_period_end ?? 0;
+      const maintenant = Math.floor(Date.now() / 1000);
+      const nouvelleFin = Math.max(finActuelle, maintenant) + jours * JOUR_S;
+
+      await this.stripe.subscriptions.update(abonnement, {
+        trial_end: nouvelleFin,
+        proration_behavior: 'none',
+      });
+
+      this.logger.log(
+        `Abonnement ${abonnement} prolonge de ${jours} jours jusqu'au ${new Date(nouvelleFin * 1000).toISOString()}.`,
+      );
+
+      return new Date(nouvelleFin * 1000);
+    } catch (erreur: unknown) {
+      this.logger.warn(`Prolongation refusee pour ${abonnement} : ${erreur}`);
+
+      return null;
     }
   }
 
@@ -362,7 +391,32 @@ export class StripePaymentProvider implements PaymentProviderPort {
       );
     }
 
+    if (evenement.type === 'invoice.paid') {
+      return this.verdictDeLaFacture(evenement.data.object as Stripe.Invoice);
+    }
+
     return null;
+  }
+
+  private verdictDeLaFacture(facture: Stripe.Invoice): VerdictPaiement | null {
+    if (facture.amount_paid <= 0) return null;
+
+    const abonnement = facture.parent?.subscription_details?.subscription;
+
+    if (!abonnement) return null;
+
+    const fin = facture.lines?.data?.[0]?.period?.end;
+
+    this.logger.log(
+      `Facture ${facture.id} reglee : ${facture.amount_paid} ${facture.currency}.`,
+    );
+
+    return {
+      externalId: typeof abonnement === 'string' ? abonnement : abonnement.id,
+      statut: 'ACTIVE',
+      finDePeriode: typeof fin === 'number' ? new Date(fin * 1000) : null,
+      paye: true,
+    };
   }
 
   private verdictDeLaCaisse(

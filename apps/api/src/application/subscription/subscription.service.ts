@@ -316,8 +316,6 @@ export class SubscriptionService {
       return;
     }
 
-    const premiereActivation = abonnement.startedAt === null;
-
     await this.prisma.subscription.update({
       where: { id: abonnement.id },
       data: {
@@ -330,9 +328,7 @@ export class SubscriptionService {
       },
     });
 
-    // Le parrainage se paie sur une conversion reelle, pas sur une intention :
-    // il attend la premiere activation.
-    if (premiereActivation) {
+    if (verdict.paye) {
       await this.referrals.recompenser(abonnement.userId, (userId, jours) =>
         this.offrirDesJours(userId, jours),
       );
@@ -372,7 +368,7 @@ export class SubscriptionService {
   async offrirDesJours(userId: string, jours: number): Promise<void> {
     const abonnement = await this.prisma.subscription.findUnique({
       where: { userId },
-      select: { id: true, currentPeriodEnd: true, plan: true },
+      select: { id: true, currentPeriodEnd: true, plan: true, externalId: true },
     });
 
     const maintenant = Date.now();
@@ -382,7 +378,11 @@ export class SubscriptionService {
       maintenant,
     );
 
-    const fin = new Date(depart + jours * JOUR_MS);
+    const finChezLePrestataire = abonnement?.externalId
+      ? await this.provider.offrirDesJours(abonnement.externalId, jours)
+      : null;
+
+    const fin = finChezLePrestataire ?? new Date(depart + jours * JOUR_MS);
 
     if (!abonnement) {
       await this.prisma.subscription.create({

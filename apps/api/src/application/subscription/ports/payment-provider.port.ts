@@ -5,6 +5,7 @@ export type VerdictPaiement = {
   nouvelExternalId?: string;
   statut: 'ACTIVE' | 'CANCELLED' | 'EXPIRED';
   finDePeriode: Date | null;
+  paye?: boolean;
 };
 
 export type TarifAffiche = {
@@ -29,6 +30,8 @@ export interface PaymentProviderPort {
   ouvrirLePortail(externalId: string): Promise<string | null>;
 
   resilier(externalId: string): Promise<boolean>;
+
+  offrirDesJours(externalId: string, jours: number): Promise<Date | null>;
 
   moyensDePaiement(externalId: string): Promise<MoyenDePaiement[]>;
 

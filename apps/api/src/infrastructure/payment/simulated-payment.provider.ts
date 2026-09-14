@@ -28,6 +28,10 @@ export class SimulatedPaymentProvider implements PaymentProviderPort {
     return true;
   }
 
+  async offrirDesJours(): Promise<Date | null> {
+    return null;
+  }
+
   async moyensDePaiement(): Promise<MoyenDePaiement[]> {
     return [];
   }

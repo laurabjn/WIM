@@ -262,7 +262,7 @@ describe('SubscriptionController.simuler', () => {
     await controller.simuler(utilisateur as never);
 
     expect(subscriptions.appliquerVerdict).toHaveBeenCalledWith(
-      expect.objectContaining({ externalId: 'cs_123', statut: 'ACTIVE' }),
+      expect.objectContaining({ externalId: 'cs_123', statut: 'ACTIVE', paye: true }),
     );
   });
 

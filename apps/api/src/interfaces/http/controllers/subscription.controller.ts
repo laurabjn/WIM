@@ -197,6 +197,7 @@ export class SubscriptionController {
       externalId: abonnement,
       statut: 'ACTIVE',
       finDePeriode: null,
+      paye: true,
     });
 
     return this.subscriptions.etat(req.user.sub);
