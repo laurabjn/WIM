@@ -157,8 +157,6 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.contenu}>
-        <Text style={styles.section}>{t('subscription:mine')}</Text>
-
         <View style={styles.carte}>
           <View style={[styles.pastille, actif ? styles.pastilleActive : null]}>
             <Text
