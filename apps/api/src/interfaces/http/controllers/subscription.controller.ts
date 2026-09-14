@@ -2,11 +2,13 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Headers,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   RawBodyRequest,
   Req,
@@ -92,6 +94,51 @@ export class SubscriptionController {
   @HttpCode(HttpStatus.OK)
   async portail(@Req() req: AuthenticatedRequest) {
     return this.subscriptions.portail(req.user.sub);
+  }
+
+  @Get('payment-methods')
+  @UseGuards(JwtAuthGuard)
+  async moyensDePaiement(@Req() req: AuthenticatedRequest) {
+    return this.subscriptions.moyensDePaiement(req.user.sub);
+  }
+
+  @Post('payment-methods/default')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async moyenPrincipal(
+    @Req() req: AuthenticatedRequest,
+    @Body() body: { id?: string },
+  ) {
+    if (!body?.id) {
+      throw new BadRequestException('Moyen de paiement manquant.');
+    }
+
+    return this.subscriptions.definirLeMoyenPrincipal(req.user.sub, body.id);
+  }
+
+  @Delete('payment-methods/:id')
+  @UseGuards(JwtAuthGuard)
+  async retirerLeMoyen(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    return this.subscriptions.retirerLeMoyen(req.user.sub, id);
+  }
+
+  @Post('payment-methods/setup')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async ajouterUnMoyen(
+    @Req() req: AuthenticatedRequest,
+    @Headers('x-platform') plateforme?: string,
+  ) {
+    if (!this.subscriptions.venteAutorisee(plateforme)) {
+      throw new ForbiddenException(
+        "L'ajout d'un moyen de paiement ne se fait pas depuis cette application.",
+      );
+    }
+
+    return this.subscriptions.ajouterUnMoyen(req.user.sub);
   }
 
   @Post('webhook')

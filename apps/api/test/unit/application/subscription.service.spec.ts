@@ -33,6 +33,10 @@ function creer(
     tarifs: jest.fn().mockResolvedValue({ MONTHLY: null, YEARLY: null }),
     ouvrirLePortail: jest.fn().mockResolvedValue('https://portail.stripe.com/x'),
     resilier: jest.fn().mockResolvedValue(options.resilier ?? true),
+    moyensDePaiement: jest.fn().mockResolvedValue([]),
+    definirLeMoyenPrincipal: jest.fn().mockResolvedValue(true),
+    retirerLeMoyen: jest.fn().mockResolvedValue(true),
+    ajouterUnMoyen: jest.fn().mockResolvedValue('https://enregistrement'),
     creerPaiement: jest.fn().mockResolvedValue({
       url: 'https://checkout.stripe.com/abc',
       externalId: 'cs_123',
@@ -314,6 +318,48 @@ describe('SubscriptionService.appliquerVerdict', () => {
     });
 
     expect(prisma.subscription.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('SubscriptionService.moyens de paiement', () => {
+  it('n a rien a lister sans abonnement', async () => {
+    const { provider, service } = creer(null);
+
+    await expect(service.moyensDePaiement('user-1')).resolves.toEqual([]);
+
+    expect(provider.moyensDePaiement).not.toHaveBeenCalled();
+  });
+
+  it('refuse d ajouter un moyen sans abonnement', async () => {
+    const { service } = creer(null);
+
+    await expect(service.ajouterUnMoyen('user-1')).rejects.toThrow(
+      'Aucun abonnement',
+    );
+  });
+
+  it('signale un moyen que le prestataire ne reconnait pas', async () => {
+    const { provider, service } = creer({ externalId: 'sub_456' });
+
+    provider.retirerLeMoyen.mockResolvedValue(false);
+
+    await expect(service.retirerLeMoyen('user-1', 'pm_x')).rejects.toThrow(
+      'introuvable',
+    );
+  });
+
+  it('renvoie la liste a jour apres un changement de principal', async () => {
+    const { provider, service } = creer({ externalId: 'sub_456' });
+
+    provider.moyensDePaiement.mockResolvedValue([
+      { id: 'pm_1', type: 'card', libelle: 'Visa', detail: '4242', principal: true },
+    ]);
+
+    await expect(
+      service.definirLeMoyenPrincipal('user-1', 'pm_1'),
+    ).resolves.toHaveLength(1);
+
+    expect(provider.definirLeMoyenPrincipal).toHaveBeenCalledWith('sub_456', 'pm_1');
   });
 });
 

@@ -9,6 +9,7 @@ import {
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { PAYMENT_PROVIDER } from 'src/interfaces/http/tokens/token';
 import type {
+  MoyenDePaiement,
   PaymentProviderPort,
   PlanAbonnement,
   TarifsParPlan,
@@ -208,6 +209,73 @@ export class SubscriptionService {
     }
 
     return { url };
+  }
+
+  async moyensDePaiement(userId: string): Promise<MoyenDePaiement[]> {
+    const externalId = await this.identifiantDuCompte(userId);
+
+    return externalId ? this.provider.moyensDePaiement(externalId) : [];
+  }
+
+  async definirLeMoyenPrincipal(
+    userId: string,
+    moyenId: string,
+  ): Promise<MoyenDePaiement[]> {
+    const externalId = await this.identifiantDuCompte(userId);
+
+    if (!externalId) {
+      throw new NotFoundException('Aucun abonnement.');
+    }
+
+    if (!(await this.provider.definirLeMoyenPrincipal(externalId, moyenId))) {
+      throw new NotFoundException('Moyen de paiement introuvable.');
+    }
+
+    return this.provider.moyensDePaiement(externalId);
+  }
+
+  async retirerLeMoyen(
+    userId: string,
+    moyenId: string,
+  ): Promise<MoyenDePaiement[]> {
+    const externalId = await this.identifiantDuCompte(userId);
+
+    if (!externalId) {
+      throw new NotFoundException('Aucun abonnement.');
+    }
+
+    if (!(await this.provider.retirerLeMoyen(externalId, moyenId))) {
+      throw new NotFoundException('Moyen de paiement introuvable.');
+    }
+
+    return this.provider.moyensDePaiement(externalId);
+  }
+
+  async ajouterUnMoyen(userId: string): Promise<{ url: string }> {
+    const externalId = await this.identifiantDuCompte(userId);
+
+    if (!externalId) {
+      throw new NotFoundException('Aucun abonnement.');
+    }
+
+    const url = await this.provider.ajouterUnMoyen(externalId);
+
+    if (!url) {
+      throw new ServiceUnavailableException(
+        "L'ajout d'un moyen de paiement est indisponible.",
+      );
+    }
+
+    return { url };
+  }
+
+  private async identifiantDuCompte(userId: string): Promise<string | null> {
+    const abonnement = await this.prisma.subscription.findUnique({
+      where: { userId },
+      select: { externalId: true },
+    });
+
+    return abonnement?.externalId ?? null;
   }
 
   async identifiantExterne(userId: string): Promise<string> {

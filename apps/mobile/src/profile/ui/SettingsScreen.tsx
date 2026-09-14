@@ -479,16 +479,9 @@ export function SettingsScreen({ route, navigation }: Props) {
         <SettingsSection title={t('profile:settings.subscription')}>
           <SettingsRow
             icon="★"
-            label={t('subscription:title')}
-            value={t('subscription:offerValue')}
-            onPress={() => navigation.navigate('Subscription')}
-          />
-
-          <SettingsRow
-            icon="⚙"
-            label={t('subscription:manage')}
+            label={t('subscription:mine')}
             value={t('subscription:manageValue')}
-            onPress={() => navigation.navigate('SubscriptionManage')}
+            onPress={() => navigation.navigate('Subscription')}
           />
         </SettingsSection>
 

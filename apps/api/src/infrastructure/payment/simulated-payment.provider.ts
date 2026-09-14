@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 import type {
+  MoyenDePaiement,
   PaymentProviderPort,
   PlanAbonnement,
   TarifsParPlan,
@@ -25,6 +26,22 @@ export class SimulatedPaymentProvider implements PaymentProviderPort {
 
   async resilier(): Promise<boolean> {
     return true;
+  }
+
+  async moyensDePaiement(): Promise<MoyenDePaiement[]> {
+    return [];
+  }
+
+  async definirLeMoyenPrincipal(): Promise<boolean> {
+    return false;
+  }
+
+  async retirerLeMoyen(): Promise<boolean> {
+    return false;
+  }
+
+  async ajouterUnMoyen(): Promise<string | null> {
+    return null;
   }
 
   async creerPaiement(params: {

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import Stripe = require('stripe');
 
 import type {
+  MoyenDePaiement,
   PaymentProviderPort,
   PlanAbonnement,
   TarifAffiche,
@@ -20,6 +21,19 @@ export function isStripePaymentConfigured(): boolean {
 const DUREE_DU_CACHE_MS = 10 * 60 * 1000;
 
 const STATUTS_ACTIFS = new Set(['active', 'trialing']);
+
+const LIBELLES: Record<string, string> = {
+  visa: 'Visa',
+  mastercard: 'Mastercard',
+  amex: 'American Express',
+  cartes_bancaires: 'Carte bancaire',
+  sepa_debit: 'Prélèvement SEPA',
+  paypal: 'PayPal',
+};
+
+function libelleDe(cle: string): string {
+  return LIBELLES[cle] ?? cle.charAt(0).toUpperCase() + cle.slice(1);
+}
 
 @Injectable()
 export class StripePaymentProvider implements PaymentProviderPort {
@@ -153,6 +167,139 @@ export class StripePaymentProvider implements PaymentProviderPort {
     }
   }
 
+  async moyensDePaiement(externalId: string): Promise<MoyenDePaiement[]> {
+    const client = await this.clientDe(externalId);
+
+    if (!client) return [];
+
+    const [moyens, principal] = await Promise.all([
+      this.stripe.paymentMethods.list({ customer: client, limit: 20 }),
+      this.moyenPrincipalDe(externalId, client),
+    ]);
+
+    if (moyens.data.length === 0) return [];
+
+    const principalEffectif = principal ?? moyens.data[0].id;
+
+    if (!principal) {
+      await this.definirLeMoyenPrincipal(externalId, principalEffectif);
+    }
+
+    return moyens.data.map((moyen) => this.decrire(moyen, principalEffectif));
+  }
+
+  async definirLeMoyenPrincipal(
+    externalId: string,
+    moyenId: string,
+  ): Promise<boolean> {
+    const client = await this.clientDe(externalId);
+
+    if (!client || !(await this.appartientA(moyenId, client))) return false;
+
+    await this.stripe.customers.update(client, {
+      invoice_settings: { default_payment_method: moyenId },
+    });
+
+    const abonnement = await this.abonnementDe(externalId);
+
+    if (abonnement) {
+      await this.stripe.subscriptions.update(abonnement, {
+        default_payment_method: moyenId,
+      });
+    }
+
+    return true;
+  }
+
+  async retirerLeMoyen(externalId: string, moyenId: string): Promise<boolean> {
+    const client = await this.clientDe(externalId);
+
+    if (!client || !(await this.appartientA(moyenId, client))) return false;
+
+    await this.stripe.paymentMethods.detach(moyenId);
+
+    return true;
+  }
+
+  async ajouterUnMoyen(externalId: string): Promise<string | null> {
+    const client = await this.clientDe(externalId);
+
+    if (!client) return null;
+
+    const retour = this.urlDeRetour();
+
+    const session = await this.stripe.checkout.sessions.create({
+      mode: 'setup',
+      customer: client,
+      success_url: `${retour}?moyen=ok`,
+      cancel_url: `${retour}?moyen=annule`,
+    });
+
+    return session.url ?? null;
+  }
+
+  private async moyenPrincipalDe(
+    externalId: string,
+    client: string,
+  ): Promise<string | null> {
+    const abonnement = await this.abonnementDe(externalId);
+
+    if (abonnement) {
+      const detail = await this.stripe.subscriptions.retrieve(abonnement);
+      const moyen = detail.default_payment_method;
+
+      if (moyen) return typeof moyen === 'string' ? moyen : moyen.id;
+    }
+
+    const detailClient = await this.stripe.customers.retrieve(client);
+
+    if ('deleted' in detailClient && detailClient.deleted) return null;
+
+    const moyen = (detailClient as Stripe.Customer).invoice_settings
+      ?.default_payment_method;
+
+    return typeof moyen === 'string' ? moyen : (moyen?.id ?? null);
+  }
+
+  private async appartientA(moyenId: string, client: string): Promise<boolean> {
+    try {
+      const moyen = await this.stripe.paymentMethods.retrieve(moyenId);
+      const proprietaire = moyen.customer;
+
+      return (
+        (typeof proprietaire === 'string' ? proprietaire : proprietaire?.id) ===
+        client
+      );
+    } catch (erreur: unknown) {
+      this.logger.warn(`Moyen de paiement ${moyenId} illisible : ${erreur}`);
+
+      return false;
+    }
+  }
+
+  private decrire(
+    moyen: Stripe.PaymentMethod,
+    principal: string,
+  ): MoyenDePaiement {
+    const detail =
+      moyen.card?.last4 ??
+      moyen.sepa_debit?.last4 ??
+      moyen.paypal?.payer_email ??
+      '';
+
+    const libelle = moyen.card
+      ? libelleDe(moyen.card.brand)
+      : libelleDe(moyen.type);
+
+    return {
+      id: moyen.id,
+      type: moyen.type,
+      libelle,
+      detail,
+      principal: moyen.id === principal,
+    };
+  }
+
   private async abonnementDe(externalId: string): Promise<string | null> {
     if (externalId.startsWith('sub_')) return externalId;
 
@@ -221,6 +368,8 @@ export class StripePaymentProvider implements PaymentProviderPort {
   private verdictDeLaCaisse(
     session: Stripe.Checkout.Session,
   ): VerdictPaiement | null {
+    if (session.mode === 'setup') return null;
+
     if (session.payment_status === 'unpaid') return null;
 
     const abonnement =

@@ -6,7 +6,6 @@ import { View, Text } from 'react-native';
 import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
 import { SettingsScreen } from 'src/profile/ui/SettingsScreen';
 import { SubscriptionScreen } from 'src/subscription/ui/SubscriptionScreen';
-import { SubscriptionManageScreen } from 'src/subscription/ui/SubscriptionManageScreen';
 import { NotificationCenterScreen } from 'src/notifications/ui/NotificationCenterScreen';
 import { PreferencesScreen } from 'src/profile/ui/PreferencesScreen';
 import { FavoritesScreen } from 'src/home/ui/FavoritesScreen';
@@ -68,11 +67,6 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
       <Stack.Screen
         name="Subscription"
         component={SubscriptionScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="SubscriptionManage"
-        component={SubscriptionManageScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

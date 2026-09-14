@@ -39,6 +39,17 @@ describe('StripePaymentProvider.lireEvenement', () => {
     });
   });
 
+  it('ignore une caisse ouverte pour enregistrer un moyen de paiement', () => {
+    const provider = fournisseurAvec({
+      type: 'checkout.session.completed',
+      data: {
+        object: { id: 'cs_setup', mode: 'setup', payment_status: 'no_payment_required' },
+      },
+    });
+
+    expect(provider.lireEvenement(corps, 'signature')).toBeNull();
+  });
+
   it('ignore une caisse restee impayee', () => {
     const provider = fournisseurAvec({
       type: 'checkout.session.completed',
@@ -326,5 +337,116 @@ describe('StripePaymentProvider.resilier', () => {
       .stripe.subscriptions.update.mockRejectedValue(new Error('refus'));
 
     await expect(provider.resilier('sub_456')).resolves.toBe(false);
+  });
+});
+
+describe('StripePaymentProvider.moyensDePaiement', () => {
+  const carte = {
+    id: 'pm_carte',
+    type: 'card',
+    customer: 'cus_1',
+    card: { brand: 'mastercard', last4: '6789' },
+  };
+  const paypal = {
+    id: 'pm_paypal',
+    type: 'paypal',
+    customer: 'cus_1',
+    paypal: { payer_email: 'lea@exemple.fr' },
+  };
+
+  function fournisseurAvecClient(options: {
+    moyens: unknown[];
+    principalAbonnement?: string | null;
+    principalClient?: string | null;
+  }) {
+    const provider = new StripePaymentProvider();
+    const modifierClient = jest.fn().mockResolvedValue({});
+    const modifierAbonnement = jest.fn().mockResolvedValue({});
+    const detacher = jest.fn().mockResolvedValue({});
+
+    (provider as unknown as { stripe: unknown }).stripe = {
+      subscriptions: {
+        retrieve: jest.fn().mockResolvedValue({
+          customer: 'cus_1',
+          default_payment_method: options.principalAbonnement ?? null,
+        }),
+        update: modifierAbonnement,
+      },
+      customers: {
+        retrieve: jest.fn().mockResolvedValue({
+          id: 'cus_1',
+          invoice_settings: {
+            default_payment_method: options.principalClient ?? null,
+          },
+        }),
+        update: modifierClient,
+      },
+      paymentMethods: {
+        list: jest.fn().mockResolvedValue({ data: options.moyens }),
+        retrieve: jest.fn().mockImplementation((id: string) =>
+          Promise.resolve(
+            options.moyens.find((m) => (m as { id: string }).id === id) ?? {
+              id,
+              customer: 'cus_autre',
+            },
+          ),
+        ),
+        detach: detacher,
+      },
+    };
+
+    return { provider, modifierClient, modifierAbonnement, detacher };
+  }
+
+  it('decrit chaque moyen avec sa marque et sa fin', async () => {
+    const { provider } = fournisseurAvecClient({
+      moyens: [carte, paypal],
+      principalAbonnement: 'pm_paypal',
+    });
+
+    await expect(provider.moyensDePaiement('sub_1')).resolves.toEqual([
+      { id: 'pm_carte', type: 'card', libelle: 'Mastercard', detail: '6789', principal: false },
+      { id: 'pm_paypal', type: 'paypal', libelle: 'PayPal', detail: 'lea@exemple.fr', principal: true },
+    ]);
+  });
+
+  it('promeut le premier moyen quand aucun n est principal', async () => {
+    const { provider, modifierClient, modifierAbonnement } = fournisseurAvecClient({
+      moyens: [carte, paypal],
+    });
+
+    const moyens = await provider.moyensDePaiement('sub_1');
+
+    expect(moyens[0].principal).toBe(true);
+    expect(modifierClient).toHaveBeenCalledWith('cus_1', {
+      invoice_settings: { default_payment_method: 'pm_carte' },
+    });
+    expect(modifierAbonnement).toHaveBeenCalledWith('sub_1', {
+      default_payment_method: 'pm_carte',
+    });
+  });
+
+  it('refuse de toucher au moyen d un autre client', async () => {
+    const { provider, detacher, modifierClient } = fournisseurAvecClient({
+      moyens: [carte],
+      principalClient: 'pm_carte',
+    });
+
+    await expect(provider.retirerLeMoyen('sub_1', 'pm_etranger')).resolves.toBe(false);
+    await expect(provider.definirLeMoyenPrincipal('sub_1', 'pm_etranger')).resolves.toBe(false);
+
+    expect(detacher).not.toHaveBeenCalled();
+    expect(modifierClient).not.toHaveBeenCalled();
+  });
+
+  it('detache un moyen qui appartient bien au client', async () => {
+    const { provider, detacher } = fournisseurAvecClient({
+      moyens: [carte, paypal],
+      principalClient: 'pm_carte',
+    });
+
+    await expect(provider.retirerLeMoyen('sub_1', 'pm_paypal')).resolves.toBe(true);
+
+    expect(detacher).toHaveBeenCalledWith('pm_paypal');
   });
 });

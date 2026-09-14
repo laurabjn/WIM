@@ -12,6 +12,10 @@ function creer(options: { verdict?: unknown; signatureValide?: boolean } = {}) {
     identifiantExterne: jest.fn().mockResolvedValue('cs_123'),
     analyse: jest.fn().mockResolvedValue({}),
     venteAutorisee: jest.fn().mockReturnValue(true),
+    moyensDePaiement: jest.fn().mockResolvedValue([]),
+    definirLeMoyenPrincipal: jest.fn().mockResolvedValue([]),
+    retirerLeMoyen: jest.fn().mockResolvedValue([]),
+    ajouterUnMoyen: jest.fn().mockResolvedValue({ url: 'https://enregistrement' }),
   };
 
   const referrals = {
@@ -179,6 +183,44 @@ describe('SubscriptionController.checkout', () => {
 
     expect(subscriptions.venteAutorisee).toHaveBeenCalledWith('android');
     expect(subscriptions.demarrer).toHaveBeenCalled();
+  });
+});
+
+describe('SubscriptionController.moyens de paiement', () => {
+  const utilisateur = { user: { sub: 'user-1', email: 'lea@exemple.fr' } };
+
+  it('refuse de definir un principal sans identifiant', async () => {
+    const { controller, subscriptions } = creer();
+
+    await expect(
+      controller.moyenPrincipal(utilisateur as never, {}),
+    ).rejects.toThrow('Moyen de paiement manquant');
+
+    expect(subscriptions.definirLeMoyenPrincipal).not.toHaveBeenCalled();
+  });
+
+  it('ferme l ajout d un moyen sur une plateforme ou la vente est fermee', async () => {
+    const { controller, subscriptions } = creer();
+
+    subscriptions.venteAutorisee.mockReturnValue(false);
+
+    await expect(
+      controller.ajouterUnMoyen(utilisateur as never, 'ios'),
+    ).rejects.toThrow('ne se fait pas depuis cette application');
+
+    expect(subscriptions.ajouterUnMoyen).not.toHaveBeenCalled();
+  });
+
+  it('laisse lister et retirer quelle que soit la plateforme', async () => {
+    const { controller, subscriptions } = creer();
+
+    subscriptions.venteAutorisee.mockReturnValue(false);
+
+    await controller.moyensDePaiement(utilisateur as never);
+    await controller.retirerLeMoyen(utilisateur as never, 'pm_1');
+
+    expect(subscriptions.moyensDePaiement).toHaveBeenCalledWith('user-1');
+    expect(subscriptions.retirerLeMoyen).toHaveBeenCalledWith('user-1', 'pm_1');
   });
 });
 

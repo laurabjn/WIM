@@ -21,6 +21,14 @@ export type EtatAbonnement = {
   venteDansLApp: boolean;
 };
 
+export type MoyenDePaiement = {
+  id: string;
+  type: string;
+  libelle: string;
+  detail: string;
+  principal: boolean;
+};
+
 export type EtatParrainage = {
   code: string;
   filleuls: number;
@@ -71,6 +79,29 @@ export function openBillingPortalApi(): Promise<{ url: string }> {
 
 export function cancelSubscriptionApi(): Promise<EtatAbonnement> {
   return appeler('/subscriptions/cancel', { method: 'POST' });
+}
+
+export function fetchPaymentMethodsApi(): Promise<MoyenDePaiement[]> {
+  return appeler('/subscriptions/payment-methods');
+}
+
+export function setPrimaryPaymentMethodApi(
+  id: string,
+): Promise<MoyenDePaiement[]> {
+  return appeler('/subscriptions/payment-methods/default', {
+    method: 'POST',
+    body: { id },
+  });
+}
+
+export function removePaymentMethodApi(id: string): Promise<MoyenDePaiement[]> {
+  return appeler(`/subscriptions/payment-methods/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
+}
+
+export function addPaymentMethodApi(): Promise<{ url: string }> {
+  return appeler('/subscriptions/payment-methods/setup', { method: 'POST' });
 }
 
 // Sans prestataire de paiement, l'API expose un retour de caisse simule : il
