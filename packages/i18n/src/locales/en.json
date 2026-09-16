@@ -1126,6 +1126,7 @@
     "yearly": "Yearly subscription",
     "monthlyHint": "No commitment",
     "yearlyHint": "First year free",
+    "freeUntil": "Free access until {{date}}. Nothing to do until then.",
     "subscribe": "Subscribe",
     "activeUntil": "Active until {{date}}",
     "cancelled": "Cancelled, active until {{date}}",

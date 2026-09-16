@@ -142,7 +142,9 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
   const resilie = Boolean(abonnement?.annuleLe);
   const enAttente = abonnement?.statut === 'PENDING';
   const venteOuverte = abonnement?.venteDansLApp !== false;
-  const abonne = actif || abonnement?.statut === 'CANCELLED';
+  const accesLibre = abonnement?.accesLibreJusquAu ?? null;
+  const abonne =
+    abonnement?.statut === 'ACTIVE' || abonnement?.statut === 'CANCELLED';
   const prix = abonnement?.tarifs.YEARLY?.libelle ?? '';
 
   const principal = moyens.find((moyen) => moyen.principal) ?? null;
@@ -208,7 +210,7 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
           ) : null}
         </View>
 
-        {actif ? (
+        {abonne && actif ? (
           <>
             <Text style={styles.section}>{t('subscription:nextPayment')}</Text>
 
@@ -249,6 +251,12 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
             )}
           </>
+        ) : accesLibre ? (
+          <Text style={styles.information}>
+            {t('subscription:freeUntil', {
+              date: formatDate(accesLibre, i18n.language),
+            })}
+          </Text>
         ) : venteOuverte ? (
           <>
             <Text style={styles.information}>{t('subscription:subtitle')}</Text>

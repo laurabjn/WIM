@@ -171,6 +171,85 @@ describe('SubscriptionService.venteAutorisee', () => {
   });
 });
 
+describe('SubscriptionService pendant la periode de lancement', () => {
+  const declare = process.env.SUBSCRIPTION_REQUIRED_FROM;
+  const dansUnAn = new Date(Date.now() + 365 * JOUR_MS);
+
+  beforeEach(() => {
+    process.env.SUBSCRIPTION_REQUIRED_FROM = dansUnAn.toISOString();
+  });
+
+  afterAll(() => {
+    if (declare === undefined) {
+      delete process.env.SUBSCRIPTION_REQUIRED_FROM;
+    } else {
+      process.env.SUBSCRIPTION_REQUIRED_FROM = declare;
+    }
+  });
+
+  it('ouvre les echanges a tout le monde sans rien souscrire', async () => {
+    const { prisma, service } = creer(null);
+
+    await expect(service.estActif('user-1')).resolves.toBe(true);
+
+    expect(prisma.subscription.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('annonce la date jusqu a laquelle l acces est libre', async () => {
+    const { service } = creer(null);
+
+    await expect(service.etat('user-1')).resolves.toMatchObject({
+      actif: true,
+      statut: 'NONE',
+      accesLibreJusquAu: dansUnAn.toISOString(),
+    });
+  });
+
+  it('refuse d ouvrir une caisse tant que l acces est libre', async () => {
+    const { provider, service } = creer(null);
+
+    await expect(service.demarrer('user-1', 'YEARLY')).rejects.toThrow(
+      "L'accès est libre jusqu'au",
+    );
+
+    expect(provider.creerPaiement).not.toHaveBeenCalled();
+  });
+
+  it('fait demarrer un cadeau a la fin de la periode de lancement', async () => {
+    const { prisma, service } = creer(null);
+
+    await service.offrirDesJours('user-1', 365);
+
+    const donnees = prisma.subscription.create.mock.calls[0][0].data;
+
+    expect(donnees.currentPeriodEnd.getTime()).toBe(
+      dansUnAn.getTime() + 365 * JOUR_MS,
+    );
+  });
+
+  it('redevient exigeant une fois la date passee', async () => {
+    process.env.SUBSCRIPTION_REQUIRED_FROM = new Date(
+      Date.now() - JOUR_MS,
+    ).toISOString();
+
+    const { service } = creer(null);
+
+    await expect(service.estActif('user-1')).resolves.toBe(false);
+    await expect(service.etat('user-1')).resolves.toMatchObject({
+      actif: false,
+      accesLibreJusquAu: null,
+    });
+  });
+
+  it('ignore une date illisible', async () => {
+    process.env.SUBSCRIPTION_REQUIRED_FROM = 'bientot';
+
+    const { service } = creer(null);
+
+    await expect(service.estActif('user-1')).resolves.toBe(false);
+  });
+});
+
 describe('SubscriptionService.etat', () => {
   it('laisse courir jusqu a son terme une periode deja reglee', async () => {
     const { service } = creer({

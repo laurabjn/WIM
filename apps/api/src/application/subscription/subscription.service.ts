@@ -26,6 +26,7 @@ const DUREE_JOURS: Record<PlanAbonnement, number> = {
 
 export type EtatAbonnement = {
   actif: boolean;
+  accesLibreJusquAu: string | null;
   plan: PlanAbonnement | null;
   statut: string;
   finDePeriode: string | null;
@@ -52,9 +53,12 @@ export class SubscriptionService {
       .tarifs()
       .catch(() => ({ MONTHLY: null, YEARLY: null }) as TarifsParPlan);
 
+    const accesLibre = this.accesLibreJusquAu();
+
     if (!abonnement) {
       return {
-        actif: false,
+        actif: accesLibre !== null,
+        accesLibreJusquAu: accesLibre?.toISOString() ?? null,
         plan: null,
         statut: 'NONE',
         finDePeriode: null,
@@ -65,7 +69,8 @@ export class SubscriptionService {
     }
 
     return {
-      actif: this.estEnCours(abonnement),
+      actif: accesLibre !== null || this.estEnCours(abonnement),
+      accesLibreJusquAu: accesLibre?.toISOString() ?? null,
       plan: abonnement.plan,
       statut: abonnement.status,
       finDePeriode: abonnement.currentPeriodEnd?.toISOString() ?? null,
@@ -89,6 +94,8 @@ export class SubscriptionService {
   // Une periode payee court jusqu'a son terme meme apres une annulation : c'est
   // du temps deja regle.
   async estActif(userId: string): Promise<boolean> {
+    if (this.accesLibreJusquAu()) return true;
+
     const abonnement = await this.prisma.subscription.findUnique({
       where: { userId },
       select: { status: true, currentPeriodEnd: true },
@@ -152,6 +159,14 @@ export class SubscriptionService {
     userId: string,
     plan: PlanAbonnement,
   ): Promise<{ url: string }> {
+    const accesLibre = this.accesLibreJusquAu();
+
+    if (accesLibre) {
+      throw new BadRequestException(
+        `L'accès est libre jusqu'au ${accesLibre.toLocaleDateString('fr-FR')}.`,
+      );
+    }
+
     if (await this.estActif(userId)) {
       throw new BadRequestException('Votre abonnement est déjà actif.');
     }
@@ -375,6 +390,7 @@ export class SubscriptionService {
 
     const depart = Math.max(
       abonnement?.currentPeriodEnd?.getTime() ?? maintenant,
+      this.accesLibreJusquAu()?.getTime() ?? maintenant,
       maintenant,
     );
 
@@ -402,6 +418,20 @@ export class SubscriptionService {
       where: { id: abonnement.id },
       data: { status: 'ACTIVE', currentPeriodEnd: fin },
     });
+  }
+
+  accesLibreJusquAu(): Date | null {
+    const declare = process.env.SUBSCRIPTION_REQUIRED_FROM?.trim();
+
+    if (!declare) return null;
+
+    const date = new Date(declare);
+
+    if (Number.isNaN(date.getTime()) || date.getTime() <= Date.now()) {
+      return null;
+    }
+
+    return date;
   }
 
   private estEnCours(

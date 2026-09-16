@@ -13,6 +13,7 @@ export type TarifAffiche = {
 
 export type EtatAbonnement = {
   actif: boolean;
+  accesLibreJusquAu: string | null;
   plan: PlanAbonnement | null;
   statut: string;
   finDePeriode: string | null;
