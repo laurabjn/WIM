@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { estUneDemandeDIdentite } from 'src/auth/ui/identityGate';
+import {
+  estUneDemandeDIdentite,
+  ouvrirLaPorteSiNonVerifie,
+} from 'src/auth/ui/identityGate';
 import {
     ActivityIndicator,
   Image,
@@ -49,6 +52,10 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { homeId } = route.params ?? {};
 
   const isCreating = !homeId;
+
+  useEffect(() => {
+    if (isCreating) void ouvrirLaPorteSiNonVerifie();
+  }, [isCreating]);
     
   const [activeTab, setActiveTab] = useState('Général');
   const [home, setHome] = useState<Home | null>(null);
