@@ -44,7 +44,10 @@ export interface PaymentProviderPort {
     userId: string;
     email: string;
     plan: PlanAbonnement;
+    coupon?: string;
   }): Promise<{ url: string; externalId: string }>;
+
+  appliquerUneRemise(externalId: string, coupon: string): Promise<boolean>;
 
   lireEvenement(corps: Buffer, signature: string): VerdictPaiement | null;
 }

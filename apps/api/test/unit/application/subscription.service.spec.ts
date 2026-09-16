@@ -526,3 +526,47 @@ describe('SubscriptionService.offrirDesJours', () => {
     );
   });
 });
+
+describe('SubscriptionService.demarrer pour un etudiant', () => {
+  const declare = process.env.STRIPE_STUDENT_COUPON;
+
+  afterEach(() => {
+    if (declare === undefined) {
+      delete process.env.STRIPE_STUDENT_COUPON;
+    } else {
+      process.env.STRIPE_STUDENT_COUPON = declare;
+    }
+  });
+
+  it('passe le bon etudiant a la caisse quand le statut est valide', async () => {
+    process.env.STRIPE_STUDENT_COUPON = 'ETUDIANT50';
+
+    const { prisma, provider, service } = creer(null);
+
+    prisma.user.findUnique.mockResolvedValue({
+      email: 'lea@exemple.fr',
+      studentVerifiedUntil: new Date(Date.now() + 100 * JOUR_MS),
+    });
+
+    await service.demarrer('user-1', 'YEARLY');
+
+    expect(provider.creerPaiement).toHaveBeenCalledWith(
+      expect.objectContaining({ coupon: 'ETUDIANT50' }),
+    );
+  });
+
+  it('ne passe aucun bon quand le statut a expire', async () => {
+    process.env.STRIPE_STUDENT_COUPON = 'ETUDIANT50';
+
+    const { prisma, provider, service } = creer(null);
+
+    prisma.user.findUnique.mockResolvedValue({
+      email: 'lea@exemple.fr',
+      studentVerifiedUntil: new Date(Date.now() - JOUR_MS),
+    });
+
+    await service.demarrer('user-1', 'YEARLY');
+
+    expect(provider.creerPaiement.mock.calls[0][0].coupon).toBeUndefined();
+  });
+});

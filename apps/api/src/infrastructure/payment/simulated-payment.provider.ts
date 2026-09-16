@@ -32,6 +32,10 @@ export class SimulatedPaymentProvider implements PaymentProviderPort {
     return null;
   }
 
+  async appliquerUneRemise(): Promise<boolean> {
+    return false;
+  }
+
   async moyensDePaiement(): Promise<MoyenDePaiement[]> {
     return [];
   }

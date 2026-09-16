@@ -16,6 +16,7 @@ import type {
   VerdictPaiement,
 } from './ports/payment-provider.port';
 import { ReferralService } from './referral.service';
+import { bonEtudiant } from './student.service';
 
 const JOUR_MS = 24 * 60 * 60 * 1000;
 
@@ -27,6 +28,7 @@ const DUREE_JOURS: Record<PlanAbonnement, number> = {
 export type EtatAbonnement = {
   actif: boolean;
   accesLibreJusquAu: string | null;
+  etudiant: boolean;
   plan: PlanAbonnement | null;
   statut: string;
   finDePeriode: string | null;
@@ -54,11 +56,13 @@ export class SubscriptionService {
       .catch(() => ({ MONTHLY: null, YEARLY: null }) as TarifsParPlan);
 
     const accesLibre = this.accesLibreJusquAu();
+    const etudiant = await this.estEtudiant(userId);
 
     if (!abonnement) {
       return {
         actif: accesLibre !== null,
         accesLibreJusquAu: accesLibre?.toISOString() ?? null,
+        etudiant,
         plan: null,
         statut: 'NONE',
         finDePeriode: null,
@@ -71,6 +75,7 @@ export class SubscriptionService {
     return {
       actif: accesLibre !== null || this.estEnCours(abonnement),
       accesLibreJusquAu: accesLibre?.toISOString() ?? null,
+      etudiant,
       plan: abonnement.plan,
       statut: abonnement.status,
       finDePeriode: abonnement.currentPeriodEnd?.toISOString() ?? null,
@@ -173,17 +178,22 @@ export class SubscriptionService {
 
     const personne = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true },
+      select: { email: true, studentVerifiedUntil: true },
     });
 
     if (!personne) {
       throw new NotFoundException('Utilisateur introuvable.');
     }
 
+    const bon = bonEtudiant();
+    const etudiant =
+      (personne.studentVerifiedUntil?.getTime() ?? 0) > Date.now();
+
     const paiement = await this.provider.creerPaiement({
       userId,
       email: personne.email,
       plan,
+      ...(etudiant && bon ? { coupon: bon } : {}),
     });
 
     await this.prisma.subscription.upsert({
@@ -419,6 +429,15 @@ export class SubscriptionService {
       where: { id: abonnement.id },
       data: { status: 'ACTIVE', currentPeriodEnd: fin },
     });
+  }
+
+  private async estEtudiant(userId: string): Promise<boolean> {
+    const compte = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { studentVerifiedUntil: true },
+    });
+
+    return (compte?.studentVerifiedUntil?.getTime() ?? 0) > Date.now();
   }
 
   accesLibreJusquAu(): Date | null {

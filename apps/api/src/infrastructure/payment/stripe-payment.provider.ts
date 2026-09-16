@@ -91,6 +91,7 @@ export class StripePaymentProvider implements PaymentProviderPort {
     userId: string;
     email: string;
     plan: PlanAbonnement;
+    coupon?: string;
   }): Promise<{ url: string; externalId: string }> {
     const tarif =
       params.plan === 'YEARLY'
@@ -111,6 +112,7 @@ export class StripePaymentProvider implements PaymentProviderPort {
       client_reference_id: params.userId,
       metadata: { userId: params.userId, plan: params.plan },
       payment_method_collection: 'if_required',
+      ...(params.coupon ? { discounts: [{ coupon: params.coupon }] } : {}),
       subscription_data: {
         metadata: { userId: params.userId, plan: params.plan },
         ...(essai > 0
@@ -163,6 +165,26 @@ export class StripePaymentProvider implements PaymentProviderPort {
       return true;
     } catch (erreur: unknown) {
       this.logger.warn(`Resiliation refusee pour ${abonnement} : ${erreur}`);
+
+      return false;
+    }
+  }
+
+  async appliquerUneRemise(externalId: string, coupon: string): Promise<boolean> {
+    const abonnement = await this.abonnementDe(externalId);
+
+    if (!abonnement) return false;
+
+    try {
+      await this.stripe.subscriptions.update(abonnement, {
+        discounts: [{ coupon }],
+      });
+
+      this.logger.log(`Remise ${coupon} appliquee a ${abonnement}.`);
+
+      return true;
+    } catch (erreur: unknown) {
+      this.logger.warn(`Remise refusee pour ${abonnement} : ${erreur}`);
 
       return false;
     }
