@@ -10,10 +10,9 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 
-export const SANS_VERIFICATION_IDENTITE = 'sansVerificationIdentite';
+export const IDENTITE_VERIFIEE = 'identiteVerifiee';
 
-export const SansVerificationIdentite = () =>
-  SetMetadata(SANS_VERIFICATION_IDENTITE, true);
+export const IdentiteVerifiee = () => SetMetadata(IDENTITE_VERIFIEE, true);
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -29,12 +28,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     if (!authentifie) return false;
 
-    const exempte = this.reflector.getAllAndOverride<boolean>(
-      SANS_VERIFICATION_IDENTITE,
+    const exigee = this.reflector.getAllAndOverride<boolean>(
+      IDENTITE_VERIFIEE,
       [context.getHandler(), context.getClass()],
     );
 
-    if (exempte) return true;
+    if (!exigee) return true;
 
     const requete = context.switchToHttp().getRequest();
     const identifiant = requete.user?.sub;
@@ -54,7 +53,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       code: 'IDENTITY_NOT_VERIFIED',
       identityStatus: compte.identityStatus,
       message:
-        "Votre identite doit etre verifiee avant d'utiliser l'application.",
+        'Votre identité doit être vérifiée pour publier un logement ou demander un échange.',
     });
   }
 

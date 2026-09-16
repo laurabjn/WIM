@@ -32,6 +32,8 @@ model User {
 
   lastSeenAt DateTime? @map("last_seen_at")
 
+  identityReminderSentAt DateTime? @map("identity_reminder_sent_at")
+
   statusText      String?   @map("status_text")
   statusUpdatedAt DateTime? @map("status_updated_at")
 

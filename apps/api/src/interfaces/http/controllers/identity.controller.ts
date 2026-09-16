@@ -22,7 +22,7 @@ import {
   StripeIdentityProvider,
   isStripeIdentityConfigured,
 } from 'src/infrastructure/identity/stripe-identity.provider';
-import { JwtAuthGuard, SansVerificationIdentite } from '../jwt-auth.guard';
+import { JwtAuthGuard } from '../jwt-auth.guard';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -33,7 +33,6 @@ interface AuthenticatedRequest extends Request {
 }
 
 @Controller('identity')
-@SansVerificationIdentite()
 export class IdentityController {
   constructor(
     private readonly startIdentityVerificationUseCase: StartIdentityVerificationUseCase,

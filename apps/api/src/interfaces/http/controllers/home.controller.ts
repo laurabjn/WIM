@@ -25,7 +25,7 @@ import { ListMyHomesUseCase } from 'src/application/home/use-cases/list-my-homes
 import { UpdateHomeUseCase } from 'src/application/home/use-cases/update-home.usecase';
 import { CreateHomeDto } from '../dtos/create-home.dto';
 import { UpdateHomeDto } from '../dtos/home/update-home.dto';
-import { JwtAuthGuard } from '../jwt-auth.guard';
+import { IdentiteVerifiee, JwtAuthGuard } from '../jwt-auth.guard';
 import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
 import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
 import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
@@ -70,6 +70,7 @@ export class HomeController {
   }
 
   @UseGuards(JwtAuthGuard)
+    @IdentiteVerifiee()
     @Post()
     create(@Req() req: any, @Body() dto: CreateHomeDto) {
       const ownerId = req.user.sub ?? req.user.userId;
