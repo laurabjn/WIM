@@ -23,6 +23,9 @@ import {
   addPaymentMethodApi,
   applyReferralApi,
   cancelSubscriptionApi,
+  confirmStudentCodeApi,
+  fetchStudentApi,
+  sendStudentCodeApi,
   fetchPaymentMethodsApi,
   fetchReferralApi,
   fetchSubscriptionApi,
@@ -31,6 +34,7 @@ import {
   simulatePaymentApi,
   startCheckoutApi,
   type EtatAbonnement,
+  type EtatEtudiant,
   type EtatParrainage,
   type MoyenDePaiement,
 } from '../infrastructure/subscription.api';
@@ -65,18 +69,23 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
   const [occupe, setOccupe] = useState(false);
   const [avantagesOuverts, setAvantagesOuverts] = useState(false);
   const [code, setCode] = useState('');
+  const [etudiant, setEtudiant] = useState<EtatEtudiant | null>(null);
+  const [emailEcole, setEmailEcole] = useState('');
+  const [codeEtudiant, setCodeEtudiant] = useState('');
 
   const charger = useCallback(async () => {
     try {
-      const [etat, liste, filleuls] = await Promise.all([
+      const [etat, liste, filleuls, statutEtudiant] = await Promise.all([
         fetchSubscriptionApi(),
         fetchPaymentMethodsApi().catch(() => []),
         fetchReferralApi(),
+        fetchStudentApi().catch(() => null),
       ]);
 
       setAbonnement(etat);
       setMoyens(liste);
       setParrainage(filleuls);
+      setEtudiant(statutEtudiant);
     } catch (error) {
       console.log('Load subscription error:', error);
     }
@@ -401,6 +410,88 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
             ) : null}
           </>
         ) : null}
+
+        <Text style={styles.section}>{t('subscription:studentTitle')}</Text>
+
+        {etudiant?.etudiant ? (
+          <Text style={styles.information}>
+            {t('subscription:studentActive', {
+              date: formatDate(etudiant.jusquAu, i18n.language),
+              email: etudiant.email ?? '',
+            })}
+          </Text>
+        ) : (
+          <>
+            <Text style={styles.information}>{t('subscription:studentHint')}</Text>
+
+            {etudiant?.codeEnvoye ? (
+              <View style={styles.saisie}>
+                <TextInput
+                  value={codeEtudiant}
+                  onChangeText={setCodeEtudiant}
+                  placeholder={t('subscription:studentCode')}
+                  placeholderTextColor={themeColors.textFaint}
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  style={styles.champ}
+                />
+
+                <TouchableOpacity
+                  style={styles.valider}
+                  disabled={occupe || codeEtudiant.trim().length < 6}
+                  onPress={() =>
+                    agir(async () => {
+                      setEtudiant(await confirmStudentCodeApi(codeEtudiant));
+                      setCodeEtudiant('');
+                    })
+                  }
+                >
+                  <Text style={styles.validerTexte}>{t('subscription:apply')}</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.saisie}>
+                <TextInput
+                  value={emailEcole}
+                  onChangeText={setEmailEcole}
+                  placeholder={t('subscription:studentEmail')}
+                  placeholderTextColor={themeColors.textFaint}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  style={styles.champ}
+                />
+
+                <TouchableOpacity
+                  style={styles.valider}
+                  disabled={occupe || !emailEcole.includes('@')}
+                  onPress={() =>
+                    agir(async () => {
+                      setEtudiant(await sendStudentCodeApi(emailEcole));
+                    })
+                  }
+                >
+                  <Text style={styles.validerTexte}>
+                    {t('subscription:studentSend')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {etudiant?.codeEnvoye ? (
+              <TouchableOpacity
+                onPress={() =>
+                  agir(async () => {
+                    setEtudiant(await sendStudentCodeApi(emailEcole));
+                  })
+                }
+                disabled={occupe || !emailEcole.includes('@')}
+              >
+                <Text style={styles.aide}>{t('subscription:studentResend')}</Text>
+              </TouchableOpacity>
+            ) : null}
+          </>
+        )}
 
         <Text style={styles.section}>{t('subscription:referralTitle')}</Text>
         <Text style={styles.information}>{texteParrainage}</Text>

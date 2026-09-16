@@ -14,6 +14,7 @@ export type TarifAffiche = {
 export type EtatAbonnement = {
   actif: boolean;
   accesLibreJusquAu: string | null;
+  etudiant: boolean;
   plan: PlanAbonnement | null;
   statut: string;
   finDePeriode: string | null;
@@ -114,6 +115,25 @@ export function simulatePaymentApi(): Promise<EtatAbonnement> {
 
 export function fetchReferralApi(): Promise<EtatParrainage> {
   return appeler('/subscriptions/referral');
+}
+
+export type EtatEtudiant = {
+  etudiant: boolean;
+  jusquAu: string | null;
+  email: string | null;
+  codeEnvoye: boolean;
+};
+
+export function fetchStudentApi(): Promise<EtatEtudiant> {
+  return appeler('/students/me');
+}
+
+export function sendStudentCodeApi(email: string): Promise<EtatEtudiant> {
+  return appeler('/students/code', { method: 'POST', body: { email } });
+}
+
+export function confirmStudentCodeApi(code: string): Promise<EtatEtudiant> {
+  return appeler('/students/confirm', { method: 'POST', body: { code } });
 }
 
 export function applyReferralApi(code: string): Promise<EtatParrainage> {
