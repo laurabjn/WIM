@@ -11,7 +11,7 @@ import {
 } from 'src/shared/utils/identity-reminder.template';
 
 const JOUR_MS = 24 * 60 * 60 * 1000;
-const DELAI_MS = 2 * JOUR_MS;
+const DELAI_MS = JOUR_MS;
 const LOT_MAX = 200;
 
 @Injectable()
