@@ -16,6 +16,7 @@ import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { requestExchangeApi } from 'src/chat/infrastructure/exchange.api';
+import { estUneDemandeDIdentite } from 'src/auth/ui/identityGate';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
@@ -65,6 +66,8 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
       }
     } catch (error) {
       console.log('Request exchange error:', error);
+
+      if (estUneDemandeDIdentite(error)) return;
 
       const message = error instanceof Error ? error.message : t('sendError');
 

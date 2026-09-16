@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { estUneDemandeDIdentite } from 'src/auth/ui/identityGate';
 import { usePendingStayReview } from 'src/home/infrastructure/hooks/usePendingStayReview';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
@@ -978,7 +979,9 @@ export function ConversationScreen({ route, navigation }: Props) {
     return true;
   }
 
-  function signalerRefus(message?: string) {
+  function signalerRefus(message?: string, erreur?: unknown) {
+    if (estUneDemandeDIdentite(erreur)) return;
+
     const texte = message ?? t('actionUnavailable');
 
     if (!texte.includes('abonnement')) {
@@ -1341,7 +1344,7 @@ export function ConversationScreen({ route, navigation }: Props) {
             } catch (acceptError: any) {
               // Sans ce filet, un refus — abonnement manquant, sejour a noter —
               // ne produisait rien du tout a l'ecran.
-              signalerRefus(acceptError?.message);
+              signalerRefus(acceptError?.message, acceptError);
             }
           }}
           onChangeDates={async (start, end) => {

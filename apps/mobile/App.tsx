@@ -1,5 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
+import { Modal } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initI18n } from './src/i18n/i18n';
 import { AuthStackNavigator } from './src/navigation/authStack';
@@ -17,10 +18,10 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import 'src/search/infrastructure/map/mapbox.config';
 import { getSession } from 'src/auth/infrastructure/authStorage';
-import { fetchIdentityStatus } from 'src/auth/infrastructure/identity.api';
-import { IdentityStatus } from 'src/auth/dtos/identityStatus';
 import { introductionDejaVue } from 'src/onboarding/infrastructure/onboardingStorage';
 import { ChargementScreen } from 'src/shared/ui/chargement/ChargementScreen';
+import { IdentityGateScreen } from 'src/auth/ui/IdentityGateScreen';
+import { ecouterLaPorteIdentite } from 'src/auth/ui/identityGate';
 import {
   navigationRef,
   useNotificationNavigation,
@@ -34,15 +35,11 @@ const Stack = createNativeStackNavigator();
 function Coquille({
   isAuthenticated,
   isAdmin,
-  identiteVerifiee,
-  onIdentiteVerifiee,
   introductionVue,
   setIsAuthenticated,
 }: {
   isAuthenticated: boolean;
   isAdmin: boolean;
-  identiteVerifiee: boolean | null;
-  onIdentiteVerifiee: () => void;
   introductionVue: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -69,8 +66,6 @@ function Coquille({
       <RootNavigator
         isAuthenticated={isAuthenticated}
         isAdmin={isAdmin}
-        identiteVerifiee={identiteVerifiee}
-        onIdentiteVerifiee={onIdentiteVerifiee}
         introductionVue={introductionVue}
         setIsAuthenticated={setIsAuthenticated}
       />
@@ -81,7 +76,7 @@ function Coquille({
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [identiteVerifiee, setIdentiteVerifiee] = useState<boolean | null>(null);
+  const [porteIdentite, setPorteIdentite] = useState(false);
   const [introductionVue, setIntroductionVue] = useState(true);
   const [ready, setReady] = useState(false);
   const [logoTermine, setLogoTermine] = useState(false);
@@ -106,10 +101,12 @@ export default function App() {
     setup();
   }, []);
 
+  useEffect(() => ecouterLaPorteIdentite(setPorteIdentite), []);
+
   useEffect(() => {
     if (!isAuthenticated) {
       setIsAdmin(false);
-      setIdentiteVerifiee(null);
+      setPorteIdentite(false);
       return;
     }
 
@@ -117,28 +114,6 @@ export default function App() {
       .then((session) => setIsAdmin(session?.user.isAdmin === true))
       .catch(() => setIsAdmin(false));
   }, [isAuthenticated]);
-
-  useEffect(() => {
-    if (!isAuthenticated || isAdmin) {
-      return;
-    }
-
-    let abandonne = false;
-
-    fetchIdentityStatus()
-      .then((status) => {
-        if (!abandonne) {
-          setIdentiteVerifiee(status === IdentityStatus.VERIFIED);
-        }
-      })
-      .catch(() => {
-        if (!abandonne) setIdentiteVerifiee(null);
-      });
-
-    return () => {
-      abandonne = true;
-    };
-  }, [isAuthenticated, isAdmin]);
 
   if (!ready || !logoTermine) {
     return <ChargementScreen onFin={() => setLogoTermine(true)} />;
@@ -150,13 +125,23 @@ export default function App() {
         <SafeAreaProvider>
         <ThemeProvider>
           <Coquille
-            identiteVerifiee={identiteVerifiee}
-            onIdentiteVerifiee={() => setIdentiteVerifiee(true)}
             introductionVue={introductionVue}
             isAuthenticated={isAuthenticated}
             isAdmin={isAdmin}
             setIsAuthenticated={setIsAuthenticated}
           />
+
+          <Modal
+            visible={porteIdentite}
+            animationType="slide"
+            presentationStyle="pageSheet"
+            onRequestClose={() => setPorteIdentite(false)}
+          >
+            <IdentityGateScreen
+              onVerified={() => setPorteIdentite(false)}
+              onFermer={() => setPorteIdentite(false)}
+            />
+          </Modal>
           </ThemeProvider>
         </SafeAreaProvider>
       </KeyboardProvider>

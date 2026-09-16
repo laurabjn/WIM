@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { estUneDemandeDIdentite } from 'src/auth/ui/identityGate';
 import {
     ActivityIndicator,
   Image,
@@ -178,6 +179,8 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
       setPricePerNight(updatedHome.pricePerNight ?? null);
     } catch (err) {
       console.log(isCreating ? 'Create home error:' : 'Update home error:', err);
+
+      if (estUneDemandeDIdentite(err)) return;
 
       setError(
         isCreating

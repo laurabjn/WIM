@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
-import { clearSession } from '../infrastructure/authStorage';
 import {
   fetchIdentityStatus,
   startIdentityVerification,
@@ -22,12 +21,12 @@ import { IdentityStatus } from '../dtos/identityStatus';
 
 type Props = {
   onVerified: () => void;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  onFermer: () => void;
 };
 
 export const IdentityGateScreen: React.FC<Props> = ({
   onVerified,
-  setIsAuthenticated,
+  onFermer,
 }) => {
   const { t } = useTranslation(['auth', 'common']);
   const themeColors = useThemeColors();
@@ -129,11 +128,6 @@ export const IdentityGateScreen: React.FC<Props> = ({
     }
   }
 
-  async function seDeconnecter() {
-    await clearSession();
-    setIsAuthenticated(false);
-  }
-
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
       <View style={styles.container}>
@@ -171,8 +165,8 @@ export const IdentityGateScreen: React.FC<Props> = ({
             </TouchableOpacity>
           ) : null}
 
-          <TouchableOpacity onPress={seDeconnecter} style={styles.lien}>
-            <Text style={styles.lienTexte}>{t('auth:identity.gateLogout')}</Text>
+          <TouchableOpacity onPress={onFermer} style={styles.lien}>
+            <Text style={styles.lienTexte}>{t('auth:identity.gateLater')}</Text>
           </TouchableOpacity>
         </View>
       </View>

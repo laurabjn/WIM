@@ -121,9 +121,7 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
 
       await registerPushToken();
 
-      navigation.navigate('RegisterIdentity', {
-        identityRedirectUrl: session.identityRedirectUrl,
-      });
+      navigation.navigate('RegisterWelcome');
     } catch (err: any) {
       setError(err?.message ?? t('auth:genericError'));
     } finally {

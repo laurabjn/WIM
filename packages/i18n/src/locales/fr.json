@@ -519,11 +519,11 @@
       "failed": "La verification n'a pas abouti. Vous pouvez la recommencer.",
       "identityVerification": "Faites la vérification d’identité",
       "gateTitle": "Vérification requise",
-      "gateBody": "Votre identité doit être vérifiée pour accéder à Wim. Comptez deux minutes : une pièce d'identité et un selfie.",
+      "gateBody": "Pour publier un logement ou demander un échange, votre identité doit être vérifiée. Comptez deux minutes : une pièce d'identité et un selfie.",
       "gateAction": "Vérifier mon identité",
       "gateRecheck": "J'ai terminé, vérifier",
       "gateRestart": "Recommencer la verification",
-      "gateLogout": "Se déconnecter"
+      "gateLater": "Plus tard"
     },
     "login": {
       "title": "Connectez-vous à Wim",

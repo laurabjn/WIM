@@ -28,5 +28,4 @@ export interface RegisterUserResponse {
     avatarUrl?: string;
     isAdmin?: boolean;
   };
-  identityRedirectUrl?: string;
 }
