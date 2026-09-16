@@ -21,7 +21,10 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { introductionDejaVue } from 'src/onboarding/infrastructure/onboardingStorage';
 import { ChargementScreen } from 'src/shared/ui/chargement/ChargementScreen';
 import { IdentityGateScreen } from 'src/auth/ui/IdentityGateScreen';
-import { ecouterLaPorteIdentite } from 'src/auth/ui/identityGate';
+import {
+  ecouterLaPorteIdentite,
+  fermerLaPorteIdentite,
+} from 'src/auth/ui/identityGate';
 import {
   navigationRef,
   useNotificationNavigation,
@@ -135,11 +138,11 @@ export default function App() {
             visible={porteIdentite}
             animationType="slide"
             presentationStyle="pageSheet"
-            onRequestClose={() => setPorteIdentite(false)}
+            onRequestClose={() => fermerLaPorteIdentite(true)}
           >
             <IdentityGateScreen
-              onVerified={() => setPorteIdentite(false)}
-              onFermer={() => setPorteIdentite(false)}
+              onVerified={() => fermerLaPorteIdentite(false)}
+              onFermer={() => fermerLaPorteIdentite(true)}
             />
           </Modal>
           </ThemeProvider>

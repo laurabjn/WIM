@@ -35,8 +35,8 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
   const { homeId, startDate, endDate } = route.params;
 
   useEffect(() => {
-    void ouvrirLaPorteSiNonVerifie();
-  }, []);
+    void ouvrirLaPorteSiNonVerifie({ surAbandon: () => navigation.goBack() });
+  }, [navigation]);
     
   const DEFAULT_MESSAGE = t("defaultMessageContent");
     

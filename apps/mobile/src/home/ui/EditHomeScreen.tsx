@@ -54,8 +54,10 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const isCreating = !homeId;
 
   useEffect(() => {
-    if (isCreating) void ouvrirLaPorteSiNonVerifie();
-  }, [isCreating]);
+    if (isCreating) {
+      void ouvrirLaPorteSiNonVerifie({ surAbandon: () => navigation.goBack() });
+    }
+  }, [isCreating, navigation]);
     
   const [activeTab, setActiveTab] = useState('Général');
   const [home, setHome] = useState<Home | null>(null);
