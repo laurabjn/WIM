@@ -26,6 +26,7 @@ import { UpdateHomeUseCase } from 'src/application/home/use-cases/update-home.us
 import { CreateHomeDto } from '../dtos/create-home.dto';
 import { UpdateHomeDto } from '../dtos/home/update-home.dto';
 import { IdentiteVerifiee, JwtAuthGuard } from '../jwt-auth.guard';
+import { SubscriptionService } from 'src/application/subscription/subscription.service';
 import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
 import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
 import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
@@ -65,6 +66,7 @@ export class HomeController {
     private readonly addFavoriteUseCase: AddFavoriteUseCase,
     private readonly removeFavoriteUseCase: RemoveFavoriteUseCase,
     private readonly searchHomesUseCase: SearchHomesUseCase,
+    private readonly subscriptions: SubscriptionService,
   ) {
     console.log('homecontroller created');
   }
@@ -72,14 +74,14 @@ export class HomeController {
   @UseGuards(JwtAuthGuard)
     @IdentiteVerifiee()
     @Post()
-    create(@Req() req: any, @Body() dto: CreateHomeDto) {
+    async create(@Req() req: any, @Body() dto: CreateHomeDto) {
       const ownerId = req.user.sub ?? req.user.userId;
 
       if (!ownerId) {
         throw new UnauthorizedException();
       }
 
-      return this.createHomeUseCase.execute({
+      const logement = await this.createHomeUseCase.execute({
         ownerId,
         title: dto.title,
         description: dto.description,
@@ -106,6 +108,14 @@ export class HomeController {
 
         vehicle: dto.carExchangeAccepted ? dto.vehicle ?? null : null,
       });
+
+      await this.subscriptions
+        .recompenserLeParrainage(ownerId)
+        .catch((erreur: unknown) => {
+          console.log('Parrainage non recompense :', erreur);
+        });
+
+      return logement;
   }
   
   @Get('search')

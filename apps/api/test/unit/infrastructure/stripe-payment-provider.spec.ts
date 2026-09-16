@@ -167,7 +167,6 @@ describe('StripePaymentProvider.lireEvenement', () => {
       externalId: 'sub_456',
       statut: 'ACTIVE',
       finDePeriode: new Date(fin * 1000),
-      paye: true,
     });
   });
 

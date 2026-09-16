@@ -5,7 +5,6 @@ export type VerdictPaiement = {
   nouvelExternalId?: string;
   statut: 'ACTIVE' | 'CANCELLED' | 'EXPIRED';
   finDePeriode: Date | null;
-  paye?: boolean;
 };
 
 export type TarifAffiche = {

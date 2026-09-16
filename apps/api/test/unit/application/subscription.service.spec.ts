@@ -352,26 +352,7 @@ describe('SubscriptionService.appliquerVerdict', () => {
     );
   });
 
-  it('paie le parrainage au premier paiement reel du filleul', async () => {
-    const { referrals, service } = creer({
-      id: 'ab-1',
-      userId: 'user-1',
-      plan: 'YEARLY',
-      startedAt: new Date(Date.now() - 365 * JOUR_MS),
-      externalId: 'sub_456',
-    });
-
-    await service.appliquerVerdict({
-      externalId: 'sub_456',
-      statut: 'ACTIVE',
-      finDePeriode: null,
-      paye: true,
-    });
-
-    expect(referrals.recompenser).toHaveBeenCalled();
-  });
-
-  it('ne paie pas le parrainage pour une inscription encore gratuite', async () => {
+  it('ne melange pas le parrainage aux verdicts de paiement', async () => {
     const { referrals, service } = creer({
       id: 'ab-1',
       userId: 'user-1',
@@ -441,6 +422,24 @@ describe('SubscriptionService.moyens de paiement', () => {
     ).resolves.toHaveLength(1);
 
     expect(provider.definirLeMoyenPrincipal).toHaveBeenCalledWith('sub_456', 'pm_1');
+  });
+});
+
+describe('SubscriptionService.recompenserLeParrainage', () => {
+  it('offre les jours des deux cotes par le meme chemin que tout cadeau', async () => {
+    const { referrals, prisma, service } = creer(null);
+
+    referrals.recompenser.mockImplementation(
+      async (refereeId: string, offrir: (id: string, jours: number) => Promise<void>) => {
+        await offrir('parrain', 365);
+        await offrir(refereeId, 365);
+      },
+    );
+
+    await service.recompenserLeParrainage('filleul');
+
+    expect(referrals.recompenser).toHaveBeenCalledWith('filleul', expect.any(Function));
+    expect(prisma.subscription.create).toHaveBeenCalledTimes(2);
   });
 });
 

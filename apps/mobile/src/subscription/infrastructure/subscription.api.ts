@@ -35,6 +35,7 @@ export type EtatParrainage = {
   filleuls: number;
   recompenses: number;
   parraine: boolean;
+  joursOfferts: number;
 };
 
 async function appeler<T>(

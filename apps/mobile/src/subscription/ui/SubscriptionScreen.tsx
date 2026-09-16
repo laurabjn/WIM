@@ -150,6 +150,12 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
   const principal = moyens.find((moyen) => moyen.principal) ?? null;
   const autres = moyens.filter((moyen) => !moyen.principal);
 
+  const dureeOfferte =
+    parrainage?.joursOfferts === 365
+      ? t('subscription:oneYear')
+      : t('subscription:someDays', { count: parrainage?.joursOfferts ?? 0 });
+  const texteParrainage = t('subscription:referralHint', { duree: dureeOfferte });
+
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
       <View style={styles.entete}>
@@ -397,7 +403,7 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
         ) : null}
 
         <Text style={styles.section}>{t('subscription:referralTitle')}</Text>
-        <Text style={styles.information}>{t('subscription:referralHint')}</Text>
+        <Text style={styles.information}>{texteParrainage}</Text>
 
         {parrainage ? (
           <View style={styles.carte}>
@@ -417,7 +423,7 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
               style={styles.boutonContour}
               onPress={() =>
                 Share.share({
-                  message: `${t('subscription:referralHint')} ${parrainage.code}`,
+                  message: `${texteParrainage} ${parrainage.code}`,
                 }).catch(() => undefined)
               }
               activeOpacity={0.8}

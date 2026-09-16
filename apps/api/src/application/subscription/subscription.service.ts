@@ -343,11 +343,12 @@ export class SubscriptionService {
       },
     });
 
-    if (verdict.paye) {
-      await this.referrals.recompenser(abonnement.userId, (userId, jours) =>
-        this.offrirDesJours(userId, jours),
-      );
-    }
+  }
+
+  async recompenserLeParrainage(refereeId: string): Promise<void> {
+    await this.referrals.recompenser(refereeId, (userId, jours) =>
+      this.offrirDesJours(userId, jours),
+    );
   }
 
   async annuler(userId: string): Promise<EtatAbonnement> {

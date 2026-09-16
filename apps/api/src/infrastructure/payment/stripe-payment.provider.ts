@@ -415,7 +415,6 @@ export class StripePaymentProvider implements PaymentProviderPort {
       externalId: typeof abonnement === 'string' ? abonnement : abonnement.id,
       statut: 'ACTIVE',
       finDePeriode: typeof fin === 'number' ? new Date(fin * 1000) : null,
-      paye: true,
     };
   }
 

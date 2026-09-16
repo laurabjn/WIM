@@ -4,13 +4,25 @@ import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service
 
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const LONGUEUR = 7;
-const JOURS_OFFERTS = 30;
+const JOURS_OFFERTS_PAR_DEFAUT = 365;
+
+export function joursOfferts(): number {
+  const declare = Number.parseInt(
+    process.env.REFERRAL_REWARD_DAYS?.trim() ?? '',
+    10,
+  );
+
+  return Number.isFinite(declare) && declare > 0
+    ? declare
+    : JOURS_OFFERTS_PAR_DEFAUT;
+}
 
 export type EtatParrainage = {
   code: string;
   filleuls: number;
   recompenses: number;
   parraine: boolean;
+  joursOfferts: number;
 };
 
 @Injectable()
@@ -30,7 +42,13 @@ export class ReferralService {
       this.prisma.referral.findUnique({ where: { refereeId: userId } }),
     ]);
 
-    return { code, filleuls, recompenses, parraine: Boolean(recu) };
+    return {
+      code,
+      filleuls,
+      recompenses,
+      parraine: Boolean(recu),
+      joursOfferts: joursOfferts(),
+    };
   }
 
   // Le code ne sert a rien tant qu'il n'existe pas : on le cree au premier
@@ -117,8 +135,10 @@ export class ReferralService {
       data: { rewardedAt: new Date() },
     });
 
-    await offrir(parrainage.referrerId, JOURS_OFFERTS);
-    await offrir(refereeId, JOURS_OFFERTS);
+    const jours = joursOfferts();
+
+    await offrir(parrainage.referrerId, jours);
+    await offrir(refereeId, jours);
   }
 
   private tirer(): string {
