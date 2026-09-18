@@ -59,11 +59,11 @@ export function ProfileStackNavigator({ setIsAuthenticated }: Props) {
         component={FavoritesScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="Settings" options={{ headerShown: false }}>
+        {(props: NativeStackScreenProps<ProfileStackParamList, 'Settings'>) => (
+          <SettingsScreen {...props} setIsAuthenticated={setIsAuthenticated} />
+        )}
+      </Stack.Screen>
       <Stack.Screen
         name="Subscription"
         component={SubscriptionScreen}

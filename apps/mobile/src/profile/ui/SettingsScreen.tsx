@@ -18,13 +18,16 @@ import {
 } from '../infrastructure/settingsStorage';
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { clearSession } from 'src/auth/infrastructure/authStorage';
+import { unregisterPushToken } from 'src/notifications/pushRegistration';
 import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
 import { fetchUnreadNotificationsApi } from 'src/notifications/infrastructure/notificationCenter.api';
 import { demanderLaVerificationIdentite } from 'src/auth/ui/identityGate';
 
-type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
+type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'> & {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-export function SettingsScreen({ route, navigation }: Props) {
+export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props) {
   const { t, i18n } = useTranslation([
     'profile',
     'common',
@@ -150,13 +153,15 @@ export function SettingsScreen({ route, navigation }: Props) {
   }
 
   function confirmDisconnect() {
-    Alert.alert('Déconnexion', 'Veux-tu vraiment te déconnecter ?', [
-      { text: 'Annuler', style: 'cancel' },
+    Alert.alert(t('profile:logOutTitle'), t('profile:confirmLogOut'), [
+      { text: t('common:cancel'), style: 'cancel' },
       {
-        text: 'Se déconnecter',
+        text: t('profile:logout'),
         style: 'destructive',
         onPress: async () => {
+          await unregisterPushToken().catch(() => undefined);
           await clearSession();
+          setIsAuthenticated(false);
         },
       },
     ]);
