@@ -20,6 +20,7 @@ import { updateMyProfile } from '../infrastructure/profile.api';
 import { clearSession } from 'src/auth/infrastructure/authStorage';
 import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
 import { fetchUnreadNotificationsApi } from 'src/notifications/infrastructure/notificationCenter.api';
+import { demanderLaVerificationIdentite } from 'src/auth/ui/identityGate';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'>;
 
@@ -128,7 +129,6 @@ export function SettingsScreen({ route, navigation }: Props) {
 
   const [currency, setCurrency] = useState<'EUR' | 'USD' | 'GBP'>('EUR');
   const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km');
-  const [subscriptionPlan, setSubscriptionPlan] = useState<'free' | 'monthly' | 'yearly'>('free');
 
   const fullName = useMemo(() => {
     return `${profile.firstName} ${profile.lastName}`.trim();
@@ -182,24 +182,6 @@ export function SettingsScreen({ route, navigation }: Props) {
       {
         text: t('profile:settings.themeSystem', 'Système'),
         onPress: () => setAppTheme('system'),
-      },
-      { text: t('common:cancel'), style: 'cancel' },
-    ]);
-  }
-
-  function openSubscriptionSelector() {
-    Alert.alert(t('profile:settings.subscription'), '', [
-      {
-        text: t('profile:settings.freeTrial', 'Essai gratuit'),
-        onPress: () => setSubscriptionPlan('free'),
-      },
-      {
-        text: t('profile:settings.monthlyPlan', 'Abonnement mensuel'),
-        onPress: () => setSubscriptionPlan('monthly'),
-      },
-      {
-        text: t('profile:settings.yearlyPlan', 'Abonnement annuel'),
-        onPress: () => setSubscriptionPlan('yearly'),
       },
       { text: t('common:cancel'), style: 'cancel' },
     ]);
@@ -312,33 +294,22 @@ export function SettingsScreen({ route, navigation }: Props) {
                   : '#D88500'
             }
             onPress={() =>
-              Alert.alert(
-                t('profile:settings.verificationStatus'),
-                t('profile:settings.verificationDelay'),
-              )
+              profile.identityStatus === IdentityStatus.VERIFIED
+                ? Alert.alert(
+                    t('profile:settings.verificationStatus'),
+                    t('profile:settings.verified'),
+                  )
+                : demanderLaVerificationIdentite()
             }
           />
         </SettingsSection>
 
         <SettingsSection title={t('profile:settings.subscription')}>
           <SettingsRow
-            icon="◌"
-            label={t('profile:settings.subscription')}
-            value={
-              subscriptionPlan === 'free'
-                ? t('profile:settings.freeTrial')
-                : subscriptionPlan === 'monthly'
-                  ? t('profile:settings.monthlyPlan')
-                  : t('profile:settings.yearlyPlan')
-            }
-            valueColor="#35B77C"
-            onPress={openSubscriptionSelector}
-          />
-
-          <SettingsRow
-            icon="▤"
-            label={t('profile:settings.manageSubscription')}
-            onPress={() => notImplemented('Gestion du paiement')}
+            icon="★"
+            label={t('subscription:mine')}
+            value={t('subscription:manageValue')}
+            onPress={() => navigation.navigate('Subscription')}
           />
         </SettingsSection>
 
@@ -473,15 +444,6 @@ export function SettingsScreen({ route, navigation }: Props) {
             label={t('notifications:title')}
             value={nonLues > 0 ? String(nonLues) : ''}
             onPress={() => navigation.navigate('NotificationCenter')}
-          />
-        </SettingsSection>
-
-        <SettingsSection title={t('profile:settings.subscription')}>
-          <SettingsRow
-            icon="★"
-            label={t('subscription:mine')}
-            value={t('subscription:manageValue')}
-            onPress={() => navigation.navigate('Subscription')}
           />
         </SettingsSection>
 
