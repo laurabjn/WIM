@@ -113,6 +113,26 @@ async function renouveler(
   }
 }
 
+export async function sessionToujoursValide(
+  session: AuthSession,
+): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_URL}/identity/status`, {
+      headers: { Authorization: `Bearer ${session.accessToken}` },
+    });
+
+    if (response.status === 401) {
+      await clearSession();
+
+      return false;
+    }
+
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 export async function getSession(): Promise<AuthSession | null> {
   const [accessToken, refreshToken, userRaw] = await Promise.all([
     SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
