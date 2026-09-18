@@ -36,12 +36,14 @@ describe('StartIdentityVerificationUseCase', () => {
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
       updateIdentityStatus: jest.fn(),
+      saveIdentitySession: jest.fn(),
       touchLastSeen: jest.fn(),
       findLastSeen: jest.fn(),
     };
 
     provider = {
       startVerification: jest.fn(),
+      effacer: jest.fn().mockResolvedValue(true),
     };
 
     useCase = new StartIdentityVerificationUseCase(userRepository, provider);

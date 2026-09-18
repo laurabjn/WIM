@@ -22,15 +22,18 @@ function creer(
     effacerLeClient: jest.fn().mockResolvedValue(true),
   };
   const emailSender = { send: jest.fn().mockResolvedValue(undefined) };
+  const identite = { effacer: jest.fn().mockResolvedValue(true) };
 
   return {
     prisma,
     provider,
     emailSender,
+    identite,
     useCase: new DeleteAccountUseCase(
       prisma as never,
       provider as never,
       emailSender as never,
+      identite as never,
       options.dossier ?? tmpdir(),
     ),
   };
@@ -42,6 +45,7 @@ const lea = {
   isAdmin: false,
   avatarUrl: null,
   preferredLocale: 'fr',
+  identitySessionId: null,
   subscription: { externalId: 'sub_456' },
   homes: [],
 };
@@ -126,6 +130,20 @@ describe('DeleteAccountUseCase', () => {
     expect(existsSync(join(dossier, 'avatars', 'lea.jpg'))).toBe(false);
     expect(existsSync(join(dossier, 'homes', 'maison.jpg'))).toBe(false);
     expect(existsSync(join(dossier, 'homes', 'autre.jpg'))).toBe(true);
+  });
+
+  it('demande l expurgation des documents d identite quand une session existe', async () => {
+    const { useCase, identite } = creer({ ...lea, identitySessionId: 'vs_123' });
+
+    await useCase.execute('user-1');
+
+    expect(identite.effacer).toHaveBeenCalledWith('vs_123');
+
+    const sans = creer(lea);
+
+    await sans.useCase.execute('user-1');
+
+    expect(sans.identite.effacer).not.toHaveBeenCalled();
   });
 
   it('confirme par courriel dans la langue du compte', async () => {

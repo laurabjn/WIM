@@ -57,6 +57,13 @@ export class UserPrismaRepository implements UserRepository {
     }
   }
 
+  async saveIdentitySession(userId: string, sessionId: string): Promise<void> {
+    await this.prisma.user.updateMany({
+      where: { id: userId },
+      data: { identitySessionId: sessionId },
+    });
+  }
+
   async updateIdentityStatus(
     userId: string,
     status: IdentityStatus,

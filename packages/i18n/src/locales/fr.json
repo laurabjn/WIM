@@ -712,6 +712,7 @@
       "CULTURE": "Culture"
     },
     "guest": "Invité",
+    "deletedMember": "Membre supprimé",
     "ownerAvailability": "Vos périodes de disponibilité",
     "ownerNoAvailability": "Vous n'avez ouvert aucune période.",
     "ownerBlocked": "bloquée",

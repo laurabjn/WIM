@@ -6,6 +6,10 @@ import type { IdentityVerificationProviderPort } from 'src/application/auth/port
 export class MockIdentityProvider implements IdentityVerificationProviderPort {
   private readonly logger = new Logger(MockIdentityProvider.name);
 
+  async effacer(): Promise<boolean> {
+    return true;
+  }
+
   async startVerification(params: {
     userId: string;
     email: string;

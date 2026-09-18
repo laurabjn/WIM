@@ -16,6 +16,7 @@ describe('RegisterUserUseCase', () => {
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
       updateIdentityStatus: jest.fn(),
+      saveIdentitySession: jest.fn(),
       touchLastSeen: jest.fn(),
       findLastSeen: jest.fn(),
     };

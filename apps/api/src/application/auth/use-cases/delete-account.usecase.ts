@@ -3,6 +3,7 @@ import { unlink } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import type { EmailSenderPort } from 'src/application/notifications/ports/email-sender.port';
+import type { IdentityVerificationProviderPort } from 'src/application/auth/ports/identity-verification-provider.port';
 import type { PaymentProviderPort } from 'src/application/subscription/ports/payment-provider.port';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { buildAccountDeletedEmail } from 'src/shared/utils/account-deleted.template';
@@ -16,6 +17,7 @@ export class DeleteAccountUseCase {
     private readonly prisma: PrismaService,
     private readonly provider: PaymentProviderPort,
     private readonly emailSender: EmailSenderPort,
+    private readonly identite: IdentityVerificationProviderPort,
     private readonly dossierDesFichiers: string,
   ) {}
 
@@ -28,6 +30,7 @@ export class DeleteAccountUseCase {
         isAdmin: true,
         avatarUrl: true,
         preferredLocale: true,
+        identitySessionId: true,
         subscription: { select: { externalId: true } },
         homes: { select: { photos: { select: { url: true } } } },
       },
@@ -49,6 +52,16 @@ export class DeleteAccountUseCase {
       if (!efface) {
         this.logger.warn(
           `Client de paiement non efface pour ${userId} (${externalId}).`,
+        );
+      }
+    }
+
+    if (compte.identitySessionId) {
+      const expurgee = await this.identite.effacer(compte.identitySessionId);
+
+      if (!expurgee) {
+        this.logger.warn(
+          `Session d'identite non expurgee pour ${userId} (${compte.identitySessionId}).`,
         );
       }
     }

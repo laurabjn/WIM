@@ -713,6 +713,7 @@
       "CULTURE": "Culture"
     },
     "guest": "Guest",
+    "deletedMember": "Deleted member",
     "ownerAvailability": "Your available periods",
     "ownerNoAvailability": "You have not opened any period.",
     "ownerBlocked": "blocked",
