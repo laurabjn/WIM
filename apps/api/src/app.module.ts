@@ -9,6 +9,7 @@ import { SupportModule } from './interfaces/http/modules/support.module';
 import { HomeModule } from './interfaces/http/modules/home.module';
 import { HomeAvailabilityModule } from './interfaces/http/modules/home-availability.module';
 import { ExchangeModule } from './interfaces/http/modules/exchange.module';
+import { SubscriptionModule } from './interfaces/http/modules/subscription.module';
 import { FavoriteModule } from './interfaces/http/modules/favorite.module';
 import { SwipeModule } from './interfaces/http/modules/swipe.module';
 import { LocationModule } from './interfaces/http/modules/location.module';
@@ -34,6 +35,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     HomeModule,
     HomeAvailabilityModule,
     ExchangeModule,
+    SubscriptionModule,
     FavoriteModule,
     SwipeModule,
     LocationModule,

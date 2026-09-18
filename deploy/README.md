@@ -436,3 +436,17 @@ declare en visibilite `secret`.
 Sans ce jeton la build reussit quand meme : seules les piles d'appels restent
 minifiees. Le journal de build affiche alors un avertissement de Sentry, c'est
 la qu'il faut regarder si les erreurs remontent illisibles.
+
+## Portail de facturation Stripe
+
+La page "Gerer l'abonnement" n'affiche ni carte ni facture : elle ouvre le
+portail hebergé par Stripe, qui couvre le moyen de paiement, les factures, la
+resiliation, la reactivation et le changement de formule. Rien de tout cela ne
+transite par nous, ce qui evite d'heberger des donnees de paiement.
+
+Il faut l'activer une fois dans le tableau de bord Stripe, en mode test comme
+en mode reel : Parametres -> Facturation -> Portail client. Sans cette
+activation, l'API repond que la gestion est indisponible.
+
+Verifier au passage que les actions attendues y sont cochees : annuler,
+reprendre, changer de formule, mettre a jour le moyen de paiement.

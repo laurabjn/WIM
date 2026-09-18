@@ -22,7 +22,6 @@ import { InvalidPasswordResetTokenError } from 'src/domain/auth/errors/invalid-p
 import { PasswordResetTokenExpiredError } from 'src/domain/auth/errors/expired-password.errors';
 import { ForgotPasswordDto } from '../dtos/auth/forgot-password.dto';
 import { IdentityStatus } from 'src/domain/auth/entities/user.entity';
-import { StartIdentityVerificationUseCase } from 'src/application/auth/use-cases/start-identity-verification.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -32,7 +31,6 @@ export class AuthController {
     private readonly jwtService: JwtService,
     private readonly requestPasswordResetUseCase: RequestPasswordResetUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
-    private readonly startIdentityVerificationUseCase: StartIdentityVerificationUseCase,
     private readonly signInWithProviderUseCase: SignInWithProviderUseCase,
   ) {}
 
@@ -76,11 +74,6 @@ export class AuthController {
         expiresIn: '7d',
       });
 
-      const { redirectUrl } =
-        await this.startIdentityVerificationUseCase.execute({
-          userId: user.id,
-        });
-
       return {
         accessToken,
         refreshToken,
@@ -90,7 +83,7 @@ export class AuthController {
           firstName: user.firstName,
           lastName: user.lastName,
           isAdmin: user.isAdmin,
-          identityStatus: IdentityStatus.IN_PROGRESS,
+          identityStatus: IdentityStatus.NOT_VERIFIED,
           birthDate: user.birthDate,
           nationality: user.nationality,
           country: user.country,
@@ -98,7 +91,6 @@ export class AuthController {
           bio: user.bio,
           avatarUrl: user.avatarUrl,
         },
-        identityRedirectUrl: redirectUrl,
       };
     } catch (error) {
       if (error instanceof UserAlreadyExistsError) {

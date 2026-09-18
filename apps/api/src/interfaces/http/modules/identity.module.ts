@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ApplyIdentityVerdictUseCase } from 'src/application/auth/use-cases/apply-identity-verdict.usecase';
 import { GetIdentityStatusUseCase } from 'src/application/auth/use-cases/get-identity-status.usecase';
 import { StartIdentityVerificationUseCase } from 'src/application/auth/use-cases/start-identity-verification.usecase';
+import { IdentityReminderService } from 'src/application/auth/services/identity-reminder.service';
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { MockIdentityProvider } from 'src/infrastructure/identity/mock-identity.provider';
 import {
@@ -33,6 +34,7 @@ import {
     PushSenderService,
     ConsoleEmailSender,
     NodemailerEmailSender,
+    IdentityReminderService,
     {
       provide: EMAIL_SENDER,
       useFactory: (

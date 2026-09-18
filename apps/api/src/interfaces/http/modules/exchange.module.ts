@@ -25,6 +25,7 @@ import { ExchangeRepositoryPrisma } from 'src/infrastructure/repositories/exchan
 import { ChatPrismaRepository } from 'src/infrastructure/repositories/chat.prisma.repository';
 import { CHAT_REPOSITORY, EXCHANGE_REPOSITORY } from '../tokens/token';
 import { ModerationModule } from './moderation.module';
+import { SubscriptionModule } from './subscription.module';
 import { WebsocketModule } from 'src/interfaces/websocket/websocket.module';
 import { StayLifecycleService } from 'src/application/exchange/services/stay-lifecycle.service';
 import { AnnounceExchangeUseCase } from 'src/application/exchange/use-cases/announce-exchange.usecase';
@@ -34,7 +35,12 @@ import {
 } from 'src/application/exchange/use-cases/review-stay.usecase';
 
 @Module({
-  imports: [NotificationModule, ModerationModule, WebsocketModule],
+  imports: [
+    NotificationModule,
+    ModerationModule,
+    WebsocketModule,
+    SubscriptionModule,
+  ],
   controllers: [ExchangeController],
   providers: [
     PrismaService,

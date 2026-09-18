@@ -28,6 +28,7 @@ export function SettingsScreen({ route, navigation }: Props) {
     'profile',
     'common',
     'auth',
+    'subscription',
     'notifications',
   ]);
   const [nonLues, setNonLues] = useState(0);
@@ -475,6 +476,14 @@ export function SettingsScreen({ route, navigation }: Props) {
           />
         </SettingsSection>
 
+        <SettingsSection title={t('profile:settings.subscription')}>
+          <SettingsRow
+            icon="★"
+            label={t('subscription:mine')}
+            value={t('subscription:manageValue')}
+            onPress={() => navigation.navigate('Subscription')}
+          />
+        </SettingsSection>
 
         <SettingsSection title={t('profile:settings.preferences')}>
           <SettingsRow

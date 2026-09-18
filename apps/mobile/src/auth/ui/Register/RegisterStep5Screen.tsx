@@ -24,6 +24,7 @@ import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 import { registerPushToken } from 'src/notifications/pushRegistration';
+import { applyReferralApi } from 'src/subscription/infrastructure/subscription.api';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'RegisterStep5'>;
@@ -46,6 +47,7 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
   } = route.params;
 
   const [bio, setBio] = useState('');
+  const [codeParrainage, setCodeParrainage] = useState('');
   const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -121,9 +123,13 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
 
       await registerPushToken();
 
-      navigation.navigate('RegisterIdentity', {
-        identityRedirectUrl: session.identityRedirectUrl,
-      });
+      if (codeParrainage.trim()) {
+        await applyReferralApi(codeParrainage).catch((erreur: unknown) => {
+          console.log('Referral code error:', erreur);
+        });
+      }
+
+      navigation.navigate('RegisterWelcome');
     } catch (err: any) {
       setError(err?.message ?? t('auth:genericError'));
     } finally {
@@ -203,6 +209,17 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
                 <Text style={styles.charCount}>
                   {bio.length} / {BIO_MAX_LENGTH}
                 </Text>
+
+                <TextInput
+                  style={styles.codeInput}
+                  placeholder={t('auth:register.referralCode')}
+                  placeholderTextColor="#C0C0C0"
+                  value={codeParrainage}
+                  onChangeText={(texte) => setCodeParrainage(texte.toUpperCase())}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                  maxLength={12}
+                />
 
                 {error && <Text style={styles.errorText}>{error}</Text>}
               </View>
@@ -376,6 +393,19 @@ const createStyles = (c: ThemeColors) =>
     color: c.textMuted,
     textAlign: 'right',
     marginTop: 4,
+    marginBottom: 8,
+  },
+
+  codeInput: {
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: c.border,
+    paddingHorizontal: 16,
+    fontSize: 13,
+    letterSpacing: 2,
+    color: c.text,
+    backgroundColor: c.surface,
     marginBottom: 8,
   },
 

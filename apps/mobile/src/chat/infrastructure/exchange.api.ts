@@ -1,5 +1,6 @@
 import { API_URL } from '../../config/api';
 import type { PendingExchange } from '@wim/shared';
+import { signalerSiIdentiteRequise } from 'src/auth/ui/identityGate';
 
 async function parseOptional(response: Response) {
   const raw = await response.text();
@@ -7,15 +8,20 @@ async function parseOptional(response: Response) {
   if (!response.ok) {
     let message = 'Une erreur est survenue';
 
-    try {
-      const body = raw ? JSON.parse(raw) : null;
+    let body: { code?: string; message?: string | string[] } | null = null;
 
-      if (body?.message) {
-        message = Array.isArray(body.message)
-          ? body.message.join(', ')
-          : body.message;
-      }
+    try {
+      body = raw ? JSON.parse(raw) : null;
     } catch {
+      body = null;
+    }
+
+    signalerSiIdentiteRequise(response.status, body);
+
+    if (body?.message) {
+      message = Array.isArray(body.message)
+        ? body.message.join(', ')
+        : body.message;
     }
 
     throw new Error(message);
