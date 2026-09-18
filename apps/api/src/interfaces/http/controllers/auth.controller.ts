@@ -4,10 +4,13 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Inject,
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UserRepository } from 'src/domain/auth/repositories/user.repository';
+import { USER_REPOSITORY } from '../tokens/token';
 import { LoginUserUseCase } from 'src/application/auth/use-cases/login-user.usecase';
 import { SignInWithProviderUseCase } from 'src/application/auth/use-cases/sign-in-with-provider.usecase';
 import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.usecase';
@@ -32,6 +35,8 @@ export class AuthController {
     private readonly requestPasswordResetUseCase: RequestPasswordResetUseCase,
     private readonly resetPasswordUseCase: ResetPasswordUseCase,
     private readonly signInWithProviderUseCase: SignInWithProviderUseCase,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepository: UserRepository,
   ) {}
 
   @Post('register')
@@ -118,6 +123,12 @@ export class AuthController {
       });
     } catch {
       throw new UnauthorizedException('Session expirée, reconnectez-vous.');
+    }
+
+    const compte = await this.userRepository.findById(payload.sub);
+
+    if (!compte) {
+      throw new UnauthorizedException("Ce compte n'existe plus.");
     }
 
     const charge = {

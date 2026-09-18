@@ -17,7 +17,10 @@ import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import 'src/search/infrastructure/map/mapbox.config';
-import { getSession } from 'src/auth/infrastructure/authStorage';
+import {
+  getSession,
+  sessionToujoursValide,
+} from 'src/auth/infrastructure/authStorage';
 import { introductionDejaVue } from 'src/onboarding/infrastructure/onboardingStorage';
 import { ChargementScreen } from 'src/shared/ui/chargement/ChargementScreen';
 import { IdentityGateScreen } from 'src/auth/ui/IdentityGateScreen';
@@ -92,9 +95,10 @@ export default function App() {
         setIntroductionVue(await introductionDejaVue());
 
         const session = await getSession();
+        const valide = session ? await sessionToujoursValide(session) : false;
 
-        setIsAuthenticated(Boolean(session?.accessToken));
-        setIsAdmin(session?.user.isAdmin === true);
+        setIsAuthenticated(valide);
+        setIsAdmin(valide && session?.user.isAdmin === true);
       } catch (error) {
         console.log('Session restore error:', error);
       }
