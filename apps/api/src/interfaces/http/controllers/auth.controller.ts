@@ -2,12 +2,17 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   HttpCode,
   HttpStatus,
   Inject,
   Post,
+  Req,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
+import { DeleteAccountUseCase } from 'src/application/auth/use-cases/delete-account.usecase';
+import { JwtAuthGuard } from '../jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/domain/auth/repositories/user.repository';
 import { USER_REPOSITORY } from '../tokens/token';
@@ -37,7 +42,15 @@ export class AuthController {
     private readonly signInWithProviderUseCase: SignInWithProviderUseCase,
     @Inject(USER_REPOSITORY)
     private readonly userRepository: UserRepository,
+    private readonly deleteAccountUseCase: DeleteAccountUseCase,
   ) {}
+
+  @Delete('me')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async supprimerMonCompte(@Req() req: { user: { sub: string } }) {
+    await this.deleteAccountUseCase.execute(req.user.sub);
+  }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)

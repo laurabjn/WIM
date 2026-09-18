@@ -77,6 +77,7 @@ import {
     StartIdentityVerificationUseCase,
     GetIdentityStatusUseCase,
     ApplyIdentityVerdictUseCase,
+    IDENTITY_PROVIDER,
   ],
 })
 export class IdentityModule {}

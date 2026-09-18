@@ -4,4 +4,6 @@ export interface IdentityVerificationProviderPort {
     returnUrl: string;
     sessionId: string;
   }>;
+
+  effacer(sessionId: string): Promise<boolean>;
 }

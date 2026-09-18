@@ -45,6 +45,20 @@ export class StripeIdentityProvider implements IdentityVerificationProviderPort 
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_absente');
   }
 
+  async effacer(sessionId: string): Promise<boolean> {
+    try {
+      await this.stripe.identity.verificationSessions.redact(sessionId);
+
+      this.logger.log(`Session d'identite ${sessionId} expurgee.`);
+
+      return true;
+    } catch (erreur: unknown) {
+      this.logger.warn(`Expurgation refusee pour ${sessionId} : ${erreur}`);
+
+      return false;
+    }
+  }
+
   async startVerification(params: {
     userId: string;
     email: string;

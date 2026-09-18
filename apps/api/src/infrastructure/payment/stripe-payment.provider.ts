@@ -174,6 +174,24 @@ export class StripePaymentProvider implements PaymentProviderPort {
     return externalId.startsWith('cs_') || externalId.startsWith('sub_');
   }
 
+  async effacerLeClient(externalId: string): Promise<boolean> {
+    const client = await this.clientDe(externalId);
+
+    if (!client) return false;
+
+    try {
+      await this.stripe.customers.del(client);
+
+      this.logger.log(`Client ${client} efface, abonnements annules.`);
+
+      return true;
+    } catch (erreur: unknown) {
+      this.logger.warn(`Effacement refuse pour ${client} : ${erreur}`);
+
+      return false;
+    }
+  }
+
   async appliquerUneRemise(externalId: string, coupon: string): Promise<boolean> {
     const abonnement = await this.abonnementDe(externalId);
 

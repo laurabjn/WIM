@@ -33,6 +33,7 @@ model User {
   lastSeenAt DateTime? @map("last_seen_at")
 
   identityReminderSentAt DateTime? @map("identity_reminder_sent_at")
+  identitySessionId      String?   @map("identity_session_id")
 
   studentEmail         String?   @map("student_email")
   studentVerifiedUntil DateTime? @map("student_verified_until")

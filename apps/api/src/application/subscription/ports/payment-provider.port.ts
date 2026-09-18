@@ -51,5 +51,7 @@ export interface PaymentProviderPort {
 
   reconnait(externalId: string): boolean;
 
+  effacerLeClient(externalId: string): Promise<boolean>;
+
   lireEvenement(corps: Buffer, signature: string): VerdictPaiement | null;
 }
