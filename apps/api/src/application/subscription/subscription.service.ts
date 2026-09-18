@@ -29,6 +29,7 @@ export type EtatAbonnement = {
   actif: boolean;
   accesLibreJusquAu: string | null;
   etudiant: boolean;
+  facturable: boolean;
   plan: PlanAbonnement | null;
   statut: string;
   finDePeriode: string | null;
@@ -63,6 +64,7 @@ export class SubscriptionService {
         actif: accesLibre !== null,
         accesLibreJusquAu: accesLibre?.toISOString() ?? null,
         etudiant,
+        facturable: false,
         plan: null,
         statut: 'NONE',
         finDePeriode: null,
@@ -76,6 +78,9 @@ export class SubscriptionService {
       actif: accesLibre !== null || this.estEnCours(abonnement),
       accesLibreJusquAu: accesLibre?.toISOString() ?? null,
       etudiant,
+      facturable: abonnement.externalId
+        ? this.provider.reconnait(abonnement.externalId)
+        : false,
       plan: abonnement.plan,
       statut: abonnement.status,
       finDePeriode: abonnement.currentPeriodEnd?.toISOString() ?? null,

@@ -154,6 +154,7 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
   const accesLibre = abonnement?.accesLibreJusquAu ?? null;
   const abonne =
     abonnement?.statut === 'ACTIVE' || abonnement?.statut === 'CANCELLED';
+  const facturable = Boolean(abonnement?.facturable);
   const prix = abonnement?.tarifs.YEARLY?.libelle ?? '';
 
   const principal = moyens.find((moyen) => moyen.principal) ?? null;
@@ -309,7 +310,14 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
           </Text>
         )}
 
-        {abonne ? (
+        {abonne && !facturable ? (
+          <>
+            <Text style={styles.section}>{t('subscription:paymentMethods')}</Text>
+            <Text style={styles.information}>{t('subscription:offeredNoBilling')}</Text>
+          </>
+        ) : null}
+
+        {abonne && facturable ? (
           <>
             <Text style={styles.section}>{t('subscription:paymentMethods')}</Text>
 

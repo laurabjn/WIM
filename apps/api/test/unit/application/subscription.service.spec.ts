@@ -43,6 +43,7 @@ function creer(
       externalId: 'cs_123',
     }),
     lireEvenement: jest.fn().mockReturnValue(null),
+    reconnait: jest.fn((id: string) => id.startsWith('sub_') || id.startsWith('cs_')),
   };
 
   const referrals = { recompenser: jest.fn().mockResolvedValue(undefined) };
@@ -568,5 +569,47 @@ describe('SubscriptionService.demarrer pour un etudiant', () => {
     await service.demarrer('user-1', 'YEARLY');
 
     expect(provider.creerPaiement.mock.calls[0][0].coupon).toBeUndefined();
+  });
+});
+
+describe('SubscriptionService.etat et la facturation', () => {
+  it('signale qu un abonnement offert n a rien a facturer', async () => {
+    const { service } = creer({
+      plan: 'YEARLY',
+      status: 'ACTIVE',
+      externalId: null,
+      currentPeriodEnd: new Date(Date.now() + 100 * JOUR_MS),
+    });
+
+    await expect(service.etat('user-1')).resolves.toMatchObject({
+      actif: true,
+      facturable: false,
+    });
+  });
+
+  it('ne prend pas un abonnement de demonstration pour un abonnement Stripe', async () => {
+    const { service } = creer({
+      plan: 'YEARLY',
+      status: 'ACTIVE',
+      externalId: 'demo_sophie',
+      currentPeriodEnd: new Date(Date.now() + 100 * JOUR_MS),
+    });
+
+    await expect(service.etat('user-1')).resolves.toMatchObject({
+      facturable: false,
+    });
+  });
+
+  it('signale qu un abonnement Stripe se gere', async () => {
+    const { service } = creer({
+      plan: 'YEARLY',
+      status: 'ACTIVE',
+      externalId: 'sub_456',
+      currentPeriodEnd: new Date(Date.now() + 100 * JOUR_MS),
+    });
+
+    await expect(service.etat('user-1')).resolves.toMatchObject({
+      facturable: true,
+    });
   });
 });

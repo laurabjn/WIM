@@ -1153,6 +1153,7 @@
     "addMethod": "Add a payment method",
     "endingIn": "ending in {{last4}}",
     "noPaymentMethod": "No payment method saved.",
+    "offeredNoBilling": "This subscription was offered to you: nothing to pay, nothing to manage. A payment method will be requested when it ends.",
     "removeConfirm": "Remove this payment method?",
     "manageValue": "Billing and cancellation",
     "manageHint": "Payment method, invoices and cancellation are handled on the secure page of our provider Stripe.",

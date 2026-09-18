@@ -170,6 +170,10 @@ export class StripePaymentProvider implements PaymentProviderPort {
     }
   }
 
+  reconnait(externalId: string): boolean {
+    return externalId.startsWith('cs_') || externalId.startsWith('sub_');
+  }
+
   async appliquerUneRemise(externalId: string, coupon: string): Promise<boolean> {
     const abonnement = await this.abonnementDe(externalId);
 

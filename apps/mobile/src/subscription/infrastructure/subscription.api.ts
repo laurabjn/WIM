@@ -15,6 +15,7 @@ export type EtatAbonnement = {
   actif: boolean;
   accesLibreJusquAu: string | null;
   etudiant: boolean;
+  facturable: boolean;
   plan: PlanAbonnement | null;
   statut: string;
   finDePeriode: string | null;
