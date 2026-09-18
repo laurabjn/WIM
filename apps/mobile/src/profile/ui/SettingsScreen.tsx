@@ -18,6 +18,7 @@ import {
 } from '../infrastructure/settingsStorage';
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { clearSession } from 'src/auth/infrastructure/authStorage';
+import { deleteAccountApi } from 'src/auth/infrastructure/api';
 import { unregisterPushToken } from 'src/notifications/pushRegistration';
 import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
 import { fetchUnreadNotificationsApi } from 'src/notifications/infrastructure/notificationCenter.api';
@@ -168,10 +169,47 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
   }
 
   function confirmDeleteAccount() {
-    Alert.alert('Supprimer mon compte', 'Cette action est irréversible.', [
-      { text: 'Annuler', style: 'cancel' },
-      { text: 'Supprimer', style: 'destructive', onPress: () => notImplemented('Suppression du compte') },
-    ]);
+    Alert.alert(
+      t('profile:settings.deleteAccount'),
+      t('profile:settings.deleteAccountBody'),
+      [
+        { text: t('common:cancel'), style: 'cancel' },
+        {
+          text: t('profile:settings.deleteAccountContinue'),
+          style: 'destructive',
+          onPress: () =>
+            Alert.alert(
+              t('profile:settings.deleteAccountLastTitle'),
+              t('profile:settings.deleteAccountLastBody'),
+              [
+                { text: t('common:cancel'), style: 'cancel' },
+                {
+                  text: t('profile:settings.deleteAccountConfirm'),
+                  style: 'destructive',
+                  onPress: supprimerLeCompte,
+                },
+              ],
+            ),
+        },
+      ],
+    );
+  }
+
+  async function supprimerLeCompte() {
+    const session = await getSession();
+
+    if (!session?.accessToken) return;
+
+    try {
+      await deleteAccountApi(session.accessToken);
+      await unregisterPushToken().catch(() => undefined);
+      await clearSession();
+
+      Alert.alert('', t('profile:settings.deleteAccountDone'));
+      setIsAuthenticated(false);
+    } catch (erreur: any) {
+      Alert.alert('', erreur?.message ?? t('common:genericError'));
+    }
   }
 
   function openThemeSelector() {

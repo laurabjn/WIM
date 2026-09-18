@@ -40,6 +40,10 @@ export class SimulatedPaymentProvider implements PaymentProviderPort {
     return false;
   }
 
+  async effacerLeClient(): Promise<boolean> {
+    return true;
+  }
+
   async moyensDePaiement(): Promise<MoyenDePaiement[]> {
     return [];
   }

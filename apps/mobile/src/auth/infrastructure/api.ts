@@ -47,3 +47,16 @@ export async function loginUserApi(payload: LoginUser): Promise<LoginResult> {
 
   return data as LoginResult;
 }
+
+export async function deleteAccountApi(accessToken: string): Promise<void> {
+  const response = await fetch(`${API_URL}/auth/me`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+
+    throw new Error(data?.message ?? 'La suppression du compte a échoué.');
+  }
+}

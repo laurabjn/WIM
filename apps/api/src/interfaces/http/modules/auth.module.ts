@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { join } from 'node:path';
 import { AuthController } from '../controllers/auth.controller';
 import { RegisterUserUseCase } from 'src/application/auth/use-cases/register-user.usecase';
 import { BcryptPasswordHasher } from 'src/application/auth/ports/bcrypt-password.hasher';
@@ -25,6 +26,9 @@ import {
 } from 'src/infrastructure/notifications/nodemailer-email.sender';
 import { IdentityModule } from './identity.module';
 import { JwtStrategy } from '../jwt.strategy';
+import { DeleteAccountUseCase } from 'src/application/auth/use-cases/delete-account.usecase';
+import { PAYMENT_PROVIDER } from '../tokens/token';
+import { SubscriptionModule } from './subscription.module';
 import { PassportModule } from '@nestjs/passport';
 
 const ACCESS_TOKEN_TTL = '30m';
@@ -32,6 +36,7 @@ const ACCESS_TOKEN_TTL = '30m';
 @Module({
   controllers: [AuthController],
   imports: [
+    SubscriptionModule,
     JwtModule.register({
       secret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret',
       signOptions: { expiresIn: ACCESS_TOKEN_TTL },
@@ -58,6 +63,17 @@ const ACCESS_TOKEN_TTL = '30m';
         console_: ConsoleEmailSender,
       ) => (isSmtpConfigured() ? nodemailer : console_),
       inject: [NodemailerEmailSender, ConsoleEmailSender],
+    },
+    {
+      provide: DeleteAccountUseCase,
+      useFactory: (prisma, provider, emailSender) =>
+        new DeleteAccountUseCase(
+          prisma,
+          provider,
+          emailSender,
+          process.env.UPLOADS_DIR || join(process.cwd(), 'uploads'),
+        ),
+      inject: [PrismaService, PAYMENT_PROVIDER, EMAIL_SENDER],
     },
     {
       provide: RequestPasswordResetUseCase,

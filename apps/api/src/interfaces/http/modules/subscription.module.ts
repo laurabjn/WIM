@@ -46,6 +46,6 @@ import { EMAIL_SENDER, PAYMENT_PROVIDER } from '../tokens/token';
       inject: [StripePaymentProvider, SimulatedPaymentProvider],
     },
   ],
-  exports: [SubscriptionService, ReferralService],
+  exports: [SubscriptionService, ReferralService, PAYMENT_PROVIDER],
 })
 export class SubscriptionModule {}
