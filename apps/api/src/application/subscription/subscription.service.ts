@@ -78,7 +78,9 @@ export class SubscriptionService {
       actif: accesLibre !== null || this.estEnCours(abonnement),
       accesLibreJusquAu: accesLibre?.toISOString() ?? null,
       etudiant,
-      facturable: abonnement.externalId !== null,
+      facturable: abonnement.externalId
+        ? this.provider.reconnait(abonnement.externalId)
+        : false,
       plan: abonnement.plan,
       statut: abonnement.status,
       finDePeriode: abonnement.currentPeriodEnd?.toISOString() ?? null,

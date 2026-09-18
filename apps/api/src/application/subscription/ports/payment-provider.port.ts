@@ -49,5 +49,7 @@ export interface PaymentProviderPort {
 
   appliquerUneRemise(externalId: string, coupon: string): Promise<boolean>;
 
+  reconnait(externalId: string): boolean;
+
   lireEvenement(corps: Buffer, signature: string): VerdictPaiement | null;
 }

@@ -43,6 +43,7 @@ function creer(
       externalId: 'cs_123',
     }),
     lireEvenement: jest.fn().mockReturnValue(null),
+    reconnait: jest.fn((id: string) => id.startsWith('sub_') || id.startsWith('cs_')),
   };
 
   const referrals = { recompenser: jest.fn().mockResolvedValue(undefined) };
@@ -582,6 +583,19 @@ describe('SubscriptionService.etat et la facturation', () => {
 
     await expect(service.etat('user-1')).resolves.toMatchObject({
       actif: true,
+      facturable: false,
+    });
+  });
+
+  it('ne prend pas un abonnement de demonstration pour un abonnement Stripe', async () => {
+    const { service } = creer({
+      plan: 'YEARLY',
+      status: 'ACTIVE',
+      externalId: 'demo_sophie',
+      currentPeriodEnd: new Date(Date.now() + 100 * JOUR_MS),
+    });
+
+    await expect(service.etat('user-1')).resolves.toMatchObject({
       facturable: false,
     });
   });
