@@ -1,6 +1,8 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-native';
+import { useFonts } from 'expo-font';
+import { Oswald_700Bold } from '@expo-google-fonts/oswald/700Bold';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initI18n } from './src/i18n/i18n';
 import { AuthStackNavigator } from './src/navigation/authStack';
@@ -80,6 +82,7 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [porteIdentite, setPorteIdentite] = useState(false);
   const [ready, setReady] = useState(false);
+  const [policesChargees, erreurDePolice] = useFonts({ Oswald_700Bold });
   const [logoTermine, setLogoTermine] = useState(false);
 
   useEffect(() => {
@@ -115,7 +118,7 @@ export default function App() {
       .catch(() => setIsAdmin(false));
   }, [isAuthenticated]);
 
-  if (!ready || !logoTermine) {
+  if (!ready || !logoTermine || (!policesChargees && !erreurDePolice)) {
     return <ChargementScreen onFin={() => setLogoTermine(true)} />;
   }
 

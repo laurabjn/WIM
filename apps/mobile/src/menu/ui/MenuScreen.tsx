@@ -3,12 +3,12 @@ import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Image,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
     Umbrella,
     Waves,
@@ -150,7 +150,7 @@ export function MenuScreen({ navigation }: Props) {
     
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <View style={styles.content}>
         <SearchToggle
           quickSearch={quickSearch}
           onToggle={toggleSearch}
@@ -165,7 +165,11 @@ export function MenuScreen({ navigation }: Props) {
             <View style={[styles.heroImage, styles.heroImageVide]} />
           )}
 
-          <View style={styles.heroOverlay}>
+          <LinearGradient
+            colors={['rgba(0,0,0,0.55)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0.6)']}
+            locations={[0, 0.35, 0.6, 1]}
+            style={styles.heroOverlay}
+          >
             <Text style={styles.heroTitle}>{heroTitle}</Text>
 
             <View style={styles.heroBottom}>
@@ -189,12 +193,13 @@ export function MenuScreen({ navigation }: Props) {
                 <Text style={styles.arrow}>→</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </LinearGradient>
         </View>
 
-        <Text style={styles.sectionTitle}>{t('search:categories')}</Text>
+        <View style={styles.blocCategories}>
+          <Text style={styles.sectionTitle}>{t('search:categories')}</Text>
 
-        <View style={styles.categories}>
+          <View style={styles.categories}>
           <Category
             icon={<Umbrella color="white" size={24} />}
             label="Nature"
@@ -219,6 +224,7 @@ export function MenuScreen({ navigation }: Props) {
             color="#f47b20"
             onPress={() => openCategory('CULTURE')}
           />
+          </View>
         </View>
 
         <Text style={styles.sectionTitle}>{t('search:lastSearches')}</Text>
@@ -239,7 +245,7 @@ export function MenuScreen({ navigation }: Props) {
             }
           />
         ))}
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -251,12 +257,14 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
   },
   content: {
+    flex: 1,
     paddingTop: 8,
     paddingHorizontal: 18,
-    paddingBottom: 90,
+    paddingBottom: 84,
   },
   heroCard: {
-    aspectRatio: 1,
+    flex: 1,
+    minHeight: 180,
     borderRadius: 22,
     overflow: 'hidden',
     marginBottom: 14,
@@ -270,15 +278,15 @@ const createStyles = (c: ThemeColors) =>
   },
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
-    padding: 12,
+    padding: 14,
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(0,0,0,0.15)',
   },
   heroTitle: {
     color: '#FFFFFF',
-    fontSize: 36,
-    fontWeight: '900',
-    lineHeight: 36,
+    fontFamily: 'Oswald_700Bold',
+    fontSize: 44,
+    lineHeight: 48,
+    letterSpacing: 1,
   },
   heroBottom: {
     flexDirection: 'row',
@@ -319,82 +327,16 @@ const createStyles = (c: ThemeColors) =>
     fontWeight: '800',
     marginBottom: 8,
   },
+  blocCategories: {
+    backgroundColor: c.surfaceAlt,
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
+    marginBottom: 14,
+  },
   categories: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 14,
-  },
-  recentCard: {
-    height: 95,
-    borderRadius: 16,
-    backgroundColor: c.surface,
-    marginBottom: 12,
-    flexDirection: 'row',
-    overflow: 'hidden',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-  },
-  recentImage: {
-    width: 105,
-    height: '100%',
-  },
-  recentContent: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-  },
-  recentTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    marginBottom: 8,
-  },
-  recentText: {
-    fontSize: 12,
-    color: c.text,
-    marginBottom: 4,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-    right: 10,
-    height: 58,
-    backgroundColor: c.surface,
-    borderRadius: 30,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-  },
-  searchTab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: c.surface,
-    borderRadius: 24,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    elevation: 3,
-  },
-  searchTabText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  profileIcon: {
-    fontSize: 20,
-  },
-  headerTextActive: {
-    color: c.text,
-    fontWeight: '700',
-  },
-  toggleCircleActive: {
-    alignSelf: 'flex-end',
   },
 });
