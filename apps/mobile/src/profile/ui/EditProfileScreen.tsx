@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ActivityIndicator,
   Alert,
@@ -133,7 +134,7 @@ export function EditProfileScreen({ route, navigation }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView
         style={styles.screen}
         contentContainerStyle={styles.container}
@@ -283,6 +284,7 @@ export function EditProfileScreen({ route, navigation }: Props) {
 
 
       </ScrollView>
+      <VoileDePage />
     </SafeAreaView>
   );
 }

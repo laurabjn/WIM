@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ScrollView,
   StyleSheet,
@@ -137,7 +138,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
         <ProfileHeaderCard
           profile={profile}
@@ -193,6 +194,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
           />
         </View>
       </ScrollView>
+      <VoileDePage />
     </SafeAreaView>
   );
 }

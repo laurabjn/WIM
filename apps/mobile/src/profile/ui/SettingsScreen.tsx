@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import { Alert, Linking, ScrollView, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SettingsDangerRow } from './settings/component/SettingsDangerRow';
 import { SettingsRow } from './settings/component/SettingsRow';
 import { SettingsSection } from './settings/component/SettingsSection';
@@ -65,6 +66,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
   const { theme, setAppTheme } = useAppTheme();
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     fetchUnreadNotificationsApi()
@@ -259,11 +261,11 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: colors.screen }]}
-      edges={['top', 'bottom']}
+      edges={[]}
     >
       <ScrollView
         style={[styles.screen, { backgroundColor: colors.screen }]}
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]}
       >
         <SettingsSection title={t('profile:settings.account')}>
           <SettingsRow
@@ -539,6 +541,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           />
         </SettingsSection>
       </ScrollView>
+      <VoileDePage haut />
     </SafeAreaView>
   );
 }
@@ -553,7 +556,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   container: {
-    padding: 16,
-    paddingBottom: 120,
+    paddingHorizontal: 16,
+    paddingBottom: 110,
   },
 });

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ActivityIndicator,
   Alert,
@@ -163,7 +164,7 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
         <ProfileHeaderCard
           profile={normalizedProfile}
@@ -244,6 +245,7 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
           </View>
         </TouchableOpacity>
       </Modal>
+      <VoileDePage />
     </SafeAreaView>
   );
 }
