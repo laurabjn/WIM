@@ -18,13 +18,17 @@ import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
 import { fetchUnreadNotificationsApi } from 'src/notifications/infrastructure/notificationCenter.api';
 import { demanderLaVerificationIdentite } from 'src/auth/ui/identityGate';
 import { SITE_URL } from 'src/config/api';
+import { autoriserLePartage } from 'src/observabilite/sentry';
 import {
   ArrowLeftRight,
   BadgeCheck,
   Ban,
   Bell,
+  Cake,
   CircleQuestionMark,
+  Coins,
   CreditCard,
+  Eye,
   FileText,
   Flag,
   Heart,
@@ -33,8 +37,11 @@ import {
   Lock,
   LogOut,
   Mail,
+  MapPin,
   MessageCircle,
   Phone,
+  Ruler,
+  Share2,
   Shield,
   SunMoon,
   Trash2,
@@ -95,6 +102,20 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
   );
   const [allowMessages, setAllowMessages] = useState(
     profile.allowMessages ?? true,
+  );
+  const [profileVisible, setProfileVisible] = useState(
+    profile.profileVisible ?? true,
+  );
+  const [showPreciseLocation, setShowPreciseLocation] = useState(
+    profile.showPreciseLocation ?? true,
+  );
+  const [showAge, setShowAge] = useState(profile.showAge ?? true);
+  const [dataSharing, setDataSharing] = useState(profile.dataSharing ?? false);
+  const [currency, setCurrency] = useState<'EUR' | 'USD'>(
+    profile.currency === 'USD' ? 'USD' : 'EUR',
+  );
+  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>(
+    profile.distanceUnit === 'mi' ? 'mi' : 'km',
   );
 
   const fullName = useMemo(() => {
@@ -199,6 +220,36 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
     await enregistrerProfil({ preferredLocale: locale }, () => {
       i18n.changeLanguage(precedente);
     });
+  }
+
+  function openCurrencySelector() {
+    Alert.alert(t('profile:settings.currency'), '', [
+      { text: 'EUR (€)', onPress: () => changerDevise('EUR') },
+      { text: 'USD ($)', onPress: () => changerDevise('USD') },
+      { text: t('common:cancel'), style: 'cancel' },
+    ]);
+  }
+
+  function changerDevise(valeur: 'EUR' | 'USD') {
+    const precedente = currency;
+
+    setCurrency(valeur);
+    enregistrerProfil({ currency: valeur }, () => setCurrency(precedente));
+  }
+
+  function openDistanceUnitSelector() {
+    Alert.alert(t('profile:settings.distanceUnit'), '', [
+      { text: t('profile:settings.kilometers'), onPress: () => changerUnite('km') },
+      { text: t('profile:settings.miles'), onPress: () => changerUnite('mi') },
+      { text: t('common:cancel'), style: 'cancel' },
+    ]);
+  }
+
+  function changerUnite(valeur: 'km' | 'mi') {
+    const precedente = distanceUnit;
+
+    setDistanceUnit(valeur);
+    enregistrerProfil({ distanceUnit: valeur }, () => setDistanceUnit(precedente));
   }
 
   function ouvrirLaPage(chemin: string) {
@@ -343,6 +394,40 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.privacy')}>
           <SettingsSwitchRow
+            icon={Eye}
+            label={t('profile:settings.profileVisibility')}
+            value={profileVisible}
+            onValueChange={(valeur) => {
+              setProfileVisible(valeur);
+              enregistrerProfil({ profileVisible: valeur }, () =>
+                setProfileVisible(!valeur),
+              );
+            }}
+          />
+
+          <SettingsSwitchRow
+            icon={MapPin}
+            label={t('profile:settings.preciseLocation')}
+            value={showPreciseLocation}
+            onValueChange={(valeur) => {
+              setShowPreciseLocation(valeur);
+              enregistrerProfil({ showPreciseLocation: valeur }, () =>
+                setShowPreciseLocation(!valeur),
+              );
+            }}
+          />
+
+          <SettingsSwitchRow
+            icon={Cake}
+            label={t('profile:settings.yearSharing')}
+            value={showAge}
+            onValueChange={(valeur) => {
+              setShowAge(valeur);
+              enregistrerProfil({ showAge: valeur }, () => setShowAge(!valeur));
+            }}
+          />
+
+          <SettingsSwitchRow
             icon={MessageCircle}
             label={t('profile:settings.allowMessage')}
             value={allowMessages}
@@ -351,6 +436,20 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
               enregistrerProfil({ allowMessages: valeur }, () =>
                 setAllowMessages(!valeur),
               );
+            }}
+          />
+
+          <SettingsSwitchRow
+            icon={Share2}
+            label={t('profile:settings.dataSharing')}
+            value={dataSharing}
+            onValueChange={(valeur) => {
+              setDataSharing(valeur);
+              autoriserLePartage(valeur);
+              enregistrerProfil({ dataSharing: valeur }, () => {
+                setDataSharing(!valeur);
+                autoriserLePartage(!valeur);
+              });
             }}
           />
 
@@ -375,6 +474,24 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             label={t('profile:settings.language')}
             value={displayedLocale}
             onPress={openLanguageSelector}
+          />
+
+          <SettingsRow
+            icon={Coins}
+            label={t('profile:settings.currency')}
+            value={currency === 'USD' ? 'USD ($)' : 'EUR (€)'}
+            onPress={openCurrencySelector}
+          />
+
+          <SettingsRow
+            icon={Ruler}
+            label={t('profile:settings.distanceUnit')}
+            value={
+              distanceUnit === 'mi'
+                ? t('profile:settings.miles')
+                : t('profile:settings.kilometers')
+            }
+            onPress={openDistanceUnitSelector}
           />
         </SettingsSection>
 

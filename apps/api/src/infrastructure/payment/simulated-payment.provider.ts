@@ -64,6 +64,7 @@ export class SimulatedPaymentProvider implements PaymentProviderPort {
     userId: string;
     email: string;
     plan: PlanAbonnement;
+    devise: string;
   }): Promise<{ url: string; externalId: string }> {
     const externalId = `simule_${randomUUID()}`;
 

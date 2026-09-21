@@ -26,6 +26,7 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
 
     const homes = await this.prisma.home.findMany({
       where: {
+        owner: { profileVisible: true },
         ownerId: {
           not: userId,
           notIn: await this.hiddenOwnerIds(userId),

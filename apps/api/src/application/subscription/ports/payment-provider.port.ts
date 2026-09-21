@@ -1,5 +1,7 @@
 export type PlanAbonnement = 'MONTHLY' | 'YEARLY';
 
+export type Devise = 'EUR' | 'USD';
+
 export type VerdictPaiement = {
   externalId: string;
   nouvelExternalId?: string;
@@ -24,7 +26,7 @@ export type MoyenDePaiement = {
 };
 
 export interface PaymentProviderPort {
-  tarifs(): Promise<TarifsParPlan>;
+  tarifs(devise: Devise): Promise<TarifsParPlan>;
 
   ouvrirLePortail(externalId: string): Promise<string | null>;
 
@@ -44,6 +46,7 @@ export interface PaymentProviderPort {
     userId: string;
     email: string;
     plan: PlanAbonnement;
+    devise: Devise;
     coupon?: string;
   }): Promise<{ url: string; externalId: string }>;
 

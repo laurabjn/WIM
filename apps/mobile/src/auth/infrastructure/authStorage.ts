@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
-import { associerLeCompte } from 'src/observabilite/sentry';
+import { associerLeCompte, autoriserLePartage } from 'src/observabilite/sentry';
 
 import { API_URL } from 'src/config/api';
 
@@ -117,7 +117,7 @@ export async function sessionToujoursValide(
   session: AuthSession,
 ): Promise<boolean> {
   try {
-    const response = await fetch(`${API_URL}/identity/status`, {
+    const response = await fetch(`${API_URL}/users/me/profile`, {
       headers: { Authorization: `Bearer ${session.accessToken}` },
     });
 
@@ -125,6 +125,14 @@ export async function sessionToujoursValide(
       await clearSession();
 
       return false;
+    }
+
+    if (response.ok) {
+      const profil = await response.json().catch(() => null);
+
+      if (profil && typeof profil.dataSharing === 'boolean') {
+        autoriserLePartage(profil.dataSharing);
+      }
     }
 
     return true;

@@ -39,8 +39,8 @@ import { HomeSearchPrismaRepository } from 'src/infrastructure/repositories/home
     },
     {
       provide: GetHomeByIdUseCase,
-      useFactory: (homeRepo) => new GetHomeByIdUseCase(homeRepo),
-      inject: [HOME_REPOSITORY],
+      useFactory: (homeRepo, prisma) => new GetHomeByIdUseCase(homeRepo, prisma),
+      inject: [HOME_REPOSITORY, PrismaService],
     },
     {
       provide: ListMyHomesUseCase,

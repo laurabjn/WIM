@@ -9,6 +9,7 @@ import {
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { PAYMENT_PROVIDER } from 'src/interfaces/http/tokens/token';
 import type {
+  Devise,
   MoyenDePaiement,
   PaymentProviderPort,
   PlanAbonnement,
@@ -52,12 +53,19 @@ export class SubscriptionService {
       where: { userId },
     });
 
+    const compte = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { currency: true, studentVerifiedUntil: true },
+    });
+
+    const devise = this.deviseDe(compte?.currency);
+
     const tarifs = await this.provider
-      .tarifs()
+      .tarifs(devise)
       .catch(() => ({ MONTHLY: null, YEARLY: null }) as TarifsParPlan);
 
     const accesLibre = this.accesLibreJusquAu();
-    const etudiant = await this.estEtudiant(userId);
+    const etudiant = (compte?.studentVerifiedUntil?.getTime() ?? 0) > Date.now();
 
     if (!abonnement) {
       return {
@@ -183,7 +191,7 @@ export class SubscriptionService {
 
     const personne = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, studentVerifiedUntil: true },
+      select: { email: true, studentVerifiedUntil: true, currency: true },
     });
 
     if (!personne) {
@@ -198,6 +206,7 @@ export class SubscriptionService {
       userId,
       email: personne.email,
       plan,
+      devise: this.deviseDe(personne.currency),
       ...(etudiant && bon ? { coupon: bon } : {}),
     });
 
@@ -436,13 +445,8 @@ export class SubscriptionService {
     });
   }
 
-  private async estEtudiant(userId: string): Promise<boolean> {
-    const compte = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { studentVerifiedUntil: true },
-    });
-
-    return (compte?.studentVerifiedUntil?.getTime() ?? 0) > Date.now();
+  private deviseDe(valeur: string | null | undefined): Devise {
+    return valeur === 'USD' ? 'USD' : 'EUR';
   }
 
   accesLibreJusquAu(): Date | null {

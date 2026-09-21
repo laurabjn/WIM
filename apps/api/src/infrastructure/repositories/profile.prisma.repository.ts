@@ -49,6 +49,7 @@ export class PrismaProfileRepository implements ProfileRepository {
       showPreciseLocation: user.showPreciseLocation,
       allowMessages: user.allowMessages,
       distanceUnit: user.distanceUnit === 'mi' ? 'mi' : 'km',
+      currency: user.currency === 'USD' ? 'USD' : 'EUR',
       homesCount,
       exchangesCount,
       reviewsCount: reviewStats._count._all,
@@ -140,6 +141,7 @@ export class PrismaProfileRepository implements ProfileRepository {
         showPreciseLocation: input.showPreciseLocation,
         allowMessages: input.allowMessages,
         distanceUnit: input.distanceUnit,
+        currency: input.currency,
         ...(input.statusText === undefined
           ? {}
           : {

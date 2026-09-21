@@ -714,6 +714,8 @@
     },
     "guest": "Guest",
     "deletedMember": "Deleted member",
+
+    "distanceFromYou": "{{valeur}} {{unite}} from your home",
     "ownerAvailability": "Your available periods",
     "ownerNoAvailability": "You have not opened any period.",
     "ownerBlocked": "blocked",

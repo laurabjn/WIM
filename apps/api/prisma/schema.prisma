@@ -49,6 +49,7 @@ model User {
   showPreciseLocation Boolean @default(true) @map("show_precise_location")
   allowMessages       Boolean @default(true) @map("allow_messages")
   distanceUnit        String  @default("km") @map("distance_unit")
+  currency            String  @default("EUR")
 
   pushTokens PushToken[]
 

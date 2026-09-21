@@ -28,6 +28,7 @@ export interface Home {
   occupiedByExchange?: boolean;
   pricePerNight?: number | null;
   isFavorite?: boolean;
+  distance?: { valeur: number; unite: 'km' | 'mi' } | null;
   averageRating?: number | null;
   reviewsCount?: number | null;
   reviews: Review[];

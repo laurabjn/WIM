@@ -150,8 +150,9 @@ export class HomeController {
   }
 
   @Get(':id')
-  getById(@Param('id') id: string) {
-    return this.getHomeByIdUseCase.execute(id);
+  @UseGuards(JwtAuthGuard)
+  getById(@Req() req: any, @Param('id') id: string) {
+    return this.getHomeByIdUseCase.execute(id, req.user?.sub);
   }
 
   @UseGuards(JwtAuthGuard)
