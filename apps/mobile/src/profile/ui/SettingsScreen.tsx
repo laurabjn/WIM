@@ -23,6 +23,38 @@ import { unregisterPushToken } from 'src/notifications/pushRegistration';
 import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
 import { fetchUnreadNotificationsApi } from 'src/notifications/infrastructure/notificationCenter.api';
 import { demanderLaVerificationIdentite } from 'src/auth/ui/identityGate';
+import {
+  ArrowLeftRight,
+  BadgeCheck,
+  Ban,
+  Bell,
+  Cake,
+  CircleQuestionMark,
+  Coins,
+  CreditCard,
+  Eye,
+  FileText,
+  Flag,
+  Heart,
+  Info,
+  Languages,
+  LifeBuoy,
+  Lock,
+  LogOut,
+  Mail,
+  MapPin,
+  Megaphone,
+  MessageCircle,
+  MessageSquare,
+  Phone,
+  Ruler,
+  Scale,
+  Share2,
+  Shield,
+  SunMoon,
+  Trash2,
+  User,
+} from 'lucide-react-native';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Settings'> & {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
@@ -276,25 +308,25 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
       >
         <SettingsSection title={t('profile:settings.account')}>
           <SettingsRow
-            icon="◎"
+            icon={User}
             label={t('profile:settings.personalInfo')}
             value={fullName || t('common:notProvided')}
             onPress={() => navigation.navigate('EditProfile', { profile })}
           />
           <SettingsRow
-            icon="✉"
+            icon={Mail}
             label={t('auth:register.email')}
             value={displayedEmail}
             onPress={() => navigation.navigate('EditProfile', { profile })}
           />
           <SettingsRow
-            icon="⌕"
+            icon={Phone}
             label={t('auth:register.phone')}
             value={displayedPhone}
             onPress={() => navigation.navigate('EditProfile', { profile })}
           />
           <SettingsRow
-            icon="⌂"
+            icon={Lock}
             label={t('auth:register.password')}
             value="••••••••"
             onPress={() => navigation.navigate('EditProfile', { profile })}
@@ -303,7 +335,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.display')}>
           <SettingsRow
-            icon="◐"
+            icon={SunMoon}
             label={t('profile:settings.theme')}
             value={
               theme === 'system'
@@ -318,7 +350,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.verification')}>
           <SettingsRow
-            icon="▣"
+            icon={BadgeCheck}
             label={t('profile:settings.verificationStatus')}
             value={
               profile.identityStatus === IdentityStatus.VERIFIED
@@ -349,7 +381,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.subscription')}>
           <SettingsRow
-            icon="★"
+            icon={CreditCard}
             label={t('subscription:mine')}
             value={t('subscription:manageValue')}
             onPress={() => navigation.navigate('Subscription')}
@@ -358,7 +390,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.notifications')}>
           <SettingsSwitchRow
-            icon="⌂"
+            icon={Bell}
             label={t('profile:settings.pushNotifications')}
             value={pushNotifications}
             onValueChange={(valeur) => {
@@ -369,7 +401,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             }}
           />
           <SettingsSwitchRow
-            icon="⌕"
+            icon={MessageSquare}
             label={t('profile:settings.smsNotifications')}
             value={smsNotifications}
             onValueChange={(valeur) => {
@@ -380,7 +412,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             }}
           />
           <SettingsSwitchRow
-            icon="✉"
+            icon={MessageCircle}
             label={t('profile:settings.newMessages')}
             value={newMessages}
             onValueChange={(valeur) => {
@@ -391,7 +423,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             }}
           />
           <SettingsSwitchRow
-            icon="◎"
+            icon={ArrowLeftRight}
             label={t('profile:settings.updateMessages')}
             value={newExchangeDays}
             onValueChange={(valeur) => {
@@ -402,7 +434,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             }}
           />
           <SettingsSwitchRow
-            icon="✉"
+            icon={Megaphone}
             label={t('profile:settings.emailMarketing')}
             value={marketingEmails}
             onValueChange={(valeur) => {
@@ -416,7 +448,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.privacy')}>
           <SettingsSwitchRow
-            icon="◉"
+            icon={Eye}
             label={t('profile:settings.profileVisibility')}
             value={profileVisibleServeur}
             onValueChange={(valeur) => {
@@ -428,7 +460,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           />
 
           <SettingsSwitchRow
-            icon="⌖"
+            icon={MapPin}
             label={t('profile:settings.preciseLocation')}
             value={showPreciseLocation}
             onValueChange={(valeur) => {
@@ -440,7 +472,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           />
 
           <SettingsSwitchRow
-            icon="◌"
+            icon={Cake}
             label={t('profile:settings.yearSharing')}
             value={showAgeServeur}
             onValueChange={(valeur) => {
@@ -452,7 +484,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           />
 
           <SettingsSwitchRow
-            icon="✉"
+            icon={MessageCircle}
             label={t('profile:settings.allowMessage')}
             value={allowMessages}
             onValueChange={(valeur) => {
@@ -464,7 +496,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           />
 
           <SettingsSwitchRow
-            icon="◧"
+            icon={Share2}
             label={t('profile:settings.dataSharing')}
             value={dataSharing}
             onValueChange={(valeur) => {
@@ -476,14 +508,14 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           />
 
           <SettingsRow
-            icon="⊘"
+            icon={Ban}
             label={t('profile:blocked.title')}
             value={t('profile:blocked.manage')}
             onPress={() => navigation.navigate('BlockedUsers')}
           />
 
           <SettingsRow
-            icon="🔔"
+            icon={Bell}
             label={t('notifications:title')}
             value={nonLues > 0 ? String(nonLues) : ''}
             onPress={() => navigation.navigate('NotificationCenter')}
@@ -492,28 +524,28 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.preferences')}>
           <SettingsRow
-            icon="♡"
+            icon={Heart}
             label={t('profile:settings.managePreferences')}
             value={t('profile:settings.customize')}
             onPress={() => navigation.navigate('Preferences', { profile })}
           />
 
           <SettingsRow
-            icon="⌘"
+            icon={Languages}
             label={t('profile:settings.language')}
             value={displayedLocale}
             onPress={openLanguageSelector}
           />
 
           <SettingsRow
-            icon="€"
+            icon={Coins}
             label={t('profile:settings.currency')}
             value={`${currency} ${currency === 'EUR' ? '(€)' : currency === 'USD' ? '($)' : '(£)'}`}
             onPress={openCurrencySelector}
           />
 
           <SettingsRow
-            icon="⌁"
+            icon={Ruler}
             label={t('profile:settings.distanceUnit')}
             value={
               distanceUnit === 'km'
@@ -526,17 +558,17 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.assistance')}>
           <SettingsRow
-            icon="?"
+            icon={CircleQuestionMark}
             label={t('profile:settings.helpCenter')}
             onPress={() => navigation.navigate('Help')}
           />
           <SettingsRow
-            icon="◌"
+            icon={LifeBuoy}
             label={t('profile:settings.contactSupport')}
             onPress={() => navigation.navigate('Support', {})}
           />
           <SettingsRow
-            icon="▲"
+            icon={Flag}
             label={t('profile:settings.problemReport')}
             onPress={() => navigation.navigate('Support', { mode: 'report' })}
           />
@@ -544,22 +576,22 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.legal')}>
           <SettingsRow
-            icon="▣"
+            icon={FileText}
             label={t('profile:settings.termsOfService')}
             onPress={() => notImplemented('Conditions d’utilisation')}
           />
           <SettingsRow
-            icon="▤"
+            icon={Shield}
             label={t('profile:settings.privacyPolicy')}
             onPress={() => notImplemented('Politique de confidentialité')}
           />
           <SettingsRow
-            icon="▥"
+            icon={Scale}
             label={t('profile:settings.licenses')}
             onPress={() => notImplemented('Licences open source')}
           />
           <SettingsRow
-            icon="ⓘ"
+            icon={Info}
             label={t('profile:settings.about')}
             value="v1.0.0"
             onPress={() => notImplemented('À propos')}
@@ -568,12 +600,12 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
 
         <SettingsSection title={t('profile:settings.dangerZone')}>
           <SettingsDangerRow
-            icon="⇥"
+            icon={LogOut}
             label={t('profile:logout')}
             onPress={confirmDisconnect}
           />
           <SettingsDangerRow
-            icon="🗑"
+            icon={Trash2}
             label={t('profile:settings.deleteAccount')}
             onPress={confirmDeleteAccount}
           />
