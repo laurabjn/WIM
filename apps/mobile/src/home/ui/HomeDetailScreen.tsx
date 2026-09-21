@@ -321,7 +321,8 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           onShare={handleShare}
           showFavorite={!isMine}
         />
-        
+
+        <View style={styles.feuille}>
         <HomeSummary home={home} />
 
         <View style={styles.content}>
@@ -402,6 +403,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           />
         </View>
         <View style={styles.bottomSpacer} />
+        </View>
       </ScrollView>
 
       <Modal
@@ -525,6 +527,13 @@ const createStyles = (c: ThemeColors) =>
   },
   safeArea: {
     flex: 1,
+    backgroundColor: c.surface,
+  },
+  feuille: {
+    marginTop: -24,
+    paddingTop: 6,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     backgroundColor: c.surface,
   },
   center: {

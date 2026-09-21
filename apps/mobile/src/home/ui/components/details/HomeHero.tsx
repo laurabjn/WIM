@@ -160,8 +160,14 @@ const createStyles = (c: ThemeColors) =>
   imageCounter: {
     position: 'absolute',
     right: 14,
-    bottom: 10,
+    bottom: 36,
     color: '#FFFFFF',
     fontWeight: '600',
+    fontSize: 12,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
 });
