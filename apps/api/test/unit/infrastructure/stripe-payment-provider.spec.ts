@@ -238,6 +238,7 @@ describe('StripePaymentProvider.creerPaiement', () => {
         userId: 'u1',
         email: 'lea@exemple.fr',
         plan: 'YEARLY',
+        devise: 'EUR',
       }),
     ).resolves.toEqual({
       url: 'https://checkout.stripe.com/abc',
@@ -258,6 +259,7 @@ describe('StripePaymentProvider.creerPaiement', () => {
       userId: 'u1',
       email: 'lea@exemple.fr',
       plan: 'YEARLY',
+      devise: 'EUR',
     });
 
     expect(creer.mock.calls[0][0].payment_method_collection).toBe('if_required');
@@ -272,6 +274,7 @@ describe('StripePaymentProvider.creerPaiement', () => {
       userId: 'u1',
       email: 'lea@exemple.fr',
       plan: 'YEARLY',
+      devise: 'EUR',
     });
 
     expect(creer.mock.calls[0][0].subscription_data.trial_period_days).toBe(365);
@@ -286,6 +289,7 @@ describe('StripePaymentProvider.creerPaiement', () => {
       userId: 'u1',
       email: 'lea@exemple.fr',
       plan: 'YEARLY',
+      devise: 'EUR',
     });
 
     expect(
@@ -301,6 +305,7 @@ describe('StripePaymentProvider.creerPaiement', () => {
       userId: 'u1',
       email: 'lea@exemple.fr',
       plan: 'YEARLY',
+      devise: 'EUR',
     });
 
     expect(
@@ -318,6 +323,7 @@ describe('StripePaymentProvider.creerPaiement', () => {
         userId: 'u1',
         email: 'lea@exemple.fr',
         plan: 'MONTHLY',
+        devise: 'EUR',
       }),
     ).rejects.toThrow('Aucun tarif Stripe');
   });
@@ -528,5 +534,61 @@ describe('StripePaymentProvider.offrirDesJours', () => {
     const nouvelleFin = await provider.offrirDesJours('sub_456', 30);
 
     expect(nouvelleFin!.getTime()).toBeGreaterThan(Date.now() + 29 * 24 * 3600 * 1000);
+  });
+});
+
+describe('StripePaymentProvider et les devises', () => {
+  const sauvegarde = {
+    eur: process.env.STRIPE_PRICE_YEARLY,
+    usd: process.env.STRIPE_PRICE_YEARLY_USD,
+  };
+
+  afterEach(() => {
+    process.env.STRIPE_PRICE_YEARLY = sauvegarde.eur;
+    if (sauvegarde.usd === undefined) delete process.env.STRIPE_PRICE_YEARLY_USD;
+    else process.env.STRIPE_PRICE_YEARLY_USD = sauvegarde.usd;
+  });
+
+  function fournisseurAvecCaisse() {
+    const provider = new StripePaymentProvider();
+    const creer = jest.fn().mockResolvedValue({ id: 'cs_1', url: 'https://caisse' });
+
+    (provider as unknown as { stripe: unknown }).stripe = {
+      checkout: { sessions: { create: creer } },
+    };
+
+    return { provider, creer };
+  }
+
+  it('ouvre la caisse sur le tarif en dollars pour qui a choisi USD', async () => {
+    process.env.STRIPE_PRICE_YEARLY = 'price_eur';
+    process.env.STRIPE_PRICE_YEARLY_USD = 'price_usd';
+
+    const { provider, creer } = fournisseurAvecCaisse();
+
+    await provider.creerPaiement({
+      userId: 'u1',
+      email: 'lea@exemple.fr',
+      plan: 'YEARLY',
+      devise: 'USD',
+    });
+
+    expect(creer.mock.calls[0][0].line_items[0].price).toBe('price_usd');
+  });
+
+  it('retombe sur les euros quand aucun tarif en dollars n est declare', async () => {
+    process.env.STRIPE_PRICE_YEARLY = 'price_eur';
+    delete process.env.STRIPE_PRICE_YEARLY_USD;
+
+    const { provider, creer } = fournisseurAvecCaisse();
+
+    await provider.creerPaiement({
+      userId: 'u1',
+      email: 'lea@exemple.fr',
+      plan: 'YEARLY',
+      devise: 'USD',
+    });
+
+    expect(creer.mock.calls[0][0].line_items[0].price).toBe('price_eur');
   });
 });

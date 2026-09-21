@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import Stripe = require('stripe');
 
 import type {
+  Devise,
   MoyenDePaiement,
   PaymentProviderPort,
   PlanAbonnement,
@@ -19,6 +20,15 @@ export function isStripePaymentConfigured(): boolean {
 }
 
 const DUREE_DU_CACHE_MS = 10 * 60 * 1000;
+
+const LOCALE_PAR_DEVISE: Record<Devise, string> = { EUR: 'fr-FR', USD: 'en-US' };
+
+function identifiantDuTarif(plan: PlanAbonnement, devise: Devise): string | undefined {
+  const base = plan === 'YEARLY' ? 'STRIPE_PRICE_YEARLY' : 'STRIPE_PRICE_MONTHLY';
+  const localise = devise === 'EUR' ? undefined : process.env[`${base}_${devise}`]?.trim();
+
+  return localise || process.env[base]?.trim();
+}
 
 const STATUTS_ACTIFS = new Set(['active', 'trialing']);
 const JOUR_S = 24 * 60 * 60;
@@ -41,30 +51,35 @@ export class StripePaymentProvider implements PaymentProviderPort {
   private readonly logger = new Logger(StripePaymentProvider.name);
   private readonly stripe: Stripe;
 
-  private cache: { valeur: TarifsParPlan; obtenuA: number } | null = null;
+  private cache = new Map<Devise, { valeur: TarifsParPlan; obtenuA: number }>();
 
   constructor() {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_absente');
   }
 
-  async tarifs(): Promise<TarifsParPlan> {
-    if (this.cache && Date.now() - this.cache.obtenuA < DUREE_DU_CACHE_MS) {
-      return this.cache.valeur;
+  async tarifs(devise: Devise): Promise<TarifsParPlan> {
+    const connu = this.cache.get(devise);
+
+    if (connu && Date.now() - connu.obtenuA < DUREE_DU_CACHE_MS) {
+      return connu.valeur;
     }
 
     const [mensuel, annuel] = await Promise.all([
-      this.tarif(process.env.STRIPE_PRICE_MONTHLY?.trim()),
-      this.tarif(process.env.STRIPE_PRICE_YEARLY?.trim()),
+      this.tarif(identifiantDuTarif('MONTHLY', devise), devise),
+      this.tarif(identifiantDuTarif('YEARLY', devise), devise),
     ]);
 
     const valeur: TarifsParPlan = { MONTHLY: mensuel, YEARLY: annuel };
 
-    this.cache = { valeur, obtenuA: Date.now() };
+    this.cache.set(devise, { valeur, obtenuA: Date.now() });
 
     return valeur;
   }
 
-  private async tarif(identifiant?: string): Promise<TarifAffiche | null> {
+  private async tarif(
+    identifiant: string | undefined,
+    devise: Devise,
+  ): Promise<TarifAffiche | null> {
     if (!identifiant) return null;
 
     try {
@@ -75,7 +90,7 @@ export class StripePaymentProvider implements PaymentProviderPort {
       return {
         montant: tarif.unit_amount,
         devise: tarif.currency,
-        libelle: new Intl.NumberFormat('fr-FR', {
+        libelle: new Intl.NumberFormat(LOCALE_PAR_DEVISE[devise], {
           style: 'currency',
           currency: tarif.currency.toUpperCase(),
         }).format(tarif.unit_amount / 100),
@@ -91,12 +106,10 @@ export class StripePaymentProvider implements PaymentProviderPort {
     userId: string;
     email: string;
     plan: PlanAbonnement;
+    devise: Devise;
     coupon?: string;
   }): Promise<{ url: string; externalId: string }> {
-    const tarif =
-      params.plan === 'YEARLY'
-        ? process.env.STRIPE_PRICE_YEARLY?.trim()
-        : process.env.STRIPE_PRICE_MONTHLY?.trim();
+    const tarif = identifiantDuTarif(params.plan, params.devise);
 
     if (!tarif) {
       throw new Error(`Aucun tarif Stripe pour le plan ${params.plan}.`);

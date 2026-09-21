@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet } from 'react-native';
+import { Alert, Linking, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SettingsDangerRow } from './settings/component/SettingsDangerRow';
 import { SettingsRow } from './settings/component/SettingsRow';
@@ -10,12 +10,6 @@ import { getSession } from 'src/auth/infrastructure/authStorage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { IdentityStatus } from 'src/auth/dtos/identityStatus';
-import {
-  AppTheme,
-  DistanceUnit,
-  getAllSettings,
-  saveSetting,
-} from '../infrastructure/settingsStorage';
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { clearSession } from 'src/auth/infrastructure/authStorage';
 import { deleteAccountApi } from 'src/auth/infrastructure/api';
@@ -23,6 +17,8 @@ import { unregisterPushToken } from 'src/notifications/pushRegistration';
 import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
 import { fetchUnreadNotificationsApi } from 'src/notifications/infrastructure/notificationCenter.api';
 import { demanderLaVerificationIdentite } from 'src/auth/ui/identityGate';
+import { SITE_URL } from 'src/config/api';
+import { autoriserLePartage } from 'src/observabilite/sentry';
 import {
   ArrowLeftRight,
   BadgeCheck,
@@ -36,19 +32,15 @@ import {
   FileText,
   Flag,
   Heart,
-  Info,
   Languages,
   LifeBuoy,
   Lock,
   LogOut,
   Mail,
   MapPin,
-  Megaphone,
   MessageCircle,
-  MessageSquare,
   Phone,
   Ruler,
-  Scale,
   Share2,
   Shield,
   SunMoon,
@@ -80,45 +72,6 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
       .catch(() => setNonLues(0));
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function charger() {
-      const enregistres = await getAllSettings();
-
-      if (cancelled) return;
-
-      setCurrency(enregistres.currency);
-      setDistanceUnit(enregistres.distanceUnit);
-    }
-
-    charger();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const [profileVisibleServeur, setProfileVisibleServeur] = useState(
-    profile.profileVisible ?? true,
-  );
-  const [showAgeServeur, setShowAgeServeur] = useState(profile.showAge ?? true);
-  const [dataSharing, setDataSharing] = useState(profile.dataSharing ?? false);
-
-  async function enregistrerLocal<T>(
-    cle: Parameters<typeof saveSetting>[0],
-    valeur: T,
-    appliquer: (valeur: T) => void,
-  ) {
-    appliquer(valeur);
-
-    try {
-      await saveSetting(cle, valeur);
-    } catch (error) {
-      console.log('Save setting error:', error);
-    }
-  }
-
   async function enregistrerProfil(
     champs: Parameters<typeof updateMyProfile>[1],
     revenir: () => void,
@@ -141,30 +94,29 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
   const [pushNotifications, setPushNotifications] = useState(
     profile.notifyPush ?? true,
   );
-  const [smsNotifications, setSmsNotifications] = useState(
-    profile.notifySms ?? false,
-  );
   const [newMessages, setNewMessages] = useState(
     profile.notifyNewMessages ?? true,
   );
   const [newExchangeDays, setNewExchangeDays] = useState(
     profile.notifyExchanges ?? true,
   );
-  const [marketingEmails, setMarketingEmails] = useState(
-    profile.marketingEmails ?? false,
-  );
-
-  const [profileVisible, setProfileVisible] = useState(true);
-  const [showPreciseLocation, setShowPreciseLocation] = useState(
-    profile.showPreciseLocation ?? true,
-  );
-  const [showAge, setShowAge] = useState(true);
   const [allowMessages, setAllowMessages] = useState(
     profile.allowMessages ?? true,
   );
-
-  const [currency, setCurrency] = useState<'EUR' | 'USD' | 'GBP'>('EUR');
-  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km');
+  const [profileVisible, setProfileVisible] = useState(
+    profile.profileVisible ?? true,
+  );
+  const [showPreciseLocation, setShowPreciseLocation] = useState(
+    profile.showPreciseLocation ?? true,
+  );
+  const [showAge, setShowAge] = useState(profile.showAge ?? true);
+  const [dataSharing, setDataSharing] = useState(profile.dataSharing ?? false);
+  const [currency, setCurrency] = useState<'EUR' | 'USD'>(
+    profile.currency === 'USD' ? 'USD' : 'EUR',
+  );
+  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>(
+    profile.distanceUnit === 'mi' ? 'mi' : 'km',
+  );
 
   const fullName = useMemo(() => {
     return `${profile.firstName} ${profile.lastName}`.trim();
@@ -174,16 +126,6 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
   const displayedPhone = profile.phone || t('common:notProvided');
   const displayedLocale =
     i18n.language?.startsWith('en') ? 'English' : 'Français';
-
-  const displayedNationality = profile.nationality || t('common:notProvided');
-
-  const displayedBirthDate = profile.birthDate
-    ? new Date(profile.birthDate).toLocaleDateString('fr-FR')
-    : t('common:notProvided');
-
-  function notImplemented(label: string) {
-    Alert.alert('À faire', label);
-  }
 
   function confirmDisconnect() {
     Alert.alert(t('profile:logOutTitle'), t('profile:confirmLogOut'), [
@@ -262,15 +204,6 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
     ]);
   }
 
-  function openCurrencySelector() {
-    Alert.alert(t('profile:settings.currency'), '', [
-      { text: 'EUR (€)', onPress: () => setCurrency('EUR') },
-      { text: 'USD ($)', onPress: () => setCurrency('USD') },
-      { text: 'GBP (£)', onPress: () => setCurrency('GBP') },
-      { text: t('common:cancel'), style: 'cancel' },
-    ]);
-  }
-
   function openLanguageSelector() {
     Alert.alert(t('profile:settings.language'), '', [
       { text: 'Français', onPress: () => changerLangue('fr') },
@@ -289,12 +222,38 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
     });
   }
 
-  function openDistanceUnitSelector() {
-    Alert.alert(t('profile:settings.distanceUnit'), '', [
-      { text: t('profile:settings.kilometers', 'Kilomètres'), onPress: () => enregistrerLocal('distanceUnit', 'km', setDistanceUnit) },
-      { text: t('profile:settings.miles', 'Miles'), onPress: () => enregistrerLocal('distanceUnit', 'mi', setDistanceUnit) },
+  function openCurrencySelector() {
+    Alert.alert(t('profile:settings.currency'), '', [
+      { text: 'EUR (€)', onPress: () => changerDevise('EUR') },
+      { text: 'USD ($)', onPress: () => changerDevise('USD') },
       { text: t('common:cancel'), style: 'cancel' },
     ]);
+  }
+
+  function changerDevise(valeur: 'EUR' | 'USD') {
+    const precedente = currency;
+
+    setCurrency(valeur);
+    enregistrerProfil({ currency: valeur }, () => setCurrency(precedente));
+  }
+
+  function openDistanceUnitSelector() {
+    Alert.alert(t('profile:settings.distanceUnit'), '', [
+      { text: t('profile:settings.kilometers'), onPress: () => changerUnite('km') },
+      { text: t('profile:settings.miles'), onPress: () => changerUnite('mi') },
+      { text: t('common:cancel'), style: 'cancel' },
+    ]);
+  }
+
+  function changerUnite(valeur: 'km' | 'mi') {
+    const precedente = distanceUnit;
+
+    setDistanceUnit(valeur);
+    enregistrerProfil({ distanceUnit: valeur }, () => setDistanceUnit(precedente));
+  }
+
+  function ouvrirLaPage(chemin: string) {
+    Linking.openURL(`${SITE_URL}${chemin}`).catch(() => undefined);
   }
 
   return (
@@ -338,10 +297,10 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             icon={SunMoon}
             label={t('profile:settings.theme')}
             value={
-              theme === 'system'
-                ? t('profile:settings.themeSystem', 'Système')
-                : theme === 'dark'
-                  ? t('profile:settings.themeDark', 'Sombre')
+              theme === 'dark'
+                ? t('profile:settings.themeDark', 'Sombre')
+                : theme === 'system'
+                  ? t('profile:settings.themeSystem', 'Système')
                   : t('profile:settings.themeLight', 'Clair')
             }
             onPress={openThemeSelector}
@@ -400,17 +359,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
               );
             }}
           />
-          <SettingsSwitchRow
-            icon={MessageSquare}
-            label={t('profile:settings.smsNotifications')}
-            value={smsNotifications}
-            onValueChange={(valeur) => {
-              setSmsNotifications(valeur);
-              enregistrerProfil({ notifySms: valeur }, () =>
-                setSmsNotifications(!valeur),
-              );
-            }}
-          />
+
           <SettingsSwitchRow
             icon={MessageCircle}
             label={t('profile:settings.newMessages')}
@@ -422,6 +371,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
               );
             }}
           />
+
           <SettingsSwitchRow
             icon={ArrowLeftRight}
             label={t('profile:settings.updateMessages')}
@@ -433,16 +383,12 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
               );
             }}
           />
-          <SettingsSwitchRow
-            icon={Megaphone}
-            label={t('profile:settings.emailMarketing')}
-            value={marketingEmails}
-            onValueChange={(valeur) => {
-              setMarketingEmails(valeur);
-              enregistrerProfil({ marketingEmails: valeur }, () =>
-                setMarketingEmails(!valeur),
-              );
-            }}
+
+          <SettingsRow
+            icon={Bell}
+            label={t('notifications:title')}
+            value={nonLues > 0 ? String(nonLues) : ''}
+            onPress={() => navigation.navigate('NotificationCenter')}
           />
         </SettingsSection>
 
@@ -450,11 +396,11 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           <SettingsSwitchRow
             icon={Eye}
             label={t('profile:settings.profileVisibility')}
-            value={profileVisibleServeur}
+            value={profileVisible}
             onValueChange={(valeur) => {
-              setProfileVisibleServeur(valeur);
+              setProfileVisible(valeur);
               enregistrerProfil({ profileVisible: valeur }, () =>
-                setProfileVisibleServeur(!valeur),
+                setProfileVisible(!valeur),
               );
             }}
           />
@@ -474,12 +420,10 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           <SettingsSwitchRow
             icon={Cake}
             label={t('profile:settings.yearSharing')}
-            value={showAgeServeur}
+            value={showAge}
             onValueChange={(valeur) => {
-              setShowAgeServeur(valeur);
-              enregistrerProfil({ showAge: valeur }, () =>
-                setShowAgeServeur(!valeur),
-              );
+              setShowAge(valeur);
+              enregistrerProfil({ showAge: valeur }, () => setShowAge(!valeur));
             }}
           />
 
@@ -501,9 +445,11 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             value={dataSharing}
             onValueChange={(valeur) => {
               setDataSharing(valeur);
-              enregistrerProfil({ dataSharing: valeur }, () =>
-                setDataSharing(!valeur),
-              );
+              autoriserLePartage(valeur);
+              enregistrerProfil({ dataSharing: valeur }, () => {
+                setDataSharing(!valeur);
+                autoriserLePartage(!valeur);
+              });
             }}
           />
 
@@ -512,13 +458,6 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             label={t('profile:blocked.title')}
             value={t('profile:blocked.manage')}
             onPress={() => navigation.navigate('BlockedUsers')}
-          />
-
-          <SettingsRow
-            icon={Bell}
-            label={t('notifications:title')}
-            value={nonLues > 0 ? String(nonLues) : ''}
-            onPress={() => navigation.navigate('NotificationCenter')}
           />
         </SettingsSection>
 
@@ -540,7 +479,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           <SettingsRow
             icon={Coins}
             label={t('profile:settings.currency')}
-            value={`${currency} ${currency === 'EUR' ? '(€)' : currency === 'USD' ? '($)' : '(£)'}`}
+            value={currency === 'USD' ? 'USD ($)' : 'EUR (€)'}
             onPress={openCurrencySelector}
           />
 
@@ -548,9 +487,9 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             icon={Ruler}
             label={t('profile:settings.distanceUnit')}
             value={
-              distanceUnit === 'km'
-                ? t('profile:settings.kilometers', 'Kilomètres')
-                : t('profile:settings.miles', 'Miles')
+              distanceUnit === 'mi'
+                ? t('profile:settings.miles')
+                : t('profile:settings.kilometers')
             }
             onPress={openDistanceUnitSelector}
           />
@@ -578,23 +517,12 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           <SettingsRow
             icon={FileText}
             label={t('profile:settings.termsOfService')}
-            onPress={() => notImplemented('Conditions d’utilisation')}
+            onPress={() => ouvrirLaPage('/conditions.html')}
           />
           <SettingsRow
             icon={Shield}
             label={t('profile:settings.privacyPolicy')}
-            onPress={() => notImplemented('Politique de confidentialité')}
-          />
-          <SettingsRow
-            icon={Scale}
-            label={t('profile:settings.licenses')}
-            onPress={() => notImplemented('Licences open source')}
-          />
-          <SettingsRow
-            icon={Info}
-            label={t('profile:settings.about')}
-            value="v1.0.0"
-            onPress={() => notImplemented('À propos')}
+            onPress={() => ouvrirLaPage('/confidentialite.html')}
           />
         </SettingsSection>
 

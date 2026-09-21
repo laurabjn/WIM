@@ -713,6 +713,8 @@
     },
     "guest": "Invité",
     "deletedMember": "Membre supprimé",
+
+    "distanceFromYou": "À {{valeur}} {{unite}} de chez vous",
     "ownerAvailability": "Vos périodes de disponibilité",
     "ownerNoAvailability": "Vous n'avez ouvert aucune période.",
     "ownerBlocked": "bloquée",

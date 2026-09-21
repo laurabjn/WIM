@@ -63,6 +63,7 @@ export interface UserProfile {
   showPreciseLocation?: boolean;
   allowMessages?: boolean;
   distanceUnit?: 'km' | 'mi';
+  currency?: 'EUR' | 'USD';
 }
 
 export interface MyHome {

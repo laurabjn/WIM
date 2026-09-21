@@ -4,6 +4,12 @@ const ADRESSE = process.env.EXPO_PUBLIC_SENTRY_DSN;
 
 export const remonteeActive = Boolean(ADRESSE);
 
+let partageAutorise = true;
+
+export function autoriserLePartage(valeur: boolean): void {
+  partageAutorise = valeur;
+}
+
 export function demarrerLaRemonteeDesErreurs(): void {
   if (!ADRESSE) return;
 
@@ -16,6 +22,8 @@ export function demarrerLaRemonteeDesErreurs(): void {
     attachViewHierarchy: false,
     environment: __DEV__ ? 'development' : 'production',
     beforeSend(evenement) {
+      if (!partageAutorise) return null;
+
       if (evenement.user) {
         evenement.user = { id: evenement.user.id };
       }
