@@ -57,7 +57,8 @@ adresse du siège</span>, éditeur de l’application WIM.</p>
     <td>Compte</td>
     <td>Adresse e-mail, mot de passe chiffré, prénom, nom, photo de profil,
         description, pays, langues parlées, date de naissance, nationalité,
-        numéro de téléphone, langue de l’interface, préférences de voyage</td>
+        numéro de téléphone, langue de l’interface, devise et unité de distance,
+        préférences de voyage, réglages de confidentialité</td>
     <td>Créer votre compte, vous identifier, permettre aux autres membres de savoir
         à qui ils ont affaire</td>
   </tr>
@@ -97,8 +98,28 @@ adresse du siège</span>, éditeur de l’application WIM.</p>
   </tr>
   <tr>
     <td>Vérification d’identité</td>
-    <td>Uniquement le résultat : vérifiée, en cours, refusée</td>
+    <td>Le résultat — vérifiée, en cours, refusée — et l’identifiant de la
+        session chez Stripe, qui nous permet de demander l’effacement de vos
+        documents si vous supprimez votre compte</td>
     <td>Garantir aux membres que leur interlocuteur est une personne réelle</td>
+  </tr>
+  <tr>
+    <td>Abonnement</td>
+    <td>Statut et dates de votre abonnement, identifiant de votre compte client
+        chez Stripe. Aucun numéro de carte ne transite par nos serveurs.</td>
+    <td>Ouvrir les échanges aux membres abonnés et gérer votre facturation</td>
+  </tr>
+  <tr>
+    <td>Parrainage</td>
+    <td>Votre code, le code que vous avez saisi à l’inscription, les comptes
+        que vous avez parrainés et la récompense versée</td>
+    <td>Offrir l’avantage promis au parrain et au filleul</td>
+  </tr>
+  <tr>
+    <td>Tarif étudiant</td>
+    <td>Votre adresse e-mail d’école, la date de fin de validité du statut, et,
+        le temps d’un quart d’heure, l’empreinte du code envoyé</td>
+    <td>Appliquer le tarif réduit et le renouveler chaque année</td>
   </tr>
 </table>
 
@@ -112,12 +133,13 @@ numéro de document.</p>
 <table>
   <tr><th>Service</th><th>Ce qu’il reçoit</th><th>Pourquoi</th></tr>
   <tr><td>Stripe Identity</td><td>Votre pièce d’identité et votre photographie</td><td>Vérifier votre identité</td></tr>
+  <tr><td>Stripe</td><td>Votre adresse e-mail, votre moyen de paiement, vos factures</td><td>Encaisser l’abonnement et gérer vos moyens de paiement</td></tr>
   <tr><td>DeepL</td><td>Le texte des messages à traduire</td><td>Traduire les conversations entre langues différentes</td></tr>
   <tr><td>Mapbox</td><td>Les adresses recherchées et les coordonnées affichées</td><td>Afficher les cartes et compléter les adresses</td></tr>
   <tr><td>Google et Apple</td><td>Votre identifiant de connexion, si vous choisissez ce mode</td><td>Vous connecter sans mot de passe</td></tr>
   <tr><td>Expo et Google Firebase</td><td>L’identifiant technique de votre appareil</td><td>Acheminer les notifications</td></tr>
   <tr><td>OVH</td><td>L’ensemble des données, hébergées en France</td><td>Héberger le service et envoyer les courriels</td></tr>
-  <tr><td>Sentry</td><td>Le détail technique d’une panne : modèle d’appareil, version du système, pile d’appels, et l’identifiant de votre compte</td><td>Comprendre et corriger les pannes de l’application</td></tr>
+  <tr><td>Sentry</td><td>Le détail technique d’une panne : modèle d’appareil, version du système, pile d’appels, et l’identifiant de votre compte — seulement si vous l’avez autorisé dans vos réglages, sous «&nbsp;Partage de données&nbsp;»</td><td>Comprendre et corriger les pannes de l’application</td></tr>
 </table>
 
 <p>Nous ne vendons aucune donnée et n’en transmettons à aucun annonceur.</p>
@@ -139,7 +161,7 @@ informations sur votre appareil, nécessaires à son fonctionnement :</p>
     <td>Vous éviter de saisir votre mot de passe à chaque ouverture</td>
   </tr>
   <tr>
-    <td>Vos préférences : thème, langue, unité de distance, écrans d’introduction déjà vus</td>
+    <td>Votre préférence de thème</td>
     <td>Retrouver l’application telle que vous l’avez réglée</td>
   </tr>
   <tr>
@@ -154,9 +176,11 @@ service d’analyse comportementale. C’est pourquoi elle ne vous demande pas d
 consentement à l’ouverture : la loi ne l’exige que pour les stockages qui ne sont
 pas strictement nécessaires au service que vous avez demandé.</p>
 
-<p>Une exception mérite d’être nommée : lorsque l’application tombe en panne, le
-détail technique de l’incident est transmis à Sentry, un service qui nous sert à
-corriger les défauts. Il reçoit le modèle de l’appareil, la version du système, la
+<p>Une exception mérite d’être nommée, et elle dépend de vous : lorsque
+l’application tombe en panne, le détail technique de l’incident peut être transmis
+à Sentry, un service qui nous sert à corriger les défauts. Cela ne se produit que si
+vous avez activé «&nbsp;Partage de données&nbsp;» dans vos réglages ; c’est désactivé
+par défaut. Il reçoit le modèle de l’appareil, la version du système, la
 pile d’appels et l’identifiant de votre compte — jamais le contenu de vos
 conversations, ni vos documents, ni ce que vous étiez en train de saisir.</p>
 
@@ -168,11 +192,33 @@ mesure — nous vous demanderions votre accord avant, et cette page le dirait.</
 <table>
   <tr><th>Donnée</th><th>Durée</th></tr>
   <tr><td>Compte et contenus associés</td><td>Tant que votre compte existe</td></tr>
-  <tr><td>Après suppression du compte</td><td><span class="acompleter">À COMPLÉTER — 30 jours recommandés</span></td></tr>
-  <tr><td>Messages d’une conversation</td><td>Tant que l’un des deux comptes existe</td></tr>
+  <tr><td>Après suppression du compte</td><td>Effacement immédiat ; seules les sauvegardes de la base en gardent une copie, pendant la durée indiquée plus bas</td></tr>
+  <tr><td>Messages d’une conversation</td><td>Tant que les deux comptes existent : la suppression de l’un efface la conversation</td></tr>
+  <tr><td>Code de vérification étudiant</td><td>Quinze minutes</td></tr>
   <tr><td>Signalements traités</td><td><span class="acompleter">À COMPLÉTER — 1 an recommandé</span></td></tr>
   <tr><td>Sauvegardes de la base</td><td><span class="acompleter">À COMPLÉTER — 14 jours actuellement</span></td></tr>
 </table>
+
+<h2>Supprimer votre compte</h2>
+<p>Vous pouvez supprimer votre compte vous-même, depuis les réglages de
+l’application, en deux confirmations. L’effacement est immédiat : vos logements et
+leurs photos, vos conversations, vos correspondances, votre abonnement, vos
+signalements et vos notifications disparaissent. Nous demandons dans le même temps
+à Stripe d’effacer votre compte client et les documents de votre vérification
+d’identité. Un courriel vous confirme l’opération.</p>
+<p>Deux choses subsistent. Les séjours que vous avez faits chez d’autres membres
+restent dans leur historique, votre nom remplacé par «&nbsp;Membre supprimé&nbsp;».
+Et les sauvegardes de la base gardent une copie de vos données pendant la durée
+indiquée ci-dessus, avant de disparaître à leur tour.</p>
+
+<h2>Les courriels que vous recevez de nous</h2>
+<p>Ils sont tous liés à votre compte : confirmation d’inscription, réinitialisation
+du mot de passe, résultat de la vérification d’identité, code du tarif étudiant,
+confirmation de suppression. Un rappel unique vous est envoyé le lendemain de votre
+inscription si vous n’avez pas encore publié de logement. Stripe vous écrit de son
+côté pour tout ce qui touche à la facturation : rappel avant renouvellement, reçu,
+carte arrivant à expiration. Nous n’envoyons aucune lettre d’information ni aucun
+courriel commercial.</p>
 
 <h2>Vos droits</h2>
 <p>Vous pouvez à tout moment demander l’accès à vos données, leur correction, leur
