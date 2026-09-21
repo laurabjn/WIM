@@ -18,9 +18,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from 'src/navigation/authStack';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
-import { marquerIntroductionVue } from '../infrastructure/onboardingStorage';
-
-type Props = NativeStackScreenProps<AuthStackParamList, 'Onboarding'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'Onboarding'> & {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const VISUELS = [
   require('../../../assets/onboarding/1.png'),
@@ -29,7 +29,7 @@ const VISUELS = [
   require('../../../assets/onboarding/4.png'),
 ];
 
-export const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
+export const OnboardingScreen: React.FC<Props> = ({ setIsAuthenticated }) => {
   const { t } = useTranslation(['onboarding']);
   const themeColors = useThemeColors();
   const styles = useMemo(() => creerStyles(themeColors), [themeColors]);
@@ -45,9 +45,8 @@ export const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
 
   const dernier = index >= VISUELS.length - 1;
 
-  async function terminer() {
-    await marquerIntroductionVue();
-    navigation.replace('WelcomeEntry');
+  function terminer() {
+    setIsAuthenticated(true);
   }
 
   function avancer() {
