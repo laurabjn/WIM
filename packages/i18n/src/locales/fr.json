@@ -1039,6 +1039,8 @@
     "allRequests": "Toutes les demandes",
     "autoTranslated": "Cette discussion est traduite automatiquement,",
     "removeTranslation": "retirer la traduction",
+    "translationOff": "La traduction est désactivée,",
+    "enableTranslation": "la réactiver",
     "stopTranslation": "Ne plus traduire la discussion",
     "restoreTranslation": "Remettre la traduction",
     "photoError": "La photo n'a pas pu être envoyée.",

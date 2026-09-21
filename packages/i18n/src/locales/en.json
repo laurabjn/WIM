@@ -1040,6 +1040,8 @@
     "allRequests": "All requests",
     "autoTranslated": "This conversation is translated automatically,",
     "removeTranslation": "remove translation",
+    "translationOff": "Translation is off,",
+    "enableTranslation": "turn it back on",
     "stopTranslation": "Stop translating this conversation",
     "restoreTranslation": "Restore translation",
     "photoError": "The photo could not be sent.",
