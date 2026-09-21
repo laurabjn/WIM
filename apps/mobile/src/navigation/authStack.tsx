@@ -77,20 +77,22 @@ export type AuthStackParamList = {
 
 type Props = {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  introductionVue: boolean;
 };
 
 const Stack = createStackNavigator<AuthStackParamList>();
 
 export const AuthStackNavigator: React.FC<Props> = ({
   setIsAuthenticated,
-  introductionVue,
 }) => (
   <Stack.Navigator
     screenOptions={{ headerShown: false }}
-    initialRouteName={introductionVue ? 'WelcomeEntry' : 'Onboarding'}
+    initialRouteName="WelcomeEntry"
   >
-    <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+    <Stack.Screen name="Onboarding">
+      {(props) => (
+        <OnboardingScreen {...props} setIsAuthenticated={setIsAuthenticated} />
+      )}
+    </Stack.Screen>
     <Stack.Screen name="WelcomeEntry" component={WelcomeEntryScreen} />
     <Stack.Screen name="RegisterStart">
       {(props) => (

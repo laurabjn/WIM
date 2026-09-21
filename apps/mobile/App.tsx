@@ -21,7 +21,6 @@ import {
   getSession,
   sessionToujoursValide,
 } from 'src/auth/infrastructure/authStorage';
-import { introductionDejaVue } from 'src/onboarding/infrastructure/onboardingStorage';
 import { ChargementScreen } from 'src/shared/ui/chargement/ChargementScreen';
 import { IdentityGateScreen } from 'src/auth/ui/IdentityGateScreen';
 import {
@@ -41,12 +40,10 @@ const Stack = createNativeStackNavigator();
 function Coquille({
   isAuthenticated,
   isAdmin,
-  introductionVue,
   setIsAuthenticated,
 }: {
   isAuthenticated: boolean;
   isAdmin: boolean;
-  introductionVue: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { isDark, colors } = useAppTheme();
@@ -72,7 +69,6 @@ function Coquille({
       <RootNavigator
         isAuthenticated={isAuthenticated}
         isAdmin={isAdmin}
-        introductionVue={introductionVue}
         setIsAuthenticated={setIsAuthenticated}
       />
     </NavigationContainer>
@@ -83,7 +79,6 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [porteIdentite, setPorteIdentite] = useState(false);
-  const [introductionVue, setIntroductionVue] = useState(true);
   const [ready, setReady] = useState(false);
   const [logoTermine, setLogoTermine] = useState(false);
 
@@ -92,8 +87,6 @@ export default function App() {
       await initI18n();
 
       try {
-        setIntroductionVue(await introductionDejaVue());
-
         const session = await getSession();
         const valide = session ? await sessionToujoursValide(session) : false;
 
@@ -132,7 +125,6 @@ export default function App() {
         <SafeAreaProvider>
         <ThemeProvider>
           <Coquille
-            introductionVue={introductionVue}
             isAuthenticated={isAuthenticated}
             isAdmin={isAdmin}
             setIsAuthenticated={setIsAuthenticated}
