@@ -105,6 +105,7 @@ const MAX_RECORDING_MS = 3 * 60 * 1000;
 const AUDIO_FILE_TIMEOUT_MS = 8000;
 
 const translationKey = (chatId: string) => `chat:translate:${chatId}`;
+const translatableKey = (chatId: string) => `chat:translatable:${chatId}`;
 
 function apercuMessage(message: {
   type: string;
@@ -204,6 +205,7 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   const translatedRef = useRef(true);
   const [translationEpoch, setTranslationEpoch] = useState(0);
+  const [traduisible, setTraduisible] = useState(false);
 
   const [recording, setRecording] = useState(false);
   const [recordingMs, setRecordingMs] = useState(0);
@@ -245,8 +247,13 @@ export function ConversationScreen({ route, navigation }: Props) {
           }
         }
 
-        const stored = await AsyncStorage.getItem(translationKey(chatId));
+        const [stored, dejaTraduite] = await Promise.all([
+          AsyncStorage.getItem(translationKey(chatId)),
+          AsyncStorage.getItem(translatableKey(chatId)),
+        ]);
         const wantsTranslation = stored !== 'off';
+
+        if (!cancelled && dejaTraduite === '1') setTraduisible(true);
 
         translatedRef.current = wantsTranslation;
 
@@ -1084,8 +1091,16 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
-  const showTranslationNotice =
-    translated && messages.some((message) => message.translatedContent);
+  const aDesTraductions = messages.some((message) => message.translatedContent);
+
+  useEffect(() => {
+    if (!aDesTraductions || traduisible) return;
+
+    setTraduisible(true);
+    AsyncStorage.setItem(translatableKey(chatId), '1').catch(() => undefined);
+  }, [aDesTraductions, traduisible, chatId]);
+
+  const showTranslationNotice = translated ? aDesTraductions : traduisible;
 
   const lastSeenOwnMessageId = participantLastReadAt
     ? messages.find(
@@ -1223,6 +1238,13 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <LinearGradient
+        pointerEvents="none"
+        colors={[themeColors.surface, themeColors.surfaceAlt]}
+        locations={[0.15, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+
       <View
         style={styles.header}
         onLayout={(evenement) =>
@@ -1447,12 +1469,12 @@ export function ConversationScreen({ route, navigation }: Props) {
 
             {showTranslationNotice ? (
               <Text style={styles.translationNotice}>
-                {t('autoTranslated')}{' '}
+                {translated ? t('autoTranslated') : t('translationOff')}{' '}
                 <Text
                   style={styles.translationLink}
-                  onPress={() => applyTranslation(false)}
+                  onPress={() => applyTranslation(!translated)}
                 >
-                  {t('removeTranslation')}
+                  {translated ? t('removeTranslation') : t('enableTranslation')}
                 </Text>
               </Text>
             ) : null}
@@ -1828,11 +1850,11 @@ const createStyles = (c: ThemeColors) =>
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
+    paddingTop: 4,
     paddingBottom: 10,
     gap: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: c.border,
+    backgroundColor: 'transparent',
   },
 
 menuBackdrop: {
@@ -2000,10 +2022,17 @@ menuBackdrop: {
   },
 
   headerButton: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: c.surface,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
 
   headerAvatar: {
