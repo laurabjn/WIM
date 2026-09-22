@@ -78,7 +78,7 @@ import { fetchLikedHomesApi } from 'src/swipe/infrastructure/swipe.api';
 import { VoiceMessageBubble } from './components/VoiceMessageBubble';
 import { TypingBubble } from './components/TypingBubble';
 import { BackButton } from 'src/shared/ui/BackButton';
-import { useThemeColors } from 'src/theme/ThemeContext';
+import { useAppTheme } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 import {
   formatMessageDay,
@@ -103,6 +103,21 @@ const TYPING_EXPIRY_MS = 4000;
 const MIN_RECORDING_MS = 800;
 const MAX_RECORDING_MS = 3 * 60 * 1000;
 const AUDIO_FILE_TIMEOUT_MS = 8000;
+
+const fondDeDiscussion = (sombre: boolean) =>
+  sombre
+    ? ([
+        'rgba(0,0,0,0.5)',
+        'rgba(0,0,0,0)',
+        'rgba(45,167,243,0)',
+        'rgba(45,167,243,0.18)',
+      ] as const)
+    : ([
+        'rgba(17,17,17,0.18)',
+        'rgba(17,17,17,0)',
+        'rgba(45,167,243,0)',
+        'rgba(45,167,243,0.28)',
+      ] as const);
 
 const translationKey = (chatId: string) => `chat:translate:${chatId}`;
 const translatableKey = (chatId: string) => `chat:translatable:${chatId}`;
@@ -143,7 +158,7 @@ type Props = {
 
 export function ConversationScreen({ route, navigation }: Props) {
   const { t, i18n } = useTranslation(['chat', 'common', 'subscription']);
-  const themeColors = useThemeColors();
+  const { colors: themeColors, isDark } = useAppTheme();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
   const { chatId } = route.params;
@@ -181,7 +196,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [hauteurEntete, setHauteurEntete] = useState(0);
   const [hauteurBandeau, setHauteurBandeau] = useState(0);
   const [logementsCandidats, setLogementsCandidats] = useState<
     LogementCandidat[]
@@ -1240,17 +1254,12 @@ export function ConversationScreen({ route, navigation }: Props) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
         pointerEvents="none"
-        colors={[themeColors.surface, themeColors.surfaceAlt]}
-        locations={[0.15, 1]}
+        colors={fondDeDiscussion(isDark)}
+        locations={[0, 0.16, 0.74, 1]}
         style={StyleSheet.absoluteFill}
       />
 
-      <View
-        style={styles.header}
-        onLayout={(evenement) =>
-          setHauteurEntete(evenement.nativeEvent.layout.height)
-        }
-      >
+      <View style={styles.header}>
         <BackButton onPress={navigation.goBack} style={styles.headerButton} />
 
         <TouchableOpacity
@@ -1330,9 +1339,10 @@ export function ConversationScreen({ route, navigation }: Props) {
         }}
       />
 
+      <View style={styles.corps}>
       {exchange && bandeauVisible ? (
         <View
-          style={[styles.bandeauFlottant, { top: hauteurEntete }]}
+          style={styles.bandeauFlottant}
           pointerEvents="box-none"
           onLayout={(evenement) =>
             setHauteurBandeau(evenement.nativeEvent.layout.height)
@@ -1591,6 +1601,8 @@ export function ConversationScreen({ route, navigation }: Props) {
           </View>
         </KeyboardAvoidingView>
       )}
+      </View>
+
       <Modal
         visible={menuOpen}
         transparent
@@ -1836,8 +1848,13 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
   },
 
+  corps: {
+    flex: 1,
+  },
+
   bandeauFlottant: {
     position: 'absolute',
+    top: 0,
     left: 0,
     right: 0,
     zIndex: 10,
