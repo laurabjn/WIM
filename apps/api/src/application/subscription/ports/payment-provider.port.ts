@@ -34,13 +34,20 @@ export interface PaymentProviderPort {
 
   offrirDesJours(externalId: string, jours: number): Promise<Date | null>;
 
-  moyensDePaiement(externalId: string): Promise<MoyenDePaiement[]>;
+  clientDeLAbonnement(externalId: string): Promise<string | null>;
 
-  definirLeMoyenPrincipal(externalId: string, moyenId: string): Promise<boolean>;
+  creerUnClient(params: {
+    userId: string;
+    email: string;
+  }): Promise<string | null>;
 
-  retirerLeMoyen(externalId: string, moyenId: string): Promise<boolean>;
+  moyensDePaiement(client: string): Promise<MoyenDePaiement[]>;
 
-  ajouterUnMoyen(externalId: string): Promise<string | null>;
+  definirLeMoyenPrincipal(client: string, moyenId: string): Promise<boolean>;
+
+  retirerLeMoyen(client: string, moyenId: string): Promise<boolean>;
+
+  ajouterUnMoyen(client: string): Promise<string | null>;
 
   creerPaiement(params: {
     userId: string;
@@ -48,6 +55,7 @@ export interface PaymentProviderPort {
     plan: PlanAbonnement;
     devise: Devise;
     coupon?: string;
+    client?: string | null;
   }): Promise<{ url: string; externalId: string }>;
 
   appliquerUneRemise(externalId: string, coupon: string): Promise<boolean>;

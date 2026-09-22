@@ -19,6 +19,8 @@ import type {
 import { ReferralService } from './referral.service';
 import { bonEtudiant } from './student.service';
 
+const INDISPONIBLE = "La gestion des moyens de paiement est indisponible.";
+
 const JOUR_MS = 24 * 60 * 60 * 1000;
 
 const DUREE_JOURS: Record<PlanAbonnement, number> = {
@@ -207,6 +209,7 @@ export class SubscriptionService {
       email: personne.email,
       plan,
       devise: this.deviseDe(personne.currency),
+      client: await this.clientDuCompte(userId),
       ...(etudiant && bon ? { coupon: bon } : {}),
     });
 
@@ -251,70 +254,92 @@ export class SubscriptionService {
   }
 
   async moyensDePaiement(userId: string): Promise<MoyenDePaiement[]> {
-    const externalId = await this.identifiantDuCompte(userId);
+    const client = await this.clientDuCompte(userId);
 
-    return externalId ? this.provider.moyensDePaiement(externalId) : [];
+    return client ? this.provider.moyensDePaiement(client) : [];
   }
 
   async definirLeMoyenPrincipal(
     userId: string,
     moyenId: string,
   ): Promise<MoyenDePaiement[]> {
-    const externalId = await this.identifiantDuCompte(userId);
+    const client = await this.clientDuCompte(userId);
 
-    if (!externalId) {
-      throw new NotFoundException('Aucun abonnement.');
+    if (!client) {
+      throw new ServiceUnavailableException(INDISPONIBLE);
     }
 
-    if (!(await this.provider.definirLeMoyenPrincipal(externalId, moyenId))) {
+    if (!(await this.provider.definirLeMoyenPrincipal(client, moyenId))) {
       throw new NotFoundException('Moyen de paiement introuvable.');
     }
 
-    return this.provider.moyensDePaiement(externalId);
+    return this.provider.moyensDePaiement(client);
   }
 
   async retirerLeMoyen(
     userId: string,
     moyenId: string,
   ): Promise<MoyenDePaiement[]> {
-    const externalId = await this.identifiantDuCompte(userId);
+    const client = await this.clientDuCompte(userId);
 
-    if (!externalId) {
-      throw new NotFoundException('Aucun abonnement.');
+    if (!client) {
+      throw new ServiceUnavailableException(INDISPONIBLE);
     }
 
-    if (!(await this.provider.retirerLeMoyen(externalId, moyenId))) {
+    if (!(await this.provider.retirerLeMoyen(client, moyenId))) {
       throw new NotFoundException('Moyen de paiement introuvable.');
     }
 
-    return this.provider.moyensDePaiement(externalId);
+    return this.provider.moyensDePaiement(client);
   }
 
   async ajouterUnMoyen(userId: string): Promise<{ url: string }> {
-    const externalId = await this.identifiantDuCompte(userId);
+    const client = await this.clientDuCompte(userId);
 
-    if (!externalId) {
-      throw new NotFoundException('Aucun abonnement.');
-    }
-
-    const url = await this.provider.ajouterUnMoyen(externalId);
+    const url = client ? await this.provider.ajouterUnMoyen(client) : null;
 
     if (!url) {
-      throw new ServiceUnavailableException(
-        "L'ajout d'un moyen de paiement est indisponible.",
-      );
+      throw new ServiceUnavailableException(INDISPONIBLE);
     }
 
     return { url };
   }
 
-  private async identifiantDuCompte(userId: string): Promise<string | null> {
+  private async clientDuCompte(userId: string): Promise<string | null> {
+    const compte = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, stripeCustomerId: true },
+    });
+
+    if (!compte) return null;
+
+    if (compte.stripeCustomerId) return compte.stripeCustomerId;
+
     const abonnement = await this.prisma.subscription.findUnique({
       where: { userId },
       select: { externalId: true },
     });
 
-    return abonnement?.externalId ?? null;
+    const externalId = abonnement?.externalId ?? null;
+
+    let client =
+      externalId && this.provider.reconnait(externalId)
+        ? await this.provider.clientDeLAbonnement(externalId)
+        : null;
+
+    client ??= await this.provider.creerUnClient({
+      userId,
+      email: compte.email,
+    });
+
+    if (!client) return null;
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { stripeCustomerId: client },
+    });
+
+    return client;
   }
 
   async identifiantExterne(userId: string): Promise<string> {

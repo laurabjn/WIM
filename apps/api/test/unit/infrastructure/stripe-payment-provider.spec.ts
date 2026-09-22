@@ -417,6 +417,7 @@ describe('StripePaymentProvider.moyensDePaiement', () => {
           default_payment_method: options.principalAbonnement ?? null,
         }),
         update: modifierAbonnement,
+        list: jest.fn().mockResolvedValue({ data: [{ id: 'sub_1' }] }),
       },
       customers: {
         retrieve: jest.fn().mockResolvedValue({
@@ -450,7 +451,7 @@ describe('StripePaymentProvider.moyensDePaiement', () => {
       principalAbonnement: 'pm_paypal',
     });
 
-    await expect(provider.moyensDePaiement('sub_1')).resolves.toEqual([
+    await expect(provider.moyensDePaiement('cus_1')).resolves.toEqual([
       { id: 'pm_carte', type: 'card', libelle: 'Mastercard', detail: '6789', principal: false },
       { id: 'pm_paypal', type: 'paypal', libelle: 'PayPal', detail: 'lea@exemple.fr', principal: true },
     ]);
@@ -461,7 +462,7 @@ describe('StripePaymentProvider.moyensDePaiement', () => {
       moyens: [carte, paypal],
     });
 
-    const moyens = await provider.moyensDePaiement('sub_1');
+    const moyens = await provider.moyensDePaiement('cus_1');
 
     expect(moyens[0].principal).toBe(true);
     expect(modifierClient).toHaveBeenCalledWith('cus_1', {
@@ -478,8 +479,8 @@ describe('StripePaymentProvider.moyensDePaiement', () => {
       principalClient: 'pm_carte',
     });
 
-    await expect(provider.retirerLeMoyen('sub_1', 'pm_etranger')).resolves.toBe(false);
-    await expect(provider.definirLeMoyenPrincipal('sub_1', 'pm_etranger')).resolves.toBe(false);
+    await expect(provider.retirerLeMoyen('cus_1', 'pm_etranger')).resolves.toBe(false);
+    await expect(provider.definirLeMoyenPrincipal('cus_1', 'pm_etranger')).resolves.toBe(false);
 
     expect(detacher).not.toHaveBeenCalled();
     expect(modifierClient).not.toHaveBeenCalled();
@@ -491,7 +492,7 @@ describe('StripePaymentProvider.moyensDePaiement', () => {
       principalClient: 'pm_carte',
     });
 
-    await expect(provider.retirerLeMoyen('sub_1', 'pm_paypal')).resolves.toBe(true);
+    await expect(provider.retirerLeMoyen('cus_1', 'pm_paypal')).resolves.toBe(true);
 
     expect(detacher).toHaveBeenCalledWith('pm_paypal');
   });

@@ -44,6 +44,14 @@ export class SimulatedPaymentProvider implements PaymentProviderPort {
     return true;
   }
 
+  async clientDeLAbonnement(): Promise<string | null> {
+    return null;
+  }
+
+  async creerUnClient(): Promise<string | null> {
+    return null;
+  }
+
   async moyensDePaiement(): Promise<MoyenDePaiement[]> {
     return [];
   }

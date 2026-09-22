@@ -35,6 +35,8 @@ model User {
   identityReminderSentAt DateTime? @map("identity_reminder_sent_at")
   identitySessionId      String?   @map("identity_session_id")
 
+  stripeCustomerId String? @unique @map("stripe_customer_id")
+
   studentEmail         String?   @map("student_email")
   studentVerifiedUntil DateTime? @map("student_verified_until")
 
