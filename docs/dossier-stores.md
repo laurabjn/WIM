@@ -107,14 +107,36 @@ Mettre son adresse et son mot de passe dans le champ prévu, et dans les notes :
 comment atteindre un échange, et le fait que la vérification d'identité est
 déjà franchie sur ce compte.
 
-### 1.5 iPad : à décider
+### 1.5 iPad : soutenu
 
-`app.json` déclare `"supportsTablet": true`. Conséquence : Apple exige un jeu de
-captures iPad **et** teste l'application sur iPad. Si rien n'a été dessiné pour
-cet écran, c'est un motif de refus gratuit. Passer la valeur à `false` supprime
-l'obligation et l'application reste installable sur iPad en mode iPhone.
+L'application est déclarée pour iPad. Apple exige donc un jeu de captures iPad
+et essaie l'application sur cet écran : un rendu manifestement cassé est un
+motif de refus.
 
-Recommandation : `false` pour la version 1.0.
+Six écrans mesuraient la fenêtre une seule fois, au chargement du fichier, et
+rangeaient cette valeur dans une feuille de styles figée au même instant :
+`HomeHero`, `SearchResultCard`, `SearchResultsScreen`, `SwipehomeCard`,
+`SwipeDetailsHomeScreen` et `OnboardingScreen`. Sur un téléphone la question ne
+se pose pas, l'orientation étant bloquée en portrait. Sur iPad, Expo autorise
+les quatre orientations : une simple rotation suffisait à les laisser dessinés
+pour une largeur qui n'existait plus.
+
+Les six passent désormais par `useDimensionsEcran`, dans
+`src/shared/ui/dimensions.ts`, qui lit la fenêtre à chaque rendu et plafonne la
+largeur du contenu à 520 points. Sous cette valeur — tout téléphone, l'iPhone
+le plus large faisant 430 points — le comportement est identique au précédent,
+au pixel près. Au-dessus, les cartes et les carrousels cessent de s'étirer et
+se centrent. L'affiche d'un logement, elle, garde toute la largeur mais ne
+dépasse plus 60 % de la hauteur, sans quoi une photo carrée sur un iPad
+repousserait tout le reste sous la ligne de flottaison.
+
+Le verrou plein écran a donc été retiré : l'application accepte le partage
+d'écran et Slide Over, puisque ses mises en page suivent la fenêtre.
+
+Ce qui n'est pas fait : aucune mise en page propre à la tablette — pas de
+colonnes, pas de vue maître-détail. Sur un grand écran, c'est la mise en page
+du téléphone, centrée dans une colonne lisible. Apple l'accepte sans
+difficulté ; un vrai dessin pour tablette reste un chantier à part.
 
 ---
 
@@ -317,8 +339,45 @@ deux une année.
 **Promotional text**
 `Open your door, and the world opens its own. Find a home, agree on the dates, go. No rent, no middleman.`
 
-**Description** — traduction de la version française, à faire relire par une
-personne de langue anglaise avant publication.
+**Description**
+
+```
+What if your home were your passport?
+
+WIM brings together people who swap homes for a stay. No rent, no commission on
+the nights: you host each other.
+
+HOW IT WORKS
+
+1. List your home — photos, city, how many it sleeps, when it is free.
+2. Explore. Go through the homes, keep the ones you like.
+3. When the interest is mutual, the conversation opens.
+4. Agree on the dates, confirm the exchange, go.
+
+WHAT YOU WILL FIND
+
+• Browsing by cards, by city or on a map
+• Conversations translated as they happen: write in your language, the other
+  person reads in theirs
+• Voice messages, photos, and a record of what was said
+• An availability calendar, and dates settled inside the conversation
+• Reviews left after every stay
+• Identity verification by official document, asked for when you list a home or
+  propose an exchange
+
+PRIVACY, IN PRACTICE
+
+Your home's exact address is never public: the listing shows an area of roughly
+five kilometres. Your guests receive it only once the exchange is agreed. No
+advertising trackers, no audience measurement, no data sold. You can delete your
+account from the app, in two confirmations, and everything goes with it.
+
+THE SUBSCRIPTION
+
+Listing a home, exploring and talking stay free. The yearly subscription opens
+the exchanges themselves. Half price for students, with a school email address.
+Refer someone and you both gain a year.
+```
 
 **Keywords**
 `home,exchange,swap,house,travel,holiday,stay,host,traveller,vacation`
@@ -350,13 +409,14 @@ exigences plusieurs fois.
 | Store | Élément | Format |
 | --- | --- | --- |
 | Apple | Captures iPhone 6,9" | 1290 × 2796 ou 1320 × 2868, de 3 à 10 |
-| Apple | Captures iPad 13" | Seulement si `supportsTablet` reste à `true` |
+| Apple | Captures iPad 13" | Obligatoires : 2064 × 2752 ou 2048 × 2732, de 3 à 10 |
 | Apple | Icône | 1024 × 1024 PNG, sans transparence, sans coins arrondis |
 | Google Play | Captures téléphone | 2 à 8, entre 320 et 3840 px, le plus simple : 1080 × 1920 |
 | Google Play | Image de présentation | 1024 × 500 |
 | Google Play | Icône | 512 × 512 PNG |
 
-Le plus simple : prendre les captures sur un iPhone 16 Pro Max au simulateur
+Le plus simple : prendre les captures sur un iPhone 16 Pro Max et un iPad Pro
+13 pouces au simulateur
 pour Apple, et sur ton téléphone pour Google.
 
 ---

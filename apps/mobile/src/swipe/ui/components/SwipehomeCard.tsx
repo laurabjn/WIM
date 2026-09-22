@@ -1,7 +1,6 @@
 import React, { useRef, useState, useMemo } from 'react';
 import {
   Animated,
-  Dimensions,
   Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -17,11 +16,9 @@ import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { useDimensionsEcran } from 'src/shared/ui/dimensions';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_HORIZONTAL_PADDING = 18;
-const CAROUSEL_WIDTH =
-  SCREEN_WIDTH - CARD_HORIZONTAL_PADDING * 2;
 
 type Props = {
   home: any;
@@ -38,6 +35,11 @@ export function SwipeHomeCard({
   const { t } = useTranslation(['profile', 'swipe']);
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+  const { largeur, contenu } = useDimensionsEcran();
+  const carouselWidth = contenu - CARD_HORIZONTAL_PADDING * 2;
+  const largeurRef = useRef(largeur);
+
+  largeurRef.current = largeur;
 
   const [photoIndex, setPhotoIndex] = useState(0);
   const toucheSurImage = useRef(false);
@@ -87,7 +89,7 @@ export function SwipeHomeCard({
       onPanResponderRelease: (_, gesture) => {
         if (gesture.dx > 120) {
           Animated.timing(translateX, {
-            toValue: SCREEN_WIDTH,
+            toValue: largeurRef.current,
             duration: 220,
             useNativeDriver: true,
           }).start(() => {
@@ -100,7 +102,7 @@ export function SwipeHomeCard({
 
         if (gesture.dx < -120) {
           Animated.timing(translateX, {
-            toValue: -SCREEN_WIDTH,
+            toValue: -largeurRef.current,
             duration: 220,
             useNativeDriver: true,
           }).start(() => {
@@ -133,7 +135,7 @@ export function SwipeHomeCard({
   ) {
     const nextIndex = Math.round(
       event.nativeEvent.contentOffset.x /
-        CAROUSEL_WIDTH,
+        carouselWidth,
     );
 
     setPhotoIndex(nextIndex);
@@ -163,7 +165,12 @@ export function SwipeHomeCard({
         },
       ]}
     >
-      <View style={styles.carouselContainer}>
+      <View
+        style={[
+          styles.carouselContainer,
+          { width: carouselWidth, alignSelf: 'center' },
+        ]}
+      >
         <ScrollView
           horizontal
           pagingEnabled
@@ -203,7 +210,7 @@ export function SwipeHomeCard({
                   `${photo.url}-${index}`
                 }
                 source={{ uri: photo.url }}
-                style={styles.carouselImage}
+                style={[styles.carouselImage, { width: carouselWidth }]}
               />
             ),
           )}
@@ -342,14 +349,12 @@ const createStyles = (c: ThemeColors) =>
     paddingBottom: 240,
   },
   carouselContainer: {
-    width: CAROUSEL_WIDTH,
     height: 370,
     borderRadius: 22,
     overflow: 'hidden',
     backgroundColor: c.surfaceAlt,
   },
   carouselImage: {
-    width: CAROUSEL_WIDTH,
     height: 370,
     resizeMode: 'cover',
   },

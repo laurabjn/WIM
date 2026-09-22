@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Dimensions,
   Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -16,16 +15,14 @@ import { useTranslation } from 'react-i18next';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { useDimensionsEcran, LARGEUR_CONTENU_MAX } from 'src/shared/ui/dimensions';
 import {
   addFavoriteHome,
   removeFavoriteHome,
 } from 'src/home/infrastructure/home.api';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_HORIZONTAL_MARGIN = 20;
 const SELECTION_FRAME_INSET = 10;
-const IMAGE_WIDTH =
-  SCREEN_WIDTH - CARD_HORIZONTAL_MARGIN - SELECTION_FRAME_INSET;
 
 type Props = {
   home: Home;
@@ -39,6 +36,9 @@ export function SearchResultCard({
   const { t } = useTranslation('profile');
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+  const { contenu } = useDimensionsEcran();
+  const largeurImage =
+    contenu - CARD_HORIZONTAL_MARGIN - SELECTION_FRAME_INSET;
   const [photoIndex, setPhotoIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(
     home.isFavorite ?? false,
@@ -84,15 +84,15 @@ export function SearchResultCard({
   ) {
     const nextIndex = Math.round(
       event.nativeEvent.contentOffset.x /
-        IMAGE_WIDTH,
+        largeurImage,
     );
 
     setPhotoIndex(nextIndex);
   }
 
   return (
-    <View style={styles.card}>
-      <View style={styles.carouselContainer}>
+    <View style={[styles.card, { maxWidth: LARGEUR_CONTENU_MAX }]}>
+      <View style={[styles.carouselContainer, { width: largeurImage }]}>
         <ScrollView
           horizontal
           pagingEnabled
@@ -112,7 +112,7 @@ export function SearchResultCard({
             >
               <Image
                 source={{ uri: photo.url }}
-                style={styles.image}
+                style={[styles.image, { width: largeurImage }]}
               />
             </TouchableOpacity>
           ))}
@@ -199,11 +199,12 @@ export function SearchResultCard({
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
   card: {
+    width: '100%',
+    alignSelf: 'center',
     backgroundColor: c.surface,
   },
 
   carouselContainer: {
-    width: IMAGE_WIDTH,
     height: 360,
     borderRadius: 14,
     overflow: 'hidden',
@@ -211,7 +212,6 @@ const createStyles = (c: ThemeColors) =>
   },
 
   image: {
-    width: IMAGE_WIDTH,
     height: 360,
     resizeMode: 'cover',
   },
