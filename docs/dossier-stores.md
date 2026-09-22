@@ -382,7 +382,9 @@ pour Apple, et sur ton téléphone pour Google.
 
 À lui redemander en une seule fois, c'est la dernière liste qui bloque :
 
-1. Raison sociale, forme juridique, SIREN, adresse du siège.
+1. Le capital social et le nom du président, qui sera directeur de la
+   publication. Le reste de l'identité de la société est en place : RED ROCKS,
+   SAS, RCS Bordeaux 995 355 179, 36 rue Gabriel Fauré, 33400 Talence.
 2. L'adresse e-mail de contact, publiée et relevée.
 3. Le médiateur de la consommation retenu, avec ses coordonnées.
 4. Sa position sur l'assurance des séjours.
