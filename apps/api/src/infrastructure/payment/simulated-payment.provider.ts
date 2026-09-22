@@ -44,6 +44,14 @@ export class SimulatedPaymentProvider implements PaymentProviderPort {
     return true;
   }
 
+  urlDeRetour(): string {
+    return (
+      process.env.SUBSCRIPTION_RETURN_URL?.trim() ||
+      process.env.FRONTEND_URL?.trim() ||
+      'https://worldismine.fr'
+    );
+  }
+
   async clientDeLAbonnement(): Promise<string | null> {
     return null;
   }

@@ -568,7 +568,7 @@ export class StripePaymentProvider implements PaymentProviderPort {
     return Number.isFinite(declare) && declare > 0 ? declare : 0;
   }
 
-  private urlDeRetour(): string {
+  urlDeRetour(): string {
     return (
       process.env.SUBSCRIPTION_RETURN_URL?.trim() ||
       process.env.FRONTEND_URL?.trim() ||

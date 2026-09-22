@@ -60,6 +60,8 @@ export interface PaymentProviderPort {
 
   appliquerUneRemise(externalId: string, coupon: string): Promise<boolean>;
 
+  urlDeRetour(): string;
+
   reconnait(externalId: string): boolean;
 
   effacerLeClient(externalId: string): Promise<boolean>;

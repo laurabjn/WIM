@@ -39,6 +39,7 @@ function creer(
     ouvrirLePortail: jest.fn().mockResolvedValue('https://portail.stripe.com/x'),
     resilier: jest.fn().mockResolvedValue(options.resilier ?? true),
     offrirDesJours: jest.fn().mockResolvedValue(null),
+    urlDeRetour: jest.fn().mockReturnValue('https://worldismine.fr'),
     clientDeLAbonnement: jest.fn().mockResolvedValue('cus_abonnement'),
     creerUnClient: jest.fn().mockResolvedValue('cus_neuf'),
     moyensDePaiement: jest.fn().mockResolvedValue([]),
@@ -320,6 +321,7 @@ describe('SubscriptionService.demarrer', () => {
 
     await expect(service.demarrer('user-1', 'YEARLY')).resolves.toEqual({
       url: 'https://checkout.stripe.com/abc',
+      returnUrl: 'https://worldismine.fr',
     });
 
     expect(prisma.subscription.upsert).toHaveBeenCalledWith(
@@ -413,6 +415,7 @@ describe('SubscriptionService.moyens de paiement', () => {
 
     await expect(service.ajouterUnMoyen('user-1')).resolves.toEqual({
       url: 'https://enregistrement',
+      returnUrl: 'https://worldismine.fr',
     });
 
     expect(provider.ajouterUnMoyen).toHaveBeenCalledWith('cus_neuf', 'EUR');

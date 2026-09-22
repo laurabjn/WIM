@@ -112,15 +112,18 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  async function ouvrir(url: string) {
-    await WebBrowser.openBrowserAsync(url);
+  async function ouvrir(url: string, retour?: string) {
+    if (retour) await WebBrowser.openAuthSessionAsync(url, retour);
+    else await WebBrowser.openBrowserAsync(url);
+
+    await charger();
   }
 
   function souscrire() {
     return agir(async () => {
-      const { url } = await startCheckoutApi('YEARLY');
+      const { url, returnUrl } = await startCheckoutApi('YEARLY');
 
-      await ouvrir(url);
+      await ouvrir(url, returnUrl);
     });
   }
 
@@ -402,9 +405,9 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
                 style={styles.boutonContour}
                 onPress={() =>
                   agir(async () => {
-                    const { url } = await addPaymentMethodApi();
+                    const { url, returnUrl } = await addPaymentMethodApi();
 
-                    await ouvrir(url);
+                    await ouvrir(url, returnUrl);
                   })
                 }
                 disabled={occupe}

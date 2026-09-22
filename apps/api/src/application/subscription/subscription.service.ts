@@ -178,7 +178,7 @@ export class SubscriptionService {
   async demarrer(
     userId: string,
     plan: PlanAbonnement,
-  ): Promise<{ url: string }> {
+  ): Promise<{ url: string; returnUrl: string }> {
     const accesLibre = this.accesLibreJusquAu();
 
     if (accesLibre) {
@@ -229,7 +229,7 @@ export class SubscriptionService {
       },
     });
 
-    return { url: paiement.url };
+    return { url: paiement.url, returnUrl: this.provider.urlDeRetour() };
   }
 
   async portail(userId: string): Promise<{ url: string }> {
@@ -293,7 +293,9 @@ export class SubscriptionService {
     return this.provider.moyensDePaiement(client);
   }
 
-  async ajouterUnMoyen(userId: string): Promise<{ url: string }> {
+  async ajouterUnMoyen(
+    userId: string,
+  ): Promise<{ url: string; returnUrl: string }> {
     const client = await this.clientDuCompte(userId);
 
     const compte = await this.prisma.user.findUnique({
@@ -312,7 +314,7 @@ export class SubscriptionService {
       throw new ServiceUnavailableException(INDISPONIBLE);
     }
 
-    return { url };
+    return { url, returnUrl: this.provider.urlDeRetour() };
   }
 
   private async clientDuCompte(userId: string): Promise<string | null> {

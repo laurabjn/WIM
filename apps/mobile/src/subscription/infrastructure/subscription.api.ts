@@ -73,7 +73,9 @@ export function fetchSubscriptionApi(): Promise<EtatAbonnement> {
   return appeler('/subscriptions/me');
 }
 
-export function startCheckoutApi(plan: PlanAbonnement): Promise<{ url: string }> {
+export function startCheckoutApi(
+  plan: PlanAbonnement,
+): Promise<{ url: string; returnUrl?: string }> {
   return appeler('/subscriptions/checkout', { method: 'POST', body: { plan } });
 }
 
@@ -104,7 +106,10 @@ export function removePaymentMethodApi(id: string): Promise<MoyenDePaiement[]> {
   });
 }
 
-export function addPaymentMethodApi(): Promise<{ url: string }> {
+export function addPaymentMethodApi(): Promise<{
+  url: string;
+  returnUrl?: string;
+}> {
   return appeler('/subscriptions/payment-methods/setup', { method: 'POST' });
 }
 
