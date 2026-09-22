@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LanguagePills } from './LanguagePills';
 import { ProfileStatsRow } from './ProfileStatsRow';
 import { UserProfile } from '@wim/shared';
@@ -18,9 +19,16 @@ type Props = {
   profile: UserProfile;
   onPressEdit: () => void;
   hideEditButton?: boolean;
+  enTete?: boolean;
 };
 
-export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Props) {
+export function ProfileHeaderCard({
+  profile,
+  onPressEdit,
+  hideEditButton,
+  enTete,
+}: Props) {
+    const insets = useSafeAreaInsets();
     const { t } = useTranslation('profile');
     const themeColors = useThemeColors();
     const styles = useMemo(() => createStyles(themeColors), [themeColors]);
@@ -52,7 +60,13 @@ export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Prop
   const homesCount = profile.homesCount ?? 0;
 
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        enTete ? styles.carteEnTete : null,
+        enTete ? { paddingTop: insets.top + 16 } : null,
+      ]}
+    >
       <View style={styles.topRow}>
         <View style={styles.userRow}>
           <Image
@@ -98,6 +112,10 @@ export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Prop
 
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
+  carteEnTete: {
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+  },
   card: {
     backgroundColor: c.surface,
     borderRadius: 20,
