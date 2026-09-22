@@ -21,9 +21,9 @@ export function Category({
   return (
     <TouchableOpacity style={styles.category} onPress={onPress}>
       <LinearGradient
-        colors={[eclaircir(color, 0.5), eclaircir(color, 0.06), color]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        colors={[eclaircir(color, 0.55), color]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
         style={styles.categoryIcon}
       >
         {icon}
