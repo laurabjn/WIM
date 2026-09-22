@@ -47,7 +47,7 @@ export interface PaymentProviderPort {
 
   retirerLeMoyen(client: string, moyenId: string): Promise<boolean>;
 
-  ajouterUnMoyen(client: string): Promise<string | null>;
+  ajouterUnMoyen(client: string, devise: Devise): Promise<string | null>;
 
   creerPaiement(params: {
     userId: string;
