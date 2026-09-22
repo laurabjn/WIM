@@ -64,18 +64,30 @@ sur le store.
 | --- | --- |
 | « Profitez de 12 mois d'échanges illimités ! » | Vraie : c'est l'abonnement annuel |
 | « Voyagez chez plus de 200 000 membres dans 155 pays » | Remplacée par « Voyagez chez d'autres membres, sans loyer ni commission » |
-| « Échange garanti ou 2ème année offerte » | À trancher par le client |
-| « Assistance aux membres 24h/24 et 7j/7 » | À trancher par le client |
+| « Échange garanti ou 2ème année offerte » | Gardée, à la demande du client — devenue une clause des conditions |
+| « Assistance aux membres 24h/24 et 7j/7 » | Gardée, à la demande du client — devenue une clause des conditions |
 
 Le compte de membres a été retiré : aucun chiffre ne remplace un chiffre faux,
 la phrase dit maintenant ce que l'abonnement donne.
 
-Les deux dernières ne se règlent pas en réécrivant : ce sont des engagements.
-Ou bien le client les tient — une assistance réellement joignable, une garantie
-écrite dans les conditions d'utilisation — ou bien elles disparaissent de la
-page. Les remplacements possibles, s'il choisit de les retirer : « Des membres
-dont l'identité est vérifiée » et « Une équipe qui répond à vos signalements »,
-toutes deux vraies aujourd'hui.
+Le client tient aux deux autres. Elles restent donc affichées, et elles sont
+désormais écrites dans les conditions d'utilisation, sur la branche
+`feat/pages-legales` : une section « Assistance », et une clause « Garantie
+d'échange » dans la section Abonnement. C'est ce qui les fait passer du slogan
+à l'engagement — et c'est aussi ce qu'un relecteur, ou un membre mécontent,
+ira lire.
+
+Ce qui reste à obtenir de lui pour que ces clauses tiennent debout :
+
+- ce qui compte comme échange conclu, et ce que le membre doit avoir fait pour
+  avoir droit à la garantie. Sans ces bornes, la clause se retourne contre sa
+  société au premier litige : quelqu'un qui n'a jamais publié de logement
+  pourrait réclamer sa deuxième année ;
+- le délai pour réclamer la garantie après l'échéance, et l'adresse où la
+  réclamer ;
+- par où passe l'assistance, dans quelle langue elle répond, et sous quel
+  délai. Apple exige de toute façon une URL d'assistance qui fonctionne, et un
+  relecteur peut l'essayer.
 
 ### 1.4 Les comptes de démonstration
 
@@ -375,6 +387,9 @@ pour Apple, et sur ton téléphone pour Google.
 3. Le médiateur de la consommation retenu, avec ses coordonnées.
 4. Sa position sur l'assurance des séjours.
 5. La durée de conservation des signalements traités.
-6. Son arbitrage sur les quatre phrases de la page Abonnement (voir 1.3).
-7. Le compte développeur Apple, à créer à son nom de société, et l'hébergement
+6. Les bornes de la garantie d'échange : ce qui compte comme échange conclu, ce
+   que le membre doit avoir fait pour y avoir droit, le délai et l'adresse pour
+   la réclamer (voir 1.3).
+7. Le canal de l'assistance permanente, sa langue et son délai de réponse.
+8. Le compte développeur Apple, à créer à son nom de société, et l'hébergement
    du site.
