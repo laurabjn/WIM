@@ -50,7 +50,12 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "Wim utilise Face ID pour protéger vos identifiants de connexion."
+        }
+      ],
       "@react-native-community/datetimepicker",
       "@rnmapbox/maps",
       "expo-audio",
@@ -59,6 +64,23 @@
         {
           "microphonePermission": "Wim utilise le micro pour enregistrer vos messages vocaux.",
           "speechRecognitionPermission": "Wim transcrit vos messages vocaux directement sur votre téléphone."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Wim accède à vos photos pour illustrer votre profil, votre logement et vos messages.",
+          "cameraPermission": "Wim utilise l’appareil photo pour envoyer une photo dans une conversation."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Wim utilise votre position pour situer votre logement et trouver les échanges autour de vous.",
+          "locationAlwaysAndWhenInUsePermission": false,
+          "locationAlwaysPermission": false,
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
         }
       ],
       [
