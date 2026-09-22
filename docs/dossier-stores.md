@@ -339,8 +339,45 @@ deux une année.
 **Promotional text**
 `Open your door, and the world opens its own. Find a home, agree on the dates, go. No rent, no middleman.`
 
-**Description** — traduction de la version française, à faire relire par une
-personne de langue anglaise avant publication.
+**Description**
+
+```
+What if your home were your passport?
+
+WIM brings together people who swap homes for a stay. No rent, no commission on
+the nights: you host each other.
+
+HOW IT WORKS
+
+1. List your home — photos, city, how many it sleeps, when it is free.
+2. Explore. Go through the homes, keep the ones you like.
+3. When the interest is mutual, the conversation opens.
+4. Agree on the dates, confirm the exchange, go.
+
+WHAT YOU WILL FIND
+
+• Browsing by cards, by city or on a map
+• Conversations translated as they happen: write in your language, the other
+  person reads in theirs
+• Voice messages, photos, and a record of what was said
+• An availability calendar, and dates settled inside the conversation
+• Reviews left after every stay
+• Identity verification by official document, asked for when you list a home or
+  propose an exchange
+
+PRIVACY, IN PRACTICE
+
+Your home's exact address is never public: the listing shows an area of roughly
+five kilometres. Your guests receive it only once the exchange is agreed. No
+advertising trackers, no audience measurement, no data sold. You can delete your
+account from the app, in two confirmations, and everything goes with it.
+
+THE SUBSCRIPTION
+
+Listing a home, exploring and talking stay free. The yearly subscription opens
+the exchanges themselves. Half price for students, with a school email address.
+Refer someone and you both gain a year.
+```
 
 **Keywords**
 `home,exchange,swap,house,travel,holiday,stay,host,traveller,vacation`
