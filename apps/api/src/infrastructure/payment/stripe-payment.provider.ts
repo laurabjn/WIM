@@ -108,6 +108,7 @@ export class StripePaymentProvider implements PaymentProviderPort {
     plan: PlanAbonnement;
     devise: Devise;
     coupon?: string;
+    client?: string | null;
   }): Promise<{ url: string; externalId: string }> {
     const tarif = identifiantDuTarif(params.plan, params.devise);
 
@@ -121,7 +122,9 @@ export class StripePaymentProvider implements PaymentProviderPort {
     const session = await this.stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: tarif, quantity: 1 }],
-      customer_email: params.email,
+      ...(params.client
+        ? { customer: params.client }
+        : { customer_email: params.email }),
       client_reference_id: params.userId,
       metadata: { userId: params.userId, plan: params.plan },
       payment_method_collection: 'if_required',
@@ -253,14 +256,34 @@ export class StripePaymentProvider implements PaymentProviderPort {
     }
   }
 
-  async moyensDePaiement(externalId: string): Promise<MoyenDePaiement[]> {
-    const client = await this.clientDe(externalId);
+  async clientDeLAbonnement(externalId: string): Promise<string | null> {
+    return this.clientDe(externalId);
+  }
 
-    if (!client) return [];
+  async creerUnClient(params: {
+    userId: string;
+    email: string;
+  }): Promise<string | null> {
+    try {
+      const client = await this.stripe.customers.create({
+        email: params.email,
+        metadata: { userId: params.userId },
+      });
 
+      return client.id;
+    } catch (erreur: unknown) {
+      this.logger.warn(
+        `Client de paiement non cree pour ${params.userId} : ${erreur}`,
+      );
+
+      return null;
+    }
+  }
+
+  async moyensDePaiement(client: string): Promise<MoyenDePaiement[]> {
     const [moyens, principal] = await Promise.all([
       this.stripe.paymentMethods.list({ customer: client, limit: 20 }),
-      this.moyenPrincipalDe(externalId, client),
+      this.moyenPrincipalDe(client),
     ]);
 
     if (moyens.data.length === 0) return [];
@@ -268,25 +291,23 @@ export class StripePaymentProvider implements PaymentProviderPort {
     const principalEffectif = principal ?? moyens.data[0].id;
 
     if (!principal) {
-      await this.definirLeMoyenPrincipal(externalId, principalEffectif);
+      await this.definirLeMoyenPrincipal(client, principalEffectif);
     }
 
     return moyens.data.map((moyen) => this.decrire(moyen, principalEffectif));
   }
 
   async definirLeMoyenPrincipal(
-    externalId: string,
+    client: string,
     moyenId: string,
   ): Promise<boolean> {
-    const client = await this.clientDe(externalId);
-
-    if (!client || !(await this.appartientA(moyenId, client))) return false;
+    if (!(await this.appartientA(moyenId, client))) return false;
 
     await this.stripe.customers.update(client, {
       invoice_settings: { default_payment_method: moyenId },
     });
 
-    const abonnement = await this.abonnementDe(externalId);
+    const abonnement = await this.abonnementDuClient(client);
 
     if (abonnement) {
       await this.stripe.subscriptions.update(abonnement, {
@@ -297,21 +318,15 @@ export class StripePaymentProvider implements PaymentProviderPort {
     return true;
   }
 
-  async retirerLeMoyen(externalId: string, moyenId: string): Promise<boolean> {
-    const client = await this.clientDe(externalId);
-
-    if (!client || !(await this.appartientA(moyenId, client))) return false;
+  async retirerLeMoyen(client: string, moyenId: string): Promise<boolean> {
+    if (!(await this.appartientA(moyenId, client))) return false;
 
     await this.stripe.paymentMethods.detach(moyenId);
 
     return true;
   }
 
-  async ajouterUnMoyen(externalId: string): Promise<string | null> {
-    const client = await this.clientDe(externalId);
-
-    if (!client) return null;
-
+  async ajouterUnMoyen(client: string): Promise<string | null> {
     const retour = this.urlDeRetour();
 
     const session = await this.stripe.checkout.sessions.create({
@@ -324,11 +339,24 @@ export class StripePaymentProvider implements PaymentProviderPort {
     return session.url ?? null;
   }
 
-  private async moyenPrincipalDe(
-    externalId: string,
-    client: string,
-  ): Promise<string | null> {
-    const abonnement = await this.abonnementDe(externalId);
+  private async abonnementDuClient(client: string): Promise<string | null> {
+    try {
+      const abonnements = await this.stripe.subscriptions.list({
+        customer: client,
+        status: 'active',
+        limit: 1,
+      });
+
+      return abonnements.data[0]?.id ?? null;
+    } catch (erreur: unknown) {
+      this.logger.warn(`Abonnements illisibles pour ${client} : ${erreur}`);
+
+      return null;
+    }
+  }
+
+  private async moyenPrincipalDe(client: string): Promise<string | null> {
+    const abonnement = await this.abonnementDuClient(client);
 
     if (abonnement) {
       const detail = await this.stripe.subscriptions.retrieve(abonnement);

@@ -1163,7 +1163,7 @@
     "addMethod": "Ajouter un mode de paiement",
     "endingIn": "se terminant par {{last4}}",
     "noPaymentMethod": "Aucun mode de paiement enregistré.",
-    "offeredNoBilling": "Cet abonnement vous a été offert : rien à régler, rien à gérer. Un moyen de paiement vous sera demandé à son terme.",
+    "offeredNoBilling": "Cet abonnement vous a été offert : rien à régler pour l’instant. Vous pouvez enregistrer une carte dès maintenant, pour la suite.",
     "removeConfirm": "Supprimer ce mode de paiement ?",
     "manageValue": "Facturation et résiliation",
     "manageHint": "Moyen de paiement, factures et résiliation se gèrent sur la page sécurisée de notre prestataire Stripe.",

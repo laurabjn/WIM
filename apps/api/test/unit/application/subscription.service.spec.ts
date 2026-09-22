@@ -15,7 +15,7 @@ type Abonnement = {
 
 function creer(
   abonnement: Abonnement | null,
-  options: { resilier?: boolean } = {},
+  options: { resilier?: boolean; client?: string | null } = {},
 ) {
   const prisma = {
     subscription: {
@@ -25,7 +25,11 @@ function creer(
       create: jest.fn().mockResolvedValue(abonnement),
     },
     user: {
-      findUnique: jest.fn().mockResolvedValue({ email: 'lea@exemple.fr' }),
+      findUnique: jest.fn().mockResolvedValue({
+        email: 'lea@exemple.fr',
+        stripeCustomerId: options.client === undefined ? null : options.client,
+      }),
+      update: jest.fn().mockResolvedValue({}),
     },
   };
 
@@ -34,6 +38,8 @@ function creer(
     ouvrirLePortail: jest.fn().mockResolvedValue('https://portail.stripe.com/x'),
     resilier: jest.fn().mockResolvedValue(options.resilier ?? true),
     offrirDesJours: jest.fn().mockResolvedValue(null),
+    clientDeLAbonnement: jest.fn().mockResolvedValue('cus_abonnement'),
+    creerUnClient: jest.fn().mockResolvedValue('cus_neuf'),
     moyensDePaiement: jest.fn().mockResolvedValue([]),
     definirLeMoyenPrincipal: jest.fn().mockResolvedValue(true),
     retirerLeMoyen: jest.fn().mockResolvedValue(true),
@@ -385,20 +391,51 @@ describe('SubscriptionService.appliquerVerdict', () => {
 });
 
 describe('SubscriptionService.moyens de paiement', () => {
-  it('n a rien a lister sans abonnement', async () => {
-    const { provider, service } = creer(null);
+  it('ouvre un client de paiement a qui n a pas encore d abonnement', async () => {
+    const { prisma, provider, service } = creer(null);
 
     await expect(service.moyensDePaiement('user-1')).resolves.toEqual([]);
 
-    expect(provider.moyensDePaiement).not.toHaveBeenCalled();
+    expect(provider.creerUnClient).toHaveBeenCalledWith({
+      userId: 'user-1',
+      email: 'lea@exemple.fr',
+    });
+    expect(provider.moyensDePaiement).toHaveBeenCalledWith('cus_neuf');
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: 'user-1' },
+      data: { stripeCustomerId: 'cus_neuf' },
+    });
   });
 
-  it('refuse d ajouter un moyen sans abonnement', async () => {
-    const { service } = creer(null);
+  it('laisse enregistrer une carte sans abonnement', async () => {
+    const { provider, service } = creer(null);
 
-    await expect(service.ajouterUnMoyen('user-1')).rejects.toThrow(
-      'Aucun abonnement',
-    );
+    await expect(service.ajouterUnMoyen('user-1')).resolves.toEqual({
+      url: 'https://enregistrement',
+    });
+
+    expect(provider.ajouterUnMoyen).toHaveBeenCalledWith('cus_neuf');
+  });
+
+  it('reutilise le client deja connu du compte, sans rien recreer', async () => {
+    const { prisma, provider, service } = creer(null, { client: 'cus_connu' });
+
+    await service.moyensDePaiement('user-1');
+
+    expect(provider.creerUnClient).not.toHaveBeenCalled();
+    expect(provider.clientDeLAbonnement).not.toHaveBeenCalled();
+    expect(provider.moyensDePaiement).toHaveBeenCalledWith('cus_connu');
+    expect(prisma.user.update).not.toHaveBeenCalled();
+  });
+
+  it('retrouve le client d un abonnement existant plutot que d en creer un', async () => {
+    const { provider, service } = creer({ externalId: 'sub_456' });
+
+    await service.moyensDePaiement('user-1');
+
+    expect(provider.clientDeLAbonnement).toHaveBeenCalledWith('sub_456');
+    expect(provider.creerUnClient).not.toHaveBeenCalled();
+    expect(provider.moyensDePaiement).toHaveBeenCalledWith('cus_abonnement');
   });
 
   it('signale un moyen que le prestataire ne reconnait pas', async () => {
@@ -422,7 +459,10 @@ describe('SubscriptionService.moyens de paiement', () => {
       service.definirLeMoyenPrincipal('user-1', 'pm_1'),
     ).resolves.toHaveLength(1);
 
-    expect(provider.definirLeMoyenPrincipal).toHaveBeenCalledWith('sub_456', 'pm_1');
+    expect(provider.definirLeMoyenPrincipal).toHaveBeenCalledWith(
+      'cus_abonnement',
+      'pm_1',
+    );
   });
 });
 

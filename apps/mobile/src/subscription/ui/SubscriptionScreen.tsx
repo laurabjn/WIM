@@ -310,16 +310,15 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
           </Text>
         )}
 
-        {abonne && !facturable ? (
+        {venteOuverte ? (
           <>
             <Text style={styles.section}>{t('subscription:paymentMethods')}</Text>
-            <Text style={styles.information}>{t('subscription:offeredNoBilling')}</Text>
-          </>
-        ) : null}
 
-        {abonne && facturable ? (
-          <>
-            <Text style={styles.section}>{t('subscription:paymentMethods')}</Text>
+            {abonne && !facturable ? (
+              <Text style={styles.information}>
+                {t('subscription:offeredNoBilling')}
+              </Text>
+            ) : null}
 
             {moyens.length === 0 ? (
               <Text style={styles.information}>
