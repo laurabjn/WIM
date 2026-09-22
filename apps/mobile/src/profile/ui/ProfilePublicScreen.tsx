@@ -164,14 +164,16 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={[]}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
         <ProfileHeaderCard
+          enTete
           profile={normalizedProfile}
           onPressEdit={() => {}}
           hideEditButton
         />
 
+        <View style={styles.corps}>
         <Text style={styles.sectionTitle}>{t('homes')}</Text>
 
         {isHomesLoading ? (
@@ -205,6 +207,7 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
         >
           <Text style={styles.reportText}>⚠ {t('report')}</Text>
         </TouchableOpacity>
+        </View>
       </ScrollView>
 
       <Modal
@@ -261,8 +264,11 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surfaceAlt,
   },
   container: {
-    padding: 16,
     paddingBottom: 110,
+  },
+  corps: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   centered: {
     flex: 1,
