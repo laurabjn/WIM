@@ -450,3 +450,83 @@ activation, l'API repond que la gestion est indisponible.
 
 Verifier au passage que les actions attendues y sont cochees : annuler,
 reprendre, changer de formule, mettre a jour le moyen de paiement.
+
+## Essayer le paiement en mode test
+
+Tant que le compte Stripe n'est pas active, le VPS peut tourner avec les cles
+de test : l'application se comporte exactement comme en production, cartes
+comprises, sans qu'un centime bouge.
+
+### Ce qu'il faut creer dans Stripe, interrupteur "Mode test" active
+
+1. **Catalogue -> Produits.** Un produit "WIM", un tarif recurrent annuel de
+   25 EUR. Copier l'identifiant du tarif : il commence par `price_`, pas par
+   `prod_`.
+2. **Developpeurs -> Cles d'API.** Copier la cle secrete, `sk_test_...`.
+3. **Developpeurs -> Webhooks.** Deux points de terminaison distincts, donc
+   deux secrets `whsec_` differents, meme sur un seul compte :
+
+   | Adresse | Evenements |
+   | --- | --- |
+   | `https://api.worldismine.fr/api/subscriptions/webhook` | `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted` |
+   | `https://api.worldismine.fr/api/identity/webhook` | `identity.verification_session.verified`, `.processing`, `.requires_input`, `.canceled` |
+
+4. **Parametres -> Facturation -> Portail client.** L'activer, sinon "Gerer
+   mon abonnement" repond que la gestion est indisponible. Le mode test a son
+   propre reglage.
+5. Facultatif, pour essayer le tarif etudiant : **Catalogue -> Bons de
+   reduction**, 50 % pendant 12 mois, et copier son identifiant.
+
+### Ce qu'il faut poser dans `deploy/.env.prod`
+
+```sh
+PAYMENT_PROVIDER=stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PRICE_YEARLY=price_...
+STRIPE_SUBSCRIPTION_WEBHOOK_SECRET=whsec_...   # celui du point /subscriptions
+STRIPE_WEBHOOK_SECRET=whsec_...                # celui du point /identity
+STRIPE_TRIAL_DAYS=                             # vide : la carte est debitee tout de suite
+SUBSCRIPTION_REQUIRED_FROM=                    # vide : l'abonnement est exige, donc visible
+STRIPE_STUDENT_COUPON=                         # facultatif
+```
+
+Les trois premieres lignes sont la condition : il manque l'une d'elles et
+l'API retombe silencieusement sur le paiement simule, ou personne ne paie
+rien. Puis redemarrer l'API :
+
+```sh
+wim up -d --build api
+wim logs -f api
+```
+
+### Les cartes a essayer
+
+Toutes acceptent n'importe quelle date future, n'importe quel cryptogramme et
+n'importe quel code postal.
+
+| Numero | Ce qu'il se passe |
+| --- | --- |
+| 4242 4242 4242 4242 | Paiement accepte |
+| 4000 0025 0000 3155 | Demande une authentification 3-D Secure |
+| 4000 0000 0000 9995 | Refusee, fonds insuffisants |
+| 4000 0000 0000 0341 | Acceptee a l'enregistrement, refusee au premier debit |
+
+La derniere est la plus instructive : elle montre ce que voit un membre dont
+la carte lache au renouvellement.
+
+### Ce qui merite d'etre verifie
+
+- S'abonner, puis rouvrir l'application : l'abonnement doit etre actif sans
+  avoir a se reconnecter, c'est le webhook qui l'a ecrit.
+- Ajouter une deuxieme carte, la passer par defaut, retirer la premiere.
+- Resilier : l'abonnement doit rester actif jusqu'a la fin de la periode
+  payee, et non disparaitre.
+- La verification d'identite : en mode test, Stripe propose un document
+  simule, aucune piece reelle n'est envoyee.
+
+### Avant l'ouverture au public
+
+Remplacer les quatre valeurs par leurs equivalents en mode reel : la cle
+`sk_live_`, le tarif cree hors mode test, et les deux secrets de webhook des
+points de terminaison reels. Les identifiants de test ne fonctionnent pas en
+production, et inversement.
