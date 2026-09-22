@@ -107,14 +107,27 @@ Mettre son adresse et son mot de passe dans le champ prévu, et dans les notes :
 comment atteindre un échange, et le fait que la vérification d'identité est
 déjà franchie sur ce compte.
 
-### 1.5 iPad : à décider
+### 1.5 iPad : soutenu
 
-`app.json` déclare `"supportsTablet": true`. Conséquence : Apple exige un jeu de
-captures iPad **et** teste l'application sur iPad. Si rien n'a été dessiné pour
-cet écran, c'est un motif de refus gratuit. Passer la valeur à `false` supprime
-l'obligation et l'application reste installable sur iPad en mode iPhone.
+L'application est déclarée pour iPad. Apple exige donc un jeu de captures iPad
+et essaie l'application sur cet écran : un rendu manifestement cassé est un
+motif de refus.
 
-Recommandation : `false` pour la version 1.0.
+Pour que le rendu tienne, la fenêtre est verrouillée. `requireFullScreen`
+interdit le partage d'écran et Slide Over, et l'orientation reste en portrait.
+Ce n'est pas un détail de confort : six écrans mesurent la fenêtre une seule
+fois, au chargement du module — `HomeHero`, `SearchResultCard`,
+`SearchResultsScreen`, `SwipehomeCard`, `SwipeDetailsHomeScreen` et
+`OnboardingScreen`. Tant que la fenêtre ne peut pas changer de taille, leur
+mesure reste juste. Le jour où l'application devra accepter le
+redimensionnement — iPadOS pousse dans cette direction — ces six fichiers
+devront passer par `useWindowDimensions`.
+
+Ce qui reste à savoir : l'application fonctionne sur iPad, mais y affiche la
+mise en page du téléphone, agrandie. Cartes très larges, lignes de texte
+longues. Apple l'accepte, beaucoup d'applications sortent ainsi. Une mise en
+page pensée pour la tablette est un chantier à part, à décider selon ce que le
+client attend de l'iPad.
 
 ---
 
@@ -350,13 +363,14 @@ exigences plusieurs fois.
 | Store | Élément | Format |
 | --- | --- | --- |
 | Apple | Captures iPhone 6,9" | 1290 × 2796 ou 1320 × 2868, de 3 à 10 |
-| Apple | Captures iPad 13" | Seulement si `supportsTablet` reste à `true` |
+| Apple | Captures iPad 13" | Obligatoires : 2064 × 2752 ou 2048 × 2732, de 3 à 10 |
 | Apple | Icône | 1024 × 1024 PNG, sans transparence, sans coins arrondis |
 | Google Play | Captures téléphone | 2 à 8, entre 320 et 3840 px, le plus simple : 1080 × 1920 |
 | Google Play | Image de présentation | 1024 × 500 |
 | Google Play | Icône | 512 × 512 PNG |
 
-Le plus simple : prendre les captures sur un iPhone 16 Pro Max au simulateur
+Le plus simple : prendre les captures sur un iPhone 16 Pro Max et un iPad Pro
+13 pouces au simulateur
 pour Apple, et sur ton téléphone pour Google.
 
 ---
