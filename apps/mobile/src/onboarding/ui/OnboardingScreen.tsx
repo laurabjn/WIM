@@ -1,6 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
 import {
-  Dimensions,
   FlatList,
   Image,
   NativeScrollEvent,
@@ -18,6 +17,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from 'src/navigation/authStack';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { useDimensionsEcran } from 'src/shared/ui/dimensions';
 type Props = NativeStackScreenProps<AuthStackParamList, 'Onboarding'> & {
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -34,7 +34,7 @@ export const OnboardingScreen: React.FC<Props> = ({ setIsAuthenticated }) => {
   const themeColors = useThemeColors();
   const styles = useMemo(() => creerStyles(themeColors), [themeColors]);
 
-  const { width } = Dimensions.get('window');
+  const { largeur: width } = useDimensionsEcran();
   const liste = useRef<FlatList>(null);
   const [index, setIndex] = useState(0);
 

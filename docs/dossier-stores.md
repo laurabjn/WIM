@@ -113,21 +113,30 @@ L'application est déclarée pour iPad. Apple exige donc un jeu de captures iPad
 et essaie l'application sur cet écran : un rendu manifestement cassé est un
 motif de refus.
 
-Pour que le rendu tienne, la fenêtre est verrouillée. `requireFullScreen`
-interdit le partage d'écran et Slide Over, et l'orientation reste en portrait.
-Ce n'est pas un détail de confort : six écrans mesurent la fenêtre une seule
-fois, au chargement du module — `HomeHero`, `SearchResultCard`,
-`SearchResultsScreen`, `SwipehomeCard`, `SwipeDetailsHomeScreen` et
-`OnboardingScreen`. Tant que la fenêtre ne peut pas changer de taille, leur
-mesure reste juste. Le jour où l'application devra accepter le
-redimensionnement — iPadOS pousse dans cette direction — ces six fichiers
-devront passer par `useWindowDimensions`.
+Six écrans mesuraient la fenêtre une seule fois, au chargement du fichier, et
+rangeaient cette valeur dans une feuille de styles figée au même instant :
+`HomeHero`, `SearchResultCard`, `SearchResultsScreen`, `SwipehomeCard`,
+`SwipeDetailsHomeScreen` et `OnboardingScreen`. Sur un téléphone la question ne
+se pose pas, l'orientation étant bloquée en portrait. Sur iPad, Expo autorise
+les quatre orientations : une simple rotation suffisait à les laisser dessinés
+pour une largeur qui n'existait plus.
 
-Ce qui reste à savoir : l'application fonctionne sur iPad, mais y affiche la
-mise en page du téléphone, agrandie. Cartes très larges, lignes de texte
-longues. Apple l'accepte, beaucoup d'applications sortent ainsi. Une mise en
-page pensée pour la tablette est un chantier à part, à décider selon ce que le
-client attend de l'iPad.
+Les six passent désormais par `useDimensionsEcran`, dans
+`src/shared/ui/dimensions.ts`, qui lit la fenêtre à chaque rendu et plafonne la
+largeur du contenu à 520 points. Sous cette valeur — tout téléphone, l'iPhone
+le plus large faisant 430 points — le comportement est identique au précédent,
+au pixel près. Au-dessus, les cartes et les carrousels cessent de s'étirer et
+se centrent. L'affiche d'un logement, elle, garde toute la largeur mais ne
+dépasse plus 60 % de la hauteur, sans quoi une photo carrée sur un iPad
+repousserait tout le reste sous la ligne de flottaison.
+
+Le verrou plein écran a donc été retiré : l'application accepte le partage
+d'écran et Slide Over, puisque ses mises en page suivent la fenêtre.
+
+Ce qui n'est pas fait : aucune mise en page propre à la tablette — pas de
+colonnes, pas de vue maître-détail. Sur un grand écran, c'est la mise en page
+du téléphone, centrée dans une colonne lisible. Apple l'accepte sans
+difficulté ; un vrai dessin pour tablette reste un chantier à part.
 
 ---
 

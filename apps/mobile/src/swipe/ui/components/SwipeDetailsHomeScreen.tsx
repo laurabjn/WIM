@@ -8,7 +8,6 @@ import React, {
 import {
   ActivityIndicator,
   Animated,
-  Dimensions,
   Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -49,12 +48,9 @@ import { addFavoriteHome, listFavoriteHomes, removeFavoriteHome } from 'src/home
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { useDimensionsEcran } from 'src/shared/ui/dimensions';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const SCREEN_HEIGHT = Dimensions.get('window').height;
-const SHEET_COLLAPSED = SCREEN_HEIGHT * 0.46;
 const SHEET_EXPANDED = 85;
-const PHOTO_WIDTH = SCREEN_WIDTH - 36;
 
 type Props = NativeStackScreenProps<
   SearchStackParamList,
@@ -73,15 +69,18 @@ export function SwipeDetailHomeScreen({
   const { t } = useTranslation("swipe");
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+  const { hauteur, contenu } = useDimensionsEcran();
+  const sheetCollapsed = hauteur * 0.46;
+  const photoWidth = contenu - 36;
   const { homeId } = route.params;
   const insets = useSafeAreaInsets();
   const cameraRef = useRef<Mapbox.Camera>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const reviewsPositionRef = useRef(0);
   const sheetY = useRef(
-    new Animated.Value(SHEET_COLLAPSED),
+    new Animated.Value(sheetCollapsed),
   ).current;
-  const sheetPositionRef = useRef(SHEET_COLLAPSED);
+  const sheetPositionRef = useRef(sheetCollapsed);
 
   const [token, setToken] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -269,7 +268,7 @@ export function SwipeDetailHomeScreen({
 
           const boundedPosition =
             Math.min(
-              SHEET_COLLAPSED,
+              sheetCollapsed,
               Math.max(
                 SHEET_EXPANDED,
                 nextPosition,
@@ -290,7 +289,7 @@ export function SwipeDetailHomeScreen({
             gesture.dy;
 
           const middlePosition =
-            (SHEET_COLLAPSED +
+            (sheetCollapsed +
               SHEET_EXPANDED) /
             2;
 
@@ -303,7 +302,7 @@ export function SwipeDetailHomeScreen({
             return;
           }
 
-          moveSheet(SHEET_COLLAPSED);
+          moveSheet(sheetCollapsed);
         },
 
         onPanResponderTerminate: () => {
@@ -320,7 +319,7 @@ export function SwipeDetailHomeScreen({
   ) {
     const nextIndex = Math.round(
       event.nativeEvent.contentOffset.x /
-        PHOTO_WIDTH,
+        photoWidth,
     );
 
     setPhotoIndex(nextIndex);
@@ -435,7 +434,7 @@ export function SwipeDetailHomeScreen({
         onSelectHome={selectedHome => {
           centerCamera(selectedHome);
           moveSheet(
-            SHEET_COLLAPSED,
+            sheetCollapsed,
           );
         }}
         onClearSelection={() => {}}
@@ -445,6 +444,7 @@ export function SwipeDetailHomeScreen({
         style={[
           styles.sheet,
           {
+            height: hauteur,
             transform: [
               {
                 translateY: sheetY,
@@ -523,9 +523,13 @@ export function SwipeDetailHomeScreen({
           ]}
         >
           <View
-            style={
-              styles.carouselContainer
-            }
+            style={[
+              styles.carouselContainer,
+              {
+                width: photoWidth,
+                alignSelf: 'center',
+              },
+            ]}
           >
             <ScrollView
               horizontal
@@ -554,9 +558,10 @@ export function SwipeDetailHomeScreen({
                     source={{
                       uri: photo.url,
                     }}
-                    style={
-                      styles.carouselImage
-                    }
+                    style={[
+                      styles.carouselImage,
+                      { width: photoWidth },
+                    ]}
                   />
                 ),
               )}
@@ -722,7 +727,6 @@ const createStyles = (c: ThemeColors) =>
     top: 0,
     left: 0,
     right: 0,
-    height: SCREEN_HEIGHT,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
     backgroundColor: c.surface,
@@ -788,7 +792,6 @@ const createStyles = (c: ThemeColors) =>
   },
 
   carouselContainer: {
-    width: PHOTO_WIDTH,
     height: 270,
     marginHorizontal: 18,
     borderRadius: 22,
@@ -797,7 +800,6 @@ const createStyles = (c: ThemeColors) =>
   },
 
   carouselImage: {
-    width: PHOTO_WIDTH,
     height: 270,
     resizeMode: 'cover',
   },
