@@ -1,0 +1,374 @@
+# Dossier des stores — WIM
+
+Tout ce qu'App Store Connect et la Google Play Console vont demander, avec les
+réponses déjà écrites. Chaque réponse vient du code ou de la politique de
+confidentialité : rien n'est inventé. Ce qui reste à décider ou à obtenir est
+signalé comme tel.
+
+Identifiants de l'application : `com.wim.mobile` sur les deux plateformes,
+version `1.0.0`, domaine `worldismine.fr`, projet EAS `b59c258a-7edd-41c4-a766-8b8ea9dabc9e`.
+
+---
+
+## 1. Ce qui bloquerait le premier envoi
+
+### 1.1 Les autorisations iOS — corrigé sur cette branche
+
+L'application demandait l'appareil photo, la photothèque et la position sans
+déclarer pourquoi. iOS ne prévient pas : il tue l'application à la seconde où
+l'autorisation est demandée, et Apple refuse le binaire à l'envoi. Quatre écrans
+étaient concernés — la photo de profil à l'inscription, les photos du logement,
+l'appareil photo dans une conversation, et la géolocalisation d'une adresse.
+
+Les phrases sont maintenant dans `apps/mobile/app.json`, en français :
+
+| Clé | Phrase |
+| --- | --- |
+| `NSCameraUsageDescription` | Wim utilise l'appareil photo pour envoyer une photo dans une conversation. |
+| `NSPhotoLibraryUsageDescription` | Wim accède à vos photos pour illustrer votre profil, votre logement et vos messages. |
+| `NSLocationWhenInUseUsageDescription` | Wim utilise votre position pour situer votre logement et trouver les échanges autour de vous. |
+| `NSFaceIDUsageDescription` | Wim utilise Face ID pour protéger vos identifiants de connexion. |
+
+Les deux variantes « localisation en permanence » ont été retirées : l'application
+ne s'en sert pas, et les déclarer fait poser des questions à la revue.
+
+Le dossier `android/` et le dossier `ios/` sont ignorés par git : EAS les
+régénère à chaque build depuis `app.json`, donc le prochain build les aura. En
+local, `expo run:android` réutilise le dossier existant — il faut le supprimer
+pour voir la différence.
+
+### 1.2 Les pages légales doivent être en ligne
+
+Les deux stores demandent une URL de politique de confidentialité **joignable
+publiquement** au moment de l'envoi, et la refusent si elle renvoie une erreur.
+La branche `feat/pages-legales` contient les deux pages, avec six trous que seul
+le client peut combler : raison sociale, forme juridique, SIREN et adresse du
+siège ; l'adresse e-mail de contact ; la date de publication ; le médiateur de la
+consommation ; sa position sur l'assurance ; la durée de conservation des
+signalements traités.
+
+Tant que le site n'est pas hébergé, ni l'un ni l'autre store n'acceptera la fiche,
+et les deux liens légaux des réglages de l'application ne mènent nulle part.
+
+### 1.3 Les promesses de la page Abonnement ne sont pas tenables
+
+La maquette du client fait afficher, sur la page d'abonnement, quatre phrases
+qui sont dans `packages/i18n/src/locales/fr.json` :
+
+- « Profitez de 12 mois d'échanges illimités ! »
+- « Voyagez chez plus de 200 000 membres dans 155 pays »
+- « Échange garanti ou 2ème année offerte »
+- « Assistance aux membres 24h/24 et 7j/7 »
+
+Au lancement, il n'y a ni 200 000 membres, ni 155 pays, ni assistance
+permanente, ni garantie d'échange. Apple refuse les fiches et les captures dont
+le contenu ne correspond pas à l'application, et en France une promesse
+commerciale invérifiable est une pratique trompeuse au sens du code de la
+consommation — le risque est sur la société du client, pas sur le store.
+
+À trancher avec lui avant l'envoi : ou bien ces phrases deviennent vraies
+(une assistance, une garantie écrite dans les conditions), ou bien elles sont
+réécrites. Les trois dernières sont les plus exposées ; la première est
+seulement une reformulation de l'abonnement annuel.
+
+### 1.4 Les comptes de démonstration
+
+`apps/api/prisma/seed-demo.js` crée des comptes avec un mot de passe unique et
+connu. Ils doivent disparaître de la base de production avant l'ouverture.
+
+En revanche Apple **exige** un compte de test qui fonctionne, fourni dans les
+« informations de revue », sans quoi le refus est automatique. Il en faut donc
+un, créé à la main, avec :
+
+- un logement publié et des photos,
+- une conversation en cours,
+- l'abonnement actif, pour que le relecteur voie ce que l'abonnement ouvre,
+- l'identité déjà vérifiée, sinon le relecteur bute sur la vérification Stripe.
+
+Mettre son adresse et son mot de passe dans le champ prévu, et dans les notes :
+comment atteindre un échange, et le fait que la vérification d'identité est
+déjà franchie sur ce compte.
+
+### 1.5 iPad : à décider
+
+`app.json` déclare `"supportsTablet": true`. Conséquence : Apple exige un jeu de
+captures iPad **et** teste l'application sur iPad. Si rien n'a été dessiné pour
+cet écran, c'est un motif de refus gratuit. Passer la valeur à `false` supprime
+l'obligation et l'application reste installable sur iPad en mode iPhone.
+
+Recommandation : `false` pour la version 1.0.
+
+---
+
+## 2. Le vrai risque de la revue Apple : l'abonnement hors achat intégré
+
+Apple demande que tout abonnement qui ouvre une fonction de l'application passe
+par l'achat intégré, avec sa commission. WIM encaisse par Stripe, décision prise
+et assumée. Les exceptions d'Apple — presse, applications « reader », achats de
+biens physiques — ne s'appliquent pas ici.
+
+Le refus est donc possible. Le plan de repli est déjà dans le code et ne demande
+aucun nouveau build : le serveur décide par plateforme si la vente est ouverte
+(`venteAutorisee`), et l'application affiche alors le message déjà traduit
+`subscription.saleOutsideApp` — « L'abonnement ne se souscrit pas depuis
+l'application. Vous pouvez le prendre depuis un navigateur, avec le même
+compte. » Une variable d'environnement sur le VPS suffit à basculer.
+
+Deux précautions qui font la différence à la revue :
+
+- ne mettre aucun bouton ni aucun lien vers le paiement web dans la version iOS
+  soumise, tant que la question n'est pas tranchée ;
+- ne pas mentionner de prix dans les captures iOS.
+
+---
+
+## 3. Confidentialité de l'app — App Store Connect
+
+Apple demande, pour chaque type de donnée : est-elle collectée, est-elle liée à
+l'identité de la personne, sert-elle au suivi publicitaire, et pourquoi.
+
+**Suivi : non, sur toute la ligne.** L'application n'embarque ni mesure
+d'audience, ni traceur publicitaire. Il ne faut donc **pas** cocher « utilisée
+pour le suivi », et aucune demande d'autorisation de suivi (ATT) n'est à ajouter.
+
+| Type de donnée Apple | Collectée | Liée à l'identité | Finalité |
+| --- | --- | --- | --- |
+| Coordonnées — e-mail, nom, prénom, téléphone | Oui | Oui | Fonctionnalité de l'app |
+| Contenu utilisateur — photos, messages, messages vocaux, avis | Oui | Oui | Fonctionnalité de l'app |
+| Identifiants — identifiant de compte, identifiant d'appareil pour les notifications | Oui | Oui | Fonctionnalité de l'app |
+| Achats — statut et dates de l'abonnement | Oui | Oui | Fonctionnalité de l'app |
+| Localisation approximative — ville et zone du logement | Oui | Oui | Fonctionnalité de l'app |
+| Localisation précise — coordonnées du logement, jamais montrées publiquement | Oui | Oui | Fonctionnalité de l'app |
+| Informations sensibles — pièce d'identité et photographie, reçues par Stripe Identity | Oui | Oui | Fonctionnalité de l'app |
+| Diagnostics — pannes, modèle d'appareil, pile d'appels | Oui | Oui | Fonctionnalité de l'app |
+| Données d'utilisation | Non | — | — |
+| Historique de navigation, de recherche sur le web | Non | — | — |
+| Contacts, santé, finances, messages d'autres applications | Non | — | — |
+
+Deux nuances à savoir défendre si Apple pose la question :
+
+- **Informations sensibles.** WIM ne reçoit jamais la pièce d'identité : Stripe
+  la reçoit directement et ne renvoie qu'un verdict. Apple demande néanmoins de
+  déclarer ce que les partenaires collectent dans l'application, d'où le « oui ».
+- **Diagnostics.** Ils ne partent que si la personne a activé « Partage de
+  données » dans ses réglages, désactivé par défaut. Apple n'a pas de case
+  « facultatif » : on déclare, et on le dit dans la fiche.
+
+---
+
+## 4. Sécurité des données — Google Play Console
+
+Même exercice, vocabulaire différent. Deux colonnes comptent particulièrement :
+« collectée » et « partagée ».
+
+**Partagée : non, partout.** Google ne considère pas comme un partage le fait de
+confier des données à un sous-traitant qui les traite pour votre compte — c'est
+le cas de Stripe, DeepL, Mapbox, Sentry, OVH et Firebase. Rien n'est cédé à un
+annonceur ni à un courtier.
+
+| Type de donnée | Collectée | Obligatoire | Finalité |
+| --- | --- | --- | --- |
+| Nom | Oui | Obligatoire | Fonctionnalité de l'app |
+| Adresse e-mail | Oui | Obligatoire | Fonctionnalité, identification |
+| Numéro de téléphone | Oui | Facultatif | Fonctionnalité de l'app |
+| Autres informations personnelles — date de naissance, nationalité, langues | Oui | Obligatoire | Fonctionnalité de l'app |
+| Pièce d'identité | Oui | Facultatif | Fonctionnalité, prévention de la fraude |
+| Position approximative | Oui | Obligatoire | Fonctionnalité de l'app |
+| Position précise | Oui | Facultatif | Fonctionnalité de l'app |
+| Photos | Oui | Facultatif | Fonctionnalité de l'app |
+| Fichiers audio — messages vocaux | Oui | Facultatif | Fonctionnalité de l'app |
+| Messages dans l'application | Oui | Facultatif | Fonctionnalité de l'app |
+| Historique d'achats | Oui | Obligatoire | Fonctionnalité de l'app |
+| Actions dans l'application | Oui | Obligatoire | Fonctionnalité, personnalisation |
+| Identifiants d'appareil ou autres | Oui | Obligatoire | Fonctionnalité de l'app |
+| Journaux de plantage et diagnostics | Oui | Facultatif | Diagnostics |
+
+Les trois questions transversales :
+
+- **Chiffrées en transit ?** Oui — tout passe en HTTPS, la base n'est joignable
+  depuis Internet par aucun moyen direct.
+- **Suppression possible ?** Oui, depuis l'application : Profil → Réglages →
+  Supprimer mon compte, en deux confirmations, effacement immédiat. Donner aussi
+  l'adresse de contact des pages légales, Google demande un moyen hors
+  application.
+- **Collecte facultative ?** Les lignes marquées « facultatif » ci-dessus ne
+  partent que si la personne les fournit — un message vocal, une photo, la
+  vérification d'identité, le partage de diagnostics.
+
+---
+
+## 5. Classification par âge
+
+Les conditions réservent WIM aux personnes majeures : il faut demander la
+tranche adulte des deux côtés, et ne pas essayer de descendre.
+
+Ce qui déclenche cette tranche, et qu'il faut déclarer honnêtement :
+
+- les membres échangent des messages, des photos et des enregistrements sans
+  modération préalable ;
+- les membres se rencontrent physiquement et dorment chez l'autre ;
+- l'application partage une position approximative.
+
+Apple attend, pour toute application à contenu produit par les membres
+(règle 1.2), quatre choses. Elles existent toutes, et il faut le dire dans les
+notes de revue :
+
+| Exigence | Où elle est |
+| --- | --- |
+| Signaler un contenu ou un membre | Menu « ⓘ » d'une conversation → Signaler, six motifs |
+| Bloquer un membre | Même menu → Bloquer |
+| Filtrer et traiter les abus | Back-office d'administration : étudier un compte signalé, le suspendre |
+| Coordonnées de l'éditeur publiées | Pages légales, une fois l'adresse de contact fournie |
+
+Deux autres règles sont déjà satisfaites, autant le signaler : la suppression du
+compte depuis l'application (règle 5.1.1 v), et « Se connecter avec Apple »
+offert partout où « Se connecter avec Google » l'est (règle 4.8).
+
+---
+
+## 6. Les textes de la fiche
+
+À relire par le client avant publication : c'est sa société qui les signe.
+
+### Français
+
+**Nom** (30 caractères maximum)
+`WIM — Échange de maisons`
+
+**Sous-titre Apple** (30 caractères)
+`Votre maison ouvre le monde`
+
+**Texte promotionnel Apple** (170 caractères, modifiable sans nouvelle version)
+`Ouvrez votre porte, le monde vous ouvre la sienne. Trouvez un logement, convenez des dates, partez. Sans loyer, sans intermédiaire.`
+
+**Description**
+
+```
+Et si votre maison devenait votre passeport ?
+
+WIM met en relation des particuliers qui échangent leur logement le temps d'un
+séjour. Pas de loyer, pas de commission sur la nuitée : vous vous accueillez
+mutuellement.
+
+COMMENT ÇA MARCHE
+
+1. Publiez votre logement — photos, ville, capacité, périodes où il est libre.
+2. Explorez. Faites défiler les logements, gardez ceux qui vous plaisent.
+3. Quand l'intérêt est réciproque, la conversation s'ouvre.
+4. Convenez des dates, confirmez l'échange, partez.
+
+CE QUE VOUS Y TROUVEREZ
+
+• Une exploration par cartes, par ville ou par carte géographique
+• Des conversations traduites automatiquement : écrivez dans votre langue,
+  votre interlocuteur lit dans la sienne
+• Des messages vocaux, des photos, la relecture de ce qui a été dit
+• Un calendrier de disponibilités et des dates qui se négocient dans la
+  conversation
+• Des avis laissés après chaque séjour
+• Une vérification d'identité par pièce officielle, demandée au moment de
+  publier ou de proposer un échange
+
+LA VIE PRIVÉE, CONCRÈTEMENT
+
+L'adresse exacte de votre logement n'est jamais publique : la fiche montre une
+zone d'environ cinq kilomètres. Vos hôtes ne la reçoivent qu'une fois l'échange
+convenu. Aucun traceur publicitaire, aucune mesure d'audience, aucune donnée
+vendue. Vous pouvez supprimer votre compte depuis l'application, en deux
+confirmations, et tout disparaît.
+
+L'ABONNEMENT
+
+Publier un logement, explorer et discuter restent libres. L'abonnement annuel
+ouvre les échanges eux-mêmes. Tarif réduit de moitié pour les étudiants, sur
+présentation d'une adresse e-mail d'école. Parrainez, et vous gagnez tous les
+deux une année.
+```
+
+**Mots-clés Apple** (100 caractères, séparés par des virgules, sans espaces)
+`échange,maison,logement,voyage,vacances,séjour,hôte,troc,voyageur,home,exchange`
+
+### English
+
+**Name**
+`WIM — Home Exchange`
+
+**Subtitle**
+`Your home opens the world`
+
+**Promotional text**
+`Open your door, and the world opens its own. Find a home, agree on the dates, go. No rent, no middleman.`
+
+**Description** — traduction de la version française, à faire relire par une
+personne de langue anglaise avant publication.
+
+**Keywords**
+`home,exchange,swap,house,travel,holiday,stay,host,traveller,vacation`
+
+---
+
+## 7. Les captures d'écran
+
+### Les écrans à montrer, dans cet ordre
+
+1. **Explorer** — l'affiche de la ville, les catégories, les dernières
+   recherches. C'est la première impression.
+2. **Le défilement des logements** — une belle photo, le geste de tri.
+3. **La fiche d'un logement** — la feuille qui remonte sur la photo, les
+   équipements, la zone approximative sur la carte.
+4. **Une conversation** — de préférence avec la traduction automatique visible,
+   c'est ce qui distingue l'application.
+5. **L'échange confirmé** — le bandeau avec les deux logements et les dates.
+6. **Le profil vérifié** — le badge d'identité, les avis.
+
+Ne pas montrer la page Abonnement sur iOS tant que la question de l'achat
+intégré n'est pas tranchée.
+
+### Les formats
+
+À confirmer dans chaque console au moment de l'envoi : Apple a changé ces
+exigences plusieurs fois.
+
+| Store | Élément | Format |
+| --- | --- | --- |
+| Apple | Captures iPhone 6,9" | 1290 × 2796 ou 1320 × 2868, de 3 à 10 |
+| Apple | Captures iPad 13" | Seulement si `supportsTablet` reste à `true` |
+| Apple | Icône | 1024 × 1024 PNG, sans transparence, sans coins arrondis |
+| Google Play | Captures téléphone | 2 à 8, entre 320 et 3840 px, le plus simple : 1080 × 1920 |
+| Google Play | Image de présentation | 1024 × 500 |
+| Google Play | Icône | 512 × 512 PNG |
+
+Le plus simple : prendre les captures sur un iPhone 16 Pro Max au simulateur
+pour Apple, et sur ton téléphone pour Google.
+
+---
+
+## 8. Les champs administratifs
+
+| Champ | Valeur | Qui la fournit |
+| --- | --- | --- |
+| Catégorie principale | Voyage | — |
+| Catégorie secondaire | Style de vie | — |
+| URL de la politique de confidentialité | `https://worldismine.fr/confidentialite` | branche `feat/pages-legales` |
+| URL des conditions d'utilisation | `https://worldismine.fr/conditions` | idem |
+| URL d'assistance | Une page ou une adresse e-mail joignable | client |
+| URL marketing | Facultative | client |
+| Copyright | © <année> <raison sociale> | client |
+| Adresse, téléphone et e-mail de contact de la revue | — | client |
+| Compte de test pour la revue | Voir 1.4 | toi |
+| Chiffrement | Déjà déclaré : `ITSAppUsesNonExemptEncryption: false` — HTTPS seul, pas de déclaration d'export à faire | — |
+
+---
+
+## 9. Ce que personne d'autre que le client ne peut donner
+
+À lui redemander en une seule fois, c'est la dernière liste qui bloque :
+
+1. Raison sociale, forme juridique, SIREN, adresse du siège.
+2. L'adresse e-mail de contact, publiée et relevée.
+3. Le médiateur de la consommation retenu, avec ses coordonnées.
+4. Sa position sur l'assurance des séjours.
+5. La durée de conservation des signalements traités.
+6. Son arbitrage sur les quatre phrases de la page Abonnement (voir 1.3).
+7. Le compte développeur Apple, à créer à son nom de société, et l'hébergement
+   du site.
