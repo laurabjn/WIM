@@ -52,24 +52,30 @@ et les deux liens légaux des réglages de l'application ne mènent nulle part.
 
 ### 1.3 Les promesses de la page Abonnement ne sont pas tenables
 
-La maquette du client fait afficher, sur la page d'abonnement, quatre phrases
-qui sont dans `packages/i18n/src/locales/fr.json` :
+La maquette du client fait afficher, sur la page d'abonnement, quatre phrases,
+dans `packages/i18n/src/locales/fr.json`. Trois posent problème, parce qu'elles
+décrivent une application qui n'a encore aucun membre. Apple refuse les fiches
+et les captures dont le contenu ne correspond pas à l'application, et en France
+une promesse invérifiable est une
+pratique commerciale trompeuse : le risque est sur la société du client, pas
+sur le store.
 
-- « Profitez de 12 mois d'échanges illimités ! »
-- « Voyagez chez plus de 200 000 membres dans 155 pays »
-- « Échange garanti ou 2ème année offerte »
-- « Assistance aux membres 24h/24 et 7j/7 »
+| Phrase d'origine | État |
+| --- | --- |
+| « Profitez de 12 mois d'échanges illimités ! » | Vraie : c'est l'abonnement annuel |
+| « Voyagez chez plus de 200 000 membres dans 155 pays » | Remplacée par « Voyagez chez d'autres membres, sans loyer ni commission » |
+| « Échange garanti ou 2ème année offerte » | À trancher par le client |
+| « Assistance aux membres 24h/24 et 7j/7 » | À trancher par le client |
 
-Au lancement, il n'y a ni 200 000 membres, ni 155 pays, ni assistance
-permanente, ni garantie d'échange. Apple refuse les fiches et les captures dont
-le contenu ne correspond pas à l'application, et en France une promesse
-commerciale invérifiable est une pratique trompeuse au sens du code de la
-consommation — le risque est sur la société du client, pas sur le store.
+Le compte de membres a été retiré : aucun chiffre ne remplace un chiffre faux,
+la phrase dit maintenant ce que l'abonnement donne.
 
-À trancher avec lui avant l'envoi : ou bien ces phrases deviennent vraies
-(une assistance, une garantie écrite dans les conditions), ou bien elles sont
-réécrites. Les trois dernières sont les plus exposées ; la première est
-seulement une reformulation de l'abonnement annuel.
+Les deux dernières ne se règlent pas en réécrivant : ce sont des engagements.
+Ou bien le client les tient — une assistance réellement joignable, une garantie
+écrite dans les conditions d'utilisation — ou bien elles disparaissent de la
+page. Les remplacements possibles, s'il choisit de les retirer : « Des membres
+dont l'identité est vérifiée » et « Une équipe qui répond à vos signalements »,
+toutes deux vraies aujourd'hui.
 
 ### 1.4 Les comptes de démonstration
 
