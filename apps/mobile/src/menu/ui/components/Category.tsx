@@ -21,7 +21,7 @@ export function Category({
   return (
     <TouchableOpacity style={styles.category} onPress={onPress}>
       <LinearGradient
-        colors={[eclaircir(color), color]}
+        colors={[eclaircir(color, 0.5), eclaircir(color, 0.06), color]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.categoryIcon}
@@ -34,12 +34,23 @@ export function Category({
   );
 }
 
-function eclaircir(hex: string): string {
-  const valeur = hex.replace('#', '');
-  const canal = (position: number) => parseInt(valeur.slice(position, position + 2), 16);
-  const clair = (composante: number) => Math.round(composante + (255 - composante) * 0.35);
+function eclaircir(hex: string, force: number): string {
+  const abrege = hex.replace('#', '');
+  const valeur =
+    abrege.length === 3
+      ? abrege
+          .split('')
+          .map((caractere) => caractere + caractere)
+          .join('')
+      : abrege.padEnd(6, '0');
 
-  return `rgb(${clair(canal(0))}, ${clair(canal(2))}, ${clair(canal(4))})`;
+  const clair = (position: number) => {
+    const composante = parseInt(valeur.slice(position, position + 2), 16) || 0;
+
+    return Math.round(composante + (255 - composante) * force);
+  };
+
+  return `rgb(${clair(0)}, ${clair(2)}, ${clair(4)})`;
 }
 
 const createStyles = (c: ThemeColors) =>
