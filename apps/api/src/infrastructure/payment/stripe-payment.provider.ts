@@ -326,12 +326,16 @@ export class StripePaymentProvider implements PaymentProviderPort {
     return true;
   }
 
-  async ajouterUnMoyen(client: string): Promise<string | null> {
+  async ajouterUnMoyen(
+    client: string,
+    devise: Devise,
+  ): Promise<string | null> {
     const retour = this.urlDeRetour();
 
     const session = await this.stripe.checkout.sessions.create({
       mode: 'setup',
       customer: client,
+      currency: devise.toLowerCase(),
       success_url: `${retour}?moyen=ok`,
       cancel_url: `${retour}?moyen=annule`,
     });

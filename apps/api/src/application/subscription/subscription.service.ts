@@ -296,7 +296,17 @@ export class SubscriptionService {
   async ajouterUnMoyen(userId: string): Promise<{ url: string }> {
     const client = await this.clientDuCompte(userId);
 
-    const url = client ? await this.provider.ajouterUnMoyen(client) : null;
+    const compte = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { currency: true },
+    });
+
+    const url = client
+      ? await this.provider.ajouterUnMoyen(
+          client,
+          this.deviseDe(compte?.currency),
+        )
+      : null;
 
     if (!url) {
       throw new ServiceUnavailableException(INDISPONIBLE);

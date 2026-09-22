@@ -15,7 +15,7 @@ type Abonnement = {
 
 function creer(
   abonnement: Abonnement | null,
-  options: { resilier?: boolean; client?: string | null } = {},
+  options: { resilier?: boolean; client?: string | null; devise?: string } = {},
 ) {
   const prisma = {
     subscription: {
@@ -28,6 +28,7 @@ function creer(
       findUnique: jest.fn().mockResolvedValue({
         email: 'lea@exemple.fr',
         stripeCustomerId: options.client === undefined ? null : options.client,
+        currency: options.devise ?? 'EUR',
       }),
       update: jest.fn().mockResolvedValue({}),
     },
@@ -414,7 +415,15 @@ describe('SubscriptionService.moyens de paiement', () => {
       url: 'https://enregistrement',
     });
 
-    expect(provider.ajouterUnMoyen).toHaveBeenCalledWith('cus_neuf');
+    expect(provider.ajouterUnMoyen).toHaveBeenCalledWith('cus_neuf', 'EUR');
+  });
+
+  it('enregistre la carte dans la devise du membre', async () => {
+    const { provider, service } = creer(null, { devise: 'USD' });
+
+    await service.ajouterUnMoyen('user-1');
+
+    expect(provider.ajouterUnMoyen).toHaveBeenCalledWith('cus_neuf', 'USD');
   });
 
   it('reutilise le client deja connu du compte, sans rien recreer', async () => {
