@@ -16,6 +16,10 @@ import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getSession } from 'src/auth/infrastructure/authStorage';
 import { requestExchangeApi } from 'src/chat/infrastructure/exchange.api';
+import {
+  estUneDemandeDIdentite,
+  ouvrirLaPorteSiNonVerifie,
+} from 'src/auth/ui/identityGate';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
@@ -24,11 +28,15 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ExchangeMessage'>;
 
 export function ExchangeMessageScreen({ navigation, route }: any) {
-  const { t } = useTranslation("contact");
+  const { t } = useTranslation(['contact', 'common', 'subscription']);
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
   const { homeId, startDate, endDate } = route.params;
+
+  useEffect(() => {
+    void ouvrirLaPorteSiNonVerifie({ surAbandon: () => navigation.goBack() });
+  }, [navigation]);
     
   const DEFAULT_MESSAGE = t("defaultMessageContent");
     
@@ -66,10 +74,27 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
     } catch (error) {
       console.log('Request exchange error:', error);
 
-      Alert.alert(
-        '',
-        error instanceof Error ? error.message : t('sendError'),
-      );
+      if (estUneDemandeDIdentite(error)) return;
+
+      const message = error instanceof Error ? error.message : t('sendError');
+
+      // Un refus faute d'abonnement n'est pas une panne : il a une suite.
+      if (message.includes('abonnement')) {
+        Alert.alert('', message, [
+          { text: t('common:cancel'), style: 'cancel' },
+          {
+            text: t('subscription:title'),
+            onPress: () =>
+              navigation
+                .getParent?.()
+                ?.navigate('ProfileTab', { screen: 'Subscription' }),
+          },
+        ]);
+
+        return;
+      }
+
+      Alert.alert('', message);
     } finally {
       setSending(false);
     }

@@ -1,6 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
 import {
-  Dimensions,
   FlatList,
   Image,
   NativeScrollEvent,
@@ -18,9 +17,10 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { AuthStackParamList } from 'src/navigation/authStack';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
-import { marquerIntroductionVue } from '../infrastructure/onboardingStorage';
-
-type Props = NativeStackScreenProps<AuthStackParamList, 'Onboarding'>;
+import { useDimensionsEcran } from 'src/shared/ui/dimensions';
+type Props = NativeStackScreenProps<AuthStackParamList, 'Onboarding'> & {
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const VISUELS = [
   require('../../../assets/onboarding/1.png'),
@@ -29,12 +29,12 @@ const VISUELS = [
   require('../../../assets/onboarding/4.png'),
 ];
 
-export const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
+export const OnboardingScreen: React.FC<Props> = ({ setIsAuthenticated }) => {
   const { t } = useTranslation(['onboarding']);
   const themeColors = useThemeColors();
   const styles = useMemo(() => creerStyles(themeColors), [themeColors]);
 
-  const { width } = Dimensions.get('window');
+  const { largeur: width } = useDimensionsEcran();
   const liste = useRef<FlatList>(null);
   const [index, setIndex] = useState(0);
 
@@ -45,9 +45,8 @@ export const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
 
   const dernier = index >= VISUELS.length - 1;
 
-  async function terminer() {
-    await marquerIntroductionVue();
-    navigation.replace('WelcomeEntry');
+  function terminer() {
+    setIsAuthenticated(true);
   }
 
   function avancer() {

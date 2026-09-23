@@ -15,3 +15,5 @@ export const EXCHANGE_REPOSITORY = Symbol('EXCHANGE_REPOSITORY');
 
 
 export const TRANSLATOR = Symbol('TRANSLATOR');
+
+export const PAYMENT_PROVIDER = Symbol('PAYMENT_PROVIDER');

@@ -1,5 +1,8 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
+import { Modal } from 'react-native';
+import { useFonts } from 'expo-font';
+import { Oswald_700Bold } from '@expo-google-fonts/oswald/700Bold';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initI18n } from './src/i18n/i18n';
 import { AuthStackNavigator } from './src/navigation/authStack';
@@ -10,37 +13,39 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootNavigator } from 'src/navigation/rootNavigator';
 import { ThemeProvider, useAppTheme } from 'src/theme/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
+import { demarrerLaRemonteeDesErreurs } from 'src/observabilite/sentry';
 import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import 'src/search/infrastructure/map/mapbox.config';
-import { getSession } from 'src/auth/infrastructure/authStorage';
-import { fetchIdentityStatus } from 'src/auth/infrastructure/identity.api';
-import { IdentityStatus } from 'src/auth/dtos/identityStatus';
-import { introductionDejaVue } from 'src/onboarding/infrastructure/onboardingStorage';
+import {
+  getSession,
+  sessionToujoursValide,
+} from 'src/auth/infrastructure/authStorage';
+import { ChargementScreen } from 'src/shared/ui/chargement/ChargementScreen';
+import { IdentityGateScreen } from 'src/auth/ui/IdentityGateScreen';
+import {
+  ecouterLaPorteIdentite,
+  fermerLaPorteIdentite,
+} from 'src/auth/ui/identityGate';
 import {
   navigationRef,
   useNotificationNavigation,
 } from 'src/notifications/useNotificationNavigation';
 
 enableScreens();
+demarrerLaRemonteeDesErreurs();
 
 const Stack = createNativeStackNavigator();
 
 function Coquille({
   isAuthenticated,
   isAdmin,
-  identiteVerifiee,
-  onIdentiteVerifiee,
-  introductionVue,
   setIsAuthenticated,
 }: {
   isAuthenticated: boolean;
   isAdmin: boolean;
-  identiteVerifiee: boolean | null;
-  onIdentiteVerifiee: () => void;
-  introductionVue: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { isDark, colors } = useAppTheme();
@@ -66,9 +71,6 @@ function Coquille({
       <RootNavigator
         isAuthenticated={isAuthenticated}
         isAdmin={isAdmin}
-        identiteVerifiee={identiteVerifiee}
-        onIdentiteVerifiee={onIdentiteVerifiee}
-        introductionVue={introductionVue}
         setIsAuthenticated={setIsAuthenticated}
       />
     </NavigationContainer>
@@ -78,21 +80,21 @@ function Coquille({
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [identiteVerifiee, setIdentiteVerifiee] = useState<boolean | null>(null);
-  const [introductionVue, setIntroductionVue] = useState(true);
+  const [porteIdentite, setPorteIdentite] = useState(false);
   const [ready, setReady] = useState(false);
+  const [policesChargees, erreurDePolice] = useFonts({ Oswald_700Bold });
+  const [logoTermine, setLogoTermine] = useState(false);
 
   useEffect(() => {
     async function setup() {
       await initI18n();
 
       try {
-        setIntroductionVue(await introductionDejaVue());
-
         const session = await getSession();
+        const valide = session ? await sessionToujoursValide(session) : false;
 
-        setIsAuthenticated(Boolean(session?.accessToken));
-        setIsAdmin(session?.user.isAdmin === true);
+        setIsAuthenticated(valide);
+        setIsAdmin(valide && session?.user.isAdmin === true);
       } catch (error) {
         console.log('Session restore error:', error);
       }
@@ -102,10 +104,12 @@ export default function App() {
     setup();
   }, []);
 
+  useEffect(() => ecouterLaPorteIdentite(setPorteIdentite), []);
+
   useEffect(() => {
     if (!isAuthenticated) {
       setIsAdmin(false);
-      setIdentiteVerifiee(null);
+      setPorteIdentite(false);
       return;
     }
 
@@ -114,29 +118,9 @@ export default function App() {
       .catch(() => setIsAdmin(false));
   }, [isAuthenticated]);
 
-  useEffect(() => {
-    if (!isAuthenticated || isAdmin) {
-      return;
-    }
-
-    let abandonne = false;
-
-    fetchIdentityStatus()
-      .then((status) => {
-        if (!abandonne) {
-          setIdentiteVerifiee(status === IdentityStatus.VERIFIED);
-        }
-      })
-      .catch(() => {
-        if (!abandonne) setIdentiteVerifiee(null);
-      });
-
-    return () => {
-      abandonne = true;
-    };
-  }, [isAuthenticated, isAdmin]);
-
-  if (!ready) return null;
+  if (!ready || !logoTermine || (!policesChargees && !erreurDePolice)) {
+    return <ChargementScreen onFin={() => setLogoTermine(true)} />;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -144,13 +128,22 @@ export default function App() {
         <SafeAreaProvider>
         <ThemeProvider>
           <Coquille
-            identiteVerifiee={identiteVerifiee}
-            onIdentiteVerifiee={() => setIdentiteVerifiee(true)}
-            introductionVue={introductionVue}
             isAuthenticated={isAuthenticated}
             isAdmin={isAdmin}
             setIsAuthenticated={setIsAuthenticated}
           />
+
+          <Modal
+            visible={porteIdentite}
+            animationType="slide"
+            presentationStyle="pageSheet"
+            onRequestClose={() => fermerLaPorteIdentite(true)}
+          >
+            <IdentityGateScreen
+              onVerified={() => fermerLaPorteIdentite(false)}
+              onFermer={() => fermerLaPorteIdentite(true)}
+            />
+          </Modal>
           </ThemeProvider>
         </SafeAreaProvider>
       </KeyboardProvider>

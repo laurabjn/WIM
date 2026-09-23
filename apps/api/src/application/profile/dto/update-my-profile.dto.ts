@@ -30,4 +30,5 @@ export type UpdateProfileInput = {
   showPreciseLocation?: boolean;
   allowMessages?: boolean;
   distanceUnit?: 'km' | 'mi';
+  currency?: 'EUR' | 'USD';
 };

@@ -1,0 +1,11 @@
+ALTER TABLE "Home" DROP CONSTRAINT "Home_ownerId_fkey";
+
+ALTER TABLE "Home" ADD CONSTRAINT "Home_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Swipe" DROP CONSTRAINT "Swipe_swiperId_fkey";
+
+ALTER TABLE "Swipe" ADD CONSTRAINT "Swipe_swiperId_fkey" FOREIGN KEY ("swiperId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE "Swipe" DROP CONSTRAINT "Swipe_targetUserId_fkey";
+
+ALTER TABLE "Swipe" ADD CONSTRAINT "Swipe_targetUserId_fkey" FOREIGN KEY ("targetUserId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

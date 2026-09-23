@@ -24,6 +24,7 @@ describe('GetIdentityStatusUseCase', () => {
     createdAt: new Date(),
     updatedAt: new Date(),
     suspendedAt: null,
+    preferredLocale: 'fr',
   };
 
   beforeEach(() => {
@@ -33,6 +34,7 @@ describe('GetIdentityStatusUseCase', () => {
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
       updateIdentityStatus: jest.fn(),
+      saveIdentitySession: jest.fn(),
       touchLastSeen: jest.fn(),
       findLastSeen: jest.fn(),
     };

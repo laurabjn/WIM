@@ -16,6 +16,7 @@ describe('LoginUserUseCase', () => {
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
       updateIdentityStatus: jest.fn(),
+      saveIdentitySession: jest.fn(),
       touchLastSeen: jest.fn(),
       findLastSeen: jest.fn(),
     };
@@ -46,6 +47,7 @@ describe('LoginUserUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       suspendedAt: null,
+      preferredLocale: 'fr',
     });
 
     passwordHasher.compare.mockResolvedValue(true);
@@ -93,6 +95,7 @@ describe('LoginUserUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       suspendedAt: null,
+      preferredLocale: 'fr',
     });
 
     passwordHasher.compare.mockResolvedValue(false);

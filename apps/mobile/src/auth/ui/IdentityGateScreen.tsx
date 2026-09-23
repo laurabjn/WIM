@@ -13,7 +13,6 @@ import { useTranslation } from 'react-i18next';
 
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
-import { clearSession } from '../infrastructure/authStorage';
 import {
   fetchIdentityStatus,
   startIdentityVerification,
@@ -22,12 +21,12 @@ import { IdentityStatus } from '../dtos/identityStatus';
 
 type Props = {
   onVerified: () => void;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  onFermer: () => void;
 };
 
 export const IdentityGateScreen: React.FC<Props> = ({
   onVerified,
-  setIsAuthenticated,
+  onFermer,
 }) => {
   const { t } = useTranslation(['auth', 'common']);
   const themeColors = useThemeColors();
@@ -129,11 +128,6 @@ export const IdentityGateScreen: React.FC<Props> = ({
     }
   }
 
-  async function seDeconnecter() {
-    await clearSession();
-    setIsAuthenticated(false);
-  }
-
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
       <View style={styles.container}>
@@ -146,21 +140,33 @@ export const IdentityGateScreen: React.FC<Props> = ({
           <TouchableOpacity
             style={[styles.bouton, occupe && styles.boutonInactif]}
             disabled={occupe}
-            onPress={() => (lancee ? verifier(false) : ouvrirLaVerification())}
+            onPress={ouvrirLaVerification}
           >
             {occupe ? (
               <ActivityIndicator color={themeColors.onContrast} />
             ) : (
               <Text style={styles.boutonTexte}>
                 {lancee
-                  ? t('auth:identity.gateRecheck')
+                  ? t('auth:identity.gateRestart')
                   : t('auth:identity.gateAction')}
               </Text>
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={seDeconnecter} style={styles.lien}>
-            <Text style={styles.lienTexte}>{t('auth:identity.gateLogout')}</Text>
+          {lancee ? (
+            <TouchableOpacity
+              onPress={() => verifier(false)}
+              disabled={occupe}
+              style={styles.lien}
+            >
+              <Text style={styles.lienTexte}>
+                {t('auth:identity.gateRecheck')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+
+          <TouchableOpacity onPress={onFermer} style={styles.lien}>
+            <Text style={styles.lienTexte}>{t('auth:identity.gateLater')}</Text>
           </TouchableOpacity>
         </View>
       </View>

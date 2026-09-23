@@ -40,6 +40,7 @@ export class User {
     public readonly createdAt: Date = new Date(),
     public readonly updatedAt: Date = new Date(),
     public readonly suspendedAt: Date | null = null,
+    public readonly preferredLocale: string = 'fr',
   ) {}
 
   static create(params: CreateUserPayload): User {
@@ -82,6 +83,7 @@ export class User {
       prismaUser.createdAt,
       prismaUser.updatedAt,
       prismaUser.suspendedAt ?? null,
+      prismaUser.preferredLocale ?? 'fr',
     );
   }
 }

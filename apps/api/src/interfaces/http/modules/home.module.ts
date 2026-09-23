@@ -10,6 +10,7 @@ import { HomeRepositoryPrisma } from 'src/infrastructure/repositories/home.prism
 import { PrismaService } from 'src/infrastructure/database/prisma/prisma.service';
 import { HOME_REPOSITORY, HOME_SEARCH_REPOSITORY } from '../tokens/token';
 import { AuthModule } from './auth.module';
+import { SubscriptionModule } from './subscription.module';
 import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
 import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
 import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
@@ -17,7 +18,7 @@ import { SearchHomesUseCase } from 'src/application/home/use-cases/search-homes.
 import { HomeSearchPrismaRepository } from 'src/infrastructure/repositories/home-search.prisma.repository';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, SubscriptionModule],
   controllers: [HomeController],
   providers: [
     PrismaService,
@@ -38,8 +39,8 @@ import { HomeSearchPrismaRepository } from 'src/infrastructure/repositories/home
     },
     {
       provide: GetHomeByIdUseCase,
-      useFactory: (homeRepo) => new GetHomeByIdUseCase(homeRepo),
-      inject: [HOME_REPOSITORY],
+      useFactory: (homeRepo, prisma) => new GetHomeByIdUseCase(homeRepo, prisma),
+      inject: [HOME_REPOSITORY, PrismaService],
     },
     {
       provide: ListMyHomesUseCase,

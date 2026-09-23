@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ScrollView,
   StyleSheet,
@@ -137,9 +138,10 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={[]}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
         <ProfileHeaderCard
+          enTete
           profile={profile}
           onPressEdit={() => {
             console.log('Aller à Modifier profil');
@@ -147,6 +149,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
           }}
         />
 
+        <View style={styles.corps}>
         <View style={styles.homesHeader}>
           <Text style={styles.sectionTitle}>{t('homes')}</Text>
 
@@ -192,7 +195,9 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
             onPressLogout={confirmLogout}
           />
         </View>
+        </View>
       </ScrollView>
+      <VoileDePage />
     </SafeAreaView>
   );
 }
@@ -208,8 +213,11 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surfaceAlt,
   },
   container: {
-    padding: 16,
     paddingBottom: 110,
+  },
+  corps: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   centered: {
     flex: 1,

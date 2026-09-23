@@ -6,10 +6,12 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LanguagePills } from './LanguagePills';
 import { ProfileStatsRow } from './ProfileStatsRow';
 import { UserProfile } from '@wim/shared';
 import { useTranslation } from 'react-i18next';
+import { BadgeVerifie } from 'src/shared/ui/BadgeVerifie';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
@@ -17,9 +19,16 @@ type Props = {
   profile: UserProfile;
   onPressEdit: () => void;
   hideEditButton?: boolean;
+  enTete?: boolean;
 };
 
-export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Props) {
+export function ProfileHeaderCard({
+  profile,
+  onPressEdit,
+  hideEditButton,
+  enTete,
+}: Props) {
+    const insets = useSafeAreaInsets();
     const { t } = useTranslation('profile');
     const themeColors = useThemeColors();
     const styles = useMemo(() => createStyles(themeColors), [themeColors]);
@@ -51,7 +60,13 @@ export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Prop
   const homesCount = profile.homesCount ?? 0;
 
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        enTete ? styles.carteEnTete : null,
+        enTete ? { paddingTop: insets.top + 16 } : null,
+      ]}
+    >
       <View style={styles.topRow}>
         <View style={styles.userRow}>
           <Image
@@ -64,7 +79,10 @@ export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Prop
           />
 
           <View style={styles.identityBlock}>
-            <Text style={styles.name}>{fullName}</Text>
+            <View style={styles.nameRow}>
+              <Text style={styles.name}>{fullName}</Text>
+              <BadgeVerifie verifie={profile.identityVerified} />
+            </View>
             {!!ageText && <Text style={styles.age}>{ageText}</Text>}
             <Text style={styles.rating}>
               ★ {rating.toFixed(1)} ({reviewsCount} {t('profile:reviews')})
@@ -94,6 +112,10 @@ export function ProfileHeaderCard({ profile, onPressEdit, hideEditButton }: Prop
 
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
+  carteEnTete: {
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+  },
   card: {
     backgroundColor: c.surface,
     borderRadius: 20,
@@ -118,6 +140,11 @@ const createStyles = (c: ThemeColors) =>
     height: 58,
     borderRadius: 29,
     backgroundColor: c.surfaceAlt,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   identityBlock: {
     marginLeft: 12,
