@@ -171,6 +171,7 @@ export class PrismaProfileRepository implements ProfileRepository {
       lastName: user.lastName,
       age: calculateAge(user.birthDate),
       avatarUrl: user.avatarUrl ?? null,
+      identityVerified: user.identityStatus === 'VERIFIED',
       bio: user.bio ?? null,
       country: user.country ?? null,
       nationality: user.nationality ?? null,
