@@ -213,6 +213,11 @@ conserver dans le dossier.]**
 - Les accès au serveur se font par clé SSH.
 - La base est sauvegardée quotidiennement, avec quatorze jours de rétention, et
   la restauration est éprouvée périodiquement.
+- Les sauvegardes sont copiées hors du serveur et **chiffrées avant leur
+  envoi** : le prestataire de stockage ne détient que des octets illisibles.
+- Les données au repos ne sont pas chiffrées sur le disque du serveur. Ce choix
+  est assumé : sur une machine allumée en permanence, le chiffrement de disque
+  ne protège que du vol physique du support, déjà couvert par l’hébergeur.
 - Aucune donnée de carte bancaire n'est stockée ni ne transite par nos serveurs.
 
 ---

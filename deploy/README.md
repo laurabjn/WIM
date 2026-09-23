@@ -303,8 +303,59 @@ le journal signale que la copie distante n'est pas partie, ce qui est
 préférable à une sauvegarde qu'on croit à l'abri.
 
 La rétention distante (`REMOTE_RETENTION_DAYS`, 90 jours) est plus longue que
-la locale : le stockage objet coûte peu, et une corruption peut n'être
+la locale : le stockage objet coûte peu, et une corruption peut n’être
 découverte que des semaines plus tard.
+
+### Chiffrer les sauvegardes avant qu’elles partent
+
+La question posée est souvent celle du chiffrement du disque. Sur une machine
+louée, il protège mal : le disque n’est déchiffré qu’au démarrage, donc tant
+que le serveur tourne — c’est-à-dire toujours — les données sont en clair pour
+qui entre dans la machine. Il ne couvre qu’un cas : quelqu’un repart avec le
+disque physique, ou l’hébergeur le recycle mal. Et sur un VPS déjà installé, il
+demande une réinstallation complète, avec une phrase de passe à saisir à chaque
+redémarrage : un reboot la nuit laisse le service à terre jusqu’à ce que
+quelqu’un se lève. Poser la clé sur le même disque supprime l’intérêt.
+
+Le vrai point d’exposition est ailleurs : les sauvegardes. Elles contiennent la
+base entière — tous les membres, toutes les conversations — et elles partent
+chez un tiers, où elles ne sont protégées que par un identifiant. C’est là que
+le chiffrement se justifie, et il coûte dix minutes.
+
+`rclone` chiffre avant l’envoi : ni OVH ni personne d’autre ne voit autre chose
+que des octets illisibles.
+
+```bash
+sudo rclone config
+```
+
+Réponses attendues : `n`, nom `ovh-chiffre`, type `crypt`, remote
+`ovh:wim-backups`, chiffrement des noms de fichiers `standard`, chiffrement des
+noms de dossiers `true`, puis **générer** le mot de passe et le sel plutôt que
+de les choisir.
+
+```bash
+# Faire passer les sauvegardes par le remote chiffré
+sudo sed -i 's|^RCLONE_REMOTE=.*|RCLONE_REMOTE=ovh-chiffre:|' /opt/wim/deploy/.env.prod
+sudo /opt/wim/deploy/backup-db.sh
+
+# Vérifier : illisible côté OVH, lisible à travers le remote chiffré
+sudo rclone ls ovh:wim-backups
+sudo rclone ls ovh-chiffre:
+```
+
+La première commande doit montrer des noms incompréhensibles, la seconde les
+vrais noms de fichiers.
+
+> **La phrase de passe ne doit pas vivre uniquement sur le VPS.** Elle est dans
+> `/root/.config/rclone/rclone.conf`, sur la machine même que ces sauvegardes
+> servent à remplacer. Si le serveur disparaît, les sauvegardes deviennent
+> illisibles et la copie hors site n’aura servi à rien. Copier ce fichier dans
+> un gestionnaire de mots de passe, aujourd’hui, avant d’oublier :
+>
+> ```bash
+> sudo rclone config show ovh-chiffre
+> ```
 
 **Restauration** :
 
