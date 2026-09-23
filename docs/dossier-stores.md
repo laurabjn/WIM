@@ -443,7 +443,7 @@ pour Apple, et sur ton téléphone pour Google.
 | Catégorie secondaire | Style de vie | — |
 | URL de la politique de confidentialité | `https://worldismine.fr/confidentialite` | branche `feat/pages-legales` |
 | URL des conditions d'utilisation | `https://worldismine.fr/conditions` | idem |
-| URL d'assistance | Une page ou une adresse e-mail joignable | client |
+| URL d'assistance | `https://worldismine.fr/assistance` | branche `feat/servir-le-site` |
 | URL marketing | Facultative | client |
 | Copyright | © <année> <raison sociale> | client |
 | Adresse, téléphone et e-mail de contact de la revue | — | client |
