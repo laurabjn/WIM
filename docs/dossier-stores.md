@@ -281,6 +281,10 @@ offert partout où « Se connecter avec Google » l'est (règle 4.8).
 **Texte promotionnel Apple** (170 caractères, modifiable sans nouvelle version)
 `Ouvrez votre porte, le monde vous ouvre la sienne. Trouvez un logement, convenez des dates, partez. Sans loyer, sans intermédiaire.`
 
+**Description courte Google** (80 caractères, c'est elle qui s'affiche dans les
+résultats de recherche du Play Store)
+`Échangez votre logement avec d'autres membres. Sans loyer, sans commission.`
+
 **Description**
 
 ```
@@ -338,6 +342,9 @@ deux une année.
 
 **Promotional text**
 `Open your door, and the world opens its own. Find a home, agree on the dates, go. No rent, no middleman.`
+
+**Short description** (Google, 80 characters)
+`Swap your home with other members. No rent, no commission on the nights.`
 
 **Description**
 
@@ -414,6 +421,13 @@ exigences plusieurs fois.
 | Google Play | Captures téléphone | 2 à 8, entre 320 et 3840 px, le plus simple : 1080 × 1920 |
 | Google Play | Image de présentation | 1024 × 500 |
 | Google Play | Icône | 512 × 512 PNG |
+
+Les champs propres à la Play Console, qu'Apple ne demande pas : le nom (30
+caractères), la **description courte** (80 caractères, celle des résultats de
+recherche) et la description complète (4000 caractères). L'image de
+présentation, 1024 × 500, n'est pas une capture : c'est une bannière à
+composer, avec le logo sur un fond. C'est le seul visuel du dossier qui ne
+sort pas d'un téléphone.
 
 Le plus simple : prendre les captures sur un iPhone 16 Pro Max et un iPad Pro
 13 pouces au simulateur
