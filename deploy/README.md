@@ -211,6 +211,60 @@ curl -s https://api.worldismine.fr/api/health
 Le renouvellement est automatique (timer systemd `certbot.timer`). Pour le
 tester : `sudo certbot renew --dry-run`.
 
+## 6 bis. Servir le site sur worldismine.fr
+
+Le domaine pointe deja sur le VPS : il n'y a rien a louer ailleurs. Ce qui
+manque est un hote virtuel nginx, car seul le sous-domaine `api` en a un.
+
+Le site sert trois choses, et les trois comptent :
+
+- les **pages legales**, que les deux stores exigent joignables publiquement
+  avant meme de regarder la fiche ;
+- la **page de retour de la verification d'identite**, ou Stripe renvoie la
+  personne en fin de parcours (`/verification-identite`) ;
+- le fichier **`/.well-known/assetlinks.json`**, qu’Android vient lire pour
+  verifier que l'application a le droit d'ouvrir les liens du domaine. Sans
+  lui, la verification echoue en silence et le retour se fait dans le
+  navigateur au lieu de rouvrir WIM.
+
+```bash
+sudo cp /opt/wim/deploy/nginx/worldismine.fr.conf \
+  /etc/nginx/sites-available/worldismine.fr
+sudo ln -s /etc/nginx/sites-available/worldismine.fr /etc/nginx/sites-enabled/
+
+# Valide la syntaxe SANS interrompre l’API deja servie
+sudo nginx -t && sudo systemctl reload nginx
+
+# Certificat pour le domaine nu et le www
+sudo certbot --nginx -d worldismine.fr -d www.worldismine.fr
+```
+
+Le dossier servi est `/opt/wim/deploy/site`, donc un `git pull` suffit a
+publier une correction des pages : aucune copie de fichiers, aucun
+redemarrage.
+
+Verifier ensuite les trois, depuis n’importe quelle machine :
+
+```bash
+curl -sI https://worldismine.fr/ | head -1
+curl -sI https://worldismine.fr/verification-identite | head -1
+curl -s  https://worldismine.fr/.well-known/assetlinks.json | head -3
+```
+
+Les deux premieres doivent repondre `200`, la troisieme afficher du JSON. Si
+assetlinks.json revient en `text/plain` ou derriere une redirection, Android
+l'ignore : c'est le piege le plus frequent de cette etape.
+
+Une fois le site en ligne, pointer explicitement le retour de la verification
+d'identite, plutot que de laisser l'accueil faire office de page de fin :
+
+```bash
+# dans /opt/wim/deploy/.env.prod
+IDENTITY_RETURN_URL=https://worldismine.fr/verification-identite
+```
+
+---
+
 ## 7. Redéployer après un changement
 
 ```bash
