@@ -27,6 +27,7 @@ import {
 import { IdentityModule } from './identity.module';
 import { JwtStrategy } from '../jwt.strategy';
 import { DeleteAccountUseCase } from 'src/application/auth/use-cases/delete-account.usecase';
+import { ExportAccountUseCase } from 'src/application/auth/use-cases/export-account.usecase';
 import { IDENTITY_PROVIDER, PAYMENT_PROVIDER } from '../tokens/token';
 import { SubscriptionModule } from './subscription.module';
 import { PassportModule } from '@nestjs/passport';
@@ -75,6 +76,12 @@ const ACCESS_TOKEN_TTL = '30m';
           process.env.UPLOADS_DIR || join(process.cwd(), 'uploads'),
         ),
       inject: [PrismaService, PAYMENT_PROVIDER, EMAIL_SENDER, IDENTITY_PROVIDER],
+    },
+    {
+      provide: ExportAccountUseCase,
+      useFactory: (prisma, emailSender) =>
+        new ExportAccountUseCase(prisma, emailSender),
+      inject: [PrismaService, EMAIL_SENDER],
     },
     {
       provide: RequestPasswordResetUseCase,

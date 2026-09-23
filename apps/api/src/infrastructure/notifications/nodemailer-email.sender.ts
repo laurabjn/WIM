@@ -50,6 +50,7 @@ export class NodemailerEmailSender implements EmailSenderPort, OnModuleInit {
     subject: string;
     html?: string;
     text?: string;
+    piecesJointes?: { nom: string; contenu: string; type?: string }[];
   }): Promise<void> {
     await this.transporter.sendMail({
       from: process.env.MAIL_FROM || '"WIM" <no-reply@wim.app>',
@@ -57,6 +58,11 @@ export class NodemailerEmailSender implements EmailSenderPort, OnModuleInit {
       subject: options.subject,
       text: options.text,
       html: options.html,
+      attachments: options.piecesJointes?.map((piece) => ({
+        filename: piece.nom,
+        content: piece.contenu,
+        contentType: piece.type,
+      })),
     });
   }
 }
