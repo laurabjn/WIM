@@ -19,12 +19,21 @@ export class ConsoleEmailSender implements EmailSenderPort, OnModuleInit {
     subject: string;
     html?: string;
     text?: string;
+    piecesJointes?: { nom: string; contenu: string; type?: string }[];
   }): Promise<void> {
     console.log('==== EMAIL DEV ====');
     console.log('TO:', options.to);
     console.log('SUBJECT:', options.subject);
     console.log('TEXT:', options.text);
     console.log('HTML:', options.html);
+
+    for (const piece of options.piecesJointes ?? []) {
+      console.log(
+        'PIECE JOINTE:',
+        piece.nom,
+        piece.contenu.length + ' caracteres',
+      );
+    }
     console.log('===================');
   }
 }

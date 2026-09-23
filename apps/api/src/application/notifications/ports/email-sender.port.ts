@@ -4,5 +4,6 @@ export interface EmailSenderPort {
     subject: string;
     html?: string;
     text?: string;
+    piecesJointes?: { nom: string; contenu: string; type?: string }[];
   }): Promise<void>;
 }

@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { DeleteAccountUseCase } from 'src/application/auth/use-cases/delete-account.usecase';
+import { ExportAccountUseCase } from 'src/application/auth/use-cases/export-account.usecase';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'src/domain/auth/repositories/user.repository';
@@ -43,7 +44,15 @@ export class AuthController {
     @Inject(USER_REPOSITORY)
     private readonly userRepository: UserRepository,
     private readonly deleteAccountUseCase: DeleteAccountUseCase,
+    private readonly exportAccountUseCase: ExportAccountUseCase,
   ) {}
+
+  @Post('me/export')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.ACCEPTED)
+  async exporterMesDonnees(@Req() req: { user: { sub: string } }) {
+    await this.exportAccountUseCase.execute(req.user.sub);
+  }
 
   @Delete('me')
   @UseGuards(JwtAuthGuard)

@@ -48,6 +48,19 @@ export async function loginUserApi(payload: LoginUser): Promise<LoginResult> {
   return data as LoginResult;
 }
 
+export async function exportAccountApi(accessToken: string): Promise<void> {
+  const response = await fetch(`${API_URL}/auth/me/export`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+
+    throw new Error(data?.message ?? "L'envoi de vos données a échoué.");
+  }
+}
+
 export async function deleteAccountApi(accessToken: string): Promise<void> {
   const response = await fetch(`${API_URL}/auth/me`, {
     method: 'DELETE',

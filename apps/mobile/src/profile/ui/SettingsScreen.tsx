@@ -13,7 +13,7 @@ import { ProfileStackParamList } from 'src/navigation/type/profileStack';
 import { IdentityStatus } from 'src/auth/dtos/identityStatus';
 import { updateMyProfile } from '../infrastructure/profile.api';
 import { clearSession } from 'src/auth/infrastructure/authStorage';
-import { deleteAccountApi } from 'src/auth/infrastructure/api';
+import { deleteAccountApi, exportAccountApi } from 'src/auth/infrastructure/api';
 import { unregisterPushToken } from 'src/notifications/pushRegistration';
 import { useAppTheme, useThemeColors } from 'src/theme/ThemeContext';
 import { fetchUnreadNotificationsApi } from 'src/notifications/infrastructure/notificationCenter.api';
@@ -29,6 +29,7 @@ import {
   CircleQuestionMark,
   Coins,
   CreditCard,
+  Download,
   Eye,
   FileText,
   Flag,
@@ -169,6 +170,20 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
         },
       ],
     );
+  }
+
+  async function demanderMesDonnees() {
+    const session = await getSession();
+
+    if (!session?.accessToken) return;
+
+    try {
+      await exportAccountApi(session.accessToken);
+
+      Alert.alert('', t('profile:settings.exportSent', { email: displayedEmail }));
+    } catch (erreur: any) {
+      Alert.alert('', erreur?.message ?? t('common:genericError'));
+    }
   }
 
   async function supprimerLeCompte() {
@@ -525,6 +540,14 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
             icon={Shield}
             label={t('profile:settings.privacyPolicy')}
             onPress={() => ouvrirLaPage('/confidentialite.html')}
+          />
+        </SettingsSection>
+
+        <SettingsSection title={t('profile:settings.myData')}>
+          <SettingsRow
+            icon={Download}
+            label={t('profile:settings.exportData')}
+            onPress={demanderMesDonnees}
           />
         </SettingsSection>
 
