@@ -407,14 +407,20 @@ justement d'ignorer les proprietaires.
 **4. Verifier que les donnees sont vraiment la**
 
 ```bash
-echo "select (select count(*) from users) as membres,
-  (select count(*) from homes) as logements,
-  (select count(*) from messages) as messages,
-  (select max(finished_at) from _prisma_migrations) as derniere_migration;" \
+echo 'select (select count(*) from users) as membres,
+  (select count(*) from "Home") as logements,
+  (select count(*) from "Message") as messages,
+  (select max(finished_at) from _prisma_migrations) as derniere_migration;' \
  | sudo docker compose -f /opt/wim/deploy/docker-compose.prod.yml \
   --env-file /opt/wim/deploy/.env.prod \
    exec -T db sh -c 'psql -U "$POSTGRES_USER" -d wim_essai'
 ```
+
+Les tables ne portent pas toutes le meme style de nom : le schema en renomme
+certaines en minuscules (users, favorites, reviews) et laisse aux autres leur
+nom d'origine, majuscule comprise (Home, Message). En SQL brut, ces
+dernieres veulent des guillemets doubles, d'ou les apostrophes autour du
+echo ci-dessus.
 
 Les trois compteurs doivent ressembler a ceux de la production, et la date de
 derniere migration correspondre au dernier deploiement. Si les comptes sont a
