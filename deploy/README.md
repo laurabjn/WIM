@@ -319,6 +319,68 @@ docker run --rm -v wim_wim_uploads:/data -v /var/backups/wim:/backup alpine \
   tar xzf /backup/wim-uploads-AAAAMMJJ-HHMMSS.tar.gz -C /data
 ```
 
+### Eprouver la restauration sans rien risquer
+
+Une sauvegarde qu'on n'a jamais restauree n'est pas une sauvegarde, c'est une
+croyance. L'essai ci-dessous ne touche jamais la base de production : il
+restaure dans une base jetable, posee a cote, puis la supprime. A refaire
+apres chaque migration de schema, car c'est la que les sauvegardes se
+periment.
+
+**1. Prendre la sauvegarde la plus recente**
+
+```bash
+DUMP=$(ls -t /var/backups/wim/wim-*.dump | head -1)
+echo "$DUMP"
+```
+
+**2. Creer la base d'essai**
+
+```bash
+sudo docker compose -f /opt/wim/deploy/docker-compose.prod.yml \
+  --env-file /opt/wim/deploy/.env.prod \
+  exec -T db sh -c 'psql -U "$POSTGRES_USER" -d postgres -c "create database wim_essai;"'
+```
+
+**3. Y restaurer le dump**
+
+```bash
+cat "$DUMP" | sudo docker compose -f /opt/wim/deploy/docker-compose.prod.yml \
+  --env-file /opt/wim/deploy/.env.prod \
+  exec -T db sh -c 'pg_restore -U "$POSTGRES_USER" -d wim_essai --no-owner'
+```
+
+Des messages sur des roles absents sont normaux : `--no-owner` demande
+justement d'ignorer les proprietaires.
+
+**4. Verifier que les donnees sont vraiment la**
+
+```bash
+echo "select (select count(*) from users) as membres,
+  (select count(*) from homes) as logements,
+  (select count(*) from messages) as messages,
+  (select max(finished_at) from _prisma_migrations) as derniere_migration;" \
+ | sudo docker compose -f /opt/wim/deploy/docker-compose.prod.yml \
+  --env-file /opt/wim/deploy/.env.prod \
+   exec -T db sh -c 'psql -U "$POSTGRES_USER" -d wim_essai'
+```
+
+Les trois compteurs doivent ressembler a ceux de la production, et la date de
+derniere migration correspondre au dernier deploiement. Si les comptes sont a
+zero, la restauration a echoue en silence : c'est exactement ce que cet essai
+sert a decouvrir aujourd'hui plutot qu'un jour de panne.
+
+**5. Effacer la base d'essai**
+
+```bash
+sudo docker compose -f /opt/wim/deploy/docker-compose.prod.yml \
+  --env-file /opt/wim/deploy/.env.prod \
+  exec -T db sh -c 'psql -U "$POSTGRES_USER" -d postgres -c "drop database wim_essai;"'
+```
+
+Noter quelque part la date du dernier essai reussi. Sans cette date, personne
+ne sait si la sauvegarde d'aujourd'hui vaut quelque chose.
+
 > Les sauvegardes restent sur le VPS : si le disque meurt, elles meurent avec.
 > Copie-les ailleurs — `rclone` vers OVH Object Storage, ou un `scp` planifié
 > depuis une autre machine. Active aussi les **snapshots automatiques** du VPS
