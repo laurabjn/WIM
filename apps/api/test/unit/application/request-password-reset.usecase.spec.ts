@@ -17,6 +17,7 @@ describe('RequestPasswordResetUseCase', () => {
       create: jest.fn(),
       updatePasswordHash: jest.fn(),
       updateIdentityStatus: jest.fn(),
+      saveIdentitySession: jest.fn(),
       touchLastSeen: jest.fn(),
       findLastSeen: jest.fn(),
     };
@@ -57,6 +58,7 @@ describe('RequestPasswordResetUseCase', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       suspendedAt: null,
+      preferredLocale: 'fr',
     });
 
     tokenRepository.sign.mockResolvedValue('jwt-reset-token');

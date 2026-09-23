@@ -9,6 +9,7 @@ import type { PendingExchange } from '@wim/shared';
 
 import { ExchangeRepository } from 'src/domain/auth/repositories/exchange.repository';
 import { EXCHANGE_REPOSITORY } from 'src/interfaces/http/tokens/token';
+import { SubscriptionService } from 'src/application/subscription/subscription.service';
 import { ListStaysToReviewUseCase } from './review-stay.usecase';
 
 export type ExchangeResponse = 'ACCEPT' | 'DECLINE';
@@ -19,6 +20,7 @@ export class RespondToExchangeUseCase {
     @Inject(EXCHANGE_REPOSITORY)
     private readonly exchangeRepository: ExchangeRepository,
     private readonly staysToReview: ListStaysToReviewUseCase,
+    private readonly subscriptions: SubscriptionService,
   ) {}
 
   async execute(
@@ -41,6 +43,14 @@ export class RespondToExchangeUseCase {
       throw new BadRequestException(
         'Cet échange a déjà reçu une réponse.',
       );
+    }
+
+    // Accepter engage un sejour : c'est l'acte que l'abonnement ouvre.
+    if (response === 'ACCEPT' && !(await this.subscriptions.estActif(userId))) {
+      throw new ForbiddenException({
+        code: 'SUBSCRIPTION_REQUIRED',
+        message: "Un abonnement est nécessaire pour accepter un échange.",
+      });
     }
 
     if (response === 'ACCEPT' && exchange.hostId !== userId) {

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { estUneDemandeDIdentite } from 'src/auth/ui/identityGate';
 import { usePendingStayReview } from 'src/home/infrastructure/hooks/usePendingStayReview';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import {
@@ -77,7 +78,7 @@ import { fetchLikedHomesApi } from 'src/swipe/infrastructure/swipe.api';
 import { VoiceMessageBubble } from './components/VoiceMessageBubble';
 import { TypingBubble } from './components/TypingBubble';
 import { BackButton } from 'src/shared/ui/BackButton';
-import { useThemeColors } from 'src/theme/ThemeContext';
+import { useAppTheme } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 import {
   formatMessageDay,
@@ -103,7 +104,23 @@ const MIN_RECORDING_MS = 800;
 const MAX_RECORDING_MS = 3 * 60 * 1000;
 const AUDIO_FILE_TIMEOUT_MS = 8000;
 
+const fondDeDiscussion = (sombre: boolean) =>
+  sombre
+    ? ([
+        'rgba(0,0,0,0.5)',
+        'rgba(0,0,0,0)',
+        'rgba(45,167,243,0)',
+        'rgba(45,167,243,0.18)',
+      ] as const)
+    : ([
+        'rgba(17,17,17,0.18)',
+        'rgba(17,17,17,0)',
+        'rgba(45,167,243,0)',
+        'rgba(45,167,243,0.28)',
+      ] as const);
+
 const translationKey = (chatId: string) => `chat:translate:${chatId}`;
+const translatableKey = (chatId: string) => `chat:translatable:${chatId}`;
 
 function apercuMessage(message: {
   type: string;
@@ -133,12 +150,15 @@ type Props = {
   navigation: {
     goBack: () => void;
     navigate: (screen: string, params?: Record<string, unknown>) => void;
+    getParent?: () => {
+      navigate: (screen: string, params?: Record<string, unknown>) => void;
+    } | undefined;
   };
 };
 
 export function ConversationScreen({ route, navigation }: Props) {
-  const { t, i18n } = useTranslation('chat');
-  const themeColors = useThemeColors();
+  const { t, i18n } = useTranslation(['chat', 'common', 'subscription']);
+  const { colors: themeColors, isDark } = useAppTheme();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
   const { chatId } = route.params;
@@ -176,7 +196,6 @@ export function ConversationScreen({ route, navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [exchange, setExchange] = useState<PendingExchange | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [hauteurEntete, setHauteurEntete] = useState(0);
   const [hauteurBandeau, setHauteurBandeau] = useState(0);
   const [logementsCandidats, setLogementsCandidats] = useState<
     LogementCandidat[]
@@ -200,6 +219,7 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   const translatedRef = useRef(true);
   const [translationEpoch, setTranslationEpoch] = useState(0);
+  const [traduisible, setTraduisible] = useState(false);
 
   const [recording, setRecording] = useState(false);
   const [recordingMs, setRecordingMs] = useState(0);
@@ -241,8 +261,13 @@ export function ConversationScreen({ route, navigation }: Props) {
           }
         }
 
-        const stored = await AsyncStorage.getItem(translationKey(chatId));
+        const [stored, dejaTraduite] = await Promise.all([
+          AsyncStorage.getItem(translationKey(chatId)),
+          AsyncStorage.getItem(translatableKey(chatId)),
+        ]);
         const wantsTranslation = stored !== 'off';
+
+        if (!cancelled && dejaTraduite === '1') setTraduisible(true);
 
         translatedRef.current = wantsTranslation;
 
@@ -975,6 +1000,28 @@ export function ConversationScreen({ route, navigation }: Props) {
     return true;
   }
 
+  function signalerRefus(message?: string, erreur?: unknown) {
+    if (estUneDemandeDIdentite(erreur)) return;
+
+    const texte = message ?? t('actionUnavailable');
+
+    if (!texte.includes('abonnement')) {
+      Alert.alert('', texte);
+      return;
+    }
+
+    Alert.alert('', texte, [
+      { text: t('common:cancel'), style: 'cancel' },
+      {
+        text: t('subscription:title'),
+        onPress: () =>
+          navigation
+            .getParent?.()
+            ?.navigate('ProfileTab', { screen: 'Subscription' }),
+      },
+    ]);
+  }
+
   async function proposeExchange() {
     setMenuOpen(false);
 
@@ -1058,8 +1105,16 @@ export function ConversationScreen({ route, navigation }: Props) {
     }
   }
 
-  const showTranslationNotice =
-    translated && messages.some((message) => message.translatedContent);
+  const aDesTraductions = messages.some((message) => message.translatedContent);
+
+  useEffect(() => {
+    if (!aDesTraductions || traduisible) return;
+
+    setTraduisible(true);
+    AsyncStorage.setItem(translatableKey(chatId), '1').catch(() => undefined);
+  }, [aDesTraductions, traduisible, chatId]);
+
+  const showTranslationNotice = translated ? aDesTraductions : traduisible;
 
   const lastSeenOwnMessageId = participantLastReadAt
     ? messages.find(
@@ -1197,12 +1252,14 @@ export function ConversationScreen({ route, navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View
-        style={styles.header}
-        onLayout={(evenement) =>
-          setHauteurEntete(evenement.nativeEvent.layout.height)
-        }
-      >
+      <LinearGradient
+        pointerEvents="none"
+        colors={fondDeDiscussion(isDark)}
+        locations={[0, 0.16, 0.74, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+
+      <View style={styles.header}>
         <BackButton onPress={navigation.goBack} style={styles.headerButton} />
 
         <TouchableOpacity
@@ -1282,9 +1339,10 @@ export function ConversationScreen({ route, navigation }: Props) {
         }}
       />
 
+      <View style={styles.corps}>
       {exchange && bandeauVisible ? (
         <View
-          style={[styles.bandeauFlottant, { top: hauteurEntete }]}
+          style={styles.bandeauFlottant}
           pointerEvents="box-none"
           onLayout={(evenement) =>
             setHauteurBandeau(evenement.nativeEvent.layout.height)
@@ -1297,23 +1355,29 @@ export function ConversationScreen({ route, navigation }: Props) {
 
             if (!session?.accessToken) return;
 
-            const candidats = await fetchGuestHomesApi(
-              session.accessToken,
-              exchange.id,
-            );
+            try {
+              const candidats = await fetchGuestHomesApi(
+                session.accessToken,
+                exchange.id,
+              );
 
-            if (candidats.length > 1) {
-              setLogementsCandidats(candidats);
-              return;
+              if (candidats.length > 1) {
+                setLogementsCandidats(candidats);
+                return;
+              }
+
+              const accepte = await respondToExchangeApi(
+                session.accessToken,
+                exchange.id,
+                'ACCEPT',
+              );
+
+              setExchange(accepte ?? null);
+            } catch (acceptError: any) {
+              // Sans ce filet, un refus — abonnement manquant, sejour a noter —
+              // ne produisait rien du tout a l'ecran.
+              signalerRefus(acceptError?.message, acceptError);
             }
-
-            const accepte = await respondToExchangeApi(
-              session.accessToken,
-              exchange.id,
-              'ACCEPT',
-            );
-
-            setExchange(accepte ?? null);
           }}
           onChangeDates={async (start, end) => {
             const session = await getSession();
@@ -1415,12 +1479,12 @@ export function ConversationScreen({ route, navigation }: Props) {
 
             {showTranslationNotice ? (
               <Text style={styles.translationNotice}>
-                {t('autoTranslated')}{' '}
+                {translated ? t('autoTranslated') : t('translationOff')}{' '}
                 <Text
                   style={styles.translationLink}
-                  onPress={() => applyTranslation(false)}
+                  onPress={() => applyTranslation(!translated)}
                 >
-                  {t('removeTranslation')}
+                  {translated ? t('removeTranslation') : t('enableTranslation')}
                 </Text>
               </Text>
             ) : null}
@@ -1537,6 +1601,8 @@ export function ConversationScreen({ route, navigation }: Props) {
           </View>
         </KeyboardAvoidingView>
       )}
+      </View>
+
       <Modal
         visible={menuOpen}
         transparent
@@ -1782,8 +1848,13 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
   },
 
+  corps: {
+    flex: 1,
+  },
+
   bandeauFlottant: {
     position: 'absolute',
+    top: 0,
     left: 0,
     right: 0,
     zIndex: 10,
@@ -1796,11 +1867,11 @@ const createStyles = (c: ThemeColors) =>
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
+    paddingTop: 4,
     paddingBottom: 10,
     gap: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: c.border,
+    backgroundColor: 'transparent',
   },
 
 menuBackdrop: {
@@ -1968,10 +2039,12 @@ menuBackdrop: {
   },
 
   headerButton: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'transparent',
   },
 
   headerAvatar: {

@@ -24,7 +24,9 @@ export function RecentSearch({
       onPress={onPress}
       activeOpacity={0.85}
     >
-      <Image source={{ uri: image }} style={styles.recentImage} />
+      <View style={styles.recentImageCadre}>
+        <Image source={{ uri: image }} style={styles.recentImage} />
+      </View>
 
       <View style={styles.recentContent}>
         <Text style={styles.recentTitle}>{title}</Text>
@@ -43,15 +45,21 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: c.surface,
     marginBottom: 12,
     flexDirection: 'row',
-    overflow: 'hidden',
     elevation: 4,
     shadowColor: '#000',
     shadowOpacity: 0.12,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
   },
-  recentImage: {
+  recentImageCadre: {
     width: 105,
+    height: '100%',
+    borderTopLeftRadius: 16,
+    borderBottomLeftRadius: 16,
+    overflow: 'hidden',
+  },
+  recentImage: {
+    width: '100%',
     height: '100%',
   },
   recentContent: {

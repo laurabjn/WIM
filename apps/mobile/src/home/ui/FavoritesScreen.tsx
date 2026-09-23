@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ActivityIndicator,
   ScrollView,
@@ -119,7 +120,7 @@ export function FavoritesScreen({ navigation }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.header}>
         <BackButton onPress={() => navigation.goBack()} style={styles.headerIconButton} />
 
@@ -203,6 +204,7 @@ export function FavoritesScreen({ navigation }: Props) {
           ))
         )}
       </ScrollView>
+      <VoileDePage />
     </SafeAreaView>
   );
 }

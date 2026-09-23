@@ -1,0 +1,147 @@
+import { Platform } from 'react-native';
+
+import { API_URL } from 'src/config/api';
+import { getSession } from 'src/auth/infrastructure/authStorage';
+
+export type PlanAbonnement = 'MONTHLY' | 'YEARLY';
+
+export type TarifAffiche = {
+  montant: number;
+  devise: string;
+  libelle: string;
+};
+
+export type EtatAbonnement = {
+  actif: boolean;
+  accesLibreJusquAu: string | null;
+  etudiant: boolean;
+  facturable: boolean;
+  plan: PlanAbonnement | null;
+  statut: string;
+  finDePeriode: string | null;
+  annuleLe: string | null;
+  tarifs: Record<PlanAbonnement, TarifAffiche | null>;
+  venteDansLApp: boolean;
+};
+
+export type MoyenDePaiement = {
+  id: string;
+  type: string;
+  libelle: string;
+  detail: string;
+  principal: boolean;
+};
+
+export type EtatParrainage = {
+  code: string;
+  filleuls: number;
+  recompenses: number;
+  parraine: boolean;
+  joursOfferts: number;
+};
+
+async function appeler<T>(
+  chemin: string,
+  options: { method?: string; body?: unknown } = {},
+): Promise<T> {
+  const session = await getSession();
+
+  if (!session?.accessToken) {
+    throw new Error('Not authenticated');
+  }
+
+  const response = await fetch(`${API_URL}${chemin}`, {
+    method: options.method ?? 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Platform': Platform.OS,
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new Error(data?.message || 'Requête refusée');
+  }
+
+  return data as T;
+}
+
+export function fetchSubscriptionApi(): Promise<EtatAbonnement> {
+  return appeler('/subscriptions/me');
+}
+
+export function startCheckoutApi(
+  plan: PlanAbonnement,
+): Promise<{ url: string; returnUrl?: string }> {
+  return appeler('/subscriptions/checkout', { method: 'POST', body: { plan } });
+}
+
+export function openBillingPortalApi(): Promise<{ url: string }> {
+  return appeler('/subscriptions/portal', { method: 'POST' });
+}
+
+export function cancelSubscriptionApi(): Promise<EtatAbonnement> {
+  return appeler('/subscriptions/cancel', { method: 'POST' });
+}
+
+export function fetchPaymentMethodsApi(): Promise<MoyenDePaiement[]> {
+  return appeler('/subscriptions/payment-methods');
+}
+
+export function setPrimaryPaymentMethodApi(
+  id: string,
+): Promise<MoyenDePaiement[]> {
+  return appeler('/subscriptions/payment-methods/default', {
+    method: 'POST',
+    body: { id },
+  });
+}
+
+export function removePaymentMethodApi(id: string): Promise<MoyenDePaiement[]> {
+  return appeler(`/subscriptions/payment-methods/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
+}
+
+export function addPaymentMethodApi(): Promise<{
+  url: string;
+  returnUrl?: string;
+}> {
+  return appeler('/subscriptions/payment-methods/setup', { method: 'POST' });
+}
+
+// Sans prestataire de paiement, l'API expose un retour de caisse simule : il
+// permet d'eprouver le parcours complet avant qu'un prestataire soit choisi.
+export function simulatePaymentApi(): Promise<EtatAbonnement> {
+  return appeler('/subscriptions/simulate', { method: 'POST' });
+}
+
+export function fetchReferralApi(): Promise<EtatParrainage> {
+  return appeler('/subscriptions/referral');
+}
+
+export type EtatEtudiant = {
+  etudiant: boolean;
+  jusquAu: string | null;
+  email: string | null;
+  codeEnvoye: boolean;
+};
+
+export function fetchStudentApi(): Promise<EtatEtudiant> {
+  return appeler('/students/me');
+}
+
+export function sendStudentCodeApi(email: string): Promise<EtatEtudiant> {
+  return appeler('/students/code', { method: 'POST', body: { email } });
+}
+
+export function confirmStudentCodeApi(code: string): Promise<EtatEtudiant> {
+  return appeler('/students/confirm', { method: 'POST', body: { code } });
+}
+
+export function applyReferralApi(code: string): Promise<EtatParrainage> {
+  return appeler('/subscriptions/referral', { method: 'POST', body: { code } });
+}

@@ -211,6 +211,60 @@ curl -s https://api.worldismine.fr/api/health
 Le renouvellement est automatique (timer systemd `certbot.timer`). Pour le
 tester : `sudo certbot renew --dry-run`.
 
+## 6 bis. Servir le site sur worldismine.fr
+
+Le domaine pointe deja sur le VPS : il n'y a rien a louer ailleurs. Ce qui
+manque est un hote virtuel nginx, car seul le sous-domaine `api` en a un.
+
+Le site sert trois choses, et les trois comptent :
+
+- les **pages legales**, que les deux stores exigent joignables publiquement
+  avant meme de regarder la fiche ;
+- la **page de retour de la verification d'identite**, ou Stripe renvoie la
+  personne en fin de parcours (`/verification-identite`) ;
+- le fichier **`/.well-known/assetlinks.json`**, qu’Android vient lire pour
+  verifier que l'application a le droit d'ouvrir les liens du domaine. Sans
+  lui, la verification echoue en silence et le retour se fait dans le
+  navigateur au lieu de rouvrir WIM.
+
+```bash
+sudo cp /opt/wim/deploy/nginx/worldismine.fr.conf \
+  /etc/nginx/sites-available/worldismine.fr
+sudo ln -s /etc/nginx/sites-available/worldismine.fr /etc/nginx/sites-enabled/
+
+# Valide la syntaxe SANS interrompre l’API deja servie
+sudo nginx -t && sudo systemctl reload nginx
+
+# Certificat pour le domaine nu et le www
+sudo certbot --nginx -d worldismine.fr -d www.worldismine.fr
+```
+
+Le dossier servi est `/opt/wim/deploy/site`, donc un `git pull` suffit a
+publier une correction des pages : aucune copie de fichiers, aucun
+redemarrage.
+
+Verifier ensuite les trois, depuis n’importe quelle machine :
+
+```bash
+curl -sI https://worldismine.fr/ | head -1
+curl -sI https://worldismine.fr/verification-identite | head -1
+curl -s  https://worldismine.fr/.well-known/assetlinks.json | head -3
+```
+
+Les deux premieres doivent repondre `200`, la troisieme afficher du JSON. Si
+assetlinks.json revient en `text/plain` ou derriere une redirection, Android
+l'ignore : c'est le piege le plus frequent de cette etape.
+
+Une fois le site en ligne, pointer explicitement le retour de la verification
+d'identite, plutot que de laisser l'accueil faire office de page de fin :
+
+```bash
+# dans /opt/wim/deploy/.env.prod
+IDENTITY_RETURN_URL=https://worldismine.fr/verification-identite
+```
+
+---
+
 ## 7. Redéployer après un changement
 
 ```bash
@@ -303,8 +357,59 @@ le journal signale que la copie distante n'est pas partie, ce qui est
 préférable à une sauvegarde qu'on croit à l'abri.
 
 La rétention distante (`REMOTE_RETENTION_DAYS`, 90 jours) est plus longue que
-la locale : le stockage objet coûte peu, et une corruption peut n'être
+la locale : le stockage objet coûte peu, et une corruption peut n’être
 découverte que des semaines plus tard.
+
+### Chiffrer les sauvegardes avant qu’elles partent
+
+La question posée est souvent celle du chiffrement du disque. Sur une machine
+louée, il protège mal : le disque n’est déchiffré qu’au démarrage, donc tant
+que le serveur tourne — c’est-à-dire toujours — les données sont en clair pour
+qui entre dans la machine. Il ne couvre qu’un cas : quelqu’un repart avec le
+disque physique, ou l’hébergeur le recycle mal. Et sur un VPS déjà installé, il
+demande une réinstallation complète, avec une phrase de passe à saisir à chaque
+redémarrage : un reboot la nuit laisse le service à terre jusqu’à ce que
+quelqu’un se lève. Poser la clé sur le même disque supprime l’intérêt.
+
+Le vrai point d’exposition est ailleurs : les sauvegardes. Elles contiennent la
+base entière — tous les membres, toutes les conversations — et elles partent
+chez un tiers, où elles ne sont protégées que par un identifiant. C’est là que
+le chiffrement se justifie, et il coûte dix minutes.
+
+`rclone` chiffre avant l’envoi : ni OVH ni personne d’autre ne voit autre chose
+que des octets illisibles.
+
+```bash
+sudo rclone config
+```
+
+Réponses attendues : `n`, nom `ovh-chiffre`, type `crypt`, remote
+`ovh:wim-backups`, chiffrement des noms de fichiers `standard`, chiffrement des
+noms de dossiers `true`, puis **générer** le mot de passe et le sel plutôt que
+de les choisir.
+
+```bash
+# Faire passer les sauvegardes par le remote chiffré
+sudo sed -i 's|^RCLONE_REMOTE=.*|RCLONE_REMOTE=ovh-chiffre:|' /opt/wim/deploy/.env.prod
+sudo /opt/wim/deploy/backup-db.sh
+
+# Vérifier : illisible côté OVH, lisible à travers le remote chiffré
+sudo rclone ls ovh:wim-backups
+sudo rclone ls ovh-chiffre:
+```
+
+La première commande doit montrer des noms incompréhensibles, la seconde les
+vrais noms de fichiers.
+
+> **La phrase de passe ne doit pas vivre uniquement sur le VPS.** Elle est dans
+> `/root/.config/rclone/rclone.conf`, sur la machine même que ces sauvegardes
+> servent à remplacer. Si le serveur disparaît, les sauvegardes deviennent
+> illisibles et la copie hors site n’aura servi à rien. Copier ce fichier dans
+> un gestionnaire de mots de passe, aujourd’hui, avant d’oublier :
+>
+> ```bash
+> sudo rclone config show ovh-chiffre
+> ```
 
 **Restauration** :
 
@@ -318,6 +423,74 @@ cat /var/backups/wim/wim-AAAAMMJJ-HHMMSS.dump | \
 docker run --rm -v wim_wim_uploads:/data -v /var/backups/wim:/backup alpine \
   tar xzf /backup/wim-uploads-AAAAMMJJ-HHMMSS.tar.gz -C /data
 ```
+
+### Eprouver la restauration sans rien risquer
+
+Une sauvegarde qu'on n'a jamais restauree n'est pas une sauvegarde, c'est une
+croyance. L'essai ci-dessous ne touche jamais la base de production : il
+restaure dans une base jetable, posee a cote, puis la supprime. A refaire
+apres chaque migration de schema, car c'est la que les sauvegardes se
+periment.
+
+**1. Prendre la sauvegarde la plus recente**
+
+```bash
+DUMP=$(ls -t /var/backups/wim/wim-*.dump | head -1)
+echo "$DUMP"
+```
+
+**2. Creer la base d'essai**
+
+```bash
+sudo docker compose -f /opt/wim/deploy/docker-compose.prod.yml \
+  --env-file /opt/wim/deploy/.env.prod \
+  exec -T db sh -c 'psql -U "$POSTGRES_USER" -d postgres -c "create database wim_essai;"'
+```
+
+**3. Y restaurer le dump**
+
+```bash
+cat "$DUMP" | sudo docker compose -f /opt/wim/deploy/docker-compose.prod.yml \
+  --env-file /opt/wim/deploy/.env.prod \
+  exec -T db sh -c 'pg_restore -U "$POSTGRES_USER" -d wim_essai --no-owner'
+```
+
+Des messages sur des roles absents sont normaux : `--no-owner` demande
+justement d'ignorer les proprietaires.
+
+**4. Verifier que les donnees sont vraiment la**
+
+```bash
+echo 'select (select count(*) from users) as membres,
+  (select count(*) from "Home") as logements,
+  (select count(*) from "Message") as messages,
+  (select max(finished_at) from _prisma_migrations) as derniere_migration;' \
+ | sudo docker compose -f /opt/wim/deploy/docker-compose.prod.yml \
+  --env-file /opt/wim/deploy/.env.prod \
+   exec -T db sh -c 'psql -U "$POSTGRES_USER" -d wim_essai'
+```
+
+Les tables ne portent pas toutes le meme style de nom : le schema en renomme
+certaines en minuscules (users, favorites, reviews) et laisse aux autres leur
+nom d'origine, majuscule comprise (Home, Message). En SQL brut, ces
+dernieres veulent des guillemets doubles, d'ou les apostrophes autour du
+echo ci-dessus.
+
+Les trois compteurs doivent ressembler a ceux de la production, et la date de
+derniere migration correspondre au dernier deploiement. Si les comptes sont a
+zero, la restauration a echoue en silence : c'est exactement ce que cet essai
+sert a decouvrir aujourd'hui plutot qu'un jour de panne.
+
+**5. Effacer la base d'essai**
+
+```bash
+sudo docker compose -f /opt/wim/deploy/docker-compose.prod.yml \
+  --env-file /opt/wim/deploy/.env.prod \
+  exec -T db sh -c 'psql -U "$POSTGRES_USER" -d postgres -c "drop database wim_essai;"'
+```
+
+Noter quelque part la date du dernier essai reussi. Sans cette date, personne
+ne sait si la sauvegarde d'aujourd'hui vaut quelque chose.
 
 > Les sauvegardes restent sur le VPS : si le disque meurt, elles meurent avec.
 > Copie-les ailleurs — `rclone` vers OVH Object Storage, ou un `scp` planifié
@@ -416,33 +589,117 @@ Vérifier depuis un poste :
 
     curl -s https://worldismine.fr/.well-known/assetlinks.json
 
-## Pages legales du site
+## Remontee des erreurs (Sentry)
 
-`site/confidentialite.html` et `site/conditions.html` sont des **premiers jets**,
-rediges a partir de ce que l'application collecte reellement. Ils ne remplacent pas
-une relecture juridique.
+L'application envoie a Sentry le detail technique des pannes, et rien d'autre.
+Deux variables la gouvernent, de natures opposees.
 
-Chaque passage surligne en jaune porte la mention `A COMPLETER` : identite de
-l'editeur, adresse de contact, durees de conservation, mediateur de la consommation.
-Tant qu'il en reste un, les pages ne sont pas publiables.
+`EXPO_PUBLIC_SENTRY_DSN` est l'adresse d'envoi. Elle part dans le bundle, elle
+n'est donc pas secrete, et se declare en visibilite `sensitive` cote EAS. Sans
+elle, la remontee ne demarre pas du tout.
 
-Elles se deposent sur l'hebergement Apache, au meme endroit que le fichier
-d'association Android :
+`SENTRY_AUTH_TOKEN` sert uniquement pendant la build, pour televerser les
+fichiers de correspondance. Celui-la est un vrai secret : il donne le droit
+d'ecrire dans le projet Sentry, et ne doit jamais atteindre le bundle. Il se
+declare en visibilite `secret`.
 
-    www/confidentialite.html
-    www/conditions.html
+    cd apps/mobile
+    npx eas env:create --name SENTRY_AUTH_TOKEN --value "..."       --visibility secret --environment preview --environment production       --scope project --type string
 
-Elles doivent repondre en HTTP 200 aux adresses
-`https://worldismine.fr/confidentialite.html` et
-`https://worldismine.fr/conditions.html`, qui sont exigees par :
+Sans ce jeton la build reussit quand meme : seules les piles d'appels restent
+minifiees. Le journal de build affiche alors un avertissement de Sentry, c'est
+la qu'il faut regarder si les erreurs remontent illisibles.
 
-- Google, pour publier l'ecran de consentement OAuth et sortir du mode test
-- l'App Store et le Play Store, avant toute mise en ligne
+## Portail de facturation Stripe
 
-La page de confidentialite decrit aussi ce que l'application garde sur le
-telephone. Cette section vaut tant qu'aucun outil de mesure d'audience n'est
-ajoute : le jour ou il y en aura un, il faudra un ecran de consentement et
-reecrire ce passage.
+La page "Gerer l'abonnement" n'affiche ni carte ni facture : elle ouvre le
+portail hebergé par Stripe, qui couvre le moyen de paiement, les factures, la
+resiliation, la reactivation et le changement de formule. Rien de tout cela ne
+transite par nous, ce qui evite d'heberger des donnees de paiement.
 
-A mettre a jour quand les abonnements seront actifs : le paiement, la facturation et
-la resiliation ne figurent dans aucune des deux pages.
+Il faut l'activer une fois dans le tableau de bord Stripe, en mode test comme
+en mode reel : Parametres -> Facturation -> Portail client. Sans cette
+activation, l'API repond que la gestion est indisponible.
+
+Verifier au passage que les actions attendues y sont cochees : annuler,
+reprendre, changer de formule, mettre a jour le moyen de paiement.
+
+## Essayer le paiement en mode test
+
+Tant que le compte Stripe n'est pas active, le VPS peut tourner avec les cles
+de test : l'application se comporte exactement comme en production, cartes
+comprises, sans qu'un centime bouge.
+
+### Ce qu'il faut creer dans Stripe, interrupteur "Mode test" active
+
+1. **Catalogue -> Produits.** Un produit "WIM", un tarif recurrent annuel de
+   25 EUR. Copier l'identifiant du tarif : il commence par `price_`, pas par
+   `prod_`.
+2. **Developpeurs -> Cles d'API.** Copier la cle secrete, `sk_test_...`.
+3. **Developpeurs -> Webhooks.** Deux points de terminaison distincts, donc
+   deux secrets `whsec_` differents, meme sur un seul compte :
+
+   | Adresse | Evenements |
+   | --- | --- |
+   | `https://api.worldismine.fr/api/subscriptions/webhook` | `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted` |
+   | `https://api.worldismine.fr/api/identity/webhook` | `identity.verification_session.verified`, `.processing`, `.requires_input`, `.canceled` |
+
+4. **Parametres -> Facturation -> Portail client.** L'activer, sinon "Gerer
+   mon abonnement" repond que la gestion est indisponible. Le mode test a son
+   propre reglage.
+5. Facultatif, pour essayer le tarif etudiant : **Catalogue -> Bons de
+   reduction**, 50 % pendant 12 mois, et copier son identifiant.
+
+### Ce qu'il faut poser dans `deploy/.env.prod`
+
+```sh
+PAYMENT_PROVIDER=stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PRICE_YEARLY=price_...
+STRIPE_SUBSCRIPTION_WEBHOOK_SECRET=whsec_...   # celui du point /subscriptions
+STRIPE_WEBHOOK_SECRET=whsec_...                # celui du point /identity
+STRIPE_TRIAL_DAYS=                             # vide : la carte est debitee tout de suite
+SUBSCRIPTION_REQUIRED_FROM=                    # vide : l'abonnement est exige, donc visible
+STRIPE_STUDENT_COUPON=                         # facultatif
+```
+
+Les trois premieres lignes sont la condition : il manque l'une d'elles et
+l'API retombe silencieusement sur le paiement simule, ou personne ne paie
+rien. Puis redemarrer l'API :
+
+```sh
+wim up -d --build api
+wim logs -f api
+```
+
+### Les cartes a essayer
+
+Toutes acceptent n'importe quelle date future, n'importe quel cryptogramme et
+n'importe quel code postal.
+
+| Numero | Ce qu'il se passe |
+| --- | --- |
+| 4242 4242 4242 4242 | Paiement accepte |
+| 4000 0025 0000 3155 | Demande une authentification 3-D Secure |
+| 4000 0000 0000 9995 | Refusee, fonds insuffisants |
+| 4000 0000 0000 0341 | Acceptee a l'enregistrement, refusee au premier debit |
+
+La derniere est la plus instructive : elle montre ce que voit un membre dont
+la carte lache au renouvellement.
+
+### Ce qui merite d'etre verifie
+
+- S'abonner, puis rouvrir l'application : l'abonnement doit etre actif sans
+  avoir a se reconnecter, c'est le webhook qui l'a ecrit.
+- Ajouter une deuxieme carte, la passer par defaut, retirer la premiere.
+- Resilier : l'abonnement doit rester actif jusqu'a la fin de la periode
+  payee, et non disparaitre.
+- La verification d'identite : en mode test, Stripe propose un document
+  simule, aucune piece reelle n'est envoyee.
+
+### Avant l'ouverture au public
+
+Remplacer les quatre valeurs par leurs equivalents en mode reel : la cle
+`sk_live_`, le tarif cree hors mode test, et les deux secrets de webhook des
+points de terminaison reels. Les identifiants de test ne fonctionnent pas en
+production, et inversement.

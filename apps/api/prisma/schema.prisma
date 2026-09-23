@@ -32,6 +32,14 @@ model User {
 
   lastSeenAt DateTime? @map("last_seen_at")
 
+  identityReminderSentAt DateTime? @map("identity_reminder_sent_at")
+  identitySessionId      String?   @map("identity_session_id")
+
+  stripeCustomerId String? @unique @map("stripe_customer_id")
+
+  studentEmail         String?   @map("student_email")
+  studentVerifiedUntil DateTime? @map("student_verified_until")
+
   statusText      String?   @map("status_text")
   statusUpdatedAt DateTime? @map("status_updated_at")
 
@@ -43,6 +51,7 @@ model User {
   showPreciseLocation Boolean @default(true) @map("show_precise_location")
   allowMessages       Boolean @default(true) @map("allow_messages")
   distanceUnit        String  @default("km") @map("distance_unit")
+  currency            String  @default("EUR")
 
   pushTokens PushToken[]
 
@@ -71,6 +80,13 @@ model User {
   reportsMade      UserReport[]      @relation("ReportsMade")
   reportsReceived  UserReport[]      @relation("ReportsReceived")
   notifications    Notification[]
+
+  referralCode String? @unique @map("referral_code")
+
+  subscription        Subscription?
+  referralsMade       Referral[]           @relation("ReferralsMade")
+  referralReceived    Referral?            @relation("ReferralReceived")
+  studentVerification StudentVerification?
 
   @@map("users")
 }
@@ -103,7 +119,7 @@ model Home {
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
-  owner          User               @relation(fields: [ownerId], references: [id])
+  owner          User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   photos         HomePhoto[]
   favorites      Favorite[]
   availabilities HomeAvailability[]
@@ -259,8 +275,8 @@ model Swipe {
   direction    SwipeDirection
   createdAt    DateTime       @default(now())
 
-  swiper     User @relation("SwipesMade", fields: [swiperId], references: [id])
-  targetUser User @relation("SwipesReceived", fields: [targetUserId], references: [id])
+  swiper     User @relation("SwipesMade", fields: [swiperId], references: [id], onDelete: Cascade)
+  targetUser User @relation("SwipesReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
 
   home Home @relation(fields: [homeId], references: [id], onDelete: Cascade)
 
@@ -486,6 +502,67 @@ model UserReport {
   @@index([reportedId])
   @@index([handledAt])
   @@map("user_reports")
+}
+
+enum SubscriptionPlan {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+model Subscription {
+  id     String @id @default(uuid())
+  userId String @unique @map("user_id")
+
+  plan   SubscriptionPlan
+  status SubscriptionStatus @default(PENDING)
+
+  startedAt        DateTime? @map("started_at")
+  currentPeriodEnd DateTime? @map("current_period_end")
+  cancelledAt      DateTime? @map("cancelled_at")
+
+  externalId String? @unique @map("external_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model StudentVerification {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  email     String
+  codeHash  String   @map("code_hash")
+  expiresAt DateTime @map("expires_at")
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("student_verifications")
+}
+
+model Referral {
+  id         String @id @default(uuid())
+  referrerId String @map("referrer_id")
+  refereeId  String @unique @map("referee_id")
+
+  rewardedAt DateTime? @map("rewarded_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  referrer User @relation("ReferralsMade", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee  User @relation("ReferralReceived", fields: [refereeId], references: [id], onDelete: Cascade)
+
+  @@map("referrals")
 }
 
 enum NotificationCategory {

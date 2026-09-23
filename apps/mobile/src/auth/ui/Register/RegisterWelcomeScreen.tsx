@@ -25,8 +25,7 @@ export const RegisterWelcomeScreen: React.FC<Props> = ({ navigation, setIsAuthen
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
   function handleGuidedTour() {
-    // TODO : plus tard tu feras une vraie visite guidée
-    // navigation.navigate('Onboarding');
+    navigation.navigate('Onboarding');
   }
 
   function handleAccessApp() {

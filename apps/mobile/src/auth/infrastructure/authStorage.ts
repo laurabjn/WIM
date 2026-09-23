@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { associerLeCompte, autoriserLePartage } from 'src/observabilite/sentry';
 
 import { API_URL } from 'src/config/api';
 
@@ -27,6 +28,8 @@ export async function saveSession(session: AuthSession): Promise<void> {
     SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken),
     SecureStore.setItemAsync(USER_KEY, JSON.stringify(session.user)),
   ]);
+
+  associerLeCompte(session.user.id);
 }
 
 const RENEW_MARGIN_MS = 60 * 1000;
@@ -110,6 +113,34 @@ async function renouveler(
   }
 }
 
+export async function sessionToujoursValide(
+  session: AuthSession,
+): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_URL}/users/me/profile`, {
+      headers: { Authorization: `Bearer ${session.accessToken}` },
+    });
+
+    if (response.status === 401) {
+      await clearSession();
+
+      return false;
+    }
+
+    if (response.ok) {
+      const profil = await response.json().catch(() => null);
+
+      if (profil && typeof profil.dataSharing === 'boolean') {
+        autoriserLePartage(profil.dataSharing);
+      }
+    }
+
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 export async function getSession(): Promise<AuthSession | null> {
   const [accessToken, refreshToken, userRaw] = await Promise.all([
     SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
@@ -156,6 +187,8 @@ export async function clearSession(): Promise<void> {
     SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
     SecureStore.deleteItemAsync(USER_KEY),
   ]);
+
+  associerLeCompte(null);
 }
 
 export async function getIsAdmin(): Promise<boolean> {

@@ -204,6 +204,15 @@ export function HomeLocationMap({ home }: Props) {
         </Text>
       ) : null}
 
+      {home.distance ? (
+        <Text style={styles.locationAddress}>
+          {t('distanceFromYou', {
+            valeur: home.distance.valeur,
+            unite: home.distance.unite,
+          })}
+        </Text>
+      ) : null}
+
       {isDescriptionLoading ? (
         <ActivityIndicator
           size="small"

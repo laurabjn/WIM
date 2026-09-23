@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import {
   Animated,
-  Dimensions,
   FlatList,
   StyleSheet,
 } from 'react-native';
@@ -30,14 +29,13 @@ import { SearchResultsSheet } from './components/SearchResultsSheet';
 import { SearchResultsMap } from './components/SearchResultsMap';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+import { useDimensionsEcran } from 'src/shared/ui/dimensions';
 
 type Props = NativeStackScreenProps<
   SearchStackParamList,
   'SearchResults'
 >;
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
-const SHEET_COLLAPSED = SCREEN_HEIGHT * 0.48;
 const SHEET_EXPANDED = 90;
 
 export const SearchResultsScreen: React.FC<Props> = ({
@@ -46,6 +44,8 @@ export const SearchResultsScreen: React.FC<Props> = ({
 }) => {
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
+  const { hauteur } = useDimensionsEcran();
+  const sheetCollapsed = hauteur * 0.48;
   const {
     city,
     capacity,
@@ -74,7 +74,7 @@ export const SearchResultsScreen: React.FC<Props> = ({
   const listRef = useRef<FlatList<Home>>(null);
 
   const sheetY = useRef(
-    new Animated.Value(SHEET_COLLAPSED),
+    new Animated.Value(sheetCollapsed),
   ).current;
 
   function isHomeAvailable(
@@ -173,7 +173,7 @@ export const SearchResultsScreen: React.FC<Props> = ({
   ) {
     setSelectedHomeId(home.id);
     centerCamera(home);
-    moveSheet(SHEET_COLLAPSED);
+    moveSheet(sheetCollapsed);
 
     listRef.current?.scrollToIndex({
       index,
@@ -217,7 +217,7 @@ export const SearchResultsScreen: React.FC<Props> = ({
         selectedHomeId={selectedHomeId}
         sheetY={sheetY}
         listRef={listRef}
-        collapsedPosition={SHEET_COLLAPSED}
+        collapsedPosition={sheetCollapsed}
         expandedPosition={SHEET_EXPANDED}
         onMoveSheet={moveSheet}
         onVisibleHomeChange={(home) => {

@@ -26,7 +26,7 @@ import {
   ListStaysToReviewUseCase,
   ReviewStayUseCase,
 } from 'src/application/exchange/use-cases/review-stay.usecase';
-import { JwtAuthGuard } from '../jwt-auth.guard';
+import { IdentiteVerifiee, JwtAuthGuard } from '../jwt-auth.guard';
 import { AnnounceExchangeUseCase } from 'src/application/exchange/use-cases/announce-exchange.usecase';
 import { PushSenderService } from 'src/application/notification/push-sender.service';
 import { AppGateway } from 'src/interfaces/websocket/app.gateway';
@@ -73,6 +73,7 @@ export class ExchangeController {
   }
 
   @Post()
+  @IdentiteVerifiee()
   async request(
     @Req() req: any,
     @Body() body: Omit<RequestExchangeInput, 'requesterId'>,
@@ -178,6 +179,7 @@ export class ExchangeController {
   }
 
   @Patch(':exchangeId/respond')
+  @IdentiteVerifiee()
   async respond(
     @Req() req: any,
     @Param('exchangeId') exchangeId: string,

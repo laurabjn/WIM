@@ -50,6 +50,7 @@ export interface UserProfile {
   exchangesCount?: number;
   homesCount?: number;
   identityStatus?: IdentityStatus | null;
+  identityVerified?: boolean;
   profileVisible?: boolean;
   showAge?: boolean;
   dataSharing?: boolean;
@@ -62,6 +63,7 @@ export interface UserProfile {
   showPreciseLocation?: boolean;
   allowMessages?: boolean;
   distanceUnit?: 'km' | 'mi';
+  currency?: 'EUR' | 'USD';
 }
 
 export interface MyHome {

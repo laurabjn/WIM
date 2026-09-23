@@ -1,4 +1,5 @@
 import { API_URL } from '../../config/api';
+import { signalerSiIdentiteRequise } from 'src/auth/ui/identityGate';
 import { Home } from "@wim/shared/home/home.type";
 
 
@@ -61,8 +62,17 @@ console.log('AUTH HEADER:', `Bearer ${token}`);
     console.log(response)
   if (!response.ok) {
     const text = await response.text();
-    console.log('Create home API error:', response.status, text);
-    throw new Error(text || 'Impossible de créer le logement');
+    let corps: { message?: string } | null = null;
+
+    try {
+      corps = text ? JSON.parse(text) : null;
+    } catch {
+      corps = null;
+    }
+
+    signalerSiIdentiteRequise(response.status, corps);
+
+    throw new Error(corps?.message || text || 'Impossible de créer le logement');
   }
 
   if (response.status === 401) {

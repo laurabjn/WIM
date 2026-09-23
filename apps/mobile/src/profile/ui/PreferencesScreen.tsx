@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ScrollView,
   StyleSheet,
@@ -174,7 +175,7 @@ export function PreferencesScreen({ route, navigation }: Props) {
     t(`profile:stayDuration.${value}`);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <BackButton onPress={() => navigation.goBack()} style={styles.headerIconButton} />
@@ -350,6 +351,7 @@ export function PreferencesScreen({ route, navigation }: Props) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <VoileDePage />
     </SafeAreaView>
   );
 }

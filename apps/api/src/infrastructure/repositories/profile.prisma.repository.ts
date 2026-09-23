@@ -49,6 +49,7 @@ export class PrismaProfileRepository implements ProfileRepository {
       showPreciseLocation: user.showPreciseLocation,
       allowMessages: user.allowMessages,
       distanceUnit: user.distanceUnit === 'mi' ? 'mi' : 'km',
+      currency: user.currency === 'USD' ? 'USD' : 'EUR',
       homesCount,
       exchangesCount,
       reviewsCount: reviewStats._count._all,
@@ -96,6 +97,7 @@ export class PrismaProfileRepository implements ProfileRepository {
           ? Math.round(reviewStats._avg.score * 10) / 10
           : null,
       avatarUrl: user.avatarUrl,
+      identityVerified: user.identityStatus === 'VERIFIED',
       bio: masque ? null : user.bio,
       country: masque ? null : user.country,
       nationality: masque ? null : user.nationality,
@@ -139,6 +141,7 @@ export class PrismaProfileRepository implements ProfileRepository {
         showPreciseLocation: input.showPreciseLocation,
         allowMessages: input.allowMessages,
         distanceUnit: input.distanceUnit,
+        currency: input.currency,
         ...(input.statusText === undefined
           ? {}
           : {
@@ -168,6 +171,7 @@ export class PrismaProfileRepository implements ProfileRepository {
       lastName: user.lastName,
       age: calculateAge(user.birthDate),
       avatarUrl: user.avatarUrl ?? null,
+      identityVerified: user.identityStatus === 'VERIFIED',
       bio: user.bio ?? null,
       country: user.country ?? null,
       nationality: user.nationality ?? null,

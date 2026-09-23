@@ -27,10 +27,13 @@ export class StartIdentityVerificationUseCase {
       throw new ConflictException('Identity already verified');
     }
 
-    const { redirectUrl, returnUrl } = await this.provider.startVerification({
-      userId: user.id,
-      email: user.email,
-    });
+    const { redirectUrl, returnUrl, sessionId } =
+      await this.provider.startVerification({
+        userId: user.id,
+        email: user.email,
+      });
+
+    await this.userRepository.saveIdentitySession(user.id, sessionId);
 
     await this.userRepository.updateIdentityStatus(
       user.id,

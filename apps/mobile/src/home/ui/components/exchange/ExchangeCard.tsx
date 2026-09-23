@@ -38,12 +38,12 @@ export function ExchangeCard({
       />
 
       <View style={styles.content}>
-        {exchange.partner ? (
-          <Text style={styles.partner} numberOfLines={1}>
-            {exchange.isHost ? t('guest') : t('host')} ·{' '}
-            {exchange.partner.firstName} {exchange.partner.lastName}
-          </Text>
-        ) : null}
+        <Text style={styles.partner} numberOfLines={1}>
+          {exchange.isHost ? t('guest') : t('host')} ·{' '}
+          {exchange.partner
+            ? `${exchange.partner.firstName} ${exchange.partner.lastName}`
+            : t('deletedMember')}
+        </Text>
 
         <Text style={styles.dates}>
           {formatDate(exchange.startDate)} - {formatDate(exchange.endDate)}

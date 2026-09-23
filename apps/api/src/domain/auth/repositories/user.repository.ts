@@ -10,6 +10,7 @@ export interface UserRepository {
   create(payload: CreateUserPayload): Promise<User>;
   updatePasswordHash(userId: string, passwordHash: string): Promise<void>;
   updateIdentityStatus(userId: string, status: IdentityStatus): Promise<void>;
+  saveIdentitySession(userId: string, sessionId: string): Promise<void>;
   touchLastSeen(userId: string): Promise<void>;
   findLastSeen(userIds: string[]): Promise<Record<string, string | null>>;
 }

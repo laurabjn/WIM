@@ -1,7 +1,6 @@
 import { Home } from '@wim/shared/home/home.type';
 import React, { useState, useMemo } from 'react';
 import {
-  Dimensions,
   Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -18,8 +17,7 @@ import { BackButton } from 'src/shared/ui/BackButton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
+import { useDimensionsEcran } from 'src/shared/ui/dimensions';
 
 type Props = {
   home: Home;
@@ -43,6 +41,7 @@ export function HomeHero({
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const { largeur, hauteur } = useDimensionsEcran();
 
   const photos = (home.photos ?? [])
     .map((photo) => resolveImageUrl(photo.url))
@@ -50,12 +49,12 @@ export function HomeHero({
 
   function handleScrollEnd(event: NativeSyntheticEvent<NativeScrollEvent>) {
     setPhotoIndex(
-      Math.round(event.nativeEvent.contentOffset.x / SCREEN_WIDTH),
+      Math.round(event.nativeEvent.contentOffset.x / largeur),
     );
   }
 
   return (
-    <View style={styles.hero}>
+    <View style={[styles.hero, { maxHeight: hauteur * 0.6 }]}>
       {photos.length > 0 ? (
         <ScrollView
           horizontal
@@ -68,7 +67,7 @@ export function HomeHero({
             <Image
               key={`${url}-${index}`}
               source={{ uri: url }}
-              style={styles.heroImage}
+              style={[styles.heroImage, { width: largeur }]}
             />
           ))}
         </ScrollView>
@@ -116,7 +115,6 @@ const createStyles = (c: ThemeColors) =>
     position: 'relative',
   },
   heroImage: {
-    width: SCREEN_WIDTH,
     height: '100%',
   },
   emptyHero: {
@@ -160,8 +158,14 @@ const createStyles = (c: ThemeColors) =>
   imageCounter: {
     position: 'absolute',
     right: 14,
-    bottom: 10,
+    bottom: 36,
     color: '#FFFFFF',
     fontWeight: '600',
+    fontSize: 12,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
 });

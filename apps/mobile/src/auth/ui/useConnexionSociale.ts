@@ -87,6 +87,8 @@ export function useConnexionSociale({ onConnecte, onErreur }: Options) {
         showPlayServicesUpdateDialog: true,
       });
 
+      await GoogleSignin.signOut().catch(() => undefined);
+
       const reponse = await GoogleSignin.signIn();
 
       if (!isSuccessResponse(reponse)) return;
