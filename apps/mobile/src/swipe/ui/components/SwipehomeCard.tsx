@@ -32,7 +32,7 @@ export function SwipeHomeCard({
   onLike,
   onDislike,
 }: Props) {
-  const { t } = useTranslation(['profile', 'swipe']);
+  const { t } = useTranslation(['profile', 'swipe', 'home']);
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const { largeur, contenu } = useDimensionsEcran();
@@ -331,7 +331,11 @@ export function SwipeHomeCard({
               style={styles.tag}
             >
               <Text style={styles.tagText}>
-                {tag}
+                {t(`home:amenities.${tag}`, {
+                  defaultValue: t(`profile:essentialAmenities.${tag}`, {
+                    defaultValue: tag,
+                  }),
+                })}
               </Text>
             </LinearGradient>
           ),
