@@ -56,7 +56,6 @@ export function HomeAmenities({
   const { t } = useTranslation('home');
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
-console.log(amenities)
   const [showAll, setShowAll] =
     useState(false);
 
