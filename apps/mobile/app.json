@@ -13,6 +13,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "icon": {
+        "light": "./assets/icon-ios-light.png",
+        "dark": "./assets/icon-ios-dark.png"
+      },
       "supportsTablet": true,
       "bundleIdentifier": "com.wim.mobile",
       "infoPlist": {
