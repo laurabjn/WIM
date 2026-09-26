@@ -154,7 +154,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   outer: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 6,
   },
 
   inner: {
@@ -163,7 +163,7 @@ const createStyles = (c: ThemeColors) =>
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 6,
   },
 
   sideButton: {
