@@ -13,11 +13,14 @@ import {
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from 'src/home/infrastructure/home.api';
 import { Share } from 'react-native';
+import { Heart, Share2 } from 'lucide-react-native';
 import { BackButton } from 'src/shared/ui/BackButton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 import { useDimensionsEcran } from 'src/shared/ui/dimensions';
+
+const FAVORI = '#F43F5E';
 
 type Props = {
   home: Home;
@@ -84,7 +87,7 @@ export function HomeHero({
 
       <View style={[styles.topActions, { top: 16 + insets.top }]}>
         <TouchableOpacity style={styles.circleButton} onPress={onShare}>
-          <Text style={styles.icon}>↗</Text>
+          <Share2 size={18} color={themeColors.text} />
         </TouchableOpacity>
 
         {showFavorite ? (
@@ -92,9 +95,11 @@ export function HomeHero({
             style={styles.circleButton}
             onPress={() => onToggleFavorite(home.id)}
           >
-            <Text style={[styles.icon, isFavorite && styles.favoriteIcon]}>
-              {isFavorite ? '★' : '☆'}
-            </Text>
+            <Heart
+              size={18}
+              color={isFavorite ? FAVORI : themeColors.text}
+              fill={isFavorite ? FAVORI : 'transparent'}
+            />
           </TouchableOpacity>
         ) : null}
       </View>
@@ -147,13 +152,6 @@ const createStyles = (c: ThemeColors) =>
     right: 16,
     flexDirection: 'row',
     gap: 10,
-  },
-  icon: {
-    fontSize: 20,
-    color: c.text,
-  },
-  favoriteIcon: {
-    color: '#F59E0B',
   },
   imageCounter: {
     position: 'absolute',
