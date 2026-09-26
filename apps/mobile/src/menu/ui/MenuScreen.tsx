@@ -46,9 +46,7 @@ export function MenuScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useFocusEffect(
-    useCallback(() => {
-      setQuickSearch(false);
-    }, []),
+    useCallback(() => () => setQuickSearch(false), []),
   );
 
   useEffect(() => {
@@ -328,9 +326,6 @@ const createStyles = (c: ThemeColors) =>
     marginBottom: 8,
   },
   blocCategories: {
-    backgroundColor: c.surfaceAlt,
-    borderRadius: 18,
-    paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 12,
     marginBottom: 14,

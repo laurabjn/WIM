@@ -21,7 +21,7 @@ export function Category({
   return (
     <TouchableOpacity style={styles.category} onPress={onPress}>
       <LinearGradient
-        colors={[eclaircir(color, 0.55), color]}
+        colors={[eclaircir(color, 0.72), color, assombrir(color, 0.22)]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
         style={styles.categoryIcon}
@@ -34,7 +34,7 @@ export function Category({
   );
 }
 
-function eclaircir(hex: string, force: number): string {
+function canaux(hex: string): [number, number, number] {
   const abrege = hex.replace('#', '');
   const valeur =
     abrege.length === 3
@@ -44,13 +44,25 @@ function eclaircir(hex: string, force: number): string {
           .join('')
       : abrege.padEnd(6, '0');
 
-  const clair = (position: number) => {
-    const composante = parseInt(valeur.slice(position, position + 2), 16) || 0;
+  return [0, 2, 4].map(
+    (position) => parseInt(valeur.slice(position, position + 2), 16) || 0,
+  ) as [number, number, number];
+}
 
-    return Math.round(composante + (255 - composante) * force);
-  };
+function eclaircir(hex: string, force: number): string {
+  const teintes = canaux(hex).map((composante) =>
+    Math.round(composante + (255 - composante) * force),
+  );
 
-  return `rgb(${clair(0)}, ${clair(2)}, ${clair(4)})`;
+  return `rgb(${teintes.join(', ')})`;
+}
+
+function assombrir(hex: string, force: number): string {
+  const teintes = canaux(hex).map((composante) =>
+    Math.round(composante * (1 - force)),
+  );
+
+  return `rgb(${teintes.join(', ')})`;
 }
 
 const createStyles = (c: ThemeColors) =>
