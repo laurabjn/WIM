@@ -36,8 +36,14 @@ export function SearchToggle({
   const [largeur, setLargeur] = useState(TOGGLE_LARGEUR_MINIMALE);
 
   useEffect(() => {
+    if (!quickSearch) {
+      progress.setValue(0);
+
+      return;
+    }
+
     Animated.timing(progress, {
-      toValue: quickSearch ? 1 : 0,
+      toValue: 1,
       duration: 250,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
