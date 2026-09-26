@@ -46,9 +46,7 @@ export function MenuScreen({ navigation }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useFocusEffect(
-    useCallback(() => {
-      setQuickSearch(false);
-    }, []),
+    useCallback(() => () => setQuickSearch(false), []),
   );
 
   useEffect(() => {
