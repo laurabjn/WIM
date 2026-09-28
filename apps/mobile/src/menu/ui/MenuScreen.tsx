@@ -164,8 +164,8 @@ export function MenuScreen({ navigation }: Props) {
           )}
 
           <LinearGradient
-            colors={['rgba(0,0,0,0.55)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0.6)']}
-            locations={[0, 0.35, 0.6, 1]}
+            colors={['rgba(0,0,0,0.78)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0.88)']}
+            locations={[0, 0.34, 0.54, 1]}
             style={styles.heroOverlay}
           >
             <Text style={styles.heroTitle}>{heroTitle}</Text>
