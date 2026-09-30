@@ -131,6 +131,7 @@ export const NotificationCenterScreen: React.FC<Props> = ({ navigation }) => {
         <ActivityIndicator style={styles.chargement} color={themeColors.text} />
       ) : (
         <FlatList
+          contentInsetAdjustmentBehavior="never"
           data={notifications}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.liste}

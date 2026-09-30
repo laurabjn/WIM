@@ -73,7 +73,7 @@ export const GuestHomeChoiceModal: React.FC<Props> = ({
             {aide ?? t('exchange:chooseHomeHint')}
           </Text>
 
-          <ScrollView style={styles.liste}>
+          <ScrollView contentInsetAdjustmentBehavior="never" style={styles.liste}>
             {logements.map((logement) => {
               const actif = choisi === logement.id;
 

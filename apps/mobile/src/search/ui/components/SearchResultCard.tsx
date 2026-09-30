@@ -94,6 +94,7 @@ export function SearchResultCard({
     <View style={[styles.card, { maxWidth: LARGEUR_CONTENU_MAX }]}>
       <View style={[styles.carouselContainer, { width: largeurImage }]}>
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           horizontal
           pagingEnabled
           nestedScrollEnabled

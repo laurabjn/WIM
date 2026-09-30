@@ -279,6 +279,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
       edges={[]}
     >
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         style={[styles.screen, { backgroundColor: colors.screen }]}
         contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]}
       >

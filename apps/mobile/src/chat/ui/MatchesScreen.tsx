@@ -66,6 +66,7 @@ export function MatchesScreen({ navigation }: Props) {
         <ActivityIndicator style={styles.loader} color="#087EBE" />
       ) : (
         <FlatList
+          contentInsetAdjustmentBehavior="never"
           data={matches}
           keyExtractor={(match) => match.id}
           numColumns={3}

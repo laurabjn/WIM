@@ -144,6 +144,7 @@ export function AdminDashboardScreen({
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         contentContainerStyle={styles.contenu}
         refreshControl={
           <RefreshControl

@@ -35,6 +35,7 @@ export const RegisterWelcomeScreen: React.FC<Props> = ({ navigation, setIsAuthen
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}

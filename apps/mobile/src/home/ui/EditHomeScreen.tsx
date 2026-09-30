@@ -268,6 +268,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >

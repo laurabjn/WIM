@@ -130,6 +130,7 @@ export const AdminUsersScreen: React.FC<Props> = ({ navigation }) => {
         <ActivityIndicator style={styles.chargement} color={themeColors.text} />
       ) : (
         <FlatList
+          contentInsetAdjustmentBehavior="never"
           data={comptes}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.liste}

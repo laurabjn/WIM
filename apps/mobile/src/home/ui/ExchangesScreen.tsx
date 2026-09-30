@@ -109,6 +109,7 @@ export function ExchangesScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         contentContainerStyle={styles.content}
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={refresh} />

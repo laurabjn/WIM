@@ -99,7 +99,7 @@ export function SupportScreen({ navigation, route }: Props) {
         style={styles.flex}
         behavior="padding"
       >
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView contentInsetAdjustmentBehavior="never" contentContainerStyle={styles.content}>
           <Text style={styles.label}>{t('profile:support.topic')}</Text>
 
           <View style={styles.topics}>

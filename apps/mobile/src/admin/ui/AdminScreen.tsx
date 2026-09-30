@@ -254,6 +254,7 @@ export function AdminScreen({ navigation }: Props) {
         <ActivityIndicator style={styles.loader} color={themeColors.primary} />
       ) : (
         <FlatList
+          contentInsetAdjustmentBehavior="never"
           data={reports}
           keyExtractor={(report) => report.id}
           renderItem={renderReport}

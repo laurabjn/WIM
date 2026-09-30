@@ -230,6 +230,7 @@ export const RegisterHousingStep3Screen: React.FC<Props> = ({
         behavior="padding"
       >
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}

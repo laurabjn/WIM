@@ -177,6 +177,7 @@ export const DestinationSearchScreen: React.FC<Props> = ({
         </View>
 
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           style={styles.list}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}

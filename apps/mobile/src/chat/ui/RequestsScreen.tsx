@@ -129,6 +129,7 @@ export function RequestsScreen({ navigation }: Props) {
         <ActivityIndicator style={styles.loader} color="#087EBE" />
       ) : (
         <FlatList
+          contentInsetAdjustmentBehavior="never"
           data={visibleRequests}
           keyExtractor={(chat) => chat.id}
           contentContainerStyle={styles.list}

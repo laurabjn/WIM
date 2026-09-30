@@ -93,7 +93,7 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
         style={styles.container}
         behavior="padding"
       >
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView contentInsetAdjustmentBehavior="never" contentContainerStyle={styles.content}>
             <View style={styles.header}>
                 <BackButton
                   onPress={() => navigation.goBack()}

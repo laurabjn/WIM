@@ -81,7 +81,7 @@ export function RegionDestinationsScreen({ route, navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
+      <ScrollView contentInsetAdjustmentBehavior="never" style={styles.screen} contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <BackButton onPress={handleBack} style={styles.headerIconButton} />
 

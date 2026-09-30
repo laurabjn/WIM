@@ -177,7 +177,7 @@ export const SubscriptionScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.rond} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.contenu}>
+      <ScrollView contentInsetAdjustmentBehavior="never" contentContainerStyle={styles.contenu}>
         <View style={styles.carte}>
           <View style={[styles.pastille, actif ? styles.pastilleActive : null]}>
             <Text

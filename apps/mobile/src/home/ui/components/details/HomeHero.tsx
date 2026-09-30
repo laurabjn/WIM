@@ -60,6 +60,7 @@ export function HomeHero({
     <View style={[styles.hero, { maxHeight: hauteur * 0.6 }]}>
       {photos.length > 0 ? (
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}

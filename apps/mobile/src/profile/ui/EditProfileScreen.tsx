@@ -136,6 +136,7 @@ export function EditProfileScreen({ route, navigation }: Props) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         style={styles.screen}
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"

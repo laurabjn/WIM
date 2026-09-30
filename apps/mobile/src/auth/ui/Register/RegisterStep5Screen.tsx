@@ -144,6 +144,7 @@ export const RegisterStep5Screen: React.FC<Props> = ({ route, navigation }) => {
         behavior="padding"
       >
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}

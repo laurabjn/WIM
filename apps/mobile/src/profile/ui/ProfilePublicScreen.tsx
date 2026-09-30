@@ -165,7 +165,7 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={[]}>
-      <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
+      <ScrollView contentInsetAdjustmentBehavior="never" style={styles.screen} contentContainerStyle={styles.container}>
         <ProfileHeaderCard
           enTete
           profile={normalizedProfile}

@@ -115,6 +115,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation, setIsAuthenticated })
         behavior="padding"
       >
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}

@@ -142,7 +142,7 @@ export const AdminAccountScreen: React.FC<Props> = ({ route, navigation }) => {
         <View style={styles.rond} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.contenu}>
+      <ScrollView contentInsetAdjustmentBehavior="never" contentContainerStyle={styles.contenu}>
         <View style={styles.carte}>
           <View style={styles.identite}>
             {compte.avatarUrl ? (
