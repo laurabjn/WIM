@@ -181,6 +181,7 @@ export function FavoritesScreen({ navigation }: Props) {
       )}
 
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         style={styles.screen}
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}

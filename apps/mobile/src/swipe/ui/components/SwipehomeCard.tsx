@@ -172,6 +172,7 @@ export function SwipeHomeCard({
         ]}
       >
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           horizontal
           pagingEnabled
           nestedScrollEnabled

@@ -14,6 +14,7 @@ export function HomeTabs({ tabs, activeTab, onChange }: Props) {
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   return (
     <ScrollView
+      contentInsetAdjustmentBehavior="never"
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.tabsContent}

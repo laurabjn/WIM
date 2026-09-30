@@ -154,6 +154,7 @@ export const RegisterHousingStep4Screen: React.FC<Props> = ({ navigation, route 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}

@@ -67,6 +67,7 @@ export function SelecteurIndicatif({ indicatif, onChoisir }: Props) {
             <Text style={styles.titre}>{t('auth:register.phonePrefix')}</Text>
 
             <FlatList
+              contentInsetAdjustmentBehavior="never"
               data={pays}
               keyExtractor={(option) => option.cle}
               renderItem={({ item }) => (

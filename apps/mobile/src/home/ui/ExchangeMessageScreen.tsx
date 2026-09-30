@@ -109,6 +109,7 @@ export function ExchangeMessageScreen({ navigation, route }: any) {
         behavior="padding"
       >
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           contentContainerStyle={[
             styles.content,
             styles.contentCentre,

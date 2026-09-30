@@ -176,7 +176,7 @@ export function PreferencesScreen({ route, navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
+      <ScrollView contentInsetAdjustmentBehavior="never" style={styles.screen} contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <BackButton onPress={() => navigation.goBack()} style={styles.headerIconButton} />
 

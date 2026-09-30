@@ -91,6 +91,7 @@ export function ReviewStayScreen({ route, navigation }: Props) {
 
       <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           contentContainerStyle={styles.contenu}
           keyboardShouldPersistTaps="handled"
         >

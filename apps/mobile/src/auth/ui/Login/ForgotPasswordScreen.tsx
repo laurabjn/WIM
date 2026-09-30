@@ -61,6 +61,7 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
         behavior="padding"
       >
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}

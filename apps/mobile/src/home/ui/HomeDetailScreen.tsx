@@ -312,7 +312,7 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={[]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false}>
         <HomeHero
           home={home}
           onBack={() => navigation.goBack()}

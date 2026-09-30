@@ -75,6 +75,7 @@ export const OnboardingScreen: React.FC<Props> = ({ setIsAuthenticated }) => {
       </View>
 
       <FlatList
+        contentInsetAdjustmentBehavior="never"
         ref={liste}
         data={VISUELS}
         keyExtractor={(_, position) => String(position)}

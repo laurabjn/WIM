@@ -103,7 +103,7 @@ export const AdminWeightsScreen: React.FC<Props> = ({ navigation }) => {
         <ActivityIndicator style={styles.chargement} color={themeColors.text} />
       ) : (
         <>
-          <ScrollView contentContainerStyle={styles.contenu}>
+          <ScrollView contentInsetAdjustmentBehavior="never" contentContainerStyle={styles.contenu}>
             <Text style={styles.aide}>{t('admin:weightsHint')}</Text>
 
             {Object.keys(poids).map((cle) => (

@@ -358,6 +358,7 @@ export function ConversationsScreen({ navigation }: Props) {
       <Text style={styles.title}>{t('title')}</Text>
 
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.statusScroll}
@@ -438,7 +439,7 @@ export function ConversationsScreen({ navigation }: Props) {
       {loading ? (
         <ActivityIndicator style={styles.loader} color="#087EBE" />
       ) : (
-        <FlatList
+        <FlatList contentInsetAdjustmentBehavior="never"
 
           data={conversations}
           keyExtractor={(chat) => chat.id}

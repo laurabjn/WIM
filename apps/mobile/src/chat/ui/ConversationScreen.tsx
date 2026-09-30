@@ -1413,6 +1413,7 @@ export function ConversationScreen({ route, navigation }: Props) {
           ) : null}
 
           <FlatList
+            contentInsetAdjustmentBehavior="never"
             data={messages}
             keyExtractor={(message) => message.id}
             renderItem={({ item, index }) => renderMessage(item, index)}
@@ -1771,6 +1772,7 @@ export function ConversationScreen({ route, navigation }: Props) {
             />
           ) : (
             <FlatList
+              contentInsetAdjustmentBehavior="never"
               data={searchResults}
               keyExtractor={(message) => message.id}
               contentContainerStyle={styles.searchList}

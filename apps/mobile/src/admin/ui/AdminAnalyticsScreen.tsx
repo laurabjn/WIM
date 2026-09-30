@@ -78,7 +78,7 @@ export const AdminAnalyticsScreen: React.FC<Props> = ({ navigation }) => {
       {!analyse ? (
         <ActivityIndicator style={styles.chargement} color={themeColors.text} />
       ) : (
-        <ScrollView contentContainerStyle={styles.contenu}>
+        <ScrollView contentInsetAdjustmentBehavior="never" contentContainerStyle={styles.contenu}>
           <WeeklyBars
             titre={t('admin:analytics.weeklySignups')}
             couleur={themeColors.accent}

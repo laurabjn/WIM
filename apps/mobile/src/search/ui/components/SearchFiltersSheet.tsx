@@ -123,7 +123,7 @@ export const SearchFiltersSheet: React.FC<Props> = ({
 
         <Text style={styles.titre}>{t('search:filters.title')}</Text>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView contentInsetAdjustmentBehavior="never" showsVerticalScrollIndicator={false}>
           <Text style={styles.section}>{t('search:filters.homeType')}</Text>
           <View style={styles.pastilles}>
             {TYPES.map((type) => (

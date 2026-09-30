@@ -509,6 +509,7 @@ export function SwipeDetailHomeScreen({
         </View>
 
         <ScrollView
+          contentInsetAdjustmentBehavior="never"
           ref={scrollViewRef}
           showsVerticalScrollIndicator={
             false
@@ -532,6 +533,7 @@ export function SwipeDetailHomeScreen({
             ]}
           >
             <ScrollView
+              contentInsetAdjustmentBehavior="never"
               horizontal
               pagingEnabled
               nestedScrollEnabled

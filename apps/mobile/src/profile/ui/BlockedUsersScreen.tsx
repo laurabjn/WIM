@@ -104,6 +104,7 @@ export function BlockedUsersScreen({ navigation }: Props) {
         <ActivityIndicator style={styles.loader} color={themeColors.primary} />
       ) : (
         <FlatList
+          contentInsetAdjustmentBehavior="never"
           data={bloques}
           keyExtractor={(membre) => membre.id}
           contentContainerStyle={styles.liste}

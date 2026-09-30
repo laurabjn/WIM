@@ -146,6 +146,7 @@ export function SearchResultsSheet({
         <ActivityIndicator style={styles.loader} />
       ) : (
         <FlatList
+          contentInsetAdjustmentBehavior="never"
           ref={listRef}
           data={homes}
           keyExtractor={(item) => item.id}

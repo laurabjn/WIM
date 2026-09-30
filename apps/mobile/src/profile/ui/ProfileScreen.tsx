@@ -139,7 +139,7 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
 
   return (
     <SafeAreaView style={styles.safeArea} edges={[]}>
-      <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
+      <ScrollView contentInsetAdjustmentBehavior="never" style={styles.screen} contentContainerStyle={styles.container}>
         <ProfileHeaderCard
           enTete
           profile={profile}
