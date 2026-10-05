@@ -609,6 +609,8 @@
     "entireHome": "Logement entier",
     "noPhotos": "Aucune photo pour le moment.",
     "noDescription": "Aucune description pour le moment.",
+    "shareCtaText": "Ce logement vous plaît ? Créez votre compte WIM pour proposer un échange à son hôte.",
+    "shareCtaButton": "Créer mon compte",
     "amenitiesTitle": "Caractéristiques de ce logement",
     "showAllAmenities": "Afficher les {{count}} caractéristiques",
     "noAmenities": "Aucun équipement renseigné.",

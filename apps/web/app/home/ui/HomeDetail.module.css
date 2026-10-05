@@ -1,0 +1,173 @@
+.fiche {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+.galerie {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+  margin-top: 16px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.photoPrincipale {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #f1f1f1;
+}
+
+.photoPrincipale img,
+.photoSecondaire img {
+  object-fit: cover;
+}
+
+.photosSecondaires {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.photoSecondaire {
+  position: relative;
+  background: #f1f1f1;
+}
+
+.entete {
+  margin-top: 28px;
+}
+
+.titre {
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.lieu,
+.caracteristiques,
+.note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  color: #5c6b72;
+  font-size: 15px;
+}
+
+.note {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.bloc {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid #e8eaec;
+}
+
+.sousTitre {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+
+.description {
+  margin: 0;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+.periodes,
+.equipements {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.periodes li {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f2f3;
+}
+
+.equipements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.equipement {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #f4f6f7;
+  font-size: 14px;
+}
+
+.hote {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.avatar {
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.hoteNom {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.appel {
+  margin-top: 44px;
+  padding: 28px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #52d1a6, #2da7f3);
+  color: #ffffff;
+  text-align: center;
+}
+
+.appelTexte {
+  margin: 0 0 18px;
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.appelBouton {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #10243a;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .galerie {
+    grid-template-columns: 1fr;
+  }
+
+  .photosSecondaires {
+    grid-template-rows: none;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .photoSecondaire {
+    aspect-ratio: 1 / 1;
+  }
+
+  .titre {
+    font-size: 24px;
+  }
+}
