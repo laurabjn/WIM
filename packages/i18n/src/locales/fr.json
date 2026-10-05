@@ -591,6 +591,7 @@
     "LoggingIn": "Connexion en cours..."
   },
   "home": {
+    "addPhoto": "Ajouter une photo",
     "defaultTitle": "Mon logement",
     "defaultTitleWithCity": "Logement à {{city}}",
     "notFound": "Logement introuvable",
@@ -648,6 +649,8 @@
       "accessible": "Logement accessible"
     },
     "vehicule": {
+      "brand": "Marque",
+      "model": "Modèle",
       "exchangeAccepted": "Cet hôte échange sa voiture",
       "places": "Places",
       "numberOfPlaces": "Nombre de places non renseigné",

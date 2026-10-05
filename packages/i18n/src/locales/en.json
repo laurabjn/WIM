@@ -591,6 +591,7 @@
     }
   },
   "home": {
+    "addPhoto": "Add a photo",
     "availableForExchange": "Available for exchange",
     "availableForExchangeDescription": "Shows this home as available to other members.",
     "defaultTitle": "My home",
@@ -655,6 +656,8 @@
       "dryer": "Dryer"
     },
     "vehicule": {
+      "brand": "Make",
+      "model": "Model",
       "exchangeAccepted": "This host accepts car exchange",
       "places": "Places",
       "numberOfPlaces": "Number of places not provided",

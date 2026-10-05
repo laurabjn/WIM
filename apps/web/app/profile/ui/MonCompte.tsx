@@ -143,6 +143,10 @@ export function MonCompte() {
       <section className={styles.bloc}>
         <div className={styles.blocEntete}>
           <h2 className={styles.blocTitre}>{t('profile.homes')}</h2>
+
+          <Link href="/homes/new" className={styles.boutonClair}>
+            {t('profile.addHome')}
+          </Link>
         </div>
 
         {logements.length === 0 ? (
@@ -150,7 +154,16 @@ export function MonCompte() {
         ) : (
           <div className={styles.grille}>
             {logements.map((logement) => (
-              <HomeDetailsCard key={logement.id} home={logement} />
+              <div key={logement.id} className={styles.mien}>
+                <HomeDetailsCard home={logement} />
+
+                <Link
+                  href={`/homes/${logement.id}/edit`}
+                  className={styles.boutonClair}
+                >
+                  {t('common.edit')}
+                </Link>
+              </div>
             ))}
           </div>
         )}
