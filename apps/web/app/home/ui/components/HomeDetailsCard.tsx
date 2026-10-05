@@ -10,12 +10,13 @@ import { getSession } from 'app/auth/infrastructure/authStorage';
 
 type Props = {
   home: Home;
+  initialFavorite?: boolean;
 };
 
-export function HomeDetailsCard({ home }: Props) {
+export function HomeDetailsCard({ home, initialFavorite = false }: Props) {
   const t = useTranslations();
 
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [isUpdatingFavorite, setIsUpdatingFavorite] = useState(false);
   
   const coverUrl = home.photos?.[0]?.url || '/images/placeholder-home.jpg';

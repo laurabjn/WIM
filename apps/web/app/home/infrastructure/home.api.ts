@@ -131,3 +131,37 @@ export async function removeFavoriteHome(
     throw new Error(text || 'Impossible de retirer des favoris');
   }
 }
+
+export async function getMyHomes(token: string): Promise<Home[]> {
+  const response = await fetch(`${API_URL}/homes/me/list`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error('Impossible de charger mes logements');
+  }
+
+  const data = await response.json();
+
+  return data.map(normalizeHome);
+}
+
+export async function listFavoriteHomes(token: string): Promise<Home[]> {
+  const response = await fetch(`${API_URL}/favorites/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error('Impossible de charger les favoris');
+  }
+
+  const data = await response.json();
+
+  return data.map(normalizeHome);
+}

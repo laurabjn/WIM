@@ -25,7 +25,7 @@ export function Navbar() {
         <MessageSquare size={15} strokeWidth={2.2} />
         {t('messages')}
       </Link>
-      <Link href="/profile" className={styles.navItem}>
+      <Link href="/account" className={styles.navItem}>
         <User size={15} strokeWidth={2.2} />
         {t('account')}
       </Link>

@@ -1,0 +1,119 @@
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid #e8eaec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.etat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 28px;
+  border: 1px dashed #d7dcdf;
+  border-radius: 18px;
+  text-align: center;
+  color: #5c6b72;
+}
+
+.intro {
+  color: #5c6b72;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.libelle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5c6b72;
+}
+
+.champ input,
+.champ select {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #dfe3e6;
+  border-radius: 10px;
+  background: #ffffff;
+  font: inherit;
+  color: inherit;
+}
+
+.champ textarea {
+  padding: 10px 12px;
+  border: 1px solid #dfe3e6;
+  border-radius: 12px;
+  background: #ffffff;
+  font: inherit;
+  color: inherit;
+  resize: vertical;
+}
+
+.champ input:focus,
+.champ select:focus,
+.champ textarea:focus {
+  outline: 2px solid #2da7f3;
+  outline-offset: 1px;
+}
+
+.delai {
+  color: #5c6b72;
+  font-size: 13px;
+}
+
+.erreur {
+  color: #c0392b;
+  font-size: 14px;
+}
+
+.succes {
+  color: #1f7a4d;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.boutonSombre,
+.boutonClair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boutonSombre {
+  background: #111111;
+  color: #ffffff;
+}
+
+.boutonSombre:disabled {
+  background: #c3cace;
+  cursor: default;
+}
+
+.boutonClair {
+  border: 1px solid #dfe3e6;
+  background: #ffffff;
+  color: #111111;
+}

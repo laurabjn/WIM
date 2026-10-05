@@ -1,0 +1,225 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.etat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 28px;
+  border: 1px dashed #d7dcdf;
+  border-radius: 18px;
+  text-align: center;
+  color: #5c6b72;
+}
+
+.chapeau {
+  color: #5c6b72;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.bloc {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px;
+  border: 1px solid #e8eaec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.blocTitre {
+  margin-bottom: 8px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 6px 0;
+  border-bottom: 1px solid #eef1f2;
+  font-size: 15px;
+}
+
+.ligne:last-of-type {
+  border-bottom: 0;
+}
+
+.valeur {
+  color: #5c6b72;
+  font-size: 14px;
+  text-align: right;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #eaf6fe;
+  color: #1a7fc1;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.aide {
+  padding: 6px 0;
+  color: #5c6b72;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.avantages {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 8px;
+  padding-left: 20px;
+  color: #37474f;
+  font-size: 15px;
+}
+
+.formules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.formule {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px;
+  border: 1px solid #dfe3e6;
+  border-radius: 16px;
+}
+
+.formuleNom {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.formulePrix {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.formuleAide {
+  margin-bottom: 8px;
+  color: #5c6b72;
+  font-size: 13px;
+}
+
+.sousBloc {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eef1f2;
+}
+
+.sousTitre {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.enLigne {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.champ {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #dfe3e6;
+  border-radius: 10px;
+  background: #ffffff;
+  font: inherit;
+  color: inherit;
+}
+
+.champ:focus {
+  outline: 2px solid #2da7f3;
+  outline-offset: 1px;
+}
+
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.erreur {
+  padding: 14px 18px;
+  border: 1px solid #f0c0b8;
+  border-radius: 14px;
+  background: #fff5f3;
+  color: #c0392b;
+  font-size: 14px;
+}
+
+.succes {
+  padding: 14px 18px;
+  border: 1px solid #bfe0cc;
+  border-radius: 14px;
+  background: #f2fbf6;
+  color: #1f7a4d;
+  font-size: 14px;
+}
+
+.boutonSombre,
+.boutonClair,
+.boutonDanger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  height: 42px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boutonSombre {
+  background: #111111;
+  color: #ffffff;
+}
+
+.boutonSombre:disabled,
+.boutonClair:disabled,
+.boutonDanger:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.boutonClair {
+  border: 1px solid #dfe3e6;
+  background: #ffffff;
+  color: #111111;
+}
+
+.boutonDanger {
+  border: 1px solid #f0c0b8;
+  background: #ffffff;
+  color: #c0392b;
+}
+
+.boutonDanger:hover:enabled {
+  background: #fff5f3;
+}

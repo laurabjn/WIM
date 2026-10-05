@@ -3,6 +3,9 @@ export const API_URL =
 
 export const SERVER_URL = API_URL.replace(/\/api$/, '');
 
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://worldismine.fr';
+
 export function resolveImageUrl(url?: string | null) {
   if (!url) return '/images/placeholder-home.jpg';
   if (url.startsWith('http')) return url;

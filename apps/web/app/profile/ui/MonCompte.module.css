@@ -1,0 +1,178 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.etat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 28px;
+  border: 1px dashed #d7dcdf;
+  border-radius: 18px;
+  text-align: center;
+  color: #5c6b72;
+}
+
+.boutonSombre,
+.boutonClair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boutonSombre {
+  background: #111111;
+  color: #ffffff;
+}
+
+.boutonClair {
+  border: 1px solid #dfe3e6;
+  background: #ffffff;
+  color: #111111;
+}
+
+.carte {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid #e8eaec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.avatar {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d9e6ee;
+  color: #38515e;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.avatarImage {
+  object-fit: cover;
+}
+
+.identite {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.nom {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.email,
+.chiffres,
+.identiteEtat {
+  color: #5c6b72;
+  font-size: 13px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bloc {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.blocEntete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.blocTitre {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.vide {
+  padding: 28px;
+  border: 1px dashed #d7dcdf;
+  border-radius: 16px;
+  text-align: center;
+  color: #5c6b72;
+}
+
+.liens {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e8eaec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.ligne,
+.ligneDanger {
+  padding: 16px 20px;
+  border: 0;
+  border-bottom: 1px solid #eef1f2;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ligne:last-child,
+.ligneDanger:last-child {
+  border-bottom: 0;
+}
+
+.ligne:hover,
+.ligneDanger:hover {
+  background: #f4f6f7;
+}
+
+.ligneDanger {
+  color: #c0392b;
+}
+
+@media (max-width: 680px) {
+  .carte {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actions {
+    flex-direction: row;
+    width: 100%;
+  }
+}

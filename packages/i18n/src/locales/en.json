@@ -262,6 +262,7 @@
       "about": "About",
       "myData": "My data",
       "exportData": "Get my data",
+      "exportRequested": "We are sending your data to your email address, in a file any other service can read. Allow a few minutes.",
       "exportSent": "We are sending your data to {{email}}, in a file any other service can read. Give it a few minutes.",
       "dangerZone": "Danger zone",
       "contactSupport": "Contact support",
@@ -1149,6 +1150,9 @@
     ]
   },
   "subscription": {
+    "freeUntilLabel": "Free access until",
+    "activeUntilLabel": "Active until",
+    "backFromPayment": "We are recording your payment. If nothing changes here, refresh the page in a few moments.",
     "title": "Subscription",
     "subtitle": "Listing, browsing and chatting stay free. A subscription unlocks exchanges.",
     "monthly": "Monthly",

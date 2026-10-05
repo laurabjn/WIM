@@ -123,6 +123,7 @@
       "about": "À propos",
       "myData": "Mes données",
       "exportData": "Recevoir mes données",
+      "exportRequested": "Nous envoyons vos données à votre adresse e-mail, dans un fichier lisible par n'importe quel autre service. Comptez quelques minutes.",
       "exportSent": "Nous envoyons vos données à {{email}}, dans un fichier lisible par n’importe quel autre service. Comptez quelques minutes.",
       "dangerZone": "Zone dangereuse",
       "deleteAccount": "Supprimer mon compte",
@@ -1144,6 +1145,9 @@
     ]
   },
   "subscription": {
+    "freeUntilLabel": "Accès libre jusqu’au",
+    "activeUntilLabel": "Actif jusqu’au",
+    "backFromPayment": "Nous enregistrons votre paiement. Si rien ne change ici, rafraîchissez la page dans quelques instants.",
     "title": "Abonnement",
     "subtitle": "Publier, explorer et discuter restent libres. L'abonnement ouvre les échanges.",
     "monthly": "Mensuel",
