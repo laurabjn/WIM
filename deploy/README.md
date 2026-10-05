@@ -310,16 +310,32 @@ sudo certbot --nginx -d app.worldismine.fr
 ```
 
 **5. Ouvrir l'API au site.** Le navigateur appelle l'API depuis un autre
-domaine : sans cette ligne, toutes les requetes seront refusees par la
+domaine : sans ces deux lignes, toutes les requetes seront refusees par la
 politique d'origine croisee. Dans `.env.prod`, ajouter le site aux origines
-autorisees, puis recreer le conteneur de l'API :
+autorisees, pour les requetes comme pour le socket, puis recreer le conteneur
+de l'API :
 
 ```sh
-CORS_ORIGINS=https://app.worldismine.fr
+CORS_ORIGINS=https://worldismine.fr,https://www.worldismine.fr,https://app.worldismine.fr
+WS_CORS_ORIGIN=https://worldismine.fr,https://app.worldismine.fr
 ```
 
 ```sh
 wim up -d api
+```
+
+`WS_CORS_ORIGIN` est distincte : la messagerie du site ouvre un socket, et le
+mobile n'envoie pas d'origine alors que le navigateur en envoie une. Oublier
+cette ligne ne casse rien de visible — les pages s'affichent, les messages
+s'envoient — mais plus rien n'arrive en temps reel, et aucune erreur ne le dit.
+
+**5 bis. La page de retour de Stripe.** Elle est commune au site et au mobile.
+Seule la page d'abonnement du site sait lire `?abonnement=ok` et `?moyen=ok`,
+c'est donc elle qu'il faut viser ; le navigateur integre du mobile se referme
+en atteignant cette adresse, donc il s'en accommode.
+
+```sh
+SUBSCRIPTION_RETURN_URL=https://app.worldismine.fr/subscription
 ```
 
 **6. Verifier.**
