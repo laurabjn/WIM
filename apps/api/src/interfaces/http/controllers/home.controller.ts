@@ -29,8 +29,6 @@ import { IdentiteVerifiee, JwtAuthGuard } from '../jwt-auth.guard';
 import { JwtOptionnelGuard } from '../jwt-optionnel.guard';
 import { SubscriptionService } from 'src/application/subscription/subscription.service';
 import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
-import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
-import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
 import { SearchHomesDto } from '../dtos/home/search-homes.dto';
 import { SearchHomesUseCase } from 'src/application/home/use-cases/search-homes.usecase';
 
@@ -64,8 +62,6 @@ export class HomeController {
     private readonly updateHomeUseCase: UpdateHomeUseCase,
     private readonly deleteHomeUseCase: DeleteHomeUseCase,
     private readonly addHomePhotoUseCase: AddHomePhotoUseCase,
-    private readonly addFavoriteUseCase: AddFavoriteUseCase,
-    private readonly removeFavoriteUseCase: RemoveFavoriteUseCase,
     private readonly searchHomesUseCase: SearchHomesUseCase,
     private readonly subscriptions: SubscriptionService,
   ) {
@@ -171,18 +167,6 @@ export class HomeController {
   async delete(@Param('id') id: string, @Req() req: any) {
     await this.deleteHomeUseCase.execute(id, req.user.sub);
     return { success: true };
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post(':id/favorite')
-  addFavorite(@Req() req: any, @Param('id') homeId: string) {
-    return this.addFavoriteUseCase.execute(req.user.sub, homeId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id/favorite')
-  removeFavorite(@Req() req: any, @Param('id') homeId: string) {
-    return this.removeFavoriteUseCase.execute(req.user.sub, homeId);
   }
 
   @UseGuards(JwtAuthGuard)

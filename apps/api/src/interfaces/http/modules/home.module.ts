@@ -12,8 +12,6 @@ import { HOME_REPOSITORY, HOME_SEARCH_REPOSITORY } from '../tokens/token';
 import { AuthModule } from './auth.module';
 import { SubscriptionModule } from './subscription.module';
 import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
-import { AddFavoriteUseCase } from 'src/application/favorite/use-case/add-favorite.usecase';
-import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
 import { SearchHomesUseCase } from 'src/application/home/use-cases/search-homes.usecase';
 import { HomeSearchPrismaRepository } from 'src/infrastructure/repositories/home-search.prisma.repository';
 
@@ -65,16 +63,6 @@ import { HomeSearchPrismaRepository } from 'src/infrastructure/repositories/home
     {
       provide: AddHomePhotoUseCase,
       useFactory: (homeRepo) => new AddHomePhotoUseCase(homeRepo),
-      inject: [HOME_REPOSITORY],
-    },
-    {
-      provide: AddFavoriteUseCase,
-      useFactory: (homeRepo) => new AddFavoriteUseCase(homeRepo),
-      inject: [HOME_REPOSITORY],
-    },
-    {
-      provide: RemoveFavoriteUseCase,
-      useFactory: (homeRepo) => new RemoveFavoriteUseCase(homeRepo),
       inject: [HOME_REPOSITORY],
     },
     {

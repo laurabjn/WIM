@@ -132,7 +132,7 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
       bedrooms: home.bedrooms,
       averageRating: home.averageRating,
       reviewsCount: home.reviewsCount,
-      isFavorite: home.favorites.length > 0,
+      isFavorite: (home.favorites?.length ?? 0) > 0,
       photos: home.photos.map((photo) => ({
         id: photo.id,
         url: photo.url,
