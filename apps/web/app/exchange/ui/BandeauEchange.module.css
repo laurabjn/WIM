@@ -1,0 +1,126 @@
+.bandeau {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 0 0 auto;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef1f2;
+  background: #f4fafe;
+}
+
+.entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.etat {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #2da7f3;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.periode {
+  color: #5c6b72;
+  font-size: 13px;
+}
+
+.logements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.logement {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.logementRole {
+  color: #5c6b72;
+  font-size: 12px;
+}
+
+.lien {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.lien:hover {
+  color: #2da7f3;
+}
+
+.vide {
+  color: #9aa6ab;
+  font-size: 14px;
+}
+
+.erreur {
+  color: #c0392b;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.choix {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #dfe3e6;
+  border-radius: 10px;
+  background: #ffffff;
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+}
+
+.boutonSombre,
+.boutonClair,
+.boutonDanger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boutonSombre {
+  background: #111111;
+  color: #ffffff;
+}
+
+.boutonSombre:disabled,
+.boutonClair:disabled,
+.boutonDanger:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.boutonClair {
+  border: 1px solid #dfe3e6;
+  background: #ffffff;
+  color: #111111;
+}
+
+.boutonDanger {
+  border: 1px solid #f0c0b8;
+  background: #ffffff;
+  color: #c0392b;
+}

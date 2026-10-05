@@ -4,6 +4,8 @@ import { getTranslations } from 'next-intl/server';
 import { Home } from '@wim/shared/home/home.type';
 import { BadgeCheck, MapPin, Star } from 'lucide-react';
 
+import { DemandeEchange } from 'app/exchange/ui/DemandeEchange';
+
 import styles from './HomeDetail.module.css';
 
 type Props = {
@@ -160,13 +162,7 @@ export async function HomeDetail({ home, locale }: Props) {
         </section>
       ) : null}
 
-      <aside className={styles.appel}>
-        <p className={styles.appelTexte}>{t('home.shareCtaText')}</p>
-
-        <Link href="/register" className={styles.appelBouton}>
-          {t('home.shareCtaButton')}
-        </Link>
-      </aside>
+      <DemandeEchange homeId={home.id} ownerId={home.ownerId} />
     </article>
   );
 }

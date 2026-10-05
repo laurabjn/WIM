@@ -17,6 +17,7 @@ import type {
 } from '@wim/shared';
 
 import { getSession } from 'app/auth/infrastructure/authStorage';
+import { BandeauEchange } from 'app/exchange/ui/BandeauEchange';
 import {
   getChatMessages,
   getMyChats,
@@ -530,6 +531,10 @@ export function Messagerie() {
                 </span>
               </Link>
             </header>
+
+            {token ? (
+              <BandeauEchange token={token} chatId={active.id} />
+            ) : null}
 
             <div className={styles.fil} ref={fil}>
               {encore ? (
