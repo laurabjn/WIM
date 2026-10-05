@@ -1,0 +1,68 @@
+.formulaire {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid #e8eaec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.libelle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5c6b72;
+}
+
+.champ input,
+.champ select {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #dfe3e6;
+  border-radius: 10px;
+  background: #ffffff;
+  font: inherit;
+  color: inherit;
+}
+
+.champ input:focus,
+.champ select:focus {
+  outline: 2px solid #2da7f3;
+  outline-offset: 1px;
+}
+
+.bouton {
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #111111;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bouton:hover {
+  background: #2a2a2a;
+}
+
+@media (max-width: 680px) {
+  .champ {
+    flex: 1 1 100%;
+  }
+
+  .bouton {
+    width: 100%;
+  }
+}

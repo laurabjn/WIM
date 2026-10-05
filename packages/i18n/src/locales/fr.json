@@ -968,6 +968,14 @@
     "toExplore": "Explorer",
     "fastSearch": "Recherche rapide",
     "lastSearches": "Vos dernières recherches",
+    "allCategories": "Toutes les catégories",
+    "noResults": "Aucun logement ne correspond à cette recherche.",
+    "category": {
+      "nature": "Nature",
+      "beach": "Plage",
+      "city": "Ville",
+      "culture": "Culture"
+    },
     "categories": "Catégories",
     "nbExchanges": "Logements disponibles",
     "destination": "Destination",

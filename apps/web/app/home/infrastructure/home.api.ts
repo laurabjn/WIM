@@ -32,6 +32,44 @@ export async function getPublicHomes(): Promise<Home[]> {
   return data.map(normalizeHome);
 }
 
+export type FiltresRecherche = {
+  city?: string;
+  country?: string;
+  capacity?: number;
+  bedrooms?: number;
+  homeType?: string;
+  amenities?: string[];
+  category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
+  startDate?: string;
+  endDate?: string;
+};
+
+export async function searchHomes(filtres: FiltresRecherche): Promise<Home[]> {
+  const parametres = new URLSearchParams();
+
+  for (const [cle, valeur] of Object.entries(filtres)) {
+    if (valeur === undefined || valeur === '' || valeur === null) continue;
+
+    parametres.set(cle, Array.isArray(valeur) ? valeur.join(',') : String(valeur));
+  }
+
+  const requete = parametres.toString();
+
+  const requeteComplete = requete
+    ? `${API_URL}/homes/search?${requete}`
+    : `${API_URL}/homes/search`;
+
+  const response = await fetch(requeteComplete, { cache: 'no-store' });
+
+  if (!response.ok) {
+    throw new Error('Impossible de chercher les logements');
+  }
+
+  const data = await response.json();
+
+  return data.map(normalizeHome);
+}
+
 export async function getHomeById(homeId: string): Promise<Home> {
   const response = await fetch(`${API_URL}/homes/${homeId}`, {
     cache: 'no-store',
