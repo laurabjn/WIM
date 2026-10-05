@@ -47,40 +47,6 @@
   color: #111111;
 }
 
-.photo {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  border: 1px solid #e8eaec;
-  border-radius: 18px;
-  background: #ffffff;
-}
-
-.avatar {
-  position: relative;
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 84px;
-  height: 84px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #d9e6ee;
-  color: #38515e;
-  font-size: 28px;
-  font-weight: 800;
-}
-
-.avatarImage {
-  object-fit: cover;
-}
-
-.cache {
-  display: none;
-}
-
 .bloc {
   display: flex;
   flex-direction: column;
@@ -96,24 +62,12 @@
   font-weight: 800;
 }
 
-.lignes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-}
-
 .champ {
   display: flex;
   flex-direction: column;
   gap: 6px;
   flex: 1 1 200px;
   min-width: 0;
-}
-
-.libelle {
-  font-size: 13px;
-  font-weight: 600;
-  color: #5c6b72;
 }
 
 .champ input,
@@ -222,4 +176,10 @@
   width: 20px;
   height: 20px;
   accent-color: #2da7f3;
+}
+
+.aide {
+  color: #5c6b72;
+  font-size: 13px;
+  line-height: 1.5;
 }

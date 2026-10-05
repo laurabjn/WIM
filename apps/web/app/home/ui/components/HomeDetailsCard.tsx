@@ -31,10 +31,7 @@ export function HomeDetailsCard({ home, initialFavorite = false }: Props) {
     const session = getSession();
     const token = session?.accessToken;
 
-    if (!token) {
-      console.log('Utilisateur non connecté');
-      return;
-    }
+    if (!token) return;
 
     const nextValue = !isFavorite;
 
@@ -47,8 +44,7 @@ export function HomeDetailsCard({ home, initialFavorite = false }: Props) {
       } else {
         await removeFavoriteHome(token, home.id);
       }
-    } catch (error) {
-      console.log('Favorite error:', error);
+    } catch {
       setIsFavorite(!nextValue);
     } finally {
       setIsUpdatingFavorite(false);
