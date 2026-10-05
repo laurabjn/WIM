@@ -265,6 +265,77 @@ IDENTITY_RETURN_URL=https://worldismine.fr/verification-identite
 
 ---
 
+## 6 ter. Mettre le site en ligne sur app.worldismine.fr
+
+Le site tourne sur le meme VPS que l'API, dans la meme pile Docker, et nginx
+le publie sur un sous-domaine.
+
+**1. Le DNS.** Espace client OVH, zone de `worldismine.fr` :
+
+| Type | Sous-domaine | Cible |
+| --- | --- | --- |
+| A | `app` | `91.134.134.251` |
+| AAAA | `app` | `2001:41d0:305:2100::e7c3` |
+
+Attendre que `dig +short app.worldismine.fr` reponde avant la suite :
+certbot echoue tant que le nom ne resout pas.
+
+**2. La variable de construction.** Dans `/opt/wim/deploy/.env.prod` :
+
+```sh
+NEXT_PUBLIC_API_URL=https://api.worldismine.fr/api
+WEB_HOST_PORT=3020
+```
+
+Cette adresse est **figee dans le code livre au navigateur** au moment de la
+construction de l'image. La modifier plus tard impose un `up -d --build web` :
+un simple redemarrage ne la reprendra pas.
+
+**3. Le conteneur.**
+
+```sh
+cd /opt/wim && git pull
+wim up -d --build web
+wim logs -f web
+```
+
+**4. nginx et le certificat.**
+
+```sh
+sudo cp /opt/wim/deploy/nginx/app.worldismine.fr.conf \
+  /etc/nginx/sites-available/app.worldismine.fr
+sudo ln -s /etc/nginx/sites-available/app.worldismine.fr /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d app.worldismine.fr
+```
+
+**5. Ouvrir l'API au site.** Le navigateur appelle l'API depuis un autre
+domaine : sans cette ligne, toutes les requetes seront refusees par la
+politique d'origine croisee. Dans `.env.prod`, ajouter le site aux origines
+autorisees, puis recreer le conteneur de l'API :
+
+```sh
+CORS_ORIGINS=https://app.worldismine.fr
+```
+
+```sh
+wim up -d api
+```
+
+**6. Verifier.**
+
+```sh
+curl -sI https://app.worldismine.fr/ | head -1
+```
+
+Doit repondre `307` puis `200` sur `/fr` : la page d'accueil redirige vers la
+langue. Ouvrir ensuite une fiche de logement et verifier que les photos
+s'affichent — si elles manquent, c'est que l'hote des images n'etait pas
+connu a la construction, et il faut reconstruire avec la bonne
+NEXT_PUBLIC_API_URL.
+
+---
+
 ## 7. Redéployer après un changement
 
 ```bash

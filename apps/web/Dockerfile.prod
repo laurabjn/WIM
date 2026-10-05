@@ -1,0 +1,43 @@
+# Construction du site en deux temps : on fabrique avec l'outillage complet,
+# puis on ne garde que la sortie autonome de Next, qui rassemble le serveur et
+# ses seules dependances utiles. L'image finale pese une fraction du depot.
+
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json package-lock.json turbo.json ./
+COPY apps/web/package.json apps/web/package.json
+COPY packages packages
+
+RUN npm ci
+
+COPY . .
+
+# L'adresse de l'API est figee a la construction : Next remplace les variables
+# NEXT_PUBLIC_ dans le code livre au navigateur. La changer impose de
+# reconstruire, exactement comme pour l'application mobile.
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+WORKDIR /app/apps/web
+
+RUN npm run build
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+# La sortie autonome reproduit l'arborescence du depot : le serveur attend
+# donc de trouver apps/web a la meme place.
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
+
+EXPOSE 3000
+
+CMD ["node", "apps/web/server.js"]
