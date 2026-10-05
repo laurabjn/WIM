@@ -969,6 +969,14 @@
     "toExplore": "Explore",
     "fastSearch": "Fast search",
     "lastSearches": "Your last searches",
+    "allCategories": "All categories",
+    "noResults": "No home matches this search.",
+    "category": {
+      "nature": "Nature",
+      "beach": "Beach",
+      "city": "City",
+      "culture": "Culture"
+    },
     "categories": "Categories",
     "nbExchanges": "Homes available",
     "destination": "Destination",

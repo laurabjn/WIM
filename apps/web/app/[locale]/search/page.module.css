@@ -1,0 +1,39 @@
+.page {
+  min-height: 100vh;
+  background: #fafbfc;
+}
+
+.contenu {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+.titre {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 20px;
+}
+
+.compte {
+  margin: 24px 0 16px;
+  color: #5c6b72;
+  font-size: 15px;
+}
+
+.vide {
+  margin: 40px 0;
+  padding: 28px;
+  border: 1px dashed #d7dcdf;
+  border-radius: 16px;
+  text-align: center;
+  color: #5c6b72;
+}
+
+.resultats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
