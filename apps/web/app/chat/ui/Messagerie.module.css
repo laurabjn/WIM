@@ -1,0 +1,399 @@
+.messagerie {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  height: calc(100vh - 190px);
+  min-height: 460px;
+}
+
+.etat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 28px;
+  border: 1px dashed #d7dcdf;
+  border-radius: 18px;
+  text-align: center;
+  color: #5c6b72;
+}
+
+.lien {
+  padding: 10px 24px;
+  border-radius: 999px;
+  background: #111111;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid #e8eaec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.entree {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.entree:hover {
+  background: #f4f6f7;
+}
+
+.entreeActive {
+  background: #eaf6fe;
+}
+
+.avatar {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d9e6ee;
+  color: #38515e;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.avatarImage {
+  object-fit: cover;
+}
+
+.entreeTextes {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.entreeNom {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.entreeApercu {
+  overflow: hidden;
+  color: #5c6b72;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pastille {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #2da7f3;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.discussion {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e8eaec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.attente {
+  margin: auto;
+  padding: 24px;
+  color: #5c6b72;
+}
+
+.entete {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eef1f2;
+}
+
+.retour {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: #f4f6f7;
+  color: inherit;
+  cursor: pointer;
+}
+
+.enteteProfil {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.enteteNom {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fil {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 18px;
+  overflow-y: auto;
+  padding: 18px 16px;
+  background: #fafbfc;
+}
+
+.plus {
+  align-self: center;
+  padding: 8px 18px;
+  border: 1px solid #dfe3e6;
+  border-radius: 999px;
+  background: #ffffff;
+  font: inherit;
+  font-size: 13px;
+  color: #5c6b72;
+  cursor: pointer;
+}
+
+.journee {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.jourEtiquette {
+  align-self: center;
+  margin-bottom: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #eef1f2;
+  color: #5c6b72;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ligne {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.ligneMoi {
+  justify-content: flex-end;
+}
+
+.bulle {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: min(72%, 460px);
+  padding: 10px 14px;
+  border-radius: 18px;
+  border-bottom-left-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e8eaec;
+}
+
+.bulleMoi {
+  border: 0;
+  border-radius: 18px;
+  border-bottom-right-radius: 6px;
+  background: #2da7f3;
+  color: #ffffff;
+}
+
+.texte {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.photo {
+  position: relative;
+  display: block;
+  width: 240px;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.photoImage {
+  object-fit: cover;
+}
+
+.audio {
+  width: 240px;
+  max-width: 100%;
+}
+
+.meta {
+  align-self: flex-end;
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+.composeur {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid #eef1f2;
+}
+
+.champ {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #dfe3e6;
+  border-radius: 999px;
+  background: #ffffff;
+  font: inherit;
+  color: inherit;
+}
+
+.champ:focus {
+  outline: 2px solid #2da7f3;
+  outline-offset: 1px;
+}
+
+.envoyer {
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: #111111;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.envoyer:disabled {
+  background: #c3cace;
+  cursor: default;
+}
+
+.vide {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: auto;
+  padding: 28px;
+  text-align: center;
+}
+
+.videTitre {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.videTexte {
+  color: #5c6b72;
+  font-size: 14px;
+}
+
+.erreur {
+  padding: 10px 16px;
+  color: #c0392b;
+  font-size: 14px;
+}
+
+@media (max-width: 899px) {
+  .messagerie {
+    grid-template-columns: 1fr;
+    height: calc(100vh - 170px);
+  }
+
+  .messagerie .discussion {
+    display: none;
+  }
+
+  .ouverte .liste {
+    display: none;
+  }
+
+  .ouverte .discussion {
+    display: flex;
+  }
+
+  .retour {
+    display: flex;
+  }
+
+  .bulle {
+    max-width: 84%;
+  }
+}
+
+.onglets {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  margin-bottom: 6px;
+  border-radius: 999px;
+  background: #f4f6f7;
+}
+
+.onglet {
+  flex: 1 1 0;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5c6b72;
+  cursor: pointer;
+}
+
+.ongletActif {
+  background: #ffffff;
+  color: #111111;
+  font-weight: 700;
+}
+
+a.onglet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,0 +1,123 @@
+.appel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid #e8eaec;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.titre {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.appelTexte {
+  color: #5c6b72;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lignes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.libelle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5c6b72;
+}
+
+.aide {
+  color: #5c6b72;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.champ input,
+.champ select {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #dfe3e6;
+  border-radius: 10px;
+  background: #ffffff;
+  font: inherit;
+  color: inherit;
+}
+
+.champ textarea {
+  padding: 10px 12px;
+  border: 1px solid #dfe3e6;
+  border-radius: 12px;
+  background: #ffffff;
+  font: inherit;
+  color: inherit;
+  resize: vertical;
+}
+
+.champ input:focus,
+.champ select:focus,
+.champ textarea:focus {
+  outline: 2px solid #2da7f3;
+  outline-offset: 1px;
+}
+
+.erreur {
+  color: #c0392b;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.boutonSombre,
+.boutonClair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  height: 44px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boutonSombre {
+  background: #111111;
+  color: #ffffff;
+}
+
+.boutonSombre:disabled {
+  background: #c3cace;
+  cursor: default;
+}
+
+.boutonClair {
+  border: 1px solid #dfe3e6;
+  background: #ffffff;
+  color: #111111;
+}

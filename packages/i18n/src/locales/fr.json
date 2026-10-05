@@ -29,6 +29,9 @@
     "availableWithBlockDates": "Disponiblité avec dates bloquées",
     "specificDates": "Dates précises",
     "retry": "Réessayer",
+    "loading": "Chargement…",
+    "signIn": "Se connecter",
+    "signInRequired": "Connectez-vous pour accéder à cette page.",
     "exchangeState": {
       "PENDING": "Demande en cours",
       "FUTURE": "Échange prévu",
@@ -36,6 +39,9 @@
     }
   },
   "profile": {
+    "nationality": "Nationalité",
+    "phone": "Téléphone",
+    "birthDate": "Date de naissance",
     "identityVerified": "Identite verifiee",
     "exchange": "Échange",
     "exchanges": "Échanges",
@@ -117,6 +123,7 @@
       "about": "À propos",
       "myData": "Mes données",
       "exportData": "Recevoir mes données",
+      "exportRequested": "Nous envoyons vos données à votre adresse e-mail, dans un fichier lisible par n'importe quel autre service. Comptez quelques minutes.",
       "exportSent": "Nous envoyons vos données à {{email}}, dans un fichier lisible par n’importe quel autre service. Comptez quelques minutes.",
       "dangerZone": "Zone dangereuse",
       "deleteAccount": "Supprimer mon compte",
@@ -467,6 +474,7 @@
     }
   },
   "auth": {
+    "passwordRules": "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre",
     "social": {
       "or": "ou",
       "google": "Continuer avec Google",
@@ -583,6 +591,7 @@
     "LoggingIn": "Connexion en cours..."
   },
   "home": {
+    "addPhoto": "Ajouter une photo",
     "defaultTitle": "Mon logement",
     "defaultTitleWithCity": "Logement à {{city}}",
     "notFound": "Logement introuvable",
@@ -618,6 +627,7 @@
     "hostSince": "Hôte depuis {{count}} ans",
     "editHomePage": "Page de modification du logement",
     "amenities": {
+      "parking": "Parking",
       "kitchen": "Cuisine",
       "garage": "Garage",
       "garden": "Jardin",
@@ -639,6 +649,8 @@
       "accessible": "Logement accessible"
     },
     "vehicule": {
+      "brand": "Marque",
+      "model": "Modèle",
       "exchangeAccepted": "Cet hôte échange sa voiture",
       "places": "Places",
       "numberOfPlaces": "Nombre de places non renseigné",
@@ -1136,6 +1148,9 @@
     ]
   },
   "subscription": {
+    "freeUntilLabel": "Accès libre jusqu’au",
+    "activeUntilLabel": "Actif jusqu’au",
+    "backFromPayment": "Nous enregistrons votre paiement. Si rien ne change ici, rafraîchissez la page dans quelques instants.",
     "title": "Abonnement",
     "subtitle": "Publier, explorer et discuter restent libres. L'abonnement ouvre les échanges.",
     "monthly": "Mensuel",
