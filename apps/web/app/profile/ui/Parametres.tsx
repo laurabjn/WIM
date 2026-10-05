@@ -325,6 +325,10 @@ export function Parametres() {
           {t('profile.settings.preferences')}
         </h2>
 
+        <Link href="/account/preferences" className={styles.ligneLien}>
+          {t('profile.settings.managePreferences')}
+        </Link>
+
         <label className={styles.ligne}>
           <span>{t('profile.settings.language')}</span>
 
