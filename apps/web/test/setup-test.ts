@@ -6,3 +6,9 @@ jest.mock('next-intl', () => ({
     return (key: string) => key;
   },
 }));
+
+jest.mock('next-intl/server', () => ({
+  getTranslations: async () => {
+    return (key: string) => key;
+  },
+}));

@@ -1,19 +1,20 @@
-import React from 'react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { ResetPasswordForm } from '../../auth/ui/resetPasswordForm';
 
-interface ResetPasswordPageProps {
-  searchParams: { token?: string };
-}
+type ResetPasswordPageProps = {
+  searchParams: Promise<{ token?: string }>;
+};
 
-export default function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
-    const token = searchParams.token;
-    const t = useTranslations('auth');
+export default async function ResetPasswordPage({
+  searchParams,
+}: ResetPasswordPageProps) {
+  const { token } = await searchParams;
+  const t = await getTranslations('auth');
 
   if (!token) {
     return (
       <main>
-        <p data-testid="missing-token-message">{t('missingToken')}</p>
+        <p data-testid="missing-token-message">{t('login.missingToken')}</p>
       </main>
     );
   }

@@ -6,7 +6,7 @@ import { HomeExploreSection } from 'app/home/ui/HomeExploreSection';
 
 export default async function MenuPage() {
   const t = await getTranslations();
-  const homes = await getPublicHomes();
+  const homes = await getPublicHomes().catch(() => []);
 
   return (
     <main className={styles.menuPage}>
