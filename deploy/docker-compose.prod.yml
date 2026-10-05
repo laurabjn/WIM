@@ -120,6 +120,47 @@ services:
       - wim_internal
       - wim_public
 
+  web:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile.prod
+      args:
+        # Figée dans le code livré au navigateur : la changer impose de
+        # reconstruire l'image, pas seulement de redémarrer le conteneur.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    image: wim-web:latest
+    container_name: wim_web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3000/',r=>process.exit(r.statusCode<400?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    ports:
+      # Même règle que l'API : publié sur la loopback seulement, c'est le nginx
+      # de l'hôte qui expose le site au public, en TLS.
+      - '127.0.0.1:${WEB_HOST_PORT:-3020}:3000'
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - wim_public
+
 volumes:
   wim_pg:
   wim_uploads:
