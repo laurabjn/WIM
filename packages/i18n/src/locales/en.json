@@ -1,5 +1,6 @@
 {
   "common": {
+    "specificDates": "Exact dates",
     "availabilityPeriodsTitle": "Availability periods",
     "appName": "World Is Mine",
     "continue": "Next",
@@ -38,6 +39,7 @@
     }
   },
   "auth": {
+    "LoggingIn": "Signing in...",
     "social": {
       "or": "or",
       "google": "Continue with Google",
@@ -154,6 +156,51 @@
     "genericError": "An error occurred"
   },
   "profile": {
+    "nationality": "Nationality",
+    "phone": "Phone",
+    "birthDate": "Date of birth",
+    "language": {
+      "english": "English",
+      "french": "French"
+    },
+    "essentialAmenities": {
+      "wifi": "Wi-Fi",
+      "parking": "Parking",
+      "kitchen": "Kitchen",
+      "tv": "TV",
+      "airConditioning": "Air conditioning",
+      "washingMachine": "Washing machine",
+      "balcony": "Balcony",
+      "workspace": "Workspace"
+    },
+    "homeType": {
+      "apartment": "Flat",
+      "house": "House",
+      "all": "Both"
+    },
+    "continent": {
+      "northAmerica": "North America",
+      "southAmerica": "South America",
+      "europe": "Europe",
+      "africa": "Africa",
+      "asia": "Asia",
+      "oceania": "Oceania"
+    },
+    "editProfile": {
+      "title": "Edit my profile",
+      "changePhoto": "Change photo",
+      "favoriteEnvironment": "Favourite settings",
+      "presentation": "About you",
+      "namePlaceholder": "Name",
+      "agePlaceholder": "Age",
+      "bioPlaceholder": "Biography",
+      "languages": "Languages spoken",
+      "searchLanguagePlaceholder": "Search for a language",
+      "savedTitle": "Profile",
+      "savedMessage": "Profile updated",
+      "errorTitle": "Error",
+      "errorMessage": "Your changes could not be saved"
+    },
     "identityVerified": "Identity verified",
     "exchange": "Exchange",
     "exchanges": "Exchanges",
@@ -183,22 +230,8 @@
     "confirmLogOut": "Are you sure you want to logout ?",
     "logOutCancel": "Cancel",
     "report": "Report this host",
-    "editprofile": {
-      "title": "Edit my profile",
-      "changePhoto": "Edit photo",
-      "favoriteEnvironment": "Favorite environment",
-      "presentation": "Presentation",
-      "namePlaceholder": "Name",
-      "agePlaceholder": "Age",
-      "bioPlaceholder": "Biography",
-      "languages": "Spoken languages",
-      "searchLanguagePlaceholder": "Search a language",
-      "savedTitle": "Profile",
-      "savedMessage": "Profile updated",
-      "errorTitle": "Error",
-      "errorMessage": "Unable to save changes"
-    },
     "settings": {
+      "helpCenter": "Help centre",
       "title": "Settings",
       "account": "Account",
       "notifications": "Notifications",
@@ -279,35 +312,11 @@
       "selectedItems": "selected item(s)",
       "regionSubtitle": "Select the cities and/or countries where you would like to do exchanges"
     },
-    "continents": {
-      "northAmerica": "North America",
-      "southAmerica": "South America",
-      "europe": "Europe",
-      "africa": "Africa",
-      "asia": "Asia",
-      "oceania": "Oceania"
-    },
-    "homeTypes": {
-      "apartment": "Apartment",
-      "house": "House",
-      "cabin": "Cabin",
-      "all": "Both"
-    },
     "season": {
       "spring": "Spring",
       "summer": "Summer",
       "autumn": "Autumn",
       "winter": "Winter"
-    },
-    "essentialEquipments": {
-      "wifi": "Wifi",
-      "parking": "Parking",
-      "kitchen": "Kitchen",
-      "tv": "TV",
-      "airConditioning": "Air conditioning",
-      "balcony": "Balcony",
-      "washingMachine": "Washing machine",
-      "workSpace": "Work space"
     },
     "environments": {
       "country": "Country",
@@ -323,10 +332,6 @@
       "1m": "1 month",
       "2m": "2 months",
       "3m": "3 months"
-    },
-    "languages": {
-      "english": "English",
-      "french": "French"
     },
     "helpScreen": {
       "title": "Get help",
@@ -585,6 +590,8 @@
     }
   },
   "home": {
+    "availableForExchange": "Available for exchange",
+    "availableForExchangeDescription": "Shows this home as available to other members.",
     "defaultTitle": "My home",
     "defaultTitleWithCity": "Home in {{city}}",
     "notFound": "Home not found",
@@ -620,6 +627,10 @@
     "hostSince": "Host since {{count}} years",
     "editHomePage": "Home edit page",
     "amenities": {
+      "garage": "Garage",
+      "pets": "Pets",
+      "workspace": "Workspace",
+      "accessible": "Accessible home",
       "wifi": "Wifi",
       "parking": "Parking",
       "kitchen": "Kitchen",
@@ -679,8 +690,6 @@
     "carExchangeAccepted": "Car exchange accepted",
     "carExchangeDescription": "Indicate whether you agree to have your vehicle exchanged for the accommodation.",
     "availabilityTitle": "Availability",
-    "availabilityForExchange": "Availability for exchange",
-    "availabilityForExchangeDescription": "Displays this accommodation as available to other users.",
     "pricePerNight": "Price per night",
     "nbExchanges": "number of exchanges",
     "available": "Available",

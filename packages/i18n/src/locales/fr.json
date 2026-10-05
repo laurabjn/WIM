@@ -39,6 +39,9 @@
     }
   },
   "profile": {
+    "nationality": "Nationalité",
+    "phone": "Téléphone",
+    "birthDate": "Date de naissance",
     "identityVerified": "Identite verifiee",
     "exchange": "Échange",
     "exchanges": "Échanges",
@@ -470,6 +473,7 @@
     }
   },
   "auth": {
+    "passwordRules": "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre",
     "social": {
       "or": "ou",
       "google": "Continuer avec Google",
@@ -621,6 +625,7 @@
     "hostSince": "Hôte depuis {{count}} ans",
     "editHomePage": "Page de modification du logement",
     "amenities": {
+      "parking": "Parking",
       "kitchen": "Cuisine",
       "garage": "Garage",
       "garden": "Jardin",
