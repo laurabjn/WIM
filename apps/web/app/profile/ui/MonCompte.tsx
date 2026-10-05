@@ -21,6 +21,7 @@ type Etat = 'chargement' | 'anonyme' | 'prete' | 'erreur';
 
 const RACCOURCIS = [
   { href: '/favorites', cle: 'profile.favorites' },
+  { href: '/notifications', cle: 'notifications.title' },
   { href: '/account/settings', cle: 'profile.parameters' },
   { href: '/subscription', cle: 'profile.settings.subscription' },
   { href: '/account/support', cle: 'profile.help' },

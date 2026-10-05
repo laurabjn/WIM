@@ -1,0 +1,124 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.etat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 60px 28px;
+  border: 1px dashed #d7dcdf;
+  border-radius: 18px;
+  text-align: center;
+  color: #5c6b72;
+}
+
+.videTitre {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.barre {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #e8eaec;
+  border-radius: 18px;
+  background: #ffffff;
+  list-style: none;
+}
+
+.entree {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 16px 20px;
+  border: 0;
+  border-bottom: 1px solid #eef1f2;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.entree:hover {
+  background: #f4f6f7;
+}
+
+.liste li:last-child .entree {
+  border-bottom: 0;
+}
+
+.entreeNonLue {
+  background: #f4fafe;
+}
+
+.textes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.entreeTitre {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.entreeCorps {
+  color: #5c6b72;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.date {
+  flex: 0 0 auto;
+  color: #9aa6ab;
+  font-size: 12px;
+}
+
+.boutonSombre,
+.boutonClair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boutonSombre {
+  background: #111111;
+  color: #ffffff;
+}
+
+.boutonClair {
+  border: 1px solid #dfe3e6;
+  background: #ffffff;
+  color: #111111;
+}
+
+.boutonClair:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

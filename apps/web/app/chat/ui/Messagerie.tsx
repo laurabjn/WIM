@@ -76,6 +76,7 @@ export function Messagerie() {
   const [chargementMessages, setChargementMessages] = useState(false);
   const [erreurMessages, setErreurMessages] = useState(false);
 
+  const [onglet, setOnglet] = useState<'messages' | 'demandes'>('messages');
   const [brouillon, setBrouillon] = useState('');
   const [envoi, setEnvoi] = useState(false);
   const [erreurEnvoi, setErreurEnvoi] = useState(false);
@@ -136,7 +137,8 @@ export function Messagerie() {
           return;
         }
 
-        const premiere = triees[0];
+        const premiere =
+          triees.find((conversation) => !conversation.isRequest) ?? triees[0];
 
         if (large && premiere) setActiveId(premiere.id);
       })
@@ -432,6 +434,12 @@ export function Messagerie() {
     (conversation) => conversation.id === activeId,
   );
 
+  const demandes = conversations.filter((conversation) => conversation.isRequest);
+  const discussions = conversations.filter(
+    (conversation) => !conversation.isRequest,
+  );
+  const visibles = onglet === 'demandes' ? demandes : discussions;
+
   const monDernier = [...messages]
     .reverse()
     .find((message) => message.senderId === moi);
@@ -446,13 +454,44 @@ export function Messagerie() {
       className={`${styles.messagerie} ${active ? styles.ouverte : ''}`.trim()}
     >
       <aside className={styles.liste}>
-        {conversations.length === 0 ? (
+        <div className={styles.onglets}>
+          <button
+            type="button"
+            className={`${styles.onglet} ${
+              onglet === 'messages' ? styles.ongletActif : ''
+            }`.trim()}
+            onClick={() => setOnglet('messages')}
+          >
+            {t('chat.tabMessages')}
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.onglet} ${
+              onglet === 'demandes' ? styles.ongletActif : ''
+            }`.trim()}
+            onClick={() => setOnglet('demandes')}
+          >
+            {t('chat.tabRequests')}
+
+            {demandes.length > 0 ? ` · ${demandes.length}` : ''}
+          </button>
+        </div>
+
+        {visibles.length === 0 ? (
           <div className={styles.vide}>
-            <p className={styles.videTitre}>{t('chat.empty')}</p>
-            <p className={styles.videTexte}>{t('chat.emptyDescription')}</p>
+            <p className={styles.videTitre}>
+              {onglet === 'demandes' ? t('chat.emptyRequests') : t('chat.empty')}
+            </p>
+
+            <p className={styles.videTexte}>
+              {onglet === 'demandes'
+                ? t('chat.emptyRequestsDescription')
+                : t('chat.emptyDescription')}
+            </p>
           </div>
         ) : (
-          conversations.map((conversation) => (
+          visibles.map((conversation) => (
             <button
               key={conversation.id}
               type="button"

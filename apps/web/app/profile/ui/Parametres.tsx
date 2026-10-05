@@ -271,6 +271,10 @@ export function Parametres() {
         </h2>
 
         {NOTIFICATIONS.map(bascule)}
+
+        <Link href="/notifications" className={styles.ligneLien}>
+          {t('notifications.title')}
+        </Link>
       </section>
 
       <section className={styles.bloc}>

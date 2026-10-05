@@ -363,3 +363,31 @@
     max-width: 84%;
   }
 }
+
+.onglets {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  margin-bottom: 6px;
+  border-radius: 999px;
+  background: #f4f6f7;
+}
+
+.onglet {
+  flex: 1 1 0;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5c6b72;
+  cursor: pointer;
+}
+
+.ongletActif {
+  background: #ffffff;
+  color: #111111;
+  font-weight: 700;
+}
