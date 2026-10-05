@@ -26,6 +26,7 @@ import { UpdateHomeUseCase } from 'src/application/home/use-cases/update-home.us
 import { CreateHomeDto } from '../dtos/create-home.dto';
 import { UpdateHomeDto } from '../dtos/home/update-home.dto';
 import { IdentiteVerifiee, JwtAuthGuard } from '../jwt-auth.guard';
+import { JwtOptionnelGuard } from '../jwt-optionnel.guard';
 import { SubscriptionService } from 'src/application/subscription/subscription.service';
 import { ListPublicHomesUseCase } from 'src/application/home/use-cases/list-public-home.usecase';
 import { RemoveFavoriteUseCase } from 'src/application/favorite/use-case/remove-favorite.usecae';
@@ -119,10 +120,10 @@ export class HomeController {
   }
   
   @Get('search')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtOptionnelGuard)
   searchHomes(@Req() req, @Query() query: SearchHomesDto) {
     return this.searchHomesUseCase.execute({
-      userId: req.user.sub,
+      userId: req.user?.sub,
       ...query,
     });
   }
@@ -150,7 +151,7 @@ export class HomeController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtOptionnelGuard)
   getById(@Req() req: any, @Param('id') id: string) {
     return this.getHomeByIdUseCase.execute(id, req.user?.sub);
   }

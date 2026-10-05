@@ -27,10 +27,12 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
     const homes = await this.prisma.home.findMany({
       where: {
         owner: { profileVisible: true },
-        ownerId: {
-          not: userId,
-          notIn: await this.hiddenOwnerIds(userId),
-        },
+        ownerId: userId
+          ? {
+              not: userId,
+              notIn: await this.hiddenOwnerIds(userId),
+            }
+          : undefined,
 
         city: city
           ? {
@@ -101,10 +103,12 @@ export class HomeSearchPrismaRepository implements HomeSearchRepository {
           },
         },
 
-        favorites: {
-          where: { userId },
-          select: { id: true },
-        },
+        favorites: userId
+          ? {
+              where: { userId },
+              select: { id: true },
+            }
+          : false,
       },
 
       orderBy: {

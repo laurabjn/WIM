@@ -1,7 +1,7 @@
 export type HomeCategory = 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';
 
 export type SearchHomesFilters = {
-  userId: string;
+  userId?: string;
   city?: string;
   country?: string;
   capacity?: number;
