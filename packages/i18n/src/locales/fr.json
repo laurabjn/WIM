@@ -29,6 +29,9 @@
     "availableWithBlockDates": "Disponiblité avec dates bloquées",
     "specificDates": "Dates précises",
     "retry": "Réessayer",
+    "loading": "Chargement…",
+    "signIn": "Se connecter",
+    "signInRequired": "Connectez-vous pour accéder à cette page.",
     "exchangeState": {
       "PENDING": "Demande en cours",
       "FUTURE": "Échange prévu",

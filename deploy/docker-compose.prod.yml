@@ -133,6 +133,9 @@ services:
         # Figée dans le code livré au navigateur : la changer impose de
         # reconstruire l'image, pas seulement de redémarrer le conteneur.
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        # Doit valoir le WS_NAMESPACE de l’API : la messagerie du site ouvre
+        # le socket sur ce chemin.
+        NEXT_PUBLIC_WS_NAMESPACE: ${WS_NAMESPACE:-/ws}
     image: wim-web:latest
     container_name: wim_web
     restart: unless-stopped

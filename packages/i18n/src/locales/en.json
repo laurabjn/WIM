@@ -28,6 +28,9 @@
     "available": "Available",
     "availableWithBlockDates": "Available with blocked dates",
     "retry": "Try again",
+    "loading": "Loading…",
+    "signIn": "Sign in",
+    "signInRequired": "Sign in to access this page.",
     "exchangeState": {
       "PENDING": "Request pending",
       "FUTURE": "Exchange planned",
