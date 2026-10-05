@@ -127,32 +127,6 @@
   font-weight: 600;
 }
 
-.appel {
-  margin-top: 44px;
-  padding: 28px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #52d1a6, #2da7f3);
-  color: #ffffff;
-  text-align: center;
-}
-
-.appelTexte {
-  margin: 0 0 18px;
-  font-size: 17px;
-  line-height: 1.5;
-  font-weight: 600;
-}
-
-.appelBouton {
-  display: inline-block;
-  padding: 14px 28px;
-  border-radius: 999px;
-  background: #ffffff;
-  color: #10243a;
-  font-weight: 700;
-  text-decoration: none;
-}
-
 @media (max-width: 760px) {
   .galerie {
     grid-template-columns: 1fr;

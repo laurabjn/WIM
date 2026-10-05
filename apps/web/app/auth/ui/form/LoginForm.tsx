@@ -60,7 +60,7 @@ export const LoginForm: React.FC<Props> = ({
   return (
     <div className={styles.page}>
       <div className={styles.container}>       
-            <div className={styles.conterSection}>
+            <div className={styles.centerBlock}>
               <div className={styles.logo}>
                   <Image src="/logo.jpg" alt="Wim" width={42} height={42} />
               </div>

@@ -15,7 +15,6 @@ export async function uploadProfileImage(file: File): Promise<string> {
   );
 
   const data = await response.json().catch(() => ({}));
-  console.log('Upload API response:', { status: response.status, data });
 
   if (!response.ok) {
     throw new Error(data?.message || 'Failed to upload profile image');
