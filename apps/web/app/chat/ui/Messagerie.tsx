@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import type { Socket } from 'socket.io-client';
@@ -58,6 +59,8 @@ function parRecence(liste: MyChatListItem[]) {
 export function Messagerie() {
   const t = useTranslations();
   const locale = useLocale();
+  const parametres = useSearchParams();
+  const demande = parametres.get('chat');
 
   const [etat, setEtat] = useState<Etat>('chargement');
   const [token, setToken] = useState<string | null>(null);
@@ -122,6 +125,16 @@ export function Messagerie() {
           typeof window !== 'undefined' &&
           window.matchMedia('(min-width: 900px)').matches;
 
+        const demandee = triees.find(
+          (conversation) => conversation.id === demande,
+        );
+
+        if (demandee) {
+          setActiveId(demandee.id);
+
+          return;
+        }
+
         const premiere = triees[0];
 
         if (large && premiere) setActiveId(premiere.id);
@@ -161,7 +174,7 @@ export function Messagerie() {
       lien.current = null;
       disconnectChatSocket();
     };
-  }, []);
+  }, [demande]);
 
   useEffect(() => {
     if (!token || !activeId) return;
