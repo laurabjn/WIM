@@ -10,6 +10,14 @@ export default [
     },
   },
   {
+    files: ["*.config.js", "*.config.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     files: ["**/*.cjs", "test/**/*.js"],
     languageOptions: {
       sourceType: "commonjs",
