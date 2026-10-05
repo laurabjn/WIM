@@ -35,6 +35,11 @@ export async function HomeDetail({ home, locale }: Props) {
   const voyageurs =
     home.capacity > 1 ? t('home.travelers') : t('home.traveler');
 
+  const lits = home.beds > 1 ? t('profile.beds') : t('profile.bed');
+
+  const sallesDeBain =
+    home.bathrooms > 1 ? t('profile.bathrooms') : t('profile.bathroom');
+
   return (
     <article className={styles.fiche}>
       {couverture ? (
@@ -75,8 +80,8 @@ export async function HomeDetail({ home, locale }: Props) {
         </p>
 
         <p className={styles.caracteristiques}>
-          {home.capacity} {voyageurs} · {home.beds} {t('home.beds')} ·{' '}
-          {home.bathrooms} {t('home.bathrooms')}
+          {home.capacity} {voyageurs} · {home.beds} {lits} ·{' '}
+          {home.bathrooms} {sallesDeBain}
         </p>
 
         {typeof home.averageRating === 'number' ? (
