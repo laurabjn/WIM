@@ -391,3 +391,9 @@
   color: #111111;
   font-weight: 700;
 }
+
+a.onglet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

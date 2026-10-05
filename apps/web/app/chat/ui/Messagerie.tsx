@@ -476,6 +476,10 @@ export function Messagerie() {
 
             {demandes.length > 0 ? ` · ${demandes.length}` : ''}
           </button>
+
+          <Link href="/matches" className={styles.onglet}>
+            {t('chat.matches')}
+          </Link>
         </div>
 
         {visibles.length === 0 ? (

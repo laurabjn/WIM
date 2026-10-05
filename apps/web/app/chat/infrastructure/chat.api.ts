@@ -129,3 +129,32 @@ export async function getUnreadCount(
 
   return lireReponse(response);
 }
+
+export type MatchItem = {
+  id: string;
+  status: string;
+  createdAt: string;
+  chatId: string | null;
+  hasMessages: boolean;
+  user: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    avatarUrl: string | null;
+    country: string | null;
+  };
+};
+
+export async function getMyMatches(token: string): Promise<MatchItem[]> {
+  const response = await fetch(`${API_URL}/matches/me`, {
+    headers: entetes(token),
+    cache: 'no-store',
+  });
+
+  const data: MatchItem[] = await lireReponse(response);
+
+  return data.map((match) => ({
+    ...match,
+    user: { ...match.user, avatarUrl: resoudreFichier(match.user.avatarUrl) },
+  }));
+}
