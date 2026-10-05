@@ -19,7 +19,6 @@ export async function registerUserApi(payload: RegisterUserPayload): Promise<Reg
   });
 
   const data = await response.json().catch(() => ({}));
-  // console.log('API response:', { status: response.status, data });
 
   if (!response.ok) {
     const message = data?.message || 'Registration failed';
@@ -43,7 +42,6 @@ export async function loginUserApi(payload: { email: string; password: string })
   });
 
   const data = await response.json().catch(() => ({}));
-  console.log('API response:', { status: response.status, data });
 
   if (!response.ok) {
     const message = data?.message || 'Login failed';
@@ -67,7 +65,6 @@ export async function requestPasswordResetApi(
   });
 
   const data = await response.json().catch(() => ({}));
-  console.log('API response:', { status: response.status, data });
 
   if (!response.ok) {
     const message = data?.message || 'Failed to request password reset';
@@ -87,7 +84,6 @@ export async function resetPasswordApi(payload: {
   });
 
   const data = await response.json().catch(() => ({}));
-  console.log('API response:', { status: response.status, data });
   if (!response.ok) {
     const message = data?.message || 'Failed to reset password';
     throw new Error(message);

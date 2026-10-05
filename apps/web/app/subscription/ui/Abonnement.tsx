@@ -24,7 +24,7 @@ import styles from './Abonnement.module.css';
 
 type Etat = 'chargement' | 'anonyme' | 'prete' | 'erreur';
 
-const PLANS: PlanAbonnement[] = ['YEARLY', 'MONTHLY'];
+const PLANS: PlanAbonnement[] = ['YEARLY'];
 
 const LIBELLES: Record<PlanAbonnement, { nom: string; aide: string }> = {
   YEARLY: { nom: 'subscription.yearly', aide: 'subscription.yearlyHint' },

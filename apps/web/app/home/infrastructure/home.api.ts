@@ -103,7 +103,7 @@ export async function addFavoriteHome(
   token: string,
   homeId: string,
 ): Promise<void> {
-  const response = await fetch(`${API_URL}/homes/${homeId}/favorite`, {
+  const response = await fetch(`${API_URL}/favorites/${homeId}`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -120,7 +120,7 @@ export async function removeFavoriteHome(
   token: string,
   homeId: string,
 ): Promise<void> {
-  const response = await fetch(`${API_URL}/homes/${homeId}/favorite`, {
+  const response = await fetch(`${API_URL}/favorites/${homeId}`, {
     method: 'DELETE',
     headers: {
       Authorization: `Bearer ${token}`,
