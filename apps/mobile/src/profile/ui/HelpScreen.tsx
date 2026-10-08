@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ActivityIndicator,
   Alert,
@@ -248,7 +247,6 @@ export function HelpScreen({ navigation }: Props) {
           </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
-      <VoileDePage />
     </SafeAreaView>
   );
 }

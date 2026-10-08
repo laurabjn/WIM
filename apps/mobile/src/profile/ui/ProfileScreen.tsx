@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ScrollView,
   StyleSheet,
@@ -197,7 +196,6 @@ export const ProfileScreen: React.FC<Props> = ({ navigation, setIsAuthenticated,
         </View>
         </View>
       </ScrollView>
-      <VoileDePage />
     </SafeAreaView>
   );
 }

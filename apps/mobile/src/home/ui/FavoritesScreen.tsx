@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ActivityIndicator,
   ScrollView,
@@ -205,7 +204,6 @@ export function FavoritesScreen({ navigation }: Props) {
           ))
         )}
       </ScrollView>
-      <VoileDePage />
     </SafeAreaView>
   );
 }

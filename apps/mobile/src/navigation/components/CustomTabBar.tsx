@@ -7,9 +7,13 @@ import {
 } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
+
+const HAUTEUR_PILULE = 72;
+const FONDU = 40;
 
 type Props = BottomTabBarProps & { unreadCount?: number };
 
@@ -56,6 +60,12 @@ export function CustomTabBar({
 
   return (
     <View style={styles.safeArea}>
+      <LinearGradient
+        pointerEvents="none"
+        colors={[`${themeColors.surface}00`, themeColors.surface]}
+        style={[styles.voile, { height: HAUTEUR_PILULE + insets.bottom + FONDU }]}
+      />
+
       <View style={[styles.outer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         <View style={styles.inner}>
           <TouchableOpacity
@@ -145,6 +155,13 @@ export function CustomTabBar({
 
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
+  voile: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+
   safeArea: {
     position: 'absolute',
     left: 0,

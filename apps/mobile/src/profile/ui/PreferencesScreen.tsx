@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ScrollView,
   StyleSheet,
@@ -351,7 +350,6 @@ export function PreferencesScreen({ route, navigation }: Props) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <VoileDePage />
     </SafeAreaView>
   );
 }
