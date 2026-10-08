@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import {
   ActivityIndicator,
   Alert,
@@ -248,7 +247,6 @@ export const ProfilePublicScreen: React.FC<Props> = ({ route, navigation }) => {
           </View>
         </TouchableOpacity>
       </Modal>
-      <VoileDePage />
     </SafeAreaView>
   );
 }

@@ -565,7 +565,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
           />
         </SettingsSection>
       </ScrollView>
-      <VoileDePage haut />
+      <VoileDePage haut bas={false} />
     </SafeAreaView>
   );
 }
