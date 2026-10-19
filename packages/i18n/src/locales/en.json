@@ -591,6 +591,7 @@
     }
   },
   "home": {
+    "shareInvitation": "Discover this home on WIM ✨",
     "addPhoto": "Add a photo",
     "availableForExchange": "Available for exchange",
     "availableForExchangeDescription": "Shows this home as available to other members.",

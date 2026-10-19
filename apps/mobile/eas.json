@@ -25,7 +25,8 @@
       "environment": "preview",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api",
-        "EXPO_PUBLIC_ENVIRONNEMENT": "preview"
+        "EXPO_PUBLIC_ENVIRONNEMENT": "preview",
+        "EXPO_PUBLIC_APP_URL": "https://app.worldismine.fr"
       }
     },
     "preview-simulator": {
@@ -36,7 +37,8 @@
       "environment": "preview",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api",
-        "EXPO_PUBLIC_ENVIRONNEMENT": "preview"
+        "EXPO_PUBLIC_ENVIRONNEMENT": "preview",
+        "EXPO_PUBLIC_APP_URL": "https://app.worldismine.fr"
       }
     },
     "production": {
@@ -44,7 +46,8 @@
       "environment": "production",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api",
-        "EXPO_PUBLIC_ENVIRONNEMENT": "production"
+        "EXPO_PUBLIC_ENVIRONNEMENT": "production",
+        "EXPO_PUBLIC_APP_URL": "https://app.worldismine.fr"
       }
     }
   },
