@@ -15,6 +15,7 @@
   "dependencies": {
     "@react-navigation/native-stack": "^7.14.4",
     "@repo/ui": "*",
+    "@sentry/nextjs": "^10.76.2",
     "@tailwindcss/postcss": "^4.2.2",
     "next": "16.1.5",
     "next-intl": "^4.8.3",

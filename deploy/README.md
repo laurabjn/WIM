@@ -678,6 +678,55 @@ Vérifier depuis un poste :
 
 ## Remontee des erreurs (Sentry)
 
+Trois briques envoient a Sentry, chacune avec sa propre adresse : elles peuvent
+viser un seul projet ou trois projets distincts, c'est l'adresse qui decide.
+
+| Brique | Variable | Nature |
+| --- | --- | --- |
+| Application mobile | `EXPO_PUBLIC_SENTRY_DSN` | part dans le bundle, pas secrete |
+| API | `SENTRY_DSN` | reste cote serveur |
+| Site web | `NEXT_PUBLIC_SENTRY_DSN` | part dans le navigateur, figee a la construction |
+
+Laisser une variable vide suffit a eteindre la brique correspondante : le code
+verifie la presence de l'adresse avant d'initialiser quoi que ce soit.
+
+Aucune des trois n'envoie de donnees personnelles. `sendDefaultPii` est a
+`false`, et un `beforeSend` retire en plus l'en-tete d'autorisation, les
+cookies et le corps de la requete. Il ne reste que la route, la pile d'appels
+et, le cas echeant, l'identifiant du compte.
+
+### Ce qui remonte, et ce qui ne remonte pas
+
+Cote API, deux filtres se partagent le travail, et **leur ordre de declaration
+compte** : Nest consulte les filtres globaux dans l'ordre inverse de leur
+declaration dans `AppModule`. `SentryGlobalFilter` est donc declare en
+premier pour etre consulte en dernier, et `DomainExceptionFilter` en dernier
+pour etre consulte en premier. Les inverser rend le premier muet, parce qu'il
+attrape tout.
+
+`DomainExceptionFilter` traduit les erreurs du domaine en codes HTTP :
+logement introuvable en 404, acces refuse en 403, compte deja pris en 409, et
+ainsi de suite. Ces reponses sont des issues normales, pas des incidents, donc
+elles n'alertent personne. Sans ce filtre elles remontaient toutes en 500 — un
+simple identifiant errone dans une adresse aurait suffi a noyer Sentry.
+
+Tout le reste, une base injoignable par exemple, part en 500 et declenche une
+alerte.
+
+### Piles d'appels lisibles cote site
+
+Le trio `SENTRY_ORG`, `SENTRY_PROJECT` et `SENTRY_AUTH_TOKEN` sert
+uniquement a televerser les fichiers de correspondance pendant la construction
+de l'image web. Sans lui l'image se construit quand meme, les piles restent
+seulement minifiees. Le jeton est un vrai secret : il donne le droit d'ecrire
+dans le projet Sentry.
+
+Comme ces valeurs sont lues a la construction, les changer impose un
+`up -d --build web`, pas un simple redemarrage.
+
+### Application mobile
+
+
 L'application envoie a Sentry le detail technique des pannes, et rien d'autre.
 Deux variables la gouvernent, de natures opposees.
 

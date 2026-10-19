@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
+import { DomainExceptionFilter } from './interfaces/http/domain-exception.filter';
 import { ReviewModule } from './interfaces/http/modules/review.module';
 import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from './interfaces/http/modules/http.module';
@@ -22,6 +25,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ScheduleModule.forRoot(),
     HttpModule,
     ConfigModule.forRoot({
@@ -45,6 +49,16 @@ import { ScheduleModule } from '@nestjs/schedule';
     ReviewModule,
     HealthModule,
     ModerationModule
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: DomainExceptionFilter,
+    },
   ],
 })
 export class AppModule {}
