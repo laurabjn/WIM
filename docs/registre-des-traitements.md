@@ -168,7 +168,7 @@ Aucune lettre d'information ni courriel commercial n'est envoyé.
 
 ---
 
-## Traitement n° 9 — Diagnostic des pannes
+## Traitement n° 9 — Diagnostic des pannes de l'application mobile
 
 **Finalité.** Comprendre et corriger les défauts de l'application.
 
@@ -185,6 +185,32 @@ ni la saisie en cours.
 
 ---
 
+## Traitement n° 10 — Diagnostic des pannes de l'API et du site
+
+**Finalité.** Savoir qu'une panne a lieu, et où, sans attendre qu'un membre la
+signale.
+
+**Base légale.** **Intérêt légitime** — et non le consentement, contrairement
+au traitement n° 9. La distinction tient à ce qui est transmis : rien ici ne
+désigne une personne.
+
+**Données.** La route appelée et la pile d'appels. Pas d'identifiant de compte,
+pas d'adresse IP, pas d'en-tête d'autorisation, pas de cookie, pas de corps de
+requête : le code les retire avant l'envoi, et le réglage `sendDefaultPii` est
+à `false`. Une adresse de page peut contenir un identifiant de logement ou de
+compte lorsqu'il figure dans l'URL.
+
+**Sous-traitant.** Sentry, région européenne.
+
+**Durée.** Selon la rétention de Sentry, **[à vérifier dans le plan retenu]**.
+
+**À faire confirmer.** La qualification en intérêt légitime repose sur
+l'absence de donnée désignant une personne. Elle demande une relecture
+juridique, surtout si un identifiant devait un jour être rattaché aux rapports
+pour faciliter le support.
+
+---
+
 ## Les sous-traitants
 
 | Sous-traitant | Ce qu'il reçoit | Hébergement | Contrat |
@@ -195,7 +221,7 @@ ni la saisie en cours.
 | DeepL | Le texte des messages à traduire | Allemagne | — |
 | Mapbox | Adresses recherchées et coordonnées | États-Unis | Clauses contractuelles types |
 | Expo / Google Firebase | Identifiant technique de l'appareil | États-Unis | Clauses contractuelles types |
-| Sentry | Détail technique d'une panne | **[à vérifier : UE ou États-Unis selon le plan]** | Clauses contractuelles types |
+| Sentry | Détail technique d'une panne | Union européenne (Allemagne) | Clauses contractuelles types |
 | Google et Apple | Identifiant de connexion, si ce mode est choisi | États-Unis | Clauses contractuelles types |
 
 Les transferts hors Union européenne s'appuient sur les clauses contractuelles
