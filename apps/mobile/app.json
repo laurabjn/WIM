@@ -21,7 +21,10 @@
       "bundleIdentifier": "com.wim.mobile",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "associatedDomains": [
+        "applinks:app.worldismine.fr"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -41,6 +44,31 @@
               "scheme": "https",
               "host": "worldismine.fr",
               "pathPrefix": "/verification-identite"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "app.worldismine.fr",
+              "pathPrefix": "/homes"
+            },
+            {
+              "scheme": "https",
+              "host": "app.worldismine.fr",
+              "pathPrefix": "/fr/homes"
+            },
+            {
+              "scheme": "https",
+              "host": "app.worldismine.fr",
+              "pathPrefix": "/en/homes"
             }
           ],
           "category": [

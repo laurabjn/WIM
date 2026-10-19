@@ -2,6 +2,7 @@
   "$schema": "https://turborepo.dev/schema.json",
   "globalEnv": [
     "ADMIN_EMAIL",
+    "ANDROID_CERT_SHA256",
     "APPLE_CLIENT_IDS",
     "CORS_ORIGINS",
     "DATABASE_URL",

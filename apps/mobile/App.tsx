@@ -11,6 +11,7 @@ import { enableScreens } from 'react-native-screens';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootNavigator } from 'src/navigation/rootNavigator';
+import { liens } from 'src/navigation/liens';
 import { ThemeProvider, useAppTheme } from 'src/theme/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
 import { demarrerLaRemonteeDesErreurs } from 'src/observabilite/sentry';
@@ -65,7 +66,11 @@ function Coquille({
   };
 
   return (
-    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
+    <NavigationContainer
+      ref={navigationRef}
+      theme={navigationTheme}
+      linking={liens}
+    >
       <StatusBar style={isDark ? 'light' : 'dark'} />
 
       <RootNavigator

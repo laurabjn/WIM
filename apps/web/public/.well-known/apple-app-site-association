@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["FZZSP56486.com.wim.mobile"],
+        "components": [
+          { "/": "/homes/*", "comment": "Fiche d'un logement" },
+          { "/": "/fr/homes/*", "comment": "Fiche d'un logement, en francais" },
+          { "/": "/en/homes/*", "comment": "Fiche d'un logement, en anglais" }
+        ]
+      }
+    ]
+  }
+}
