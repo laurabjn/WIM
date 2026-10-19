@@ -7,6 +7,7 @@ import {
 } from '../infrastructure/review.api';
 import { usePendingStayReview } from '../infrastructure/hooks/usePendingStayReview';
 import React, { useEffect, useState, useMemo } from 'react';
+import { lienDuLogement } from 'src/config/api';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
@@ -171,15 +172,16 @@ export const HomeDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   async function handleShare() {
     if (!home) return;
 
+    const lien = lienDuLogement(home.id);
+
     try {
       await Share.share({
         title: home.title,
         message:
           `🏡 ${home.title}\n\n` +
           `${home.city}, ${home.country}\n\n` +
-          `${home.description}\n\n` +
-          `Découvre ce logement sur WIM ✨`,
-        url: home.photos?.[0]?.url,
+          `${t('home:shareInvitation')}\n${lien}`,
+        url: lien,
       });
     } catch (error) {
       console.log('Share error:', error);
