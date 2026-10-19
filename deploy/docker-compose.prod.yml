@@ -151,6 +151,9 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      # Lue a chaque requete sur /.well-known/assetlinks.json : la renseigner ne
+      # demande donc pas de reconstruire l image, juste de recreer le conteneur.
+      ANDROID_CERT_SHA256: ${ANDROID_CERT_SHA256:-}
     healthcheck:
       test:
         [

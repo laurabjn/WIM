@@ -46,6 +46,27 @@ const nextConfig = {
   // du paquet le resout, et c'est de toute facon la place d'un paquet qui
   // touche aux entrailles de Node.
   serverExternalPackages: ['@sentry/nextjs'],
+  // Le fichier d'association Apple n'a pas d'extension : sans cet en-tete Next
+  // le sert en application/octet-stream et Apple le refuse.
+  // Android lit /.well-known/assetlinks.json, mais un dossier commencant par un
+  // point n'est pas un segment de route valide : la reecriture renvoie vers une
+  // route qui construit le fichier a partir de l'empreinte de signature.
+  async rewrites() {
+    return [
+      {
+        source: '/.well-known/assetlinks.json',
+        destination: '/api/assetlinks',
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/.well-known/apple-app-site-association',
+        headers: [{ key: 'Content-Type', value: 'application/json' }],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       ...enDeveloppement,
