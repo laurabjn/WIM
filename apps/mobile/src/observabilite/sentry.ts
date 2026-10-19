@@ -2,6 +2,10 @@ import * as Sentry from '@sentry/react-native';
 
 const ADRESSE = process.env.EXPO_PUBLIC_SENTRY_DSN;
 
+const ENVIRONNEMENT =
+  process.env.EXPO_PUBLIC_ENVIRONNEMENT ??
+  (__DEV__ ? 'development' : 'production');
+
 export const remonteeActive = Boolean(ADRESSE);
 
 let partageAutorise = true;
@@ -20,7 +24,7 @@ export function demarrerLaRemonteeDesErreurs(): void {
     enableAutoPerformanceTracing: false,
     attachScreenshot: false,
     attachViewHierarchy: false,
-    environment: __DEV__ ? 'development' : 'production',
+    environment: ENVIRONNEMENT,
     beforeSend(evenement) {
       if (!partageAutorise) return null;
 

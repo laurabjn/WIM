@@ -100,7 +100,8 @@
         "@sentry/react-native",
         {
           "organization": "laurabjn",
-          "project": "wim"
+          "project": "wim",
+          "url": "https://de.sentry.io/"
         }
       ]
     ],

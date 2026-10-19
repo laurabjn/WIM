@@ -9,6 +9,9 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_ENVIRONNEMENT": "development"
       }
     },
     "preview": {
@@ -21,7 +24,8 @@
       },
       "environment": "preview",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api"
+        "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api",
+        "EXPO_PUBLIC_ENVIRONNEMENT": "preview"
       }
     },
     "preview-simulator": {
@@ -31,14 +35,16 @@
       },
       "environment": "preview",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api"
+        "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api",
+        "EXPO_PUBLIC_ENVIRONNEMENT": "preview"
       }
     },
     "production": {
       "autoIncrement": true,
       "environment": "production",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api"
+        "EXPO_PUBLIC_API_URL": "https://api.worldismine.fr/api",
+        "EXPO_PUBLIC_ENVIRONNEMENT": "production"
       }
     }
   },
