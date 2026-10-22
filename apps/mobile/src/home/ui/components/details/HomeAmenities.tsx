@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { MARGE_DE_PAGE } from 'src/shared/ui/dimensions';
 import {
   StyleSheet,
   Text,
@@ -186,7 +187,7 @@ export function HomeAmenities({
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
   section: {
-    paddingHorizontal: 18,
+    paddingHorizontal: MARGE_DE_PAGE,
   },
 
   sectionTitle: {

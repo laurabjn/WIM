@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { MARGE_DE_PAGE } from 'src/shared/ui/dimensions';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useThemeColors } from 'src/theme/ThemeContext';
@@ -27,7 +28,7 @@ export function HomeDescription({ description }: Props) {
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
   section: {
-    paddingHorizontal: 18,
+    paddingHorizontal: MARGE_DE_PAGE,
     marginTop: 18,
   },
   sectionTitle: {
