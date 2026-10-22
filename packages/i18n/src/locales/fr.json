@@ -591,6 +591,13 @@
     "LoggingIn": "Connexion en cours..."
   },
   "home": {
+    "editTabs": {
+      "general": "Général",
+      "details": "Détails",
+      "amenities": "Équipements",
+      "rules": "Règles",
+      "availability": "Disponibilité"
+    },
     "shareInvitation": "Découvre ce logement sur WIM ✨",
     "addPhoto": "Ajouter une photo",
     "defaultTitle": "Mon logement",

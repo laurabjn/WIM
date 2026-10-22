@@ -1,4 +1,5 @@
 import { Home } from '@wim/shared/home/home.type';
+import { MARGE_DE_PAGE } from 'src/shared/ui/dimensions';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +47,7 @@ export function HomeSummary({ home, onPressReviews }: Props) {
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
   content: {
-    paddingHorizontal: 18,
+    paddingHorizontal: MARGE_DE_PAGE,
     paddingTop: 18,
     alignItems: 'center',
   },

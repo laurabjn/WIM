@@ -1,4 +1,5 @@
 import { HomeOwner } from '@wim/shared/home/home.type';
+import { MARGE_DE_PAGE } from 'src/shared/ui/dimensions';
 import { BadgeVerifie } from 'src/shared/ui/BadgeVerifie';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +61,7 @@ const createStyles = (c: ThemeColors) =>
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 18,
+    paddingHorizontal: MARGE_DE_PAGE,
   },
 
   avatar: {

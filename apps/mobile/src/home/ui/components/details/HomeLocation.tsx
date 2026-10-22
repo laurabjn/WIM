@@ -1,4 +1,5 @@
 import { Home } from '@wim/shared/home/home.type';
+import { MARGE_DE_PAGE } from 'src/shared/ui/dimensions';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +43,7 @@ export function HomeLocation({ home }: Props) {
 const createStyles = (c: ThemeColors) =>
   StyleSheet.create({
   section: {
-    paddingHorizontal: 18,
+    paddingHorizontal: MARGE_DE_PAGE,
   },
   sectionTitle: {
     fontSize: 17,

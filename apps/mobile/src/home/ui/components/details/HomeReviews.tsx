@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { MARGE_DE_PAGE } from 'src/shared/ui/dimensions';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Review } from '@wim/shared';
@@ -272,7 +273,7 @@ const createStyles = (c: ThemeColors) =>
     color: c.danger,
   },
   section: {
-    paddingHorizontal: 18,
+    paddingHorizontal: MARGE_DE_PAGE,
     paddingBottom: 28,
   },
 
