@@ -591,6 +591,13 @@
     }
   },
   "home": {
+    "editTabs": {
+      "general": "General",
+      "details": "Details",
+      "amenities": "Amenities",
+      "rules": "Rules",
+      "availability": "Availability"
+    },
     "shareInvitation": "Discover this home on WIM ✨",
     "addPhoto": "Add a photo",
     "availableForExchange": "Available for exchange",

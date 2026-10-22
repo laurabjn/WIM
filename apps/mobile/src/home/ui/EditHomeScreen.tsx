@@ -43,7 +43,13 @@ import type { ThemeColors } from 'src/theme/colors';
 
 type Props = NativeStackScreenProps<HomesStackParamList, 'EditHome'>;
 
-const tabs = ['Général', 'Détails', 'Équipements', 'Règles', 'Disponibilité'];
+const CLES_ONGLETS = [
+  'general',
+  'details',
+  'amenities',
+  'rules',
+  'availability',
+] as const;
 
 export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation("home");
@@ -59,7 +65,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   }, [isCreating, navigation]);
     
-  const [activeTab, setActiveTab] = useState('Général');
+  const [activeTab, setActiveTab] = useState<string>('general');
   const [home, setHome] = useState<Home | null>(null);
 
   const [title, setTitle] = useState('');
@@ -281,12 +287,15 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
         </View>
               
         <HomeTabs
-          tabs={tabs}
+          tabs={CLES_ONGLETS.map((cle) => ({
+            cle,
+            libelle: t(`editTabs.${cle}`),
+          }))}
           activeTab={activeTab}
           onChange={setActiveTab}
         />
 
-        {activeTab === 'Général' && (
+        {activeTab === 'general' && (
           <EditHomeGeneralTab
             title={title}
             description={description}
@@ -302,7 +311,7 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
           />
         )}
 
-        {activeTab === 'Détails' && (
+        {activeTab === 'details' && (
           <EditHomeDetailsTab
             capacity={capacity}
             beds={beds}
@@ -317,21 +326,21 @@ export const EditHomeScreen: React.FC<Props> = ({ navigation, route }) => {
           />
         )}
 
-        {activeTab === 'Équipements' && (
+        {activeTab === 'amenities' && (
           <EditHomeAmenitiesTab
             amenities={amenities}
             onChangeAmenities={setAmenities}
           />
         )}
 
-        {activeTab === 'Règles' && (
+        {activeTab === 'rules' && (
           <EditHomeRulesTab
             carExchangeAccepted={carExchangeAccepted}
             onChangeCarExchangeAccepted={setCarExchangeAccepted}
           />
         )}
 
-        {activeTab === 'Disponibilité' && (
+        {activeTab === 'availability' && (
           <EditHomeAvailabilityTab
             availabilities={availabilities}
             onAddAvailability={async (start, end) => {

@@ -3,10 +3,15 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
+export type Onglet = {
+  cle: string;
+  libelle: string;
+};
+
 type Props = {
-  tabs: string[];
+  tabs: Onglet[];
   activeTab: string;
-  onChange: (tab: string) => void;
+  onChange: (cle: string) => void;
 };
 
 export function HomeTabs({ tabs, activeTab, onChange }: Props) {
@@ -20,16 +25,16 @@ export function HomeTabs({ tabs, activeTab, onChange }: Props) {
       contentContainerStyle={styles.tabsContent}
     >
       {tabs.map((tab) => {
-        const isActive = activeTab === tab;
+        const isActive = activeTab === tab.cle;
 
         return (
           <TouchableOpacity
-            key={tab}
-            onPress={() => onChange(tab)}
+            key={tab.cle}
+            onPress={() => onChange(tab.cle)}
             style={[styles.tab, isActive && styles.activeTab]}
           >
             <Text style={[styles.tabText, isActive && styles.activeTabText]}>
-              {tab}
+              {tab.libelle}
             </Text>
           </TouchableOpacity>
         );
