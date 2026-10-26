@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { ESPACE_SOUS_LA_BARRE_DETAT } from 'src/shared/ui/dimensions';
 import {
   View,
   Text,
@@ -64,7 +65,7 @@ export function ProfileHeaderCard({
       style={[
         styles.card,
         enTete ? styles.carteEnTete : null,
-        enTete ? { paddingTop: insets.top + 16 } : null,
+        enTete ? { paddingTop: insets.top + ESPACE_SOUS_LA_BARRE_DETAT } : null,
       ]}
     >
       <View style={styles.topRow}>

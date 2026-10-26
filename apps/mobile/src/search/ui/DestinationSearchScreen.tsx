@@ -153,7 +153,7 @@ export const DestinationSearchScreen: React.FC<Props> = ({
     : recentDestinations;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <KeyboardAvoidingView
         style={styles.content}
         behavior="padding"

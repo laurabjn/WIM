@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { ESPACE_SOUS_LA_BARRE_DETAT } from 'src/shared/ui/dimensions';
 import { VoileDePage } from 'src/shared/ui/VoileDePage';
 import { Alert, Linking, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -281,7 +282,7 @@ export function SettingsScreen({ route, navigation, setIsAuthenticated }: Props)
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         style={[styles.screen, { backgroundColor: colors.screen }]}
-        contentContainerStyle={[styles.container, { paddingTop: insets.top + 12 }]}
+        contentContainerStyle={[styles.container, { paddingTop: insets.top + ESPACE_SOUS_LA_BARRE_DETAT }]}
       >
         <SettingsSection title={t('profile:settings.account')}>
           <SettingsRow
