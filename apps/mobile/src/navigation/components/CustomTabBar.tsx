@@ -15,6 +15,8 @@ import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
 const HAUTEUR_PILULE = 72;
+const TAILLE_BULLE = 56;
+const MARGE_LATERALE = 0;
 const FONDU = 40;
 
 type Props = BottomTabBarProps & { unreadCount?: number };
@@ -178,7 +180,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   outer: {
-    paddingHorizontal: 6,
+    paddingHorizontal: MARGE_LATERALE,
   },
 
   inner: {
@@ -187,19 +189,19 @@ const createStyles = (c: ThemeColors) =>
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 6,
+    paddingHorizontal: MARGE_LATERALE,
   },
 
   sideButton: {
-    width: 52,
+    width: TAILLE_BULLE,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   iconBubble: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: TAILLE_BULLE,
+    height: TAILLE_BULLE,
+    borderRadius: TAILLE_BULLE / 2,
     borderWidth: 1,
     borderColor: c.border,
     backgroundColor: c.surface,
