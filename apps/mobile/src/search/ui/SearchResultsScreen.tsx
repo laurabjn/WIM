@@ -183,7 +183,7 @@ export const SearchResultsScreen: React.FC<Props> = ({
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <SearchResultsHeader
         title={city || 'Résultats'}
         onBack={() => navigation.goBack()}

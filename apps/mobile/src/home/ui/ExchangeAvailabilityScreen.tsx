@@ -69,7 +69,7 @@ export function ExchangeAvailabilityScreen({ navigation, route }: any) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <BackButton onPress={navigation.goBack} style={styles.backButton} />
 
       <View style={styles.content}>
