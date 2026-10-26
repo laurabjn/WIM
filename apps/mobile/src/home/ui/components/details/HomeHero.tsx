@@ -18,7 +18,11 @@ import { BackButton } from 'src/shared/ui/BackButton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
-import { ESPACE_SOUS_LA_BARRE_DETAT, useDimensionsEcran } from 'src/shared/ui/dimensions';
+import {
+  ESPACE_SOUS_LA_BARRE_DETAT,
+  TAILLE_BOUTON_ROND,
+  useDimensionsEcran,
+} from 'src/shared/ui/dimensions';
 
 const FAVORI = '#F43F5E';
 
@@ -135,9 +139,9 @@ const createStyles = (c: ThemeColors) =>
     fontWeight: '600',
   },
   circleButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: TAILLE_BOUTON_ROND,
+    height: TAILLE_BOUTON_ROND,
+    borderRadius: TAILLE_BOUTON_ROND / 2,
     backgroundColor: c.surface,
     alignItems: 'center',
     justifyContent: 'center',
@@ -152,7 +156,7 @@ const createStyles = (c: ThemeColors) =>
     top: 16,
     right: 16,
     flexDirection: 'row',
-    gap: 10,
+    gap: 6,
   },
   imageCounter: {
     position: 'absolute',
