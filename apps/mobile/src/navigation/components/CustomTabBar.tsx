@@ -10,12 +10,14 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { RETRAIT_BAS_IOS } from 'src/shared/ui/dimensions';
+import {
+  RETRAIT_BAS_IOS,
+  TAILLE_BOUTON_ROND,
+} from 'src/shared/ui/dimensions';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
 const HAUTEUR_PILULE = 72;
-const TAILLE_BULLE = 56;
 const MARGE_LATERALE = 0;
 const FONDU = 40;
 
@@ -193,15 +195,15 @@ const createStyles = (c: ThemeColors) =>
   },
 
   sideButton: {
-    width: TAILLE_BULLE,
+    width: TAILLE_BOUTON_ROND,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   iconBubble: {
-    width: TAILLE_BULLE,
-    height: TAILLE_BULLE,
-    borderRadius: TAILLE_BULLE / 2,
+    width: TAILLE_BOUTON_ROND,
+    height: TAILLE_BOUTON_ROND,
+    borderRadius: TAILLE_BOUTON_ROND / 2,
     borderWidth: 1,
     borderColor: c.border,
     backgroundColor: c.surface,
@@ -236,7 +238,7 @@ const createStyles = (c: ThemeColors) =>
 
   searchPill: {
     height: 50,
-    minWidth: 96,
+    minWidth: 72,
     maxWidth: 112,
     borderRadius: 999,
     borderWidth: 1,
