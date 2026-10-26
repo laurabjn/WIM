@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import {
+  Platform,
   View,
   Text,
   TouchableOpacity,
@@ -9,6 +10,7 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { RETRAIT_BAS_IOS } from 'src/shared/ui/dimensions';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
@@ -26,6 +28,11 @@ export function CustomTabBar({
   const themeColors = useThemeColors();
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
   const insets = useSafeAreaInsets();
+
+  const retraitBas = Math.max(
+    Platform.OS === 'ios' ? insets.bottom - RETRAIT_BAS_IOS : insets.bottom,
+    12,
+  );
   const currentRouteName = state.routes[state.index]?.name;
 
   function navigateTo(routeName: string) {
@@ -63,10 +70,10 @@ export function CustomTabBar({
       <LinearGradient
         pointerEvents="none"
         colors={[`${themeColors.surface}00`, themeColors.surface]}
-        style={[styles.voile, { height: HAUTEUR_PILULE + insets.bottom + FONDU }]}
+        style={[styles.voile, { height: HAUTEUR_PILULE + retraitBas + FONDU }]}
       />
 
-      <View style={[styles.outer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+      <View style={[styles.outer, { paddingBottom: retraitBas }]}>
         <View style={styles.inner}>
           <TouchableOpacity
             onPress={() => navigateTo('HomeTab')}
