@@ -18,7 +18,7 @@ import { BackButton } from 'src/shared/ui/BackButton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
-import { useDimensionsEcran } from 'src/shared/ui/dimensions';
+import { ESPACE_SOUS_LA_BARRE_DETAT, useDimensionsEcran } from 'src/shared/ui/dimensions';
 
 const FAVORI = '#F43F5E';
 
@@ -83,10 +83,10 @@ export function HomeHero({
 
       <BackButton
         onPress={onBack}
-        style={[styles.circleButton, styles.backButton, { top: 16 + insets.top }]}
+        style={[styles.circleButton, styles.backButton, { top: ESPACE_SOUS_LA_BARRE_DETAT + insets.top }]}
       />
 
-      <View style={[styles.topActions, { top: 16 + insets.top }]}>
+      <View style={[styles.topActions, { top: ESPACE_SOUS_LA_BARRE_DETAT + insets.top }]}>
         <TouchableOpacity style={styles.circleButton} onPress={onShare}>
           <Share2 size={18} color={themeColors.text} />
         </TouchableOpacity>
