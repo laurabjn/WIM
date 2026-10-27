@@ -19,7 +19,6 @@ import type { ThemeColors } from 'src/theme/colors';
 
 const HAUTEUR_PILULE = 72;
 const MARGE_LATERALE = 0;
-const ESPACEMENT_BOUTONS = 8;
 const FONDU = 40;
 
 type Props = BottomTabBarProps & { unreadCount?: number };
@@ -191,7 +190,7 @@ const createStyles = (c: ThemeColors) =>
     borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: ESPACEMENT_BOUTONS,
+    justifyContent: 'space-evenly',
     paddingHorizontal: MARGE_LATERALE,
   },
 
@@ -238,7 +237,6 @@ const createStyles = (c: ThemeColors) =>
   },
 
   searchPill: {
-    flex: 1,
     height: TAILLE_BOUTON_ROND,
     borderRadius: 999,
     borderWidth: 1,
@@ -247,7 +245,7 @@ const createStyles = (c: ThemeColors) =>
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
   },
 
   searchPillActive: {
@@ -255,7 +253,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   searchIcon: {
-    marginRight: 6,
+    marginRight: 5,
   },
 
   searchText: {
