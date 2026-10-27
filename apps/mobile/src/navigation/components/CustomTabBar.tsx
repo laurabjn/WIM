@@ -19,6 +19,7 @@ import type { ThemeColors } from 'src/theme/colors';
 
 const HAUTEUR_PILULE = 72;
 const MARGE_LATERALE = 0;
+const LARGEUR_PILULE = 80;
 const FONDU = 40;
 
 type Props = BottomTabBarProps & { unreadCount?: number };
@@ -237,6 +238,7 @@ const createStyles = (c: ThemeColors) =>
   },
 
   searchPill: {
+    width: LARGEUR_PILULE,
     height: TAILLE_BOUTON_ROND,
     borderRadius: 999,
     borderWidth: 1,
@@ -260,6 +262,6 @@ const createStyles = (c: ThemeColors) =>
     fontSize: 11,
     fontWeight: '500',
     color: c.text,
-    maxWidth: 58,
+    flexShrink: 1,
   },
 });
