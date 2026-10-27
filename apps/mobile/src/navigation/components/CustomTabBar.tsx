@@ -18,8 +18,9 @@ import { useThemeColors } from 'src/theme/ThemeContext';
 import type { ThemeColors } from 'src/theme/colors';
 
 const HAUTEUR_PILULE = 72;
-const MARGE_LATERALE = 0;
-const LARGEUR_PILULE = 80;
+const MARGE_LATERALE = 16;
+const ESPACEMENT_BOUTONS = 10;
+const LARGEUR_PILULE_MAX = 104;
 const FONDU = 40;
 
 type Props = BottomTabBarProps & { unreadCount?: number };
@@ -78,7 +79,7 @@ export function CustomTabBar({
         style={[styles.voile, { height: HAUTEUR_PILULE + retraitBas + FONDU }]}
       />
 
-      <View style={[styles.outer, { paddingBottom: retraitBas }]}>
+      <View style={{ paddingBottom: retraitBas }}>
         <View style={styles.inner}>
           <TouchableOpacity
             onPress={() => navigateTo('HomeTab')}
@@ -182,16 +183,13 @@ const createStyles = (c: ThemeColors) =>
     backgroundColor: 'transparent',
   },
 
-  outer: {
-    paddingHorizontal: MARGE_LATERALE,
-  },
-
   inner: {
     height: 72,
     borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-evenly',
+    justifyContent: 'center',
+    gap: ESPACEMENT_BOUTONS,
     paddingHorizontal: MARGE_LATERALE,
   },
 
@@ -238,7 +236,8 @@ const createStyles = (c: ThemeColors) =>
   },
 
   searchPill: {
-    width: LARGEUR_PILULE,
+    flex: 1,
+    maxWidth: LARGEUR_PILULE_MAX,
     height: TAILLE_BOUTON_ROND,
     borderRadius: 999,
     borderWidth: 1,
