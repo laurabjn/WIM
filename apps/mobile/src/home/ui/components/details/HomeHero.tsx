@@ -25,6 +25,8 @@ import {
 } from 'src/shared/ui/dimensions';
 
 const FAVORI = '#F43F5E';
+const VOILE_FOND = 'rgba(0, 0, 0, 0.35)';
+const VOILE_ICONE = '#FFFFFF';
 
 type Props = {
   home: Home;
@@ -87,12 +89,13 @@ export function HomeHero({
 
       <BackButton
         onPress={onBack}
+        color={VOILE_ICONE}
         style={[styles.circleButton, styles.backButton, { top: ESPACE_SOUS_LA_BARRE_DETAT + insets.top }]}
       />
 
       <View style={[styles.topActions, { top: ESPACE_SOUS_LA_BARRE_DETAT + insets.top }]}>
         <TouchableOpacity style={styles.circleButton} onPress={onShare}>
-          <Share2 size={18} color={themeColors.text} />
+          <Share2 size={18} color={VOILE_ICONE} />
         </TouchableOpacity>
 
         {showFavorite ? (
@@ -102,7 +105,7 @@ export function HomeHero({
           >
             <Heart
               size={18}
-              color={isFavorite ? FAVORI : themeColors.text}
+              color={isFavorite ? FAVORI : VOILE_ICONE}
               fill={isFavorite ? FAVORI : 'transparent'}
             />
           </TouchableOpacity>
@@ -142,7 +145,7 @@ const createStyles = (c: ThemeColors) =>
     width: TAILLE_BOUTON_ROND,
     height: TAILLE_BOUTON_ROND,
     borderRadius: TAILLE_BOUTON_ROND / 2,
-    backgroundColor: c.surface,
+    backgroundColor: VOILE_FOND,
     alignItems: 'center',
     justifyContent: 'center',
   },
