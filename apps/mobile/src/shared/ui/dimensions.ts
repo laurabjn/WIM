@@ -8,7 +8,7 @@ export const ESPACE_SOUS_LA_BARRE_DETAT = 0;
 
 export const RETRAIT_BAS_IOS = 20;
 
-export const TAILLE_BOUTON_ROND = 56;
+export const TAILLE_BOUTON_ROND = 52;
 
 export function useDimensionsEcran() {
   const { width, height } = useWindowDimensions();
