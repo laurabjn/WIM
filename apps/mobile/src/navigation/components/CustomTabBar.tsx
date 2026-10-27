@@ -19,6 +19,7 @@ import type { ThemeColors } from 'src/theme/colors';
 
 const HAUTEUR_PILULE = 72;
 const MARGE_LATERALE = 0;
+const ESPACEMENT_BOUTONS = 8;
 const FONDU = 40;
 
 type Props = BottomTabBarProps & { unreadCount?: number };
@@ -190,7 +191,7 @@ const createStyles = (c: ThemeColors) =>
     borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: ESPACEMENT_BOUTONS,
     paddingHorizontal: MARGE_LATERALE,
   },
 
@@ -237,9 +238,8 @@ const createStyles = (c: ThemeColors) =>
   },
 
   searchPill: {
-    height: 50,
-    minWidth: 72,
-    maxWidth: 112,
+    flex: 1,
+    height: TAILLE_BOUTON_ROND,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: c.border,
