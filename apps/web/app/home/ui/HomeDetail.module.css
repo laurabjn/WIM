@@ -54,7 +54,7 @@
 
 .colonnes {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 48px;
   align-items: start;
 }
@@ -69,6 +69,13 @@
 .colonneLaterale {
   position: sticky;
   top: 110px;
+  width: 340px;
+}
+
+/* Sur son propre logement la colonne est vide : elle ne doit pas réserver
+   sa largeur pour rien. */
+.colonneLaterale:empty {
+  display: none;
 }
 
 .bloc {

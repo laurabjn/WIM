@@ -10,6 +10,7 @@ import {
   carteEstConfiguree,
 } from 'app/home/ui/components/CarteLogement';
 import { getDescriptionDeVille } from 'app/home/infrastructure/locationDescription.api';
+import { BoutonModifierLogement } from 'app/home/ui/components/BoutonModifierLogement';
 
 import styles from './HomeDetail.module.css';
 
@@ -78,6 +79,8 @@ export async function HomeDetail({ home, locale }: Props) {
     <article className={styles.page}>
       <header className={styles.entete}>
         <h1 className={styles.titre}>{home.title}</h1>
+
+        <BoutonModifierLogement homeId={home.id} ownerId={home.ownerId} />
       </header>
 
       {couverture ? (

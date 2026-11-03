@@ -99,20 +99,7 @@ export function DemandeEchange({ homeId, ownerId }: Props) {
     }
   }
 
-  if (etat === 'mien') {
-    return (
-      <aside className={styles.proprietaire}>
-        <span className={styles.proprietaireTexte}>{t('home.myHome')}</span>
-
-        <Link
-          href={`/homes/${homeId}/edit`}
-          className={styles.proprietaireLien}
-        >
-          {t('common.edit')}
-        </Link>
-      </aside>
-    );
-  }
+  if (etat === 'mien') return null;
 
   if (etat === 'anonyme') {
     return (
