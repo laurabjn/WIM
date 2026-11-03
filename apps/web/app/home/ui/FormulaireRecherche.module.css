@@ -40,10 +40,6 @@
   cursor: pointer;
 }
 
-.segmentBouton {
-  font: inherit;
-}
-
 .segmentActif {
   border-color: var(--wim-bordure);
   background: var(--wim-surface);
@@ -107,7 +103,7 @@
   cursor: pointer;
 }
 
-.suggestions {
+.panneau {
   position: absolute;
   top: calc(100% + 10px);
   left: 0;
@@ -124,7 +120,7 @@
   box-shadow: var(--wim-ombre-flottante);
 }
 
-.suggestionsTitre {
+.panneauTitre {
   margin: 0 0 6px;
   padding: 4px 8px;
   font-size: 12px;
@@ -159,25 +155,16 @@
   color: var(--wim-texte-doux);
 }
 
-.volet {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  width: 100%;
-  padding: 18px 20px;
-  border: 1px solid var(--wim-bordure);
-  border-radius: var(--wim-rayon-carte);
-  background: var(--wim-surface);
-}
 
-.champVolet {
+
+.champPanneau {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.champVolet input,
-.champVolet select {
+.champPanneau input,
+.champPanneau select {
   height: 40px;
   padding: 0 12px;
   border: 1px solid var(--wim-bordure);
@@ -214,4 +201,37 @@
     height: 48px;
     justify-content: center;
   }
+}
+
+.declencheur {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.porteFiltres {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.panneau {
+  gap: 10px;
+}
+
+.champPanneau {
+  padding: 4px 8px;
+}
+
+/* Le bouton Filtres est au bord droit : son panneau s'y aligne, sinon il
+   déborderait de la page. */
+.porteFiltres .panneau {
+  left: auto;
+  right: 0;
 }

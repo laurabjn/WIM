@@ -15,7 +15,7 @@ import styles from './FormulaireRecherche.module.css';
 const CATEGORIES = ['NATURE', 'BEACH', 'CITY', 'CULTURE'] as const;
 const MAX_POPULAIRES = 3;
 
-type Volet = 'ou' | 'quand' | 'qui' | null;
+type Volet = 'ou' | 'quand' | 'filtres' | null;
 
 export function FormulaireRecherche() {
   const t = useTranslations();
@@ -28,11 +28,10 @@ export function FormulaireRecherche() {
   const [voyageurs, setVoyageurs] = useState(parametres.get('capacity') ?? '');
 
   const [volet, setVolet] = useState<Volet>(null);
-  const [filtresOuverts, setFiltresOuverts] = useState(false);
   const [recentes, setRecentes] = useState<string[]>([]);
   const [populaires, setPopulaires] = useState<string[]>([]);
 
-  const barre = useRef<HTMLDivElement>(null);
+  const rangee = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setRecentes(lireDestinationsRecentes());
@@ -65,7 +64,7 @@ export function FormulaireRecherche() {
     if (!volet) return;
 
     function auClicDehors(evenement: MouseEvent) {
-      if (!barre.current?.contains(evenement.target as Node)) setVolet(null);
+      if (!rangee.current?.contains(evenement.target as Node)) setVolet(null);
     }
 
     document.addEventListener('mousedown', auClicDehors);
@@ -113,14 +112,17 @@ export function FormulaireRecherche() {
   const resumeQuand =
     debut && fin ? `${debut} — ${fin}` : debut || t('search.addDates');
 
-  const resumeQui = voyageurs
-    ? `${voyageurs} ${t('search.filters.travellers')}`
-    : t('search.addTravelers');
+  const suggestions = [
+    ...recentes.map((nom) => ({ nom, detail: t('search.recentSearch') })),
+    ...populaires
+      .filter((nom) => !recentes.includes(nom))
+      .map((nom) => ({ nom, detail: t('search.popularDestination') })),
+  ];
 
   return (
     <form className={styles.formulaire} onSubmit={soumettre}>
-      <div className={styles.rangee}>
-        <div className={styles.barre} ref={barre}>
+      <div className={styles.rangee} ref={rangee}>
+        <div className={styles.barre}>
           <div
             className={`${styles.segment} ${
               volet === 'ou' ? styles.segmentActif : ''
@@ -139,44 +141,24 @@ export function FormulaireRecherche() {
             />
 
             {volet === 'ou' ? (
-              <div className={styles.suggestions}>
-                <p className={styles.suggestionsTitre}>
+              <div className={styles.panneau}>
+                <p className={styles.panneauTitre}>
                   {t('search.destinationSuggestions')}
                 </p>
 
-                {recentes.map((nom) => (
+                {suggestions.map(({ nom, detail }) => (
                   <button
-                    key={`recente-${nom}`}
+                    key={nom}
                     type="button"
                     className={styles.suggestion}
                     onClick={() => choisirDestination(nom)}
                   >
                     <span className={styles.suggestionNom}>{nom}</span>
-
-                    <span className={styles.suggestionDetail}>
-                      {t('search.recentSearch')}
-                    </span>
+                    <span className={styles.suggestionDetail}>{detail}</span>
                   </button>
                 ))}
 
-                {populaires
-                  .filter((nom) => !recentes.includes(nom))
-                  .map((nom) => (
-                    <button
-                      key={`populaire-${nom}`}
-                      type="button"
-                      className={styles.suggestion}
-                      onClick={() => choisirDestination(nom)}
-                    >
-                      <span className={styles.suggestionNom}>{nom}</span>
-
-                      <span className={styles.suggestionDetail}>
-                        {t('search.popularDestination')}
-                      </span>
-                    </button>
-                  ))}
-
-                {recentes.length === 0 && populaires.length === 0 ? (
+                {suggestions.length === 0 ? (
                   <p className={styles.suggestionDetail}>
                     {t('search.noDestination')}
                   </p>
@@ -185,27 +167,59 @@ export function FormulaireRecherche() {
             ) : null}
           </div>
 
-          <button
-            type="button"
-            className={`${styles.segment} ${styles.segmentBouton} ${
+          <div
+            className={`${styles.segment} ${
               volet === 'quand' ? styles.segmentActif : ''
             }`.trim()}
-            onClick={() => setVolet(volet === 'quand' ? null : 'quand')}
           >
-            <span className={styles.libelle}>{t('search.when')}</span>
-            <span className={styles.valeur}>{resumeQuand}</span>
-          </button>
+            <button
+              type="button"
+              className={styles.declencheur}
+              onClick={() => setVolet(volet === 'quand' ? null : 'quand')}
+            >
+              <span className={styles.libelle}>{t('search.when')}</span>
+              <span className={styles.valeur}>{resumeQuand}</span>
+            </button>
 
-          <button
-            type="button"
-            className={`${styles.segment} ${styles.segmentBouton} ${
-              volet === 'qui' ? styles.segmentActif : ''
-            }`.trim()}
-            onClick={() => setVolet(volet === 'qui' ? null : 'qui')}
-          >
+            {volet === 'quand' ? (
+              <div className={styles.panneau}>
+                <label className={styles.champPanneau}>
+                  <span className={styles.libelle}>{t('search.startDate')}</span>
+
+                  <input
+                    type="date"
+                    value={debut}
+                    onChange={(evenement) => setDebut(evenement.target.value)}
+                  />
+                </label>
+
+                <label className={styles.champPanneau}>
+                  <span className={styles.libelle}>{t('search.endDate')}</span>
+
+                  <input
+                    type="date"
+                    value={fin}
+                    min={debut || undefined}
+                    onChange={(evenement) => setFin(evenement.target.value)}
+                  />
+                </label>
+              </div>
+            ) : null}
+          </div>
+
+          <div className={styles.segment}>
             <span className={styles.libelle}>{t('search.who')}</span>
-            <span className={styles.valeur}>{resumeQui}</span>
-          </button>
+
+            <input
+              type="number"
+              name="capacity"
+              min={1}
+              className={styles.saisie}
+              value={voyageurs}
+              placeholder={t('search.addTravelers')}
+              onChange={(evenement) => setVoyageurs(evenement.target.value)}
+            />
+          </div>
 
           <button type="submit" className={styles.rechercher}>
             <Search size={16} />
@@ -213,96 +227,57 @@ export function FormulaireRecherche() {
           </button>
         </div>
 
-        <button
-          type="button"
-          className={styles.filtres}
-          onClick={() => setFiltresOuverts((ouvert) => !ouvert)}
-        >
-          <SlidersHorizontal size={16} />
-          {t('search.filters.title')}
-        </button>
+        <div className={styles.porteFiltres}>
+          <button
+            type="button"
+            className={styles.filtres}
+            aria-expanded={volet === 'filtres'}
+            onClick={() => setVolet(volet === 'filtres' ? null : 'filtres')}
+          >
+            <SlidersHorizontal size={16} />
+            {t('search.filters.title')}
+          </button>
+
+          {volet === 'filtres' ? (
+            <div className={styles.panneau}>
+              <label className={styles.champPanneau}>
+                <span className={styles.libelle}>
+                  {t('search.filters.category')}
+                </span>
+
+                <select
+                  name="category"
+                  defaultValue={parametres.get('category') ?? ''}
+                >
+                  <option value="">{t('search.filters.any')}</option>
+
+                  {CATEGORIES.map((categorie) => (
+                    <option key={categorie} value={categorie}>
+                      {t(`search.filters.categories.${categorie}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className={styles.champPanneau}>
+                <span className={styles.libelle}>
+                  {t('search.filters.bedrooms')}
+                </span>
+
+                <input
+                  type="number"
+                  name="bedrooms"
+                  min={1}
+                  defaultValue={parametres.get('bedrooms') ?? ''}
+                />
+              </label>
+            </div>
+          ) : null}
+        </div>
       </div>
 
-      {volet === 'quand' ? (
-        <div className={styles.volet}>
-          <label className={styles.champVolet}>
-            <span className={styles.libelle}>{t('search.startDate')}</span>
-
-            <input
-              type="date"
-              name="startDate"
-              value={debut}
-              onChange={(evenement) => setDebut(evenement.target.value)}
-            />
-          </label>
-
-          <label className={styles.champVolet}>
-            <span className={styles.libelle}>{t('search.endDate')}</span>
-
-            <input
-              type="date"
-              name="endDate"
-              value={fin}
-              min={debut || undefined}
-              onChange={(evenement) => setFin(evenement.target.value)}
-            />
-          </label>
-        </div>
-      ) : (
-        <>
-          <input type="hidden" name="startDate" value={debut} />
-          <input type="hidden" name="endDate" value={fin} />
-        </>
-      )}
-
-      {volet === 'qui' ? (
-        <div className={styles.volet}>
-          <label className={styles.champVolet}>
-            <span className={styles.libelle}>
-              {t('search.filters.travellers')}
-            </span>
-
-            <input
-              type="number"
-              name="capacity"
-              min={1}
-              value={voyageurs}
-              onChange={(evenement) => setVoyageurs(evenement.target.value)}
-            />
-          </label>
-        </div>
-      ) : (
-        <input type="hidden" name="capacity" value={voyageurs} />
-      )}
-
-      {filtresOuverts ? (
-        <div className={styles.volet}>
-          <label className={styles.champVolet}>
-            <span className={styles.libelle}>{t('search.filters.category')}</span>
-
-            <select name="category" defaultValue={parametres.get('category') ?? ''}>
-              <option value="">{t('search.filters.any')}</option>
-
-              {CATEGORIES.map((categorie) => (
-                <option key={categorie} value={categorie}>
-                  {t(`search.filters.categories.${categorie}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className={styles.champVolet}>
-            <span className={styles.libelle}>{t('search.filters.bedrooms')}</span>
-
-            <input
-              type="number"
-              name="bedrooms"
-              min={1}
-              defaultValue={parametres.get('bedrooms') ?? ''}
-            />
-          </label>
-        </div>
-      ) : null}
+      <input type="hidden" name="startDate" value={debut} />
+      <input type="hidden" name="endDate" value={fin} />
 
       <button type="button" className={styles.toutEffacer} onClick={toutEffacer}>
         {t('search.clearAll')}
