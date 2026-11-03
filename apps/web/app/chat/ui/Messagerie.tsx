@@ -30,6 +30,7 @@ import {
   disconnectChatSocket,
 } from 'app/chat/infrastructure/chatSocket';
 
+import { usePresence } from '../hooks/usePresence';
 import { BandeauStatuts } from './BandeauStatuts';
 import styles from './Messagerie.module.css';
 
@@ -411,6 +412,12 @@ export function Messagerie() {
     return groupes;
   }
 
+  const idsCorrespondants = conversations
+    .map((conversation) => conversation.participant?.id)
+    .filter((id): id is string => Boolean(id));
+
+  const presence = usePresence(token, idsCorrespondants);
+
   if (etat === 'chargement') {
     return <p className={styles.etat}>{t('common.loading')}</p>;
   }
@@ -513,17 +520,27 @@ export function Messagerie() {
               }`.trim()}
               onClick={() => setActiveId(conversation.id)}
             >
-              <span className={styles.avatar}>
-                {conversation.participant.avatarUrl ? (
-                  <Image
-                    src={conversation.participant.avatarUrl}
-                    alt={nomComplet(conversation.participant)}
-                    fill
-                    className={styles.avatarImage}
+              <span className={styles.porteAvatar}>
+                <span className={styles.avatar}>
+                  {conversation.participant.avatarUrl ? (
+                    <Image
+                      src={conversation.participant.avatarUrl}
+                      alt={nomComplet(conversation.participant)}
+                      fill
+                      className={styles.avatarImage}
+                    />
+                  ) : (
+                    initiales(conversation.participant)
+                  )}
+                </span>
+
+                {presence.online.has(conversation.participant.id) ? (
+                  <span
+                    className={styles.pastilleEnLigne}
+                    title={t('chat.online')}
+                    aria-label={t('chat.online')}
                   />
-                ) : (
-                  initiales(conversation.participant)
-                )}
+                ) : null}
               </span>
 
               <span className={styles.entreeTextes}>

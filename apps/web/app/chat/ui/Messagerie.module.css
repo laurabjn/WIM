@@ -59,6 +59,23 @@
   background: #eaf6fe;
 }
 
+.porteAvatar {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.pastilleEnLigne {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #22c55e;
+  border: 2px solid var(--wim-surface);
+}
+
 .avatar {
   position: relative;
   display: flex;
