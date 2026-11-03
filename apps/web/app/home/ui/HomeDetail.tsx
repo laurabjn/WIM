@@ -5,6 +5,11 @@ import { Home, Review } from '@wim/shared/home/home.type';
 import { BadgeCheck, ChevronRight, Star } from 'lucide-react';
 
 import { DemandeEchange } from 'app/exchange/ui/DemandeEchange';
+import {
+  CarteLogement,
+  carteEstConfiguree,
+} from 'app/home/ui/components/CarteLogement';
+import { getDescriptionDeVille } from 'app/home/infrastructure/locationDescription.api';
 
 import styles from './HomeDetail.module.css';
 
@@ -53,6 +58,15 @@ export async function HomeDetail({ home, locale }: Props) {
   const nombreAvis = home.reviewsCount ?? avis.length;
 
   const anneesHote = anneesDepuis(home.owner?.createdAt);
+
+  const aDesCoordonnees =
+    typeof home.latitude === 'number' && typeof home.longitude === 'number';
+
+  const presentation = await getDescriptionDeVille(
+    home.city,
+    home.country,
+    locale,
+  );
 
   const dateCourte = new Intl.DateTimeFormat(locale, {
     day: 'numeric',
@@ -219,6 +233,41 @@ export async function HomeDetail({ home, locale }: Props) {
                   );
                 })}
               </ul>
+            </section>
+          ) : null}
+
+          {aDesCoordonnees && carteEstConfiguree ? (
+            <section className={styles.bloc}>
+              <h2 className={styles.sousTitre}>{t('home.whereIsHome')}</h2>
+
+              <CarteLogement
+                latitude={home.latitude as number}
+                longitude={home.longitude as number}
+                legende={`${home.city}, ${home.country}`}
+              />
+
+              <p className={styles.mention}>{t('home.exactAddressLater')}</p>
+
+              <h3 className={styles.lieu}>
+                {home.city}, {home.country}
+              </h3>
+
+              {presentation?.extract ? (
+                <>
+                  <p className={styles.description}>{presentation.extract}</p>
+
+                  {presentation.pageUrl ? (
+                    <a
+                      className={styles.lienSource}
+                      href={presentation.pageUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {t('home.readMore')}
+                    </a>
+                  ) : null}
+                </>
+              ) : null}
             </section>
           ) : null}
 

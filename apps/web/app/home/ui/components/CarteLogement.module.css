@@ -1,0 +1,15 @@
+.carte {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1000 / 420;
+  border-radius: var(--wim-rayon-carte);
+  overflow: hidden;
+  background: var(--wim-surface-douce);
+}
+
+.carte img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

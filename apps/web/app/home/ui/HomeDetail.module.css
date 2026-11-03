@@ -339,3 +339,17 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.mention {
+  margin: 0;
+  font-size: 12px;
+  color: var(--wim-texte-doux);
+}
+
+.lienSource {
+  align-self: flex-start;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--wim-texte);
+  text-decoration: underline;
+}

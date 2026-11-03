@@ -146,6 +146,9 @@ services:
         # Services ID cree dans le compte Apple Developer, distinct de
         # l'identifiant de l'app iOS. Absent, le bouton Apple ne s'affiche pas.
         NEXT_PUBLIC_APPLE_SERVICE_ID: ${NEXT_PUBLIC_APPLE_SERVICE_ID:-}
+        # Le meme jeton public que l'app mobile : il sert les cartes
+        # statiques de la fiche d'un logement. Absent, la section n'apparait pas.
+        NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN:-}
         # Part dans le navigateur : la changer impose de reconstruire.
         NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
         SENTRY_ORG: ${SENTRY_ORG:-}
