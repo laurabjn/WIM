@@ -374,3 +374,20 @@
   line-height: 1.6;
   color: var(--wim-texte-doux);
 }
+
+.equipement {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.periodes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: var(--wim-texte);
+}

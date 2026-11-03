@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { Home, Review } from '@wim/shared/home/home.type';
-import { BadgeCheck, ChevronRight, Star } from 'lucide-react';
+import { ChevronRight, Star } from 'lucide-react';
 
 import { DemandeEchange } from 'app/exchange/ui/DemandeEchange';
 import {
@@ -11,6 +11,7 @@ import {
 } from 'app/home/ui/components/CarteLogement';
 import { getDescriptionDeVille } from 'app/home/infrastructure/locationDescription.api';
 import { BoutonModifierLogement } from 'app/home/ui/components/BoutonModifierLogement';
+import { iconeEquipement } from 'app/home/ui/components/iconesEquipements';
 import { VisiblePourLesAutres } from 'app/home/ui/components/VisiblePourLesAutres';
 
 import styles from './HomeDetail.module.css';
@@ -60,6 +61,10 @@ export async function HomeDetail({ home, locale }: Props) {
   const nombreAvis = home.reviewsCount ?? avis.length;
 
   const anneesHote = anneesDepuis(home.owner?.createdAt);
+
+  const disponibilites = (home.availabilities ?? []).filter(
+    (periode) => new Date(periode.endDate).getTime() >= Date.now(),
+  );
 
   const aDesCoordonnees =
     typeof home.latitude === 'number' && typeof home.longitude === 'number';
@@ -136,39 +141,22 @@ export async function HomeDetail({ home, locale }: Props) {
             ) : null}
           </section>
 
-          {home.owner ? (
-            <section className={styles.blocHote}>
-              <Link
-                href={`/profile?userId=${home.ownerId}`}
-                className={styles.hote}
-              >
-                {home.owner.avatarUrl ? (
-                  <Image
-                    src={home.owner.avatarUrl}
-                    alt={home.owner.firstName}
-                    width={48}
-                    height={48}
-                    className={styles.avatar}
-                  />
-                ) : null}
+          <section className={styles.bloc}>
+            <h2 className={styles.sousTitre}>{t('home.availabilityTitle')}</h2>
 
-                <span className={styles.hoteTextes}>
-                  <span className={styles.hoteNom}>
-                    {t('home.host')} : {home.owner.firstName}
-                    {home.owner.identityVerified ? (
-                      <BadgeCheck size={16} strokeWidth={2.4} />
-                    ) : null}
-                  </span>
-
-                  {anneesHote ? (
-                    <span className={styles.hoteDepuis}>
-                      {t('home.hostSinceLabel')} {anneesHote} {t('home.years')}
-                    </span>
-                  ) : null}
-                </span>
-              </Link>
-            </section>
-          ) : null}
+            {disponibilites.length ? (
+              <ul className={styles.periodes}>
+                {disponibilites.map((periode) => (
+                  <li key={periode.id ?? periode.startDate}>
+                    {dateCourte.format(new Date(periode.startDate))} —{' '}
+                    {dateCourte.format(new Date(periode.endDate))}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={styles.description}>{t('availability.free')}</p>
+            )}
+          </section>
 
           {home.description ? (
             <section className={styles.bloc}>
@@ -229,10 +217,13 @@ export async function HomeDetail({ home, locale }: Props) {
               <ul className={styles.equipements}>
                 {home.amenities.map((equipement) => {
                   const cle = `home.amenities.${equipement}`;
+                  const libelle = t.has(cle) ? t(cle) : equipement;
+                  const Icone = iconeEquipement(libelle);
 
                   return (
                     <li key={equipement} className={styles.equipement}>
-                      {t.has(cle) ? t(cle) : equipement}
+                      <Icone size={20} strokeWidth={1.8} />
+                      {libelle}
                     </li>
                   );
                 })}
