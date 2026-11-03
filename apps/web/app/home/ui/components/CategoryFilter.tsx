@@ -18,11 +18,11 @@ export function CategoryFilter({ selectedCategory, onChangeCategory }: Props) {
   const t = useTranslations();
   
   const categories: Category[] = [
-    { key: 'all', label: t('home.category.all'), icon: '⌂' },
-    { key: 'nature', label: t('home.category.nature'), icon: '♣' },
-    { key: 'beach', label: t('home.category.beach'), icon: '≋' },
-    { key: 'city', label: t('home.category.city'), icon: '♜' },
-    { key: 'culture', label: t('home.category.culture'), icon: '▥' },
+    { key: 'all', label: t('search.allCategories'), icon: '⌂' },
+    { key: 'nature', label: t('search.category.nature'), icon: '♣' },
+    { key: 'beach', label: t('search.category.beach'), icon: '≋' },
+    { key: 'city', label: t('search.category.city'), icon: '♜' },
+    { key: 'culture', label: t('search.category.culture'), icon: '▥' },
   ];
 
   return (
