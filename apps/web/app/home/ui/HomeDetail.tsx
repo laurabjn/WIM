@@ -157,17 +157,17 @@ export async function HomeDetail({ home, locale }: Props) {
 
                 <div className={styles.voitureTextes}>
                   <span className={styles.voitureTitre}>
-                    {t('home.carExchangeTitle')}
+                    {t('home.vehicule.exchangeAccepted')}
                   </span>
 
                   <span className={styles.voitureDetail}>
                     {[
                       home.vehicle.seats
-                        ? `${home.vehicle.seats} ${t('home.seats')}`
+                        ? `${home.vehicle.seats} ${t('home.vehicule.places')}`
                         : null,
                       home.vehicle.type,
                       home.vehicle.fuelType
-                        ? t(`profile.vehicle.fuel.${home.vehicle.fuelType}`)
+                        ? t(`home.vehicule.fuelType.${home.vehicle.fuelType}`)
                         : null,
                     ]
                       .filter(Boolean)
@@ -268,7 +268,7 @@ export async function HomeDetail({ home, locale }: Props) {
                     {home.owner.rating ? (
                       <div>
                         <dt>{home.owner.rating.toFixed(1)} ★</dt>
-                        <dd>{t('profile.rating')}</dd>
+                        <dd>{t('home.overallRating')}</dd>
                       </div>
                     ) : null}
 
@@ -288,7 +288,7 @@ export async function HomeDetail({ home, locale }: Props) {
                     href={`/profile?userId=${home.ownerId}`}
                     className={styles.boutonSombre}
                   >
-                    {t('chat.sendMessage')}
+                    {t('home.sendMessageAction')}
                   </Link>
                 </div>
               </div>
