@@ -1,18 +1,24 @@
 .page {
   min-height: 100vh;
-  background: #fafbfc;
+  background: var(--wim-fond);
 }
 
 .contenu {
   width: 100%;
   max-width: 1040px;
   margin: 0 auto;
-  padding: 24px 20px 80px;
+  padding: 95px 20px 80px;
 }
 
 .titre {
   font-size: 28px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin: 0 0 20px;
+  margin: 0 0 6px;
+}
+
+.sousTitre {
+  margin: 0 0 28px;
+  font-size: 14px;
+  color: var(--wim-texte-doux);
 }

@@ -794,6 +794,7 @@
     "currentExchanges": "Current exchanges",
     "pastExchanges": "Past exchanges",
     "upcomingExchanges": "Upcoming exchanges",
+    "pageSubtitle": "Find your current, upcoming and past exchanges.",
     "noExchanges": "No exchanges for the moment.",
     "noExchangesDescription": "Your exchanges will appear here once they are confirmed.",
     "host": "Host",
