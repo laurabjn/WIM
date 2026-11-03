@@ -353,3 +353,16 @@
   color: var(--wim-texte);
   text-decoration: underline;
 }
+
+/* La description d'une ville vient de Wikipédia : elle peut faire plusieurs
+   paragraphes. La maquette n'en montre que le début, suivi du lien. */
+.extrait {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--wim-texte-doux);
+}

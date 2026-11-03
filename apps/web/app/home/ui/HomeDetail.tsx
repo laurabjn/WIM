@@ -254,7 +254,7 @@ export async function HomeDetail({ home, locale }: Props) {
 
               {presentation?.extract ? (
                 <>
-                  <p className={styles.description}>{presentation.extract}</p>
+                  <p className={styles.extrait}>{presentation.extract}</p>
 
                   {presentation.pageUrl ? (
                     <a

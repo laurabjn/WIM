@@ -8,7 +8,6 @@ const RAYON_KM = 5;
 const POINTS = 48;
 const LARGEUR = 1000;
 const HAUTEUR = 420;
-const ZOOM = 12;
 
 export const carteEstConfiguree = JETON.length > 0;
 
@@ -63,9 +62,9 @@ export function CarteLogement({ latitude, longitude, legende }: Props) {
   const source =
     `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static` +
     `/geojson(${calque})` +
-    `/${longitude},${latitude},${ZOOM}` +
+    `/auto` +
     `/${LARGEUR}x${HAUTEUR}@2x` +
-    `?access_token=${JETON}&logo=false`;
+    `?access_token=${JETON}&logo=false&padding=48`;
 
   return (
     <div className={styles.carte}>
