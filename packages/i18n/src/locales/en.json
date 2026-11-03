@@ -1098,6 +1098,7 @@
     "enableTranslation": "turn it back on",
     "stopTranslation": "Stop translating this conversation",
     "restoreTranslation": "Restore translation",
+    "sendPhoto": "Send a photo",
     "photoError": "The photo could not be sent.",
     "cameraDenied": "Camera access is denied.",
     "galleryDenied": "Photo access is denied.",

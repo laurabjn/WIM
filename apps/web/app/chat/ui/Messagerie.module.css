@@ -294,6 +294,41 @@
   border-top: 1px solid #eef1f2;
 }
 
+.photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--wim-bordure);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
+  cursor: pointer;
+}
+
+.photo:hover {
+  background: var(--wim-surface-douce);
+}
+
+.photo:has(input:disabled) {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+/* Lisible par les lecteurs d ecran, invisible a l ecran. */
+.invisible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .champ {
   flex: 1 1 auto;
   min-width: 0;

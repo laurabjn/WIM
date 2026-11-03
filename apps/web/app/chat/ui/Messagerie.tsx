@@ -24,12 +24,15 @@ import {
   markChatAsRead,
   normaliserMessage,
   sendMessage,
+  sendPhotoMessage,
+  TAILLE_PHOTO_MAX,
 } from 'app/chat/infrastructure/chat.api';
 import {
   connectChatSocket,
   disconnectChatSocket,
 } from 'app/chat/infrastructure/chatSocket';
 
+import { ImagePlus } from 'lucide-react';
 import { usePresence } from '../hooks/usePresence';
 import { BandeauStatuts } from './BandeauStatuts';
 import styles from './Messagerie.module.css';
@@ -82,6 +85,7 @@ export function Messagerie() {
   const [brouillon, setBrouillon] = useState('');
   const [envoi, setEnvoi] = useState(false);
   const [erreurEnvoi, setErreurEnvoi] = useState(false);
+  const [erreurPhoto, setErreurPhoto] = useState(false);
 
   const fil = useRef<HTMLDivElement>(null);
   const lien = useRef<Socket | null>(null);
@@ -344,23 +348,47 @@ export function Messagerie() {
     try {
       const message = await sendMessage(token, activeId, contenu);
 
-      setMessages((courant) => [...courant, message]);
       setBrouillon('');
-      setConversations((liste) =>
-        parRecence(
-          liste.map((conversation) =>
-            conversation.id === activeId
-              ? {
-                  ...conversation,
-                  lastMessage: message,
-                  updatedAt: message.createdAt,
-                }
-              : conversation,
-          ),
-        ),
-      );
+      ajouterMessage(message);
     } catch {
       setErreurEnvoi(true);
+    } finally {
+      setEnvoi(false);
+    }
+  }
+
+  function ajouterMessage(message: ChatMessages) {
+    setMessages((courant) => [...courant, message]);
+    setConversations((liste) =>
+      parRecence(
+        liste.map((conversation) =>
+          conversation.id === activeId
+            ? {
+                ...conversation,
+                lastMessage: message,
+                updatedAt: message.createdAt,
+              }
+            : conversation,
+        ),
+      ),
+    );
+  }
+
+  async function envoyerPhoto(fichier: File) {
+    if (!token || !activeId || envoi) return;
+
+    if (fichier.size > TAILLE_PHOTO_MAX) {
+      setErreurPhoto(true);
+      return;
+    }
+
+    setEnvoi(true);
+    setErreurPhoto(false);
+
+    try {
+      ajouterMessage(await sendPhotoMessage(token, activeId, fichier));
+    } catch {
+      setErreurPhoto(true);
     } finally {
       setEnvoi(false);
     }
@@ -694,6 +722,28 @@ export function Messagerie() {
             </div>
 
             <form className={styles.composeur} onSubmit={envoyer}>
+              <label className={styles.photo} title={t('chat.sendPhoto')}>
+                <ImagePlus size={18} />
+
+                <span className={styles.invisible}>
+                  {t('chat.sendPhoto')}
+                </span>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  className={styles.invisible}
+                  disabled={envoi}
+                  onChange={(evenement) => {
+                    const fichier = evenement.target.files?.[0];
+
+                    evenement.target.value = '';
+
+                    if (fichier) void envoyerPhoto(fichier);
+                  }}
+                />
+              </label>
+
               <input
                 className={styles.champ}
                 type="text"
@@ -711,6 +761,10 @@ export function Messagerie() {
                 {t('chat.send')}
               </button>
             </form>
+
+            {erreurPhoto ? (
+              <p className={styles.erreur}>{t('chat.photoError')}</p>
+            ) : null}
 
             {erreurEnvoi ? (
               <p className={styles.erreur}>{t('chat.sendError')}</p>
