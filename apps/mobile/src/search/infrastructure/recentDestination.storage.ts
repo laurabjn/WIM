@@ -1,11 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DestinationSuggestion } from './mapboxSearch.api';
 
+export type DestinationRecente = DestinationSuggestion & {
+  startDate?: string;
+  endDate?: string;
+};
+
 const RECENT_DESTINATIONS_KEY = 'wim.recent-destinations';
 const MAX_RECENT_DESTINATIONS = 5;
 
 export async function getRecentDestinations(): Promise<
-  DestinationSuggestion[]
+  DestinationRecente[]
 > {
   try {
     const storedValue = await AsyncStorage.getItem(
@@ -26,8 +31,8 @@ export async function getRecentDestinations(): Promise<
 }
 
 export async function saveRecentDestination(
-  destination: DestinationSuggestion,
-): Promise<DestinationSuggestion[]> {
+  destination: DestinationRecente,
+): Promise<DestinationRecente[]> {
   try {
     const currentDestinations =
       await getRecentDestinations();
