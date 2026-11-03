@@ -76,6 +76,13 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
         pathname: '/**',
       },
+      // Les avatars des comptes de demonstration, au meme titre qu'Unsplash
+      // pour leurs photos de logement.
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+        pathname: '/**',
+      },
     ],
   },
 };
