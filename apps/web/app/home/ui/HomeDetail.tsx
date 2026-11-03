@@ -13,7 +13,6 @@ import { iconeEquipement } from 'app/home/ui/components/iconesEquipements';
 import { BoutonFavori } from 'app/home/ui/components/BoutonFavori';
 import { BoutonPartager } from 'app/home/ui/components/BoutonPartager';
 import { GalerieLogement } from 'app/home/ui/components/GalerieLogement';
-import { trancheDePrix } from 'app/home/ui/components/trancheDePrix';
 import { VisiblePourLesAutres } from 'app/home/ui/components/VisiblePourLesAutres';
 
 import styles from './HomeDetail.module.css';
@@ -99,16 +98,6 @@ export async function HomeDetail({ home, locale }: Props) {
     year: 'numeric',
   });
 
-  const prochaine = disponibilites[0];
-
-  const resumeDisponibilite = prochaine
-    ? `${dateCourte.format(new Date(prochaine.startDate))} — ${dateCourte.format(
-        new Date(prochaine.endDate),
-      )}`
-    : t('availability.free');
-
-  const prix = trancheDePrix(home.pricePerNight);
-
   return (
     <article className={styles.page}>
       <header className={styles.entete}>
@@ -144,23 +133,6 @@ export async function HomeDetail({ home, locale }: Props) {
                 </span>
               </a>
             ) : null}
-          </section>
-
-          <section className={styles.bloc}>
-            <h2 className={styles.sousTitre}>{t('home.availabilityTitle')}</h2>
-
-            {disponibilites.length ? (
-              <ul className={styles.periodes}>
-                {disponibilites.map((periode) => (
-                  <li key={periode.id ?? periode.startDate}>
-                    {dateCourte.format(new Date(periode.startDate))} —{' '}
-                    {dateCourte.format(new Date(periode.endDate))}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles.description}>{t('availability.free')}</p>
-            )}
           </section>
 
           {home.description ? (
@@ -367,12 +339,29 @@ export async function HomeDetail({ home, locale }: Props) {
 
         <aside className={styles.colonneLaterale}>
           <div className={styles.resume}>
-            {prix ? <span className={styles.prix}>{prix}</span> : null}
-
-            <span className={styles.disponibilite}>
-              <CalendarDays size={16} />
-              {resumeDisponibilite}
+            <span className={styles.resumeTitre}>
+              {t('home.availabilityTitle')}
             </span>
+
+            {disponibilites.length ? (
+              <ul className={styles.periodes}>
+                {disponibilites.map((periode) => (
+                  <li
+                    key={periode.id ?? periode.startDate}
+                    className={styles.disponibilite}
+                  >
+                    <CalendarDays size={16} />
+                    {dateCourte.format(new Date(periode.startDate))} —{' '}
+                    {dateCourte.format(new Date(periode.endDate))}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span className={styles.disponibilite}>
+                <CalendarDays size={16} />
+                {t('availability.free')}
+              </span>
+            )}
           </div>
 
           <DemandeEchange homeId={home.id} ownerId={home.ownerId} />
