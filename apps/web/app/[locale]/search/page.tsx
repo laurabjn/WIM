@@ -52,7 +52,9 @@ export default async function SearchPage({ searchParams }: Props) {
       <Navbar />
 
       <section className={styles.contenu}>
-        <h1 className={styles.titre}>{t('common.search')}</h1>
+        <h1 className={styles.titre}>{t('search.search')}</h1>
+
+        <p className={styles.sousTitre}>{t('search.pageSubtitle')}</p>
 
         <FormulaireRecherche />
 

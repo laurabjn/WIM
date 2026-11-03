@@ -1,68 +1,217 @@
 .formulaire {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: flex-end;
-  gap: 14px;
-  padding: 20px;
-  border: 1px solid #e8eaec;
-  border-radius: 18px;
-  background: #ffffff;
+  gap: 10px;
+  margin-bottom: 28px;
 }
 
-.champ {
+.rangee {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.barre {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 6px;
+  border-radius: var(--wim-rayon-pilule);
+  background: var(--wim-surface-douce);
+}
+
+.segment {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  flex: 1 1 160px;
+  justify-content: center;
+  gap: 2px;
+  flex: 1 1 0;
   min-width: 0;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: var(--wim-rayon-pilule);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.segmentBouton {
+  font: inherit;
+}
+
+.segmentActif {
+  border-color: var(--wim-bordure);
+  background: var(--wim-surface);
+  box-shadow: var(--wim-ombre-carte);
 }
 
 .libelle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wim-texte);
+}
+
+.valeur,
+.saisie {
   font-size: 13px;
-  font-weight: 600;
-  color: #5c6b72;
+  color: var(--wim-texte-doux);
 }
 
-.champ input,
-.champ select {
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid #dfe3e6;
-  border-radius: 10px;
-  background: #ffffff;
-  font: inherit;
-  color: inherit;
+.saisie {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  outline: none;
 }
 
-.champ input:focus,
-.champ select:focus {
-  outline: 2px solid #2da7f3;
-  outline-offset: 1px;
+.saisie::placeholder {
+  color: var(--wim-texte-doux);
 }
 
-.bouton {
+.rechercher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex: 0 0 auto;
-  height: 44px;
   padding: 0 24px;
   border: 0;
-  border-radius: 999px;
-  background: #111111;
+  border-radius: var(--wim-rayon-pilule);
+  background: var(--wim-degrade);
   color: #ffffff;
   font: inherit;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
 }
 
-.bouton:hover {
-  background: #2a2a2a;
+.filtres {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-champ);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-@media (max-width: 680px) {
-  .champ {
-    flex: 1 1 100%;
+.suggestions {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 20;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  padding: 10px;
+
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-bloc);
+  background: var(--wim-surface);
+  box-shadow: var(--wim-ombre-flottante);
+}
+
+.suggestionsTitre {
+  margin: 0 0 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--wim-texte-doux);
+}
+
+.suggestion {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border: 0;
+  border-radius: var(--wim-rayon-champ);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background: var(--wim-surface-douce);
+}
+
+.suggestionNom {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--wim-texte);
+}
+
+.suggestionDetail {
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--wim-texte-doux);
+}
+
+.volet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  padding: 18px 20px;
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-carte);
+  background: var(--wim-surface);
+}
+
+.champVolet {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.champVolet input,
+.champVolet select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-champ);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
+  font: inherit;
+  font-size: 14px;
+}
+
+.toutEffacer {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--wim-texte);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 860px) {
+  .rangee {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .bouton {
-    width: 100%;
+  .barre {
+    flex-direction: column;
+    border-radius: var(--wim-rayon-bloc);
+  }
+
+  .rechercher {
+    height: 48px;
+    justify-content: center;
   }
 }
