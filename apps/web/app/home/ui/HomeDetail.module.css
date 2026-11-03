@@ -391,3 +391,13 @@
   font-size: 14px;
   color: var(--wim-texte);
 }
+
+/* La barre flottante recouvre une centaine de pixels : sans cette réserve,
+   un saut d'ancre dépose le titre dessous. */
+#avis {
+  scroll-margin-top: 120px;
+}
+
+.noteLien {
+  text-decoration: underline;
+}

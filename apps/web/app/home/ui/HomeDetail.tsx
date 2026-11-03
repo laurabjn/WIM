@@ -135,10 +135,12 @@ export async function HomeDetail({ home, locale }: Props) {
             </p>
 
             {note ? (
-              <p className={styles.note}>
+              <a className={styles.note} href="#avis">
                 <Star size={15} fill="currentColor" strokeWidth={0} /> {note} •{' '}
-                {nombreAvis} {t('home.reviews.reviewsCount')}
-              </p>
+                <span className={styles.noteLien}>
+                  {nombreAvis} {t('home.reviews.reviewsCount')}
+                </span>
+              </a>
             ) : null}
           </section>
 
@@ -268,7 +270,7 @@ export async function HomeDetail({ home, locale }: Props) {
           ) : null}
 
           {avis.length ? (
-            <section className={styles.bloc}>
+            <section className={styles.bloc} id="avis">
               <h2 className={styles.sousTitre}>
                 <Star size={16} fill="currentColor" strokeWidth={0} /> {note} •{' '}
                 {nombreAvis} {t('home.reviews.reviewsCount')}
