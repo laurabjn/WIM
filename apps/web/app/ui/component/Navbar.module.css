@@ -26,8 +26,13 @@
 }
 
 .navItem {
-  color: var(--wim-texte);
+  color: var(--wim-texte-doux);
   font-size: 13px;
+  font-weight: 500;
+}
+
+.navItemActif {
+  color: var(--wim-texte);
   font-weight: 800;
 }
 

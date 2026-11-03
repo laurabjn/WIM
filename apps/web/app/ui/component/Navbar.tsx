@@ -1,4 +1,7 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
 import Link from 'next/link';
 import {
@@ -9,26 +12,39 @@ import {
   Search,
 } from 'lucide-react';
 
+const ENTREES = [
+  { chemin: '/menu', cle: 'home', Icone: Home },
+  { chemin: '/exchanges', cle: 'exchanges', Icone: Repeat },
+  { chemin: '/messages', cle: 'messages', Icone: MessageSquare },
+  { chemin: '/account', cle: 'account', Icone: User },
+] as const;
+
 export function Navbar() {
   const t = useTranslations('common');
+  const chemin = usePathname() ?? '';
+  const sansLangue = chemin.replace(/^\/(fr|en)(?=\/|$)/, '') || '/';
+
+  function estActive(cible: string) {
+    return sansLangue === cible || sansLangue.startsWith(`${cible}/`);
+  }
+
   return (
     <nav className={styles.navbar}>
-      <Link href="/menu" className={styles.navItem}>
-        <Home size={15} strokeWidth={2.2} />
-        {t('home')}
-      </Link>
-      <Link href="/exchanges" className={styles.navItem}>
-        <Repeat size={15} strokeWidth={2.2} />
-        {t('exchanges')}
-      </Link>
-      <Link href="/messages" className={styles.navItem}>
-        <MessageSquare size={15} strokeWidth={2.2} />
-        {t('messages')}
-      </Link>
-      <Link href="/account" className={styles.navItem}>
-        <User size={15} strokeWidth={2.2} />
-        {t('account')}
-      </Link>
+      {ENTREES.map(({ chemin: cible, cle, Icone }) => (
+        <Link
+          key={cible}
+          href={cible}
+          aria-current={estActive(cible) ? 'page' : undefined}
+          className={[
+            styles.navItem,
+            estActive(cible) ? styles.navItemActif : '',
+          ].join(' ')}
+        >
+          <Icone size={15} strokeWidth={2.2} />
+          {t(cle)}
+        </Link>
+      ))}
+
       <Link href="/search" className={styles.searchButton}>
         <Search size={15} strokeWidth={2.4} />
         {t('search')}
