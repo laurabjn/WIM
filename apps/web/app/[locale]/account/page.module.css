@@ -16,3 +16,21 @@
   letter-spacing: -0.02em;
   margin: 0 0 20px;
 }
+
+.fil {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--wim-texte-doux);
+}
+
+.filLien {
+  color: var(--wim-texte-doux);
+  text-decoration: underline;
+}
+
+.filCourant {
+  color: var(--wim-texte);
+}

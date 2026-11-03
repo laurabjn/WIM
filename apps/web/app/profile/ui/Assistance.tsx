@@ -38,6 +38,12 @@ export function Assistance() {
   const [erreur, setErreur] = useState<string | null>(null);
 
   useEffect(() => {
+    const demande = new URLSearchParams(window.location.search).get('sujet');
+
+    if (demande && SUJETS.includes(demande as SupportTopic)) {
+      setSujet(demande as SupportTopic);
+    }
+
     const session = getSession();
 
     if (!session) {
