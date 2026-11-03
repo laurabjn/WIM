@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Share2 } from 'lucide-react';
 
-import styles from './BoutonModifierLogement.module.css';
+import styles from './BoutonRond.module.css';
 
 type Props = {
   titre: string;
@@ -38,7 +38,7 @@ export function BoutonPartager({ titre }: Props) {
   return (
     <button
       type="button"
-      className={styles.crayon}
+      className={styles.rond}
       onClick={partager}
       title={copie ? t('linkCopied') : t('share')}
       aria-label={copie ? t('linkCopied') : t('share')}

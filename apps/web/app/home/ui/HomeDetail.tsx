@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { Home, Review } from '@wim/shared/home/home.type';
-import { ChevronRight, Star } from 'lucide-react';
+import { CalendarDays, ChevronRight, Star } from 'lucide-react';
 
 import { DemandeEchange } from 'app/exchange/ui/DemandeEchange';
 import { CarteLogement } from 'app/home/ui/components/CarteLogement';
@@ -10,7 +10,10 @@ import { carteEstConfiguree } from 'app/home/infrastructure/mapbox';
 import { getDescriptionDeVille } from 'app/home/infrastructure/locationDescription.api';
 import { BoutonModifierLogement } from 'app/home/ui/components/BoutonModifierLogement';
 import { iconeEquipement } from 'app/home/ui/components/iconesEquipements';
+import { BoutonFavori } from 'app/home/ui/components/BoutonFavori';
 import { BoutonPartager } from 'app/home/ui/components/BoutonPartager';
+import { GalerieLogement } from 'app/home/ui/components/GalerieLogement';
+import { trancheDePrix } from 'app/home/ui/components/trancheDePrix';
 import { VisiblePourLesAutres } from 'app/home/ui/components/VisiblePourLesAutres';
 
 import styles from './HomeDetail.module.css';
@@ -20,7 +23,6 @@ type Props = {
   locale: string;
 };
 
-const PHOTOS_MOSAIQUE = 6;
 const AVIS_VISIBLES = 4;
 
 function anneesDepuis(date?: string | null) {
@@ -49,21 +51,38 @@ export async function HomeDetail({ home, locale }: Props) {
   const t = await getTranslations();
 
   const photos = home.photos ?? [];
-  const couverture = photos[0]?.url;
-  const secondaires = photos.slice(1, 1 + PHOTOS_MOSAIQUE);
-
-  const colonnesSecondaires = Math.min(3, Math.ceil(secondaires.length / 2));
-  const lignesSecondaires = secondaires.length > colonnesSecondaires ? 2 : 1;
 
   const avis = home.reviews ?? [];
-  const note = moyenne(avis);
+  const note =
+    home.averageRating != null ? home.averageRating.toFixed(1) : moyenne(avis);
   const nombreAvis = home.reviewsCount ?? avis.length;
 
   const anneesHote = anneesDepuis(home.owner?.createdAt);
 
-  const disponibilites = (home.availabilities ?? []).filter(
-    (periode) => new Date(periode.endDate).getTime() >= Date.now(),
-  );
+  const disponibilites = (home.availabilities ?? [])
+    .filter((periode) => new Date(periode.endDate).getTime() >= Date.now())
+    .sort(
+      (une, autre) =>
+        new Date(une.startDate).getTime() - new Date(autre.startDate).getTime(),
+    );
+
+  const minuscules = (texte: string) => texte.toLocaleLowerCase(locale);
+
+  const cleType = `home.homeTypes.${(home.homeType ?? '').toLowerCase()}`;
+  const typeLogement = t.has(cleType) ? t(cleType) : '';
+
+  const caracteristiques = [
+    `${home.capacity} ${home.capacity > 1 ? t('home.travelers') : t('home.traveler')}`,
+    typeLogement,
+    home.beds
+      ? `${home.beds} ${minuscules(home.beds > 1 ? t('profile.beds') : t('profile.bed'))}`
+      : '',
+    home.bathrooms
+      ? `${home.bathrooms} ${minuscules(home.bathrooms > 1 ? t('profile.bathrooms') : t('profile.bathroom'))}`
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' • ');
 
   const aDesCoordonnees =
     typeof home.latitude === 'number' && typeof home.longitude === 'number';
@@ -80,59 +99,42 @@ export async function HomeDetail({ home, locale }: Props) {
     year: 'numeric',
   });
 
+  const prochaine = disponibilites[0];
+
+  const resumeDisponibilite = prochaine
+    ? `${dateCourte.format(new Date(prochaine.startDate))} — ${dateCourte.format(
+        new Date(prochaine.endDate),
+      )}`
+    : t('availability.free');
+
+  const prix = trancheDePrix(home.pricePerNight);
+
   return (
     <article className={styles.page}>
       <header className={styles.entete}>
         <h1 className={styles.titre}>{home.title}</h1>
 
-        <BoutonPartager titre={home.title} />
+        <div className={styles.actions}>
+          <BoutonPartager titre={home.title} />
 
-        <BoutonModifierLogement homeId={home.id} ownerId={home.ownerId} />
+          <BoutonFavori homeId={home.id} ownerId={home.ownerId} />
+
+          <BoutonModifierLogement homeId={home.id} ownerId={home.ownerId} />
+        </div>
       </header>
 
-      {couverture ? (
-        <div
-          className={styles.galerie}
-          style={
-            secondaires.length === 0
-              ? { gridTemplateColumns: 'minmax(0, 1fr)' }
-              : undefined
-          }
-        >
-          <div className={styles.photoPrincipale}>
-            <Image src={couverture} alt={home.title} fill sizes="50vw" />
-          </div>
-
-          {secondaires.length ? (
-            <div
-              className={styles.photosSecondaires}
-              style={{
-                gridTemplateColumns: `repeat(${colonnesSecondaires}, minmax(0, 1fr))`,
-                gridTemplateRows: `repeat(${lignesSecondaires}, minmax(0, 1fr))`,
-              }}
-            >
-              {secondaires.map((photo) => (
-                <div key={photo.id} className={styles.photoSecondaire}>
-                  <Image src={photo.url} alt={home.title} fill sizes="20vw" />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+      <GalerieLogement photos={photos} titre={home.title} />
 
       <div className={styles.colonnes}>
         <div className={styles.principal}>
           <section className={styles.bloc}>
             <h2 className={styles.lieu}>
+              {t('home.entireHome')}
+              {typeLogement ? ` : ${minuscules(typeLogement)}` : ''} -{' '}
               {home.city}, {home.country}
             </h2>
 
-            <p className={styles.caracteristiques}>
-              {home.capacity}{' '}
-              {home.capacity > 1 ? t('home.travelers') : t('home.traveler')} •{' '}
-              {home.beds} {home.beds > 1 ? t('profile.beds') : t('profile.bed')}
-            </p>
+            <p className={styles.caracteristiques}>{caracteristiques}</p>
 
             {note ? (
               <a className={styles.note} href="#avis">
@@ -364,6 +366,15 @@ export async function HomeDetail({ home, locale }: Props) {
         </div>
 
         <aside className={styles.colonneLaterale}>
+          <div className={styles.resume}>
+            {prix ? <span className={styles.prix}>{prix}</span> : null}
+
+            <span className={styles.disponibilite}>
+              <CalendarDays size={16} />
+              {resumeDisponibilite}
+            </span>
+          </div>
+
           <DemandeEchange homeId={home.id} ownerId={home.ownerId} />
         </aside>
       </div>

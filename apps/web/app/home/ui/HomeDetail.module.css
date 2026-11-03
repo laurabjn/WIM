@@ -7,49 +7,22 @@
 .entete {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 16px;
-  text-align: center;
 }
 
 .titre {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   color: var(--wim-texte);
 }
 
-.galerie {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  height: 420px;
-}
-
-.photoPrincipale {
-  position: relative;
-  border-radius: var(--wim-rayon-carte);
-  overflow: hidden;
-  background: var(--wim-surface-douce);
-}
-
-.photosSecondaires {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.photoSecondaire {
-  position: relative;
-  border-radius: var(--wim-rayon-carte);
-  overflow: hidden;
-  background: var(--wim-surface-douce);
-}
-
-.photoPrincipale img,
-.photoSecondaire img {
-  object-fit: cover;
+.actions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 8px;
 }
 
 .colonnes {
@@ -69,13 +42,35 @@
 .colonneLaterale {
   position: sticky;
   top: 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   width: 340px;
 }
 
-/* Sur son propre logement la colonne est vide : elle ne doit pas réserver
-   sa largeur pour rien. */
-.colonneLaterale:empty {
-  display: none;
+.resume {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border-radius: var(--wim-rayon-bloc);
+  background: var(--wim-surface);
+  box-shadow: var(--wim-ombre-flottante);
+}
+
+.prix {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--wim-texte);
+}
+
+.disponibilite {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--wim-texte-doux);
 }
 
 .bloc {
@@ -332,15 +327,7 @@
 
   .colonneLaterale {
     position: static;
-  }
-
-  .galerie {
-    grid-template-columns: minmax(0, 1fr);
-    height: auto;
-  }
-
-  .photoPrincipale {
-    height: 260px;
+    width: auto;
   }
 
   .rencontre {
@@ -362,8 +349,6 @@
   text-decoration: underline;
 }
 
-/* La description d'une ville vient de Wikipédia : elle peut faire plusieurs
-   paragraphes. La maquette n'en montre que le début, suivi du lien. */
 .extrait {
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -392,8 +377,6 @@
   color: var(--wim-texte);
 }
 
-/* La barre flottante recouvre une centaine de pixels : sans cette réserve,
-   un saut d'ancre dépose le titre dessous. */
 #avis {
   scroll-margin-top: 120px;
 }

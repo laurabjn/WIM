@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Pencil } from 'lucide-react';
 
 import { getSession } from 'app/auth/infrastructure/authStorage';
-import styles from './BoutonModifierLogement.module.css';
+import styles from './BoutonRond.module.css';
 
 type Props = {
   homeId: string;
@@ -26,7 +26,7 @@ export function BoutonModifierLogement({ homeId, ownerId }: Props) {
   return (
     <Link
       href={`/homes/${homeId}/edit`}
-      className={styles.crayon}
+      className={styles.rond}
       title={t('edit')}
       aria-label={t('edit')}
     >

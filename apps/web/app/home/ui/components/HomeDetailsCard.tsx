@@ -7,22 +7,12 @@ import { useTranslations } from 'next-intl';
 import { MouseEvent, useState } from 'react';
 import { addFavoriteHome, removeFavoriteHome } from 'app/home/infrastructure/home.api';
 import { getSession } from 'app/auth/infrastructure/authStorage';
+import { trancheDePrix } from './trancheDePrix';
 
 type Props = {
   home: Home;
   initialFavorite?: boolean;
 };
-
-const SEUIL_MOYEN = 80;
-const SEUIL_ELEVE = 150;
-
-function tranche(prixParNuit: number | null | undefined) {
-  if (!prixParNuit) return '';
-
-  if (prixParNuit < SEUIL_MOYEN) return '€';
-
-  return prixParNuit < SEUIL_ELEVE ? '€€' : '€€€';
-}
 
 export function HomeDetailsCard({ home, initialFavorite = false }: Props) {
   const t = useTranslations();
@@ -117,7 +107,7 @@ export function HomeDetailsCard({ home, initialFavorite = false }: Props) {
           )}
 
           <span className={styles.price}>
-            {tranche(home.pricePerNight)}
+            {trancheDePrix(home.pricePerNight)}
           </span>
         </div>
       </div>
