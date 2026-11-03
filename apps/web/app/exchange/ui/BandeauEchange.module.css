@@ -1,22 +1,22 @@
 .bandeau {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 18px;
   flex: 0 0 auto;
-  padding: 14px 16px;
-  border-bottom: 1px solid #eef1f2;
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--wim-bordure);
   background: #f4fafe;
 }
 
 .entete {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 10px;
+  align-items: center;
+  gap: 14px;
 }
 
 .etat {
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
   background: #2da7f3;
   color: #ffffff;
@@ -25,25 +25,25 @@
 }
 
 .periode {
-  color: #5c6b72;
+  color: var(--wim-texte-doux);
   font-size: 13px;
 }
 
 .logements {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px 48px;
 }
 
 .logement {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 5px;
   min-width: 0;
 }
 
 .logementRole {
-  color: #5c6b72;
+  color: var(--wim-texte-doux);
   font-size: 12px;
 }
 
@@ -71,7 +71,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  margin-top: 4px;
 }
 
 .choix {
