@@ -11,6 +11,7 @@ import {
 } from 'app/home/ui/components/CarteLogement';
 import { getDescriptionDeVille } from 'app/home/infrastructure/locationDescription.api';
 import { BoutonModifierLogement } from 'app/home/ui/components/BoutonModifierLogement';
+import { VisiblePourLesAutres } from 'app/home/ui/components/VisiblePourLesAutres';
 
 import styles from './HomeDetail.module.css';
 
@@ -311,6 +312,7 @@ export async function HomeDetail({ home, locale }: Props) {
           ) : null}
 
           {home.owner ? (
+            <VisiblePourLesAutres ownerId={home.ownerId}>
             <section className={styles.bloc}>
               <h2 className={styles.sousTitre}>{t('home.meetHosts')}</h2>
 
@@ -363,6 +365,7 @@ export async function HomeDetail({ home, locale }: Props) {
                 </div>
               </div>
             </section>
+            </VisiblePourLesAutres>
           ) : null}
         </div>
 
