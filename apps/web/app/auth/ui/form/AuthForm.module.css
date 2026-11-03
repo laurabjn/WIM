@@ -5,7 +5,7 @@
   background: var(--wim-surface);
 
   display: grid;
-  grid-template-columns: 430px 396px;
+  grid-template-columns: 430px 368px;
   justify-content: center;
   align-items: center;
   column-gap: 95px;
@@ -26,7 +26,7 @@
 }
 
 .loginCard {
-  width: 396px;
+  width: 368px;
 }
 
 .title {
@@ -60,9 +60,9 @@
   display: flex;
   align-items: center;
   width: 100%;
-  height: 62px;
+  height: 55px;
 
-  border-radius: 10px;
+  border-radius: 9999px;
   border: 1px solid var(--wim-bordure);
   background: var(--wim-surface);
 
@@ -129,7 +129,7 @@
 
 @media (max-width: 920px) {
   .loginPage {
-    grid-template-columns: minmax(0, 396px);
+    grid-template-columns: minmax(0, 368px);
     row-gap: 40px;
     padding: 32px 16px;
   }
