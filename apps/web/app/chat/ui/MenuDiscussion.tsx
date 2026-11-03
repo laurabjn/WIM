@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 
 import { blockUser, reportUser } from 'app/profile/infrastructure/account.api';
+import { getHomesByOwnerId } from 'app/home/infrastructure/home.api';
 import styles from './MenuDiscussion.module.css';
 
 const MOTIFS = [
@@ -35,6 +37,7 @@ export function MenuDiscussion({
   onPartiePourDeBon,
 }: Props) {
   const t = useTranslations('chat');
+  const router = useRouter();
 
   const [ouvert, setOuvert] = useState(false);
   const [motifsOuverts, setMotifsOuverts] = useState(false);
@@ -56,6 +59,33 @@ export function MenuDiscussion({
 
     return () => document.removeEventListener('mousedown', auClicDehors);
   }, [ouvert]);
+
+  async function proposerUnEchange() {
+    setEnCours(true);
+    setErreur(null);
+
+    try {
+      const logements = await getHomesByOwnerId(participantId);
+      const [premier] = logements;
+
+      if (!premier) {
+        setErreur(t('noHomeToExchange'));
+        return;
+      }
+
+      setOuvert(false);
+
+      router.push(
+        logements.length === 1
+          ? `/homes/${premier.id}`
+          : `/profile?userId=${participantId}`,
+      );
+    } catch {
+      setErreur(t('reportError'));
+    } finally {
+      setEnCours(false);
+    }
+  }
 
   async function bloquer() {
     setEnCours(true);
@@ -134,6 +164,16 @@ export function MenuDiscussion({
               >
                 {t('viewProfile')}
               </Link>
+
+              <button
+                type="button"
+                role="menuitem"
+                className={styles.entree}
+                disabled={enCours}
+                onClick={proposerUnEchange}
+              >
+                {t('proposeExchange')}
+              </button>
 
               {traduisible ? (
                 <button
