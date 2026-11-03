@@ -1,13 +1,11 @@
 .page {
   min-height: 100vh;
-  background: #fafbfc;
+  background: var(--wim-fond);
 }
 
 .contenu {
   width: 100%;
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 24px 20px 80px;
+  padding: 95px 48px 80px;
 }
 
 .titre {
