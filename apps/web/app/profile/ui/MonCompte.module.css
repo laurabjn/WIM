@@ -115,10 +115,13 @@
   font-weight: 800;
 }
 
+/* auto-fill et non auto-fit : avec deux logements, auto-fit les
+   etirerait sur toute la largeur au lieu de garder leur taille. Le
+   plafond de 380 evite qu une colonne isolee ne devienne demesuree. */
 .grille {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 380px));
+  gap: 24px;
 }
 
 .vide {
