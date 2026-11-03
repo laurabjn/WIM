@@ -45,6 +45,9 @@ export async function HomeDetail({ home, locale }: Props) {
   const couverture = photos[0]?.url;
   const secondaires = photos.slice(1, 1 + PHOTOS_MOSAIQUE);
 
+  const colonnesSecondaires = Math.min(3, Math.ceil(secondaires.length / 2));
+  const lignesSecondaires = secondaires.length > colonnesSecondaires ? 2 : 1;
+
   const avis = home.reviews ?? [];
   const note = moyenne(avis);
   const nombreAvis = home.reviewsCount ?? avis.length;
@@ -64,18 +67,33 @@ export async function HomeDetail({ home, locale }: Props) {
       </header>
 
       {couverture ? (
-        <div className={styles.galerie}>
+        <div
+          className={styles.galerie}
+          style={
+            secondaires.length === 0
+              ? { gridTemplateColumns: 'minmax(0, 1fr)' }
+              : undefined
+          }
+        >
           <div className={styles.photoPrincipale}>
             <Image src={couverture} alt={home.title} fill sizes="50vw" />
           </div>
 
-          <div className={styles.photosSecondaires}>
-            {secondaires.map((photo) => (
-              <div key={photo.id} className={styles.photoSecondaire}>
-                <Image src={photo.url} alt={home.title} fill sizes="20vw" />
-              </div>
-            ))}
-          </div>
+          {secondaires.length ? (
+            <div
+              className={styles.photosSecondaires}
+              style={{
+                gridTemplateColumns: `repeat(${colonnesSecondaires}, minmax(0, 1fr))`,
+                gridTemplateRows: `repeat(${lignesSecondaires}, minmax(0, 1fr))`,
+              }}
+            >
+              {secondaires.map((photo) => (
+                <div key={photo.id} className={styles.photoSecondaire}>
+                  <Image src={photo.url} alt={home.title} fill sizes="20vw" />
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
 

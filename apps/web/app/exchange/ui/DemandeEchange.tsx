@@ -102,8 +102,10 @@ export function DemandeEchange({ homeId, ownerId }: Props) {
   if (etat === 'mien') {
     return (
       <aside className={styles.appel}>
-        <Link href="/account" className={styles.boutonSombre}>
-          {t('common.account')}
+        <p className={styles.appelTexte}>{t('home.myHome')}</p>
+
+        <Link href={`/homes/${homeId}/edit`} className={styles.boutonSombre}>
+          {t('common.edit')}
         </Link>
       </aside>
     );
