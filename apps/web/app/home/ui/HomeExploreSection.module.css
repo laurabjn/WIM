@@ -16,35 +16,9 @@
   min-width: 0;
 }
 
-.modeRow {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  margin-bottom: 28px;
-  font-size: 13px;
-  font-weight: 800;
-}
-
 .topControls {
   width: 620px;
   margin-bottom: 22px;
-}
-
-.toggle {
-  width: 190px;
-  height: 24px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #52d1a6, #dff8ef);
-  padding: 3px;
-}
-
-.toggleDot {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff;
 }
 
 .rightColumn {

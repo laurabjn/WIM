@@ -15,8 +15,6 @@ export default async function MenuPage() {
       <HomeExploreSection
         homes={homes}
         labels={{
-          toExplore: t('search.toExplore'),
-          fastSearch: t('search.fastSearch'),
           lastSearches: t('search.lastSearches'),
         }}
       />
