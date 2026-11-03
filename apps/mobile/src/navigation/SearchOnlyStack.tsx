@@ -1,7 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { SearchScreen } from 'src/search/ui/SearchScreen';
-import { DestinationSearchScreen } from 'src/search/ui/DestinationSearchScreen';
 import { SearchResultsScreen } from 'src/search/ui/SearchResultsScreen';
 import { HomeDetailsScreen } from 'src/home/ui/HomeDetailScreen';
 import { ProfilePublicScreen } from 'src/profile/ui/ProfilePublicScreen';
@@ -17,11 +16,6 @@ export function SearchOnlyStackNavigator() {
       <Stack.Screen
         name="Search"
         component={SearchScreen}
-      />
-
-      <Stack.Screen
-        name="DestinationSearch"
-        component={DestinationSearchScreen}
       />
 
       <Stack.Screen

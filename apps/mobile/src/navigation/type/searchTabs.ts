@@ -1,10 +1,6 @@
 export type SearchStackParamList = {
   Menu: undefined;
   Search: undefined;
-  DestinationSearch: {
-    currentDestination: string;
-    onSelectDestination: (destination: string) => void;
-    };
   SearchResults: {
     city: string;
     category?: 'NATURE' | 'BEACH' | 'CITY' | 'CULTURE';

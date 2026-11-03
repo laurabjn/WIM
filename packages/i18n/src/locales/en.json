@@ -1010,7 +1010,21 @@
     "noDestination": "No destination found",
     "noRecentDestination": "No recent searches",
     "results": "Results",
-    "dateDone": "Done"
+    "dateDone": "Done",
+    "where": "Where?",
+    "when": "When?",
+    "who": "Who?",
+    "destinationPlaceholder": "Search a destination",
+    "destinationSuggestions": "Suggested destinations",
+    "nearby": "Nearby",
+    "nearbyHint": "Find an exchange around you",
+    "recentSearch": "Recent search",
+    "popularDestination": "Popular destination",
+    "addDestination": "Add a destination",
+    "addDates": "Add dates",
+    "addTravelers": "Add travellers",
+    "clearAll": "Clear all",
+    "locationDenied": "Location unavailable"
   },
   "swipe": {
       "alreadyMatchedOtherHome": "You had already liked another home from {{name}}: you will pick which one when proposing an exchange.",

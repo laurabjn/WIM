@@ -1005,7 +1005,21 @@
     "noDestination": "Aucune destination trouvée",
     "noRecentDestination": "Aucune destination récente",
     "results": "Résultats",
-    "dateDone": "Terminé"
+    "dateDone": "Terminé",
+    "where": "Où ?",
+    "when": "Quand ?",
+    "who": "Qui ?",
+    "destinationPlaceholder": "Rechercher une destination",
+    "destinationSuggestions": "Suggestions de destinations",
+    "nearby": "À proximité",
+    "nearbyHint": "Trouvez un échange autour de vous",
+    "recentSearch": "Recherche récente",
+    "popularDestination": "Destination populaire",
+    "addDestination": "Ajouter une destination",
+    "addDates": "Ajouter des dates",
+    "addTravelers": "Ajouter des voyageurs",
+    "clearAll": "Tout effacer",
+    "locationDenied": "Position indisponible"
   },
   "swipe": {
       "alreadyMatchedOtherHome": "Vous aviez déjà aimé un autre logement de {{name}} : vous choisirez lequel au moment de proposer un échange.",

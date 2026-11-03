@@ -1,5 +1,4 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import { DestinationSearchScreen } from "src/search/ui/DestinationSearchScreen";
 import { SearchScreen } from "src/search/ui/SearchScreen";
 import { SearchStackParamList } from "./type/searchTabs";
 import { View, Text } from 'react-native';
@@ -26,7 +25,6 @@ export function SearchStackNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Menu" component={MenuScreen} />
           <Stack.Screen name="Search" component={SearchScreen} />
-          <Stack.Screen name="DestinationSearch" component={DestinationSearchScreen} />
           <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
           <Stack.Screen
             name="Swipe"
