@@ -30,6 +30,7 @@ import {
   disconnectChatSocket,
 } from 'app/chat/infrastructure/chatSocket';
 
+import { BandeauStatuts } from './BandeauStatuts';
 import styles from './Messagerie.module.css';
 
 type Etat = 'chargement' | 'anonyme' | 'prete' | 'erreur';
@@ -454,6 +455,14 @@ export function Messagerie() {
       className={`${styles.messagerie} ${active ? styles.ouverte : ''}`.trim()}
     >
       <aside className={styles.liste}>
+        {token ? (
+          <BandeauStatuts
+            token={token}
+            conversations={conversations}
+            onOuvrir={setActiveId}
+          />
+        ) : null}
+
         <div className={styles.onglets}>
           <button
             type="button"
