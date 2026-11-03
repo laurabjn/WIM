@@ -39,6 +39,9 @@ import styles from './Messagerie.module.css';
 
 type Etat = 'chargement' | 'anonyme' | 'prete' | 'erreur';
 
+const cleTraduction = (chatId: string) => `chat:translate:${chatId}`;
+const cleTraduisible = (chatId: string) => `chat:translatable:${chatId}`;
+
 type Groupe = {
   cle: string;
   etiquette: string;
@@ -86,6 +89,8 @@ export function Messagerie() {
   const [envoi, setEnvoi] = useState(false);
   const [erreurEnvoi, setErreurEnvoi] = useState(false);
   const [erreurPhoto, setErreurPhoto] = useState(false);
+  const [traduit, setTraduit] = useState(true);
+  const [traduisible, setTraduisible] = useState(false);
 
   const fil = useRef<HTMLDivElement>(null);
   const lien = useRef<Socket | null>(null);
@@ -186,6 +191,18 @@ export function Messagerie() {
   }, [demande]);
 
   useEffect(() => {
+    if (!activeId) return;
+
+    try {
+      setTraduit(localStorage.getItem(cleTraduction(activeId)) !== 'off');
+      setTraduisible(localStorage.getItem(cleTraduisible(activeId)) === '1');
+    } catch {
+      setTraduit(true);
+      setTraduisible(false);
+    }
+  }, [activeId]);
+
+  useEffect(() => {
     if (!token || !activeId) return;
 
     let actif = true;
@@ -198,7 +215,7 @@ export function Messagerie() {
     setErreurEnvoi(false);
     setChargementMessages(true);
 
-    getChatMessages(token, activeId)
+    getChatMessages(token, activeId, undefined, traduit)
       .then((page) => {
         if (!actif) return;
 
@@ -231,7 +248,7 @@ export function Messagerie() {
     return () => {
       actif = false;
     };
-  }, [token, activeId]);
+  }, [token, activeId, traduit]);
 
   useEffect(() => {
     const socket = lien.current;
@@ -323,7 +340,7 @@ export function Messagerie() {
     setChargementMessages(true);
 
     try {
-      const page = await getChatMessages(token, activeId, curseur);
+      const page = await getChatMessages(token, activeId, curseur, traduit);
 
       setMessages((courant) => [...[...page.messages].reverse(), ...courant]);
       setCurseur(page.nextCursor);
@@ -439,6 +456,34 @@ export function Messagerie() {
 
     return groupes;
   }
+
+  const aDesTraductions = messages.some((message) => message.translatedContent);
+
+  useEffect(() => {
+    if (!activeId || !aDesTraductions || traduisible) return;
+
+    setTraduisible(true);
+
+    try {
+      localStorage.setItem(cleTraduisible(activeId), '1');
+    } catch {
+      return;
+    }
+  }, [activeId, aDesTraductions, traduisible]);
+
+  function appliquerTraduction(suivant: boolean) {
+    if (!activeId) return;
+
+    setTraduit(suivant);
+
+    try {
+      localStorage.setItem(cleTraduction(activeId), suivant ? 'on' : 'off');
+    } catch {
+      return;
+    }
+  }
+
+  const montrerLeBandeau = traduit ? aDesTraductions : traduisible;
 
   const idsCorrespondants = conversations
     .map((conversation) => conversation.participant?.id)
@@ -737,6 +782,22 @@ export function Messagerie() {
                 </div>
               ))}
             </div>
+
+            {montrerLeBandeau ? (
+              <p className={styles.avisTraduction}>
+                {traduit ? t('chat.autoTranslated') : t('chat.translationOff')}{' '}
+
+                <button
+                  type="button"
+                  className={styles.lienTraduction}
+                  onClick={() => appliquerTraduction(!traduit)}
+                >
+                  {traduit
+                    ? t('chat.removeTranslation')
+                    : t('chat.enableTranslation')}
+                </button>
+              </p>
+            ) : null}
 
             <form className={styles.composeur} onSubmit={envoyer}>
               <label className={styles.photo} title={t('chat.sendPhoto')}>

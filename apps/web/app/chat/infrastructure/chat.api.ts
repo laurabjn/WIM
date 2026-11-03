@@ -71,10 +71,12 @@ export async function getChatMessages(
   token: string,
   chatId: string,
   cursor?: string,
+  traduire = false,
 ): Promise<ChatMessagesPage> {
   const parametres = new URLSearchParams();
 
   if (cursor) parametres.set('cursor', cursor);
+  if (traduire) parametres.set('translate', 'true');
 
   const requete = parametres.toString();
 
