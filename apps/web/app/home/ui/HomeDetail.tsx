@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { Home } from '@wim/shared/home/home.type';
-import { BadgeCheck, MapPin, Star } from 'lucide-react';
+import { Home, Review } from '@wim/shared/home/home.type';
+import { BadgeCheck, ChevronRight, Star } from 'lucide-react';
 
 import { DemandeEchange } from 'app/exchange/ui/DemandeEchange';
 
@@ -13,14 +13,29 @@ type Props = {
   locale: string;
 };
 
-function formatPeriode(debut: string, fin: string, locale: string) {
-  const format = new Intl.DateTimeFormat(locale, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+const PHOTOS_MOSAIQUE = 6;
+const AVIS_VISIBLES = 4;
 
-  return `${format.format(new Date(debut))} — ${format.format(new Date(fin))}`;
+function anneesDepuis(date?: string | null) {
+  if (!date) return null;
+
+  const debut = new Date(date);
+
+  if (Number.isNaN(debut.getTime())) return null;
+
+  const annees = Math.floor(
+    (Date.now() - debut.getTime()) / (365.25 * 24 * 60 * 60 * 1000),
+  );
+
+  return annees > 0 ? annees : null;
+}
+
+function moyenne(avis: Review[]) {
+  if (avis.length === 0) return null;
+
+  const total = avis.reduce((somme, un) => somme + un.score, 0);
+
+  return (total / avis.length).toFixed(1);
 }
 
 export async function HomeDetail({ home, locale }: Props) {
@@ -28,141 +43,263 @@ export async function HomeDetail({ home, locale }: Props) {
 
   const photos = home.photos ?? [];
   const couverture = photos[0]?.url;
-  const secondaires = photos.slice(1, 5);
+  const secondaires = photos.slice(1, 1 + PHOTOS_MOSAIQUE);
 
-  const disponibilites = (home.availabilities ?? []).filter(
-    (periode) => new Date(periode.endDate).getTime() >= Date.now(),
-  );
+  const avis = home.reviews ?? [];
+  const note = moyenne(avis);
+  const nombreAvis = home.reviewsCount ?? avis.length;
 
-  const voyageurs =
-    home.capacity > 1 ? t('home.travelers') : t('home.traveler');
+  const anneesHote = anneesDepuis(home.owner?.createdAt);
 
-  const lits = home.beds > 1 ? t('profile.beds') : t('profile.bed');
-
-  const sallesDeBain =
-    home.bathrooms > 1 ? t('profile.bathrooms') : t('profile.bathroom');
+  const dateCourte = new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 
   return (
-    <article className={styles.fiche}>
-      {couverture ? (
-        <section className={styles.galerie}>
-          <div className={styles.photoPrincipale}>
-            <Image
-              src={couverture}
-              alt={home.title}
-              fill
-              sizes="(max-width: 900px) 100vw, 60vw"
-              priority
-            />
-          </div>
-
-          {secondaires.length > 0 ? (
-            <div className={styles.photosSecondaires}>
-              {secondaires.map((photo, index) => (
-                <div key={photo.url} className={styles.photoSecondaire}>
-                  <Image
-                    src={photo.url}
-                    alt={`${home.title} — ${index + 2}`}
-                    fill
-                    sizes="(max-width: 900px) 50vw, 20vw"
-                  />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </section>
-      ) : null}
-
+    <article className={styles.page}>
       <header className={styles.entete}>
         <h1 className={styles.titre}>{home.title}</h1>
-
-        <p className={styles.lieu}>
-          <MapPin size={16} strokeWidth={2.2} />
-          {home.city}, {home.country}
-        </p>
-
-        <p className={styles.caracteristiques}>
-          {home.capacity} {voyageurs} · {home.beds} {lits} ·{' '}
-          {home.bathrooms} {sallesDeBain}
-        </p>
-
-        {typeof home.averageRating === 'number' ? (
-          <p className={styles.note}>
-            <Star size={15} strokeWidth={2.4} />
-            {home.averageRating.toFixed(1)}
-            {home.reviewsCount ? ` · ${home.reviewsCount}` : ''}
-          </p>
-        ) : null}
       </header>
 
-      {disponibilites.length > 0 ? (
-        <section className={styles.bloc}>
-          <h2 className={styles.sousTitre}>{t('home.availabilityTitle')}</h2>
+      {couverture ? (
+        <div className={styles.galerie}>
+          <div className={styles.photoPrincipale}>
+            <Image src={couverture} alt={home.title} fill sizes="50vw" />
+          </div>
 
-          <ul className={styles.periodes}>
-            {disponibilites.map((periode) => (
-              <li key={periode.id ?? periode.startDate}>
-                {formatPeriode(periode.startDate, periode.endDate, locale)}
-              </li>
+          <div className={styles.photosSecondaires}>
+            {secondaires.map((photo) => (
+              <div key={photo.id} className={styles.photoSecondaire}>
+                <Image src={photo.url} alt={home.title} fill sizes="20vw" />
+              </div>
             ))}
-          </ul>
-        </section>
+          </div>
+        </div>
       ) : null}
 
-      {home.description ? (
-        <section className={styles.bloc}>
-          <h2 className={styles.sousTitre}>{t('home.description')}</h2>
-          <p className={styles.description}>{home.description}</p>
-        </section>
-      ) : null}
+      <div className={styles.colonnes}>
+        <div className={styles.principal}>
+          <section className={styles.bloc}>
+            <h2 className={styles.lieu}>
+              {home.city}, {home.country}
+            </h2>
 
-      {home.amenities?.length ? (
-        <section className={styles.bloc}>
-          <h2 className={styles.sousTitre}>{t('home.amenitiesTitle')}</h2>
+            <p className={styles.caracteristiques}>
+              {home.capacity}{' '}
+              {home.capacity > 1 ? t('home.travelers') : t('home.traveler')} •{' '}
+              {home.beds} {home.beds > 1 ? t('profile.beds') : t('profile.bed')}
+            </p>
 
-          <ul className={styles.equipements}>
-            {home.amenities.map((equipement) => {
-              const cle = `home.amenities.${equipement}`;
-
-              return (
-                <li key={equipement} className={styles.equipement}>
-                  {t.has(cle) ? t(cle) : equipement}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ) : null}
-
-      {home.owner ? (
-        <section className={styles.bloc}>
-          <h2 className={styles.sousTitre}>{t('home.host')}</h2>
-
-          <Link
-            href={`/profile?userId=${home.ownerId}`}
-            className={styles.hote}
-          >
-            {home.owner.avatarUrl ? (
-              <Image
-                src={home.owner.avatarUrl}
-                alt={home.owner.firstName}
-                width={48}
-                height={48}
-                className={styles.avatar}
-              />
+            {note ? (
+              <p className={styles.note}>
+                <Star size={15} fill="currentColor" strokeWidth={0} /> {note} •{' '}
+                {nombreAvis} {t('home.reviews.reviewsCount')}
+              </p>
             ) : null}
+          </section>
 
-            <span className={styles.hoteNom}>
-              {home.owner.firstName}
-              {home.owner.identityVerified ? (
-                <BadgeCheck size={16} strokeWidth={2.4} />
-              ) : null}
-            </span>
-          </Link>
-        </section>
-      ) : null}
+          {home.owner ? (
+            <section className={styles.blocHote}>
+              <Link
+                href={`/profile?userId=${home.ownerId}`}
+                className={styles.hote}
+              >
+                {home.owner.avatarUrl ? (
+                  <Image
+                    src={home.owner.avatarUrl}
+                    alt={home.owner.firstName}
+                    width={48}
+                    height={48}
+                    className={styles.avatar}
+                  />
+                ) : null}
 
-      <DemandeEchange homeId={home.id} ownerId={home.ownerId} />
+                <span className={styles.hoteTextes}>
+                  <span className={styles.hoteNom}>
+                    {t('home.host')} : {home.owner.firstName}
+                    {home.owner.identityVerified ? (
+                      <BadgeCheck size={16} strokeWidth={2.4} />
+                    ) : null}
+                  </span>
+
+                  {anneesHote ? (
+                    <span className={styles.hoteDepuis}>
+                      {t('home.hostSinceLabel')} {anneesHote} {t('home.years')}
+                    </span>
+                  ) : null}
+                </span>
+              </Link>
+            </section>
+          ) : null}
+
+          {home.description ? (
+            <section className={styles.bloc}>
+              <h2 className={styles.sousTitre}>{t('home.description')}</h2>
+              <p className={styles.description}>{home.description}</p>
+            </section>
+          ) : null}
+
+          {home.carExchangeAccepted && home.vehicle ? (
+            <section className={styles.bloc}>
+              <div className={styles.voiture}>
+                {home.vehicle.imageUrl ? (
+                  <div className={styles.voiturePhoto}>
+                    <Image
+                      src={home.vehicle.imageUrl}
+                      alt={home.vehicle.model ?? ''}
+                      fill
+                      sizes="140px"
+                    />
+                  </div>
+                ) : null}
+
+                <div className={styles.voitureTextes}>
+                  <span className={styles.voitureTitre}>
+                    {t('home.carExchangeTitle')}
+                  </span>
+
+                  <span className={styles.voitureDetail}>
+                    {[
+                      home.vehicle.seats
+                        ? `${home.vehicle.seats} ${t('home.seats')}`
+                        : null,
+                      home.vehicle.type,
+                      home.vehicle.fuelType
+                        ? t(`profile.vehicle.fuel.${home.vehicle.fuelType}`)
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' • ')}
+                  </span>
+
+                  <span className={styles.voitureDetail}>
+                    {[home.vehicle.brand, home.vehicle.model]
+                      .filter(Boolean)
+                      .join(' ')}
+                  </span>
+                </div>
+
+                <ChevronRight size={20} className={styles.voitureChevron} />
+              </div>
+            </section>
+          ) : null}
+
+          {home.amenities?.length ? (
+            <section className={styles.bloc}>
+              <h2 className={styles.sousTitre}>{t('home.amenitiesTitle')}</h2>
+
+              <ul className={styles.equipements}>
+                {home.amenities.map((equipement) => {
+                  const cle = `home.amenities.${equipement}`;
+
+                  return (
+                    <li key={equipement} className={styles.equipement}>
+                      {t.has(cle) ? t(cle) : equipement}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ) : null}
+
+          {avis.length ? (
+            <section className={styles.bloc}>
+              <h2 className={styles.sousTitre}>
+                <Star size={16} fill="currentColor" strokeWidth={0} /> {note} •{' '}
+                {nombreAvis} {t('home.reviews.reviewsCount')}
+              </h2>
+
+              <div className={styles.avis}>
+                {avis.slice(0, AVIS_VISIBLES).map((un) => (
+                  <article key={un.id} className={styles.avisCarte}>
+                    <p className={styles.avisEntete}>
+                      {'★'.repeat(Math.round(un.score))} ·{' '}
+                      {dateCourte.format(new Date(un.createdAt))}
+                    </p>
+
+                    <p className={styles.avisTexte}>{un.comment}</p>
+
+                    <div className={styles.avisAuteur}>
+                      {un.author.avatarUrl ? (
+                        <Image
+                          src={un.author.avatarUrl}
+                          alt={un.author.firstName ?? ''}
+                          width={32}
+                          height={32}
+                          className={styles.avatar}
+                        />
+                      ) : null}
+
+                      <span>{un.author.firstName}</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {home.owner ? (
+            <section className={styles.bloc}>
+              <h2 className={styles.sousTitre}>{t('home.meetHosts')}</h2>
+
+              <div className={styles.rencontre}>
+                <div className={styles.carteHote}>
+                  {home.owner.avatarUrl ? (
+                    <Image
+                      src={home.owner.avatarUrl}
+                      alt={home.owner.firstName}
+                      width={72}
+                      height={72}
+                      className={styles.avatarGrand}
+                    />
+                  ) : null}
+
+                  <span className={styles.hoteNom}>{home.owner.firstName}</span>
+                  <span className={styles.hoteDepuis}>{t('home.host')}</span>
+
+                  <dl className={styles.statistiques}>
+                    <div>
+                      <dt>{nombreAvis}</dt>
+                      <dd>{t('home.reviews.reviewsCount')}</dd>
+                    </div>
+
+                    {home.owner.rating ? (
+                      <div>
+                        <dt>{home.owner.rating.toFixed(1)} ★</dt>
+                        <dd>{t('profile.rating')}</dd>
+                      </div>
+                    ) : null}
+
+                    {anneesHote ? (
+                      <div>
+                        <dt>{anneesHote}</dt>
+                        <dd>{t('home.years')}</dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                </div>
+
+                <div className={styles.rencontreTextes}>
+                  <h3 className={styles.sousTitre}>{t('home.hostInfo')}</h3>
+
+                  <Link
+                    href={`/profile?userId=${home.ownerId}`}
+                    className={styles.boutonSombre}
+                  >
+                    {t('chat.sendMessage')}
+                  </Link>
+                </div>
+              </div>
+            </section>
+          ) : null}
+        </div>
+
+        <aside className={styles.colonneLaterale}>
+          <DemandeEchange homeId={home.id} ownerId={home.ownerId} />
+        </aside>
+      </div>
     </article>
   );
 }

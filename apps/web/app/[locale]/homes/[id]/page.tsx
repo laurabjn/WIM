@@ -5,6 +5,8 @@ import { Navbar } from 'app/ui/component/Navbar';
 import { getHomeById } from 'app/home/infrastructure/home.api';
 import { HomeDetail } from 'app/home/ui/HomeDetail';
 
+import styles from './page.module.css';
+
 type Props = {
   params: Promise<{ locale: string; id: string }>;
 };
@@ -51,10 +53,12 @@ export default async function HomePage({ params }: Props) {
   if (!home) notFound();
 
   return (
-    <main>
+    <main className={styles.page}>
       <Navbar />
 
-      <HomeDetail home={home} locale={locale} />
+      <div className={styles.contenu}>
+        <HomeDetail home={home} locale={locale} />
+      </div>
     </main>
   );
 }
