@@ -68,9 +68,7 @@ export function BandeauStatuts({ token, conversations, onOuvrir }: Props) {
     }
   }
 
-  const avecStatut = conversations
-    .filter((conversation) => conversation.participant?.status)
-    .slice(0, MAX_VISIBLES);
+  const visibles = conversations.slice(0, MAX_VISIBLES);
 
   return (
     <section className={styles.bandeau}>
@@ -95,16 +93,20 @@ export function BandeauStatuts({ token, conversations, onOuvrir }: Props) {
           )}
         </button>
 
-        {avecStatut.map((conversation) => (
+        {visibles.map((conversation) => (
           <button
             key={`statut-${conversation.id}`}
             type="button"
             className={styles.item}
             onClick={() => onOuvrir(conversation.id)}
           >
-            <span className={styles.bulle}>
-              {conversation.participant?.status}
-            </span>
+            {conversation.participant?.status ? (
+              <span className={styles.bulle}>
+                {conversation.participant.status}
+              </span>
+            ) : (
+              <span className={styles.bulleVide} />
+            )}
 
             {conversation.participant?.avatarUrl ? (
               <Image
@@ -115,7 +117,11 @@ export function BandeauStatuts({ token, conversations, onOuvrir }: Props) {
                 className={styles.avatar}
               />
             ) : (
-              <span className={`${styles.avatar} ${styles.avatarVide}`} />
+              <span className={`${styles.avatar} ${styles.avatarVide}`}>
+                {(conversation.participant?.firstName ?? "?")
+                  .charAt(0)
+                  .toUpperCase()}
+              </span>
             )}
           </button>
         ))}

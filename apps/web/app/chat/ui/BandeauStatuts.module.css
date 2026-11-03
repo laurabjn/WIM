@@ -55,9 +55,20 @@
   object-fit: cover;
 }
 
-.avatarVide {
+.bulleVide {
   display: block;
+  width: 100%;
+  min-height: 38px;
+}
+
+.avatarVide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--wim-surface-douce);
+  color: var(--wim-texte-doux);
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .editeur {
