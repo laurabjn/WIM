@@ -6,9 +6,10 @@ import Link from 'next/link';
 
 type Props = {
   home: Home;
+  nombreLogements: number;
 };
 
-export function HeroSearch({ home }: Props) {
+export function HeroSearch({ home, nombreLogements }: Props) {
   const t = useTranslations();
 
   const coverUrl =
@@ -32,11 +33,11 @@ export function HeroSearch({ home }: Props) {
         <div className={styles.bottomRow}>
           <div>
             <span className={styles.exchangeLabel}>
-              {t('home.nbExchanges')}
+              {t('search.nbExchanges')}
             </span>
 
             <strong className={styles.exchangeCount}>
-              {home.reviewsCount ?? 0}
+              {nombreLogements}
             </strong>
           </div>
 
@@ -45,6 +46,7 @@ export function HeroSearch({ home }: Props) {
             className={styles.moreButton}
           >
             {t('common.seeMore')}
+            <span aria-hidden="true">&#8594;</span>
           </Link>
         </div>
       </div>

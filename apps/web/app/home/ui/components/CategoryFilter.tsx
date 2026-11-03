@@ -18,7 +18,6 @@ export function CategoryFilter({ selectedCategory, onChangeCategory }: Props) {
   const t = useTranslations();
   
   const categories: Category[] = [
-    { key: 'all', label: t('search.allCategories'), icon: '⌂' },
     { key: 'nature', label: t('search.category.nature'), icon: '♣' },
     { key: 'beach', label: t('search.category.beach'), icon: '≋' },
     { key: 'city', label: t('search.category.city'), icon: '♜' },
@@ -38,7 +37,9 @@ export function CategoryFilter({ selectedCategory, onChangeCategory }: Props) {
               key={category.key}
               type="button"
               className={styles.item}
-              onClick={() => onChangeCategory(category.key)}
+              onClick={() =>
+                onChangeCategory(isSelected ? 'all' : category.key)
+              }
             >
               <span
                 className={[

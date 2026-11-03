@@ -27,6 +27,10 @@ export function HomeExploreSection({ homes, labels }: Props) {
   }, [homes, selectedCategory]);
 
   const featuredHome = filteredHomes[0];
+
+  const logementsDeLaVille = featuredHome
+    ? homes.filter((home) => home.city === featuredHome.city).length
+    : 0;
   const recentHomes = filteredHomes.slice(1, 4);
 
   return (
@@ -41,7 +45,9 @@ export function HomeExploreSection({ homes, labels }: Props) {
 
     <div className={styles.menuContent}>
       <div className={styles.leftColumn}>
-        {featuredHome && <HeroSearch home={featuredHome} />}
+        {featuredHome && (
+          <HeroSearch home={featuredHome} nombreLogements={logementsDeLaVille} />
+        )}
       </div>
 
       <div className={styles.rightColumn}>

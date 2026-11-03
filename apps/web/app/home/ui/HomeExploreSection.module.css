@@ -1,13 +1,13 @@
 .wrapper {
-  max-width: 1180px;
+  max-width: 1340px;
   margin: 0 auto;
   padding: 95px 40px 40px;
 }
 
 .menuContent {
   display: grid;
-  grid-template-columns: 620px 460px;
-  gap: 70px;
+  grid-template-columns: 1.58fr 1fr;
+  gap: 30px;
   align-items: start;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .modeRow {
-  width: 620px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
