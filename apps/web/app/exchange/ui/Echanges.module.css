@@ -199,14 +199,15 @@
 
 .cartes {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 16px;
 }
 
 .carte {
   display: flex;
+  align-items: stretch;
   overflow: hidden;
-  border: 1px solid #e8eaec;
+  border: 1px solid var(--wim-bordure);
   border-radius: 18px;
   background: #ffffff;
 }
@@ -249,8 +250,23 @@
 
 .carteActions {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   gap: 8px;
-  margin-top: 10px;
+  flex: 0 0 auto;
+  padding: 14px 14px 14px 0;
+}
+
+.boutonRond {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--wim-bordure);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
 }
 
 .vide {

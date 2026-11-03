@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
+import { Info, MessageSquare } from 'lucide-react';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Exchange, ExchangeStatus } from '@wim/shared';
 
@@ -328,23 +329,28 @@ export function Echanges() {
                         : ''}
                     </p>
 
-                    <div className={styles.carteActions}>
-                      <Link
-                        href={`/homes/${echange.homeId}`}
-                        className={styles.boutonClair}
-                      >
-                        {t('common.seeMore')}
-                      </Link>
+                  </div>
 
-                      {echange.chatId ? (
-                        <Link
-                          href={`/messages?chat=${echange.chatId}`}
-                          className={styles.boutonSombre}
-                        >
-                          {t('common.messages')}
-                        </Link>
-                      ) : null}
-                    </div>
+                  <div className={styles.carteActions}>
+                    <Link
+                      href={`/homes/${echange.homeId}`}
+                      className={styles.boutonRond}
+                      aria-label={t('common.seeMore')}
+                      title={t('common.seeMore')}
+                    >
+                      <Info size={16} />
+                    </Link>
+
+                    {echange.chatId ? (
+                      <Link
+                        href={`/messages?chat=${echange.chatId}`}
+                        className={styles.boutonRond}
+                        aria-label={t('common.messages')}
+                        title={t('common.messages')}
+                      >
+                        <MessageSquare size={16} />
+                      </Link>
+                    ) : null}
                   </div>
                 </article>
               ))}
