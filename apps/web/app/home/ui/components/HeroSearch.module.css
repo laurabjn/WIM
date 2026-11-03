@@ -1,7 +1,8 @@
 .heroSearch {
   position: relative;
   width: 100%;
-  height: 580px;
+  height: min(calc(100vh - 210px), 820px);
+  min-height: 480px;
   border-radius: 42px;
   overflow: hidden;
   background: #ddd;

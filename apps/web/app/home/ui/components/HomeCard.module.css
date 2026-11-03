@@ -6,8 +6,8 @@
   width: 100%;
   background: #fff;
   border-radius: 22px;
-  padding: 10px;
-  margin-bottom: 18px;
+  padding: 14px;
+  margin-bottom: 22px;
 
   box-shadow: 0 16px 35px rgba(0, 0, 0, 0.12);
   text-decoration: none;
@@ -16,8 +16,8 @@
 
 .imageWrapper {
   position: relative;
-  width: 130px;
-  height: 92px;
+  width: 158px;
+  height: 112px;
   border-radius: 16px;
   overflow: hidden;
   flex-shrink: 0;
