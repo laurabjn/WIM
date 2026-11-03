@@ -10,6 +10,10 @@
   padding: 95px 48px 80px;
 }
 
+.contenuLarge {
+  max-width: 1680px;
+}
+
 .titre {
   font-size: 28px;
   font-weight: 800;

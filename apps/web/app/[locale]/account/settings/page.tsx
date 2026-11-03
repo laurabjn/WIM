@@ -13,7 +13,7 @@ export default async function SettingsPage() {
     <main className={styles.page}>
       <Navbar />
 
-      <section className={styles.contenu}>
+      <section className={`${styles.contenu} ${styles.contenuLarge}`}>
         <nav className={styles.fil} aria-label={t('profile.settings.title')}>
           <Link href="/account" className={styles.filLien}>
             {t('profile.settings.account')}
