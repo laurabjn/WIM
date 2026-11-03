@@ -999,6 +999,8 @@
     "fastSearch": "Fast search",
     "lastSearches": "Your last searches",
     "allCategories": "All categories",
+    "homesIn": "homes in",
+    "homesCount": "homes",
     "noResults": "No home matches this search.",
     "category": {
       "nature": "Nature",

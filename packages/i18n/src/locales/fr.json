@@ -994,6 +994,8 @@
     "fastSearch": "Recherche rapide",
     "lastSearches": "Vos dernières recherches",
     "allCategories": "Toutes les catégories",
+    "homesIn": "logements à",
+    "homesCount": "logements",
     "noResults": "Aucun logement ne correspond à cette recherche.",
     "category": {
       "nature": "Nature",

@@ -1,0 +1,59 @@
+.rangee {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.puce {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-pilule);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.puce:hover {
+  background: var(--wim-surface-douce);
+}
+
+.puceActive {
+  border-color: var(--wim-texte);
+  background: var(--wim-texte);
+  color: var(--wim-surface);
+}
+
+.pastille {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.nature {
+  background: linear-gradient(180deg, #65d7a7, #169d78);
+}
+
+.beach {
+  background: linear-gradient(180deg, #25b8ff, #0078d7);
+}
+
+.city {
+  background: linear-gradient(180deg, #b7b7b7, #333333);
+}
+
+.culture {
+  background: linear-gradient(180deg, #ffa51e, #d96a00);
+}

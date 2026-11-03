@@ -67,3 +67,18 @@
   color: #ffffff;
   font-weight: 700;
 }
+
+.enteteResultats {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.compte {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--wim-texte);
+}

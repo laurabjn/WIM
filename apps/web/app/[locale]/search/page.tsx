@@ -5,6 +5,7 @@ import { searchHomes, type FiltresRecherche } from 'app/home/infrastructure/home
 import { HomeDetailsCard } from 'app/home/ui/components/HomeDetailsCard';
 import { FormulaireRecherche } from 'app/home/ui/FormulaireRecherche';
 import Link from 'next/link';
+import { FiltresRapides } from 'app/home/ui/components/FiltresRapides';
 
 import styles from './page.module.css';
 
@@ -80,9 +81,16 @@ export default async function SearchPage({ searchParams }: Props) {
 
         <FormulaireRecherche />
 
-        <p className={styles.compte}>
-          {logements.length} {t('search.results')}
-        </p>
+        <FiltresRapides />
+
+        <div className={styles.enteteResultats}>
+          <h2 className={styles.compte}>
+            {logements.length}{' '}
+            {filtres.city
+              ? `${t('search.homesIn')} ${filtres.city}`
+              : t('search.homesCount')}
+          </h2>
+        </div>
 
         {logements.length === 0 ? (
           <p className={styles.vide}>{t('search.noResults')}</p>

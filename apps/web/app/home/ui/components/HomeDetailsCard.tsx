@@ -13,6 +13,17 @@ type Props = {
   initialFavorite?: boolean;
 };
 
+const SEUIL_MOYEN = 80;
+const SEUIL_ELEVE = 150;
+
+function tranche(prixParNuit: number | null | undefined) {
+  if (!prixParNuit) return '';
+
+  if (prixParNuit < SEUIL_MOYEN) return '€';
+
+  return prixParNuit < SEUIL_ELEVE ? '€€' : '€€€';
+}
+
 export function HomeDetailsCard({ home, initialFavorite = false }: Props) {
   const t = useTranslations();
 
@@ -106,7 +117,7 @@ export function HomeDetailsCard({ home, initialFavorite = false }: Props) {
           )}
 
           <span className={styles.price}>
-            ✈ {t('home.from')} {home.pricePerNight ?? 0}€
+            {tranche(home.pricePerNight)}
           </span>
         </div>
       </div>
