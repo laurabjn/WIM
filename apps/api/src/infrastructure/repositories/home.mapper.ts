@@ -16,6 +16,7 @@ export const HOME_WITH_RELATIONS_INCLUDE = {
       firstName: true,
       lastName: true,
       avatarUrl: true,
+      bio: true,
       showPreciseLocation: true,
       identityStatus: true,
       createdAt: true,
@@ -104,6 +105,7 @@ export function mapOwner(owner: PrismaHomeWithRelations['owner']) {
     firstName: owner.firstName,
     lastName: owner.lastName,
     avatarUrl: owner.avatarUrl,
+    bio: owner.bio,
     identityVerified: owner.identityStatus === 'VERIFIED',
     rating:
       scores.length > 0

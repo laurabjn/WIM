@@ -281,58 +281,71 @@ export async function HomeDetail({ home, locale }: Props) {
 
           {home.owner ? (
             <VisiblePourLesAutres ownerId={home.ownerId}>
-            <section className={styles.bloc}>
-              <h2 className={styles.sousTitre}>{t('home.meetHosts')}</h2>
+              <section className={styles.bloc}>
+                <h2 className={styles.sousTitre}>{t('home.meetHosts')}</h2>
 
-              <div className={styles.rencontre}>
-                <div className={styles.carteHote}>
-                  {home.owner.avatarUrl ? (
-                    <Image
-                      src={home.owner.avatarUrl}
-                      alt={home.owner.firstName}
-                      width={72}
-                      height={72}
-                      className={styles.avatarGrand}
-                    />
-                  ) : null}
+                <div className={styles.rencontre}>
+                  <div className={styles.carteHote}>
+                    <div className={styles.identiteHote}>
+                      {home.owner.avatarUrl ? (
+                        <Image
+                          src={home.owner.avatarUrl}
+                          alt={home.owner.firstName}
+                          width={76}
+                          height={76}
+                          className={styles.avatarGrand}
+                        />
+                      ) : null}
 
-                  <span className={styles.hoteNom}>{home.owner.firstName}</span>
-                  <span className={styles.hoteDepuis}>{t('home.host')}</span>
+                      <span className={styles.hoteNom}>
+                        {home.owner.firstName}
+                      </span>
 
-                  <dl className={styles.statistiques}>
-                    <div>
-                      <dt>{nombreAvis}</dt>
-                      <dd>{t('home.reviews.reviewsCount')}</dd>
+                      <span className={styles.hoteDepuis}>{t('home.host')}</span>
                     </div>
 
-                    {home.owner.rating ? (
+                    <dl className={styles.statistiques}>
                       <div>
-                        <dt>{home.owner.rating.toFixed(1)} ★</dt>
-                        <dd>{t('home.overallRating')}</dd>
+                        <dt>{nombreAvis}</dt>
+                        <dd>{t('home.reviewsLabel')}</dd>
                       </div>
+
+                      {home.owner.rating ? (
+                        <div>
+                          <dt>{home.owner.rating.toFixed(1)} ★</dt>
+                          <dd>{t('home.overallRating')}</dd>
+                        </div>
+                      ) : null}
+
+                      {anneesHote ? (
+                        <div>
+                          <dt>{anneesHote}</dt>
+                          <dd>{t('home.hostYears')}</dd>
+                        </div>
+                      ) : null}
+                    </dl>
+                  </div>
+
+                  <div className={styles.rencontreTextes}>
+                    <h3 className={styles.sousTitre}>{t('home.hostInfo')}</h3>
+
+                    {home.owner.bio ? (
+                      <p className={styles.description}>{home.owner.bio}</p>
                     ) : null}
 
-                    {anneesHote ? (
-                      <div>
-                        <dt>{anneesHote}</dt>
-                        <dd>{t('home.years')}</dd>
-                      </div>
-                    ) : null}
-                  </dl>
-                </div>
+                    <Link
+                      href={`/profile?userId=${home.ownerId}`}
+                      className={styles.boutonSombre}
+                    >
+                      {t('home.sendMessageAction')}
+                    </Link>
 
-                <div className={styles.rencontreTextes}>
-                  <h3 className={styles.sousTitre}>{t('home.hostInfo')}</h3>
-
-                  <Link
-                    href={`/profile?userId=${home.ownerId}`}
-                    className={styles.boutonSombre}
-                  >
-                    {t('home.sendMessageAction')}
-                  </Link>
+                    <p className={styles.mention}>
+                      {t('home.alwaysUseMessaging')}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </section>
+              </section>
             </VisiblePourLesAutres>
           ) : null}
         </div>
