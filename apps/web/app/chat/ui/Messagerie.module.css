@@ -397,19 +397,6 @@
   font-weight: 600;
 }
 
-.enteteInfo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  margin-left: auto;
-  border-radius: 999px;
-  border: 1px solid var(--wim-bordure);
-  background: var(--wim-surface);
-  color: var(--wim-texte);
-}
 
 .vide {
   display: flex;

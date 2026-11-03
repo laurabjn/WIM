@@ -32,9 +32,10 @@ import {
   disconnectChatSocket,
 } from 'app/chat/infrastructure/chatSocket';
 
-import { ImagePlus, Info, SendHorizontal } from 'lucide-react';
+import { ImagePlus, SendHorizontal } from 'lucide-react';
 import { usePresence } from '../hooks/usePresence';
 import { BandeauStatuts } from './BandeauStatuts';
+import { MenuDiscussion } from './MenuDiscussion';
 import styles from './Messagerie.module.css';
 
 type Etat = 'chargement' | 'anonyme' | 'prete' | 'erreur';
@@ -681,14 +682,23 @@ export function Messagerie() {
                 </span>
               </Link>
 
-              <Link
-                href={`/profile?userId=${active.participant.id}`}
-                className={styles.enteteInfo}
-                title={t('chat.viewProfile')}
-                aria-label={t('chat.viewProfile')}
-              >
-                <Info size={18} />
-              </Link>
+              {token ? (
+                <MenuDiscussion
+                  token={token}
+                  participantId={active.participant.id}
+                  traduisible={traduisible}
+                  traduit={traduit}
+                  onBasculerTraduction={() => appliquerTraduction(!traduit)}
+                  onPartiePourDeBon={() => {
+                    setConversations((liste) =>
+                      liste.filter(
+                        (conversation) => conversation.id !== active.id,
+                      ),
+                    );
+                    setActiveId(null);
+                  }}
+                />
+              ) : null}
             </header>
 
             {token ? (
