@@ -1099,6 +1099,7 @@
     "stopTranslation": "Stop translating this conversation",
     "restoreTranslation": "Restore translation",
     "sendPhoto": "Send a photo",
+    "viewProfile": "View profile",
     "photoError": "The photo could not be sent.",
     "cameraDenied": "Camera access is denied.",
     "galleryDenied": "Photo access is denied.",

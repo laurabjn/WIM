@@ -32,7 +32,7 @@ import {
   disconnectChatSocket,
 } from 'app/chat/infrastructure/chatSocket';
 
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, Info, SendHorizontal } from 'lucide-react';
 import { usePresence } from '../hooks/usePresence';
 import { BandeauStatuts } from './BandeauStatuts';
 import styles from './Messagerie.module.css';
@@ -509,21 +509,21 @@ export function Messagerie() {
             {t('chat.tabMessages')}
           </button>
 
+          <Link href="/matches" className={styles.lienDiscret}>
+            {t('chat.matches')}
+          </Link>
+
           <button
             type="button"
-            className={`${styles.onglet} ${
+            className={`${styles.onglet} ${styles.ongletDemandes} ${
               onglet === 'demandes' ? styles.ongletActif : ''
             }`.trim()}
             onClick={() => setOnglet('demandes')}
           >
             {t('chat.tabRequests')}
 
-            {demandes.length > 0 ? ` · ${demandes.length}` : ''}
+            {demandes.length > 0 ? ` (${demandes.length})` : ''}
           </button>
-
-          <Link href="/matches" className={styles.onglet}>
-            {t('chat.matches')}
-          </Link>
         </div>
 
         {visibles.length === 0 ? (
@@ -623,9 +623,26 @@ export function Messagerie() {
                   )}
                 </span>
 
-                <span className={styles.enteteNom}>
-                  {nomComplet(active.participant)}
+                <span className={styles.enteteTextes}>
+                  <span className={styles.enteteNom}>
+                    {nomComplet(active.participant)}
+                  </span>
+
+                  {presence.online.has(active.participant.id) ? (
+                    <span className={styles.enteteEnLigne}>
+                      {t('chat.online')}
+                    </span>
+                  ) : null}
                 </span>
+              </Link>
+
+              <Link
+                href={`/profile?userId=${active.participant.id}`}
+                className={styles.enteteInfo}
+                title={t('chat.viewProfile')}
+                aria-label={t('chat.viewProfile')}
+              >
+                <Info size={18} />
               </Link>
             </header>
 
@@ -757,8 +774,10 @@ export function Messagerie() {
                 type="submit"
                 className={styles.envoyer}
                 disabled={envoi || brouillon.trim().length === 0}
+                title={t('chat.send')}
+                aria-label={t('chat.send')}
               >
-                {t('chat.send')}
+                <SendHorizontal size={18} />
               </button>
             </form>
 

@@ -347,21 +347,49 @@
 }
 
 .envoyer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
-  height: 44px;
-  padding: 0 22px;
+  width: 40px;
+  height: 40px;
   border: 0;
   border-radius: 999px;
-  background: #111111;
+  background: var(--wim-info);
   color: #ffffff;
-  font: inherit;
-  font-weight: 700;
   cursor: pointer;
 }
 
 .envoyer:disabled {
-  background: #c3cace;
+  background: var(--wim-texte-pale);
   cursor: default;
+}
+
+.enteteTextes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.enteteEnLigne {
+  color: #22c55e;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.enteteInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  border-radius: 999px;
+  border: 1px solid var(--wim-bordure);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
 }
 
 .vide {
@@ -418,34 +446,36 @@
 
 .onglets {
   display: flex;
-  gap: 6px;
-  padding: 4px;
-  margin-bottom: 6px;
-  border-radius: 999px;
-  background: #f4f6f7;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 10px;
 }
 
 .onglet {
-  flex: 1 1 0;
-  height: 34px;
+  padding: 0;
   border: 0;
-  border-radius: 999px;
   background: transparent;
   font: inherit;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  color: #5c6b72;
+  color: var(--wim-texte-doux);
   cursor: pointer;
 }
 
 .ongletActif {
-  background: #ffffff;
-  color: #111111;
-  font-weight: 700;
+  color: var(--wim-texte);
+  font-weight: 800;
 }
 
-a.onglet {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.ongletDemandes {
+  margin-left: auto;
+  color: var(--wim-info);
+  font-size: 13px;
 }
+
+.lienDiscret {
+  color: var(--wim-texte-doux);
+  font-size: 13px;
+}
+
+
