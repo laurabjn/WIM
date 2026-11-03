@@ -2,6 +2,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1000 / 420;
+  min-height: 320px;
   border-radius: var(--wim-rayon-carte);
   overflow: hidden;
   background: var(--wim-surface-douce);

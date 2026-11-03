@@ -5,13 +5,12 @@ import { Home, Review } from '@wim/shared/home/home.type';
 import { ChevronRight, Star } from 'lucide-react';
 
 import { DemandeEchange } from 'app/exchange/ui/DemandeEchange';
-import {
-  CarteLogement,
-  carteEstConfiguree,
-} from 'app/home/ui/components/CarteLogement';
+import { CarteLogement } from 'app/home/ui/components/CarteLogement';
+import { carteEstConfiguree } from 'app/home/infrastructure/mapbox';
 import { getDescriptionDeVille } from 'app/home/infrastructure/locationDescription.api';
 import { BoutonModifierLogement } from 'app/home/ui/components/BoutonModifierLogement';
 import { iconeEquipement } from 'app/home/ui/components/iconesEquipements';
+import { BoutonPartager } from 'app/home/ui/components/BoutonPartager';
 import { VisiblePourLesAutres } from 'app/home/ui/components/VisiblePourLesAutres';
 
 import styles from './HomeDetail.module.css';
@@ -85,6 +84,8 @@ export async function HomeDetail({ home, locale }: Props) {
     <article className={styles.page}>
       <header className={styles.entete}>
         <h1 className={styles.titre}>{home.title}</h1>
+
+        <BoutonPartager titre={home.title} />
 
         <BoutonModifierLogement homeId={home.id} ownerId={home.ownerId} />
       </header>

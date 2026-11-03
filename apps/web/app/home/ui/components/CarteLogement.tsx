@@ -1,37 +1,13 @@
-import Image from 'next/image';
+'use client';
 
+import { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
+
+import { JETON_MAPBOX, anneauApproche } from 'app/home/infrastructure/mapbox';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './CarteLogement.module.css';
 
-const JETON = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? '';
-
-const RAYON_KM = 5;
-const POINTS = 48;
-const LARGEUR = 1000;
-const HAUTEUR = 420;
-
-export const carteEstConfiguree = JETON.length > 0;
-
-function anneauApproche(longitude: number, latitude: number) {
-  const parKmEnLongitude = 1 / (111.32 * Math.cos((latitude * Math.PI) / 180));
-  const parKmEnLatitude = 1 / 110.574;
-
-  const points: [number, number][] = [];
-
-  for (let pas = 0; pas < POINTS; pas += 1) {
-    const angle = (pas / POINTS) * 2 * Math.PI;
-
-    points.push([
-      Number((longitude + RAYON_KM * parKmEnLongitude * Math.cos(angle)).toFixed(5)),
-      Number((latitude + RAYON_KM * parKmEnLatitude * Math.sin(angle)).toFixed(5)),
-    ]);
-  }
-
-  const premier = points[0];
-
-  if (premier) points.push(premier);
-
-  return points;
-}
+const BLEU = '#087ebe';
 
 type Props = {
   latitude: number;
@@ -40,41 +16,68 @@ type Props = {
 };
 
 export function CarteLogement({ latitude, longitude, legende }: Props) {
-  if (!carteEstConfiguree) return null;
+  const contenant = useRef<HTMLDivElement>(null);
 
-  const zone = {
-    type: 'Feature',
-    properties: {
-      fill: '#087ebe',
-      'fill-opacity': 0.14,
-      stroke: '#087ebe',
-      'stroke-width': 2,
-      'stroke-opacity': 0.9,
-    },
-    geometry: {
-      type: 'Polygon',
-      coordinates: [anneauApproche(longitude, latitude)],
-    },
-  };
+  useEffect(() => {
+    if (!contenant.current || !JETON_MAPBOX) return;
 
-  const calque = encodeURIComponent(JSON.stringify(zone));
+    mapboxgl.accessToken = JETON_MAPBOX;
 
-  const source =
-    `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static` +
-    `/geojson(${calque})` +
-    `/auto` +
-    `/${LARGEUR}x${HAUTEUR}@2x` +
-    `?access_token=${JETON}&logo=false&padding=48`;
+    const anneau = anneauApproche(longitude, latitude);
+    const premier = anneau[0];
+
+    if (!premier) return;
+
+    const carte = new mapboxgl.Map({
+      container: contenant.current,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [longitude, latitude],
+      zoom: 11,
+    });
+
+    carte.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    carte.on('load', () => {
+      carte.addSource('zone', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [anneau] },
+        },
+      });
+
+      carte.addLayer({
+        id: 'zoneFond',
+        type: 'fill',
+        source: 'zone',
+        paint: { 'fill-color': BLEU, 'fill-opacity': 0.14 },
+      });
+
+      carte.addLayer({
+        id: 'zoneContour',
+        type: 'line',
+        source: 'zone',
+        paint: { 'line-color': BLEU, 'line-width': 2 },
+      });
+
+      const cadre = anneau.reduce(
+        (limites, point) => limites.extend(point),
+        new mapboxgl.LngLatBounds(premier, premier),
+      );
+
+      carte.fitBounds(cadre, { padding: 48, duration: 0 });
+    });
+
+    return () => carte.remove();
+  }, [latitude, longitude]);
 
   return (
-    <div className={styles.carte}>
-      <Image
-        src={source}
-        alt={legende}
-        width={LARGEUR}
-        height={HAUTEUR}
-        unoptimized
-      />
-    </div>
+    <div
+      className={styles.carte}
+      ref={contenant}
+      role="application"
+      aria-label={legende}
+    />
   );
 }
