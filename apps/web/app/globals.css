@@ -75,6 +75,9 @@ button {
   --wim-danger: #dc2626;
   --wim-degrade: linear-gradient(90deg, #52d1a6, #2da7f3);
 
+  --wim-bulle-mienne: #111111;
+  --wim-sur-bulle-mienne: #ffffff;
+
   --wim-rayon-champ: 12px;
   --wim-rayon-carte: 16px;
   --wim-rayon-bloc: 24px;
@@ -94,6 +97,9 @@ button {
     --wim-texte-doux: #a1a1aa;
     --wim-texte-pale: #6b6b70;
     --wim-bordure: #2c2c2e;
+
+    --wim-bulle-mienne: #0b6fa4;
+    --wim-sur-bulle-mienne: #ffffff;
 
     --wim-ombre-carte: 0 2px 12px rgba(0, 0, 0, 0.4);
     --wim-ombre-flottante: 0 10px 28px rgba(0, 0, 0, 0.5);

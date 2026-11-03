@@ -232,8 +232,8 @@
   border: 0;
   border-radius: 18px;
   border-bottom-right-radius: 6px;
-  background: #2da7f3;
-  color: #ffffff;
+  background: var(--wim-bulle-mienne);
+  color: var(--wim-sur-bulle-mienne);
 }
 
 .texte {
