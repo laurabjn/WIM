@@ -339,10 +339,6 @@ export async function HomeDetail({ home, locale }: Props) {
 
         <aside className={styles.colonneLaterale}>
           <div className={styles.resume}>
-            <span className={styles.resumeTitre}>
-              {t('home.availabilityTitle')}
-            </span>
-
             {disponibilites.length ? (
               <ul className={styles.periodes}>
                 {disponibilites.map((periode) => (
@@ -362,9 +358,13 @@ export async function HomeDetail({ home, locale }: Props) {
                 {t('availability.free')}
               </span>
             )}
-          </div>
 
-          <DemandeEchange homeId={home.id} ownerId={home.ownerId} />
+            <DemandeEchange
+              homeId={home.id}
+              ownerId={home.ownerId}
+              capacite={home.capacity}
+            />
+          </div>
         </aside>
       </div>
     </article>

@@ -51,17 +51,11 @@
 .resume {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
   padding: 20px;
   border-radius: var(--wim-rayon-bloc);
   background: var(--wim-surface);
   box-shadow: var(--wim-ombre-flottante);
-}
-
-.resumeTitre {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--wim-texte);
 }
 
 .disponibilite {
