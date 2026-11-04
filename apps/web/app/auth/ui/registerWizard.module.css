@@ -52,18 +52,6 @@
   cursor: not-allowed;
 }
 
-.secondaryButton {
-  width: 100%;
-  height: 48px;
-  border-radius: 999px;
-  border: 1px solid #e4e4e4;
-  background: #ffffff;
-  color: #111111;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
 .centerBlock {
   flex: 1;
   display: flex;

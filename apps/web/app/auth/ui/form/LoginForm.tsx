@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import styles from './LoginForm.module.css';
 import { loginUser } from 'app/auth/application/loginUser.usecase';
+import { BoutonsFournisseurs } from 'app/auth/ui/component/BoutonsFournisseurs';
 import Image from 'next/image';
 
 type Props = {
@@ -68,13 +69,11 @@ export const LoginForm: React.FC<Props> = ({
               <h1 className={styles.title}>{title}</h1>
                       
               <div className={styles.actions}>
-                  <button className={styles.secondaryButton}>
-                      <span>{googleSignUpLabel}</span>
-                  </button>
-
-                  <button className={styles.secondaryButton}>
-                      <span>{appleSignUpLabel}</span>
-                  </button>
+                  <BoutonsFournisseurs
+                      libelleGoogle={googleSignUpLabel}
+                      libelleApple={appleSignUpLabel}
+                      onConnecte={onSuccess}
+                  />
               </div>
 
               <div className={styles.fields}>

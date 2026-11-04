@@ -1,0 +1,42 @@
+.bouton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  height: 55px;
+  padding: 0 20px;
+  border: 1px solid var(--wim-bordure);
+  border-radius: 9999px;
+  background: var(--wim-surface);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--wim-texte);
+  cursor: pointer;
+}
+
+.bouton:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.marque {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+}
+
+.erreur {
+  margin: 0;
+  font-size: 13px;
+  color: var(--wim-danger);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .bouton {
+    height: 50px;
+    font-size: 14px;
+  }
+}
