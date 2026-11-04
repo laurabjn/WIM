@@ -1,17 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './AuthForm.module.css';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
-import { socialSignInApi } from 'app/auth/infrastructure/authApi';
-import {
-  appleEstConfigure,
-  googleEstConfigure,
-  jetonApple,
-  jetonGoogle,
-} from 'app/auth/infrastructure/connexionSociale';
+import { BoutonsFournisseurs } from 'app/auth/ui/component/BoutonsFournisseurs';
 
 type Props = {
   onCreateAccount: () => void;
@@ -26,28 +20,6 @@ export const AuthForm: React.FC<Props> = ({
 }) => {
   const tCommon = useTranslations('common');
   const tAuth = useTranslations('auth');
-
-  const [enCours, setEnCours] = useState<'GOOGLE' | 'APPLE' | null>(null);
-  const [erreur, setErreur] = useState<string | null>(null);
-
-  async function connecter(provider: 'GOOGLE' | 'APPLE') {
-    setErreur(null);
-    setEnCours(provider);
-
-    try {
-      const idToken =
-        provider === 'GOOGLE' ? await jetonGoogle() : await jetonApple();
-
-      if (!idToken) return;
-
-      await socialSignInApi({ provider, idToken });
-      onConnecte();
-    } catch (cause) {
-      setErreur(cause instanceof Error ? cause.message : String(cause));
-    } finally {
-      setEnCours(null);
-    }
-  }
 
   return (
     <main className={styles.loginPage}>
@@ -71,45 +43,17 @@ export const AuthForm: React.FC<Props> = ({
 
         <p className={styles.subtitle}>{tAuth('register.signUp')}</p>
 
-        {googleEstConfigure ? (
-          <button
-            className={styles.socialButton}
-            onClick={() => connecter('GOOGLE')}
-            disabled={enCours !== null}
-          >
-            <Image
-              src="/google.svg"
-              alt=""
-              width={20}
-              height={20}
-              className={styles.marque}
-            />
-            {tAuth('register.signUpWithGoogle')}
-          </button>
-        ) : null}
-
-        {appleEstConfigure ? (
-          <button
-            className={styles.socialButton}
-            onClick={() => connecter('APPLE')}
-            disabled={enCours !== null}
-          >
-            <Image
-              src="/apple.svg"
-              alt=""
-              width={20}
-              height={20}
-              className={styles.marque}
-            />
-            {tAuth('register.signUpWithApple')}
-          </button>
-        ) : null}
+        <div className={styles.fournisseurs}>
+          <BoutonsFournisseurs
+            libelleGoogle={tAuth('register.signUpWithGoogle')}
+            libelleApple={tAuth('register.signUpWithApple')}
+            onConnecte={onConnecte}
+          />
+        </div>
 
         <button className={styles.createButton} onClick={onCreateAccount}>
           {tAuth('register.signUpWithEmail')}
         </button>
-
-        {erreur ? <p className={styles.erreur}>{erreur}</p> : null}
 
         <small className={styles.legalText}>
           {tAuth('register.usageConditions')}

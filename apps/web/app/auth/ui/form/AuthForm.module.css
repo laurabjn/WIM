@@ -54,7 +54,6 @@
   color: var(--wim-texte);
 }
 
-.socialButton,
 .createButton,
 .loginButton {
   display: flex;
@@ -73,27 +72,17 @@
   cursor: pointer;
 }
 
-.socialButton {
-  justify-content: center;
-  gap: 14px;
-  padding: 0 20px;
+.fournisseurs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
   margin-bottom: 16px;
-}
-
-.socialButton:disabled {
-  cursor: progress;
-  opacity: 0.6;
 }
 
 .createButton,
 .loginButton {
   justify-content: center;
-}
-
-.marque {
-  flex: 0 0 auto;
-  width: 20px;
-  height: 20px;
 }
 
 .legalText {
@@ -106,13 +95,6 @@
   font-size: 11px;
   line-height: 1.4;
   color: var(--wim-texte-doux);
-}
-
-.erreur {
-  margin: 14px 0 0;
-  font-size: 13px;
-  color: var(--wim-danger);
-  text-align: center;
 }
 
 .loginBottom {

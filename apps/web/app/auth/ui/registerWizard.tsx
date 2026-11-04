@@ -12,6 +12,7 @@ import { RegisterStep5Form } from './form/RegisterStep5Form';
 import { RegisterIdentityForm } from './form/RegisterIdentityForm';
 import { RegisterHousingForm } from './form/RegisterHousingForm';
 import { RegisterWelcome } from './RegisterWelcome';
+import { BoutonsFournisseurs } from './component/BoutonsFournisseurs';
 import styles from './registerWizard.module.css';
 import Image from 'next/image';
 import { uploadProfileImage } from '../infrastructure/uploadProfileImage';
@@ -64,13 +65,11 @@ export const RegisterWizard: React.FC = () => {
             </p>
 
             <div className={styles.actions}>
-              <button className={styles.secondaryButton}>
-                <span>{t('auth.register.googleSignUp')}</span>
-              </button>
-
-              <button className={styles.secondaryButton}>
-                <span>{t('auth.register.signUpWithApple')}</span>
-              </button>
+              <BoutonsFournisseurs
+                libelleGoogle={t('auth.register.googleSignUp')}
+                libelleApple={t('auth.register.signUpWithApple')}
+                onConnecte={() => router.push('/menu')}
+              />
             </div>
           </div>
 
