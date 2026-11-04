@@ -1,21 +1,38 @@
 .page {
   min-height: 100vh;
-  background: #fafbfc;
+  background: var(--wim-fond);
 }
 
 .contenu {
   width: 100%;
-  max-width: 1040px;
+  max-width: 1680px;
   margin: 0 auto;
-  padding: 24px 20px 80px;
+  padding: 95px 48px 80px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.fil {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--wim-texte-doux);
+}
+
+.filLien {
+  color: var(--wim-texte-doux);
+  text-decoration: underline;
+}
+
+.filCourant {
+  color: var(--wim-texte);
 }
 
 .titre {
   font-size: 28px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin: 0 0 20px;
+  margin: 0;
 }

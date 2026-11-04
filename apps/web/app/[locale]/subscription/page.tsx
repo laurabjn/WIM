@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
 import { Abonnement } from 'app/subscription/ui/Abonnement';
@@ -14,7 +15,19 @@ export default async function SubscriptionPage() {
       <Navbar />
 
       <section className={styles.contenu}>
-        <h1 className={styles.titre}>{t('subscription.title')}</h1>
+        <nav className={styles.fil} aria-label={t('subscription.manageTitle')}>
+          <Link href="/account" className={styles.filLien}>
+            {t('profile.settings.account')}
+          </Link>
+
+          <span aria-hidden="true">›</span>
+
+          <span className={styles.filCourant}>
+            {t('subscription.manageTitle')}
+          </span>
+        </nav>
+
+        <h1 className={styles.titre}>{t('subscription.manageTitle')}</h1>
 
         <Abonnement />
 
