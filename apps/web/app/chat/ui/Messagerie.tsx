@@ -24,15 +24,24 @@ import {
   markChatAsRead,
   normaliserMessage,
   sendMessage,
+  sendPhotoMessage,
+  TAILLE_PHOTO_MAX,
 } from 'app/chat/infrastructure/chat.api';
 import {
   connectChatSocket,
   disconnectChatSocket,
 } from 'app/chat/infrastructure/chatSocket';
 
+import { ImagePlus, SendHorizontal } from 'lucide-react';
+import { usePresence } from '../hooks/usePresence';
+import { BandeauStatuts } from './BandeauStatuts';
+import { MenuDiscussion } from './MenuDiscussion';
 import styles from './Messagerie.module.css';
 
 type Etat = 'chargement' | 'anonyme' | 'prete' | 'erreur';
+
+const cleTraduction = (chatId: string) => `chat:translate:${chatId}`;
+const cleTraduisible = (chatId: string) => `chat:translatable:${chatId}`;
 
 type Groupe = {
   cle: string;
@@ -80,6 +89,9 @@ export function Messagerie() {
   const [brouillon, setBrouillon] = useState('');
   const [envoi, setEnvoi] = useState(false);
   const [erreurEnvoi, setErreurEnvoi] = useState(false);
+  const [erreurPhoto, setErreurPhoto] = useState(false);
+  const [traduit, setTraduit] = useState(true);
+  const [traduisible, setTraduisible] = useState(false);
 
   const fil = useRef<HTMLDivElement>(null);
   const lien = useRef<Socket | null>(null);
@@ -180,6 +192,18 @@ export function Messagerie() {
   }, [demande]);
 
   useEffect(() => {
+    if (!activeId) return;
+
+    try {
+      setTraduit(localStorage.getItem(cleTraduction(activeId)) !== 'off');
+      setTraduisible(localStorage.getItem(cleTraduisible(activeId)) === '1');
+    } catch {
+      setTraduit(true);
+      setTraduisible(false);
+    }
+  }, [activeId]);
+
+  useEffect(() => {
     if (!token || !activeId) return;
 
     let actif = true;
@@ -192,7 +216,7 @@ export function Messagerie() {
     setErreurEnvoi(false);
     setChargementMessages(true);
 
-    getChatMessages(token, activeId)
+    getChatMessages(token, activeId, undefined, traduit)
       .then((page) => {
         if (!actif) return;
 
@@ -225,7 +249,7 @@ export function Messagerie() {
     return () => {
       actif = false;
     };
-  }, [token, activeId]);
+  }, [token, activeId, traduit]);
 
   useEffect(() => {
     const socket = lien.current;
@@ -317,7 +341,7 @@ export function Messagerie() {
     setChargementMessages(true);
 
     try {
-      const page = await getChatMessages(token, activeId, curseur);
+      const page = await getChatMessages(token, activeId, curseur, traduit);
 
       setMessages((courant) => [...[...page.messages].reverse(), ...courant]);
       setCurseur(page.nextCursor);
@@ -342,23 +366,47 @@ export function Messagerie() {
     try {
       const message = await sendMessage(token, activeId, contenu);
 
-      setMessages((courant) => [...courant, message]);
       setBrouillon('');
-      setConversations((liste) =>
-        parRecence(
-          liste.map((conversation) =>
-            conversation.id === activeId
-              ? {
-                  ...conversation,
-                  lastMessage: message,
-                  updatedAt: message.createdAt,
-                }
-              : conversation,
-          ),
-        ),
-      );
+      ajouterMessage(message);
     } catch {
       setErreurEnvoi(true);
+    } finally {
+      setEnvoi(false);
+    }
+  }
+
+  function ajouterMessage(message: ChatMessages) {
+    setMessages((courant) => [...courant, message]);
+    setConversations((liste) =>
+      parRecence(
+        liste.map((conversation) =>
+          conversation.id === activeId
+            ? {
+                ...conversation,
+                lastMessage: message,
+                updatedAt: message.createdAt,
+              }
+            : conversation,
+        ),
+      ),
+    );
+  }
+
+  async function envoyerPhoto(fichier: File) {
+    if (!token || !activeId || envoi) return;
+
+    if (fichier.size > TAILLE_PHOTO_MAX) {
+      setErreurPhoto(true);
+      return;
+    }
+
+    setEnvoi(true);
+    setErreurPhoto(false);
+
+    try {
+      ajouterMessage(await sendPhotoMessage(token, activeId, fichier));
+    } catch {
+      setErreurPhoto(true);
     } finally {
       setEnvoi(false);
     }
@@ -410,6 +458,40 @@ export function Messagerie() {
     return groupes;
   }
 
+  const aDesTraductions = messages.some((message) => message.translatedContent);
+
+  useEffect(() => {
+    if (!activeId || !aDesTraductions || traduisible) return;
+
+    setTraduisible(true);
+
+    try {
+      localStorage.setItem(cleTraduisible(activeId), '1');
+    } catch {
+      return;
+    }
+  }, [activeId, aDesTraductions, traduisible]);
+
+  function appliquerTraduction(suivant: boolean) {
+    if (!activeId) return;
+
+    setTraduit(suivant);
+
+    try {
+      localStorage.setItem(cleTraduction(activeId), suivant ? 'on' : 'off');
+    } catch {
+      return;
+    }
+  }
+
+  const montrerLeBandeau = traduit ? aDesTraductions : traduisible;
+
+  const idsCorrespondants = conversations
+    .map((conversation) => conversation.participant?.id)
+    .filter((id): id is string => Boolean(id));
+
+  const presence = usePresence(token, idsCorrespondants);
+
   if (etat === 'chargement') {
     return <p className={styles.etat}>{t('common.loading')}</p>;
   }
@@ -454,6 +536,14 @@ export function Messagerie() {
       className={`${styles.messagerie} ${active ? styles.ouverte : ''}`.trim()}
     >
       <aside className={styles.liste}>
+        {token ? (
+          <BandeauStatuts
+            token={token}
+            conversations={conversations}
+            onOuvrir={setActiveId}
+          />
+        ) : null}
+
         <div className={styles.onglets}>
           <button
             type="button"
@@ -465,21 +555,21 @@ export function Messagerie() {
             {t('chat.tabMessages')}
           </button>
 
+          <Link href="/matches" className={styles.lienDiscret}>
+            {t('chat.matches')}
+          </Link>
+
           <button
             type="button"
-            className={`${styles.onglet} ${
+            className={`${styles.onglet} ${styles.ongletDemandes} ${
               onglet === 'demandes' ? styles.ongletActif : ''
             }`.trim()}
             onClick={() => setOnglet('demandes')}
           >
             {t('chat.tabRequests')}
 
-            {demandes.length > 0 ? ` · ${demandes.length}` : ''}
+            {demandes.length > 0 ? ` (${demandes.length})` : ''}
           </button>
-
-          <Link href="/matches" className={styles.onglet}>
-            {t('chat.matches')}
-          </Link>
         </div>
 
         {visibles.length === 0 ? (
@@ -504,17 +594,27 @@ export function Messagerie() {
               }`.trim()}
               onClick={() => setActiveId(conversation.id)}
             >
-              <span className={styles.avatar}>
-                {conversation.participant.avatarUrl ? (
-                  <Image
-                    src={conversation.participant.avatarUrl}
-                    alt={nomComplet(conversation.participant)}
-                    fill
-                    className={styles.avatarImage}
+              <span className={styles.porteAvatar}>
+                <span className={styles.avatar}>
+                  {conversation.participant.avatarUrl ? (
+                    <Image
+                      src={conversation.participant.avatarUrl}
+                      alt={nomComplet(conversation.participant)}
+                      fill
+                      className={styles.avatarImage}
+                    />
+                  ) : (
+                    initiales(conversation.participant)
+                  )}
+                </span>
+
+                {presence.online.has(conversation.participant.id) ? (
+                  <span
+                    className={styles.pastilleEnLigne}
+                    title={t('chat.online')}
+                    aria-label={t('chat.online')}
                   />
-                ) : (
-                  initiales(conversation.participant)
-                )}
+                ) : null}
               </span>
 
               <span className={styles.entreeTextes}>
@@ -569,10 +669,36 @@ export function Messagerie() {
                   )}
                 </span>
 
-                <span className={styles.enteteNom}>
-                  {nomComplet(active.participant)}
+                <span className={styles.enteteTextes}>
+                  <span className={styles.enteteNom}>
+                    {nomComplet(active.participant)}
+                  </span>
+
+                  {presence.online.has(active.participant.id) ? (
+                    <span className={styles.enteteEnLigne}>
+                      {t('chat.online')}
+                    </span>
+                  ) : null}
                 </span>
               </Link>
+
+              {token ? (
+                <MenuDiscussion
+                  token={token}
+                  participantId={active.participant.id}
+                  traduisible={traduisible}
+                  traduit={traduit}
+                  onBasculerTraduction={() => appliquerTraduction(!traduit)}
+                  onPartiePourDeBon={() => {
+                    setConversations((liste) =>
+                      liste.filter(
+                        (conversation) => conversation.id !== active.id,
+                      ),
+                    );
+                    setActiveId(null);
+                  }}
+                />
+              ) : null}
             </header>
 
             {token ? (
@@ -667,7 +793,45 @@ export function Messagerie() {
               ))}
             </div>
 
+            {montrerLeBandeau ? (
+              <p className={styles.avisTraduction}>
+                {traduit ? t('chat.autoTranslated') : t('chat.translationOff')}{' '}
+
+                <button
+                  type="button"
+                  className={styles.lienTraduction}
+                  onClick={() => appliquerTraduction(!traduit)}
+                >
+                  {traduit
+                    ? t('chat.removeTranslation')
+                    : t('chat.enableTranslation')}
+                </button>
+              </p>
+            ) : null}
+
             <form className={styles.composeur} onSubmit={envoyer}>
+              <label className={styles.photo} title={t('chat.sendPhoto')}>
+                <ImagePlus size={18} />
+
+                <span className={styles.invisible}>
+                  {t('chat.sendPhoto')}
+                </span>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  className={styles.invisible}
+                  disabled={envoi}
+                  onChange={(evenement) => {
+                    const fichier = evenement.target.files?.[0];
+
+                    evenement.target.value = '';
+
+                    if (fichier) void envoyerPhoto(fichier);
+                  }}
+                />
+              </label>
+
               <input
                 className={styles.champ}
                 type="text"
@@ -681,10 +845,16 @@ export function Messagerie() {
                 type="submit"
                 className={styles.envoyer}
                 disabled={envoi || brouillon.trim().length === 0}
+                title={t('chat.send')}
+                aria-label={t('chat.send')}
               >
-                {t('chat.send')}
+                <SendHorizontal size={18} />
               </button>
             </form>
+
+            {erreurPhoto ? (
+              <p className={styles.erreur}>{t('chat.photoError')}</p>
+            ) : null}
 
             {erreurEnvoi ? (
               <p className={styles.erreur}>{t('chat.sendError')}</p>

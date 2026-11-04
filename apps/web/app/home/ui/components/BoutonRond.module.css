@@ -1,0 +1,25 @@
+.rond {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--wim-bordure);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
+}
+
+.rond:hover {
+  background: var(--wim-surface-douce);
+}
+
+.rond:disabled {
+  opacity: 0.6;
+}
+
+.rondActif {
+  color: var(--wim-vert);
+  border-color: var(--wim-vert);
+}

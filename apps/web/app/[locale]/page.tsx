@@ -10,6 +10,7 @@ export default function HomePage() {
     <AuthForm
       onCreateAccount={() => router.push("/register")}
       onLogin={() => router.push("/login")}
+      onConnecte={() => router.push("/menu")}
     />
   );
 }

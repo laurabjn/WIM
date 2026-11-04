@@ -9,8 +9,6 @@ import { HomeCard } from './components/HomeCard';
 type Props = {
   homes: Home[];
   labels: {
-    toExplore: string;
-    fastSearch: string;
     lastSearches: string;
   };
 };
@@ -27,21 +25,19 @@ export function HomeExploreSection({ homes, labels }: Props) {
   }, [homes, selectedCategory]);
 
   const featuredHome = filteredHomes[0];
+
+  const logementsDeLaVille = featuredHome
+    ? homes.filter((home) => home.city === featuredHome.city).length
+    : 0;
   const recentHomes = filteredHomes.slice(1, 4);
 
   return (
   <section className={styles.wrapper}>
-    <div className={styles.modeRow}>
-      <span>{labels.toExplore}</span>
-      <div className={styles.toggle}>
-        <div className={styles.toggleDot} />
-      </div>
-      <span>{labels.fastSearch}</span>
-    </div>
-
     <div className={styles.menuContent}>
       <div className={styles.leftColumn}>
-        {featuredHome && <HeroSearch home={featuredHome} />}
+        {featuredHome && (
+          <HeroSearch home={featuredHome} nombreLogements={logementsDeLaVille} />
+        )}
       </div>
 
       <div className={styles.rightColumn}>

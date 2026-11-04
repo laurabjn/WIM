@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
+import { ChevronDown, ChevronUp, CircleCheck, CreditCard, Wallet } from 'lucide-react';
 
 import { getSession } from 'app/auth/infrastructure/authStorage';
 import {
@@ -31,6 +32,17 @@ const LIBELLES: Record<PlanAbonnement, { nom: string; aide: string }> = {
   MONTHLY: { nom: 'subscription.monthly', aide: 'subscription.monthlyHint' },
 };
 
+const AVANTAGES = [
+  {
+    titre: 'subscription.benefitsFindTitle',
+    lignes: ['subscription.benefitsFind1', 'subscription.benefitsFind2'],
+  },
+  {
+    titre: 'subscription.benefitsSafeTitle',
+    lignes: ['subscription.benefitsSafe1', 'subscription.benefitsSafe2'],
+  },
+];
+
 export function Abonnement() {
   const t = useTranslations();
   const locale = useLocale();
@@ -44,6 +56,7 @@ export function Abonnement() {
   const [occupe, setOccupe] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [confirmeResiliation, setConfirmeResiliation] = useState(false);
+  const [avantagesOuverts, setAvantagesOuverts] = useState(true);
 
   const revenuDeStripe =
     parametres.get('abonnement') === 'ok' || parametres.get('moyen') === 'ok';
@@ -52,7 +65,7 @@ export function Abonnement() {
     () =>
       new Intl.DateTimeFormat(locale, {
         day: 'numeric',
-        month: 'long',
+        month: 'short',
         year: 'numeric',
       }),
     [locale],
@@ -163,242 +176,298 @@ export function Abonnement() {
   const principal = moyens.find((moyen) => moyen.principal);
   const autres = moyens.filter((moyen) => !moyen.principal);
 
+  const tarif = abonnement.plan ? abonnement.tarifs[abonnement.plan] : null;
+
+  function decrire(moyen: MoyenDePaiement) {
+    return moyen.type === 'paypal'
+      ? t('subscription.methodPaypal', {
+          marque: moyen.libelle,
+          compte: moyen.detail,
+        })
+      : t('subscription.methodCard', {
+          marque: moyen.libelle,
+          last4: moyen.detail,
+        });
+  }
+
+  function carteDeMoyen(moyen: MoyenDePaiement) {
+    const Icone = moyen.type === 'paypal' ? Wallet : CreditCard;
+
+    return (
+      <div key={moyen.id} className={styles.moyen}>
+        <p className={styles.moyenLigne}>
+          <Icone size={22} className={styles.moyenIcone} />
+          {decrire(moyen)}
+        </p>
+
+        <p className={styles.moyenActions}>
+          {moyen.principal ? null : (
+            <button
+              type="button"
+              className={styles.lien}
+              disabled={occupe || !token}
+              onClick={() =>
+                token && agirSurLeMoyen(setPrimaryPaymentMethod(token, moyen.id))
+              }
+            >
+              {t('subscription.setPrimary')}
+            </button>
+          )}
+
+          <button
+            type="button"
+            className={styles.lien}
+            disabled={occupe || !token}
+            onClick={() =>
+              token && agirSurLeMoyen(removePaymentMethod(token, moyen.id))
+            }
+          >
+            {t('subscription.remove')}
+          </button>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
-      <p className={styles.chapeau}>{t('subscription.subtitle')}</p>
-
       {revenuDeStripe ? (
         <p className={styles.succes}>{t('subscription.backFromPayment')}</p>
       ) : null}
 
       {erreur ? <p className={styles.erreur}>{erreur}</p> : null}
 
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>{t('subscription.mine')}</h2>
+      <div className={styles.colonnes}>
+        <div className={styles.colonne}>
+          <h2 className={styles.sectionTitre}>{t('subscription.mine')}</h2>
 
-        <div className={styles.ligne}>
-          <span>{t('subscription.planName')}</span>
-
-          <span className={styles.valeur}>
-            {abonnement.actif
-              ? t('subscription.statusActive')
-              : t('subscription.statusInactive')}
-          </span>
-        </div>
-
-        {abonnement.accesLibreJusquAu ? (
-          <div className={styles.ligne}>
-            <span>{t('subscription.freeUntilLabel')}</span>
-
-            <span className={styles.valeur}>
-              {dates.format(new Date(abonnement.accesLibreJusquAu))}
-            </span>
-          </div>
-        ) : null}
-
-        {abonnement.finDePeriode ? (
-          <div className={styles.ligne}>
-            <span>
-              {abonnement.annuleLe
-                ? t('subscription.activeUntilLabel')
-                : t('subscription.nextPayment')}
+          <div className={styles.carte}>
+            <span
+              className={
+                abonnement.actif ? styles.badgeActif : styles.badgeInactif
+              }
+            >
+              {abonnement.actif
+                ? t('subscription.statusActive')
+                : t('subscription.statusInactive')}
             </span>
 
-            <span className={styles.valeur}>
-              {dates.format(new Date(abonnement.finDePeriode))}
-            </span>
-          </div>
-        ) : null}
+            <p className={styles.plan}>{t('subscription.planName')}</p>
 
-        {abonnement.plan && abonnement.tarifs[abonnement.plan] ? (
-          <div className={styles.ligne}>
-            <span>{t('subscription.price')}</span>
+            <button
+              type="button"
+              className={styles.replier}
+              aria-expanded={avantagesOuverts}
+              onClick={() => setAvantagesOuverts((ouvert) => !ouvert)}
+            >
+              {avantagesOuverts ? (
+                <ChevronUp size={16} />
+              ) : (
+                <ChevronDown size={16} />
+              )}
 
-            <span className={styles.valeur}>
-              {abonnement.tarifs[abonnement.plan]?.libelle}
-            </span>
-          </div>
-        ) : null}
+              {t('subscription.benefits')}
+            </button>
 
-        {abonnement.actif && !abonnement.facturable ? (
-          <p className={styles.aide}>{t('subscription.offeredNoBilling')}</p>
-        ) : null}
+            {avantagesOuverts
+              ? AVANTAGES.map((groupe) => (
+                  <div key={groupe.titre} className={styles.groupe}>
+                    <p className={styles.groupeTitre}>{t(groupe.titre)}</p>
 
-        {abonnement.actif ? null : (
-          <p className={styles.aide}>{t('subscription.noSubscription')}</p>
-        )}
-      </section>
-
-      {abonnement.actif && abonnement.facturable ? null : (
-        <section className={styles.bloc}>
-          <h2 className={styles.blocTitre}>{t('subscription.benefits')}</h2>
-
-          <ul className={styles.avantages}>
-            <li>{t('subscription.benefitsFind1')}</li>
-            <li>{t('subscription.benefitsFind2')}</li>
-            <li>{t('subscription.benefitsSafe1')}</li>
-            <li>{t('subscription.benefitsSafe2')}</li>
-          </ul>
-
-          {abonnement.venteDansLApp ? (
-            <div className={styles.formules}>
-              {PLANS.map((plan) => {
-                const tarif = abonnement.tarifs[plan];
-
-                return (
-                  <div key={plan} className={styles.formule}>
-                    <p className={styles.formuleNom}>
-                      {t(LIBELLES[plan].nom)}
-                    </p>
-
-                    <p className={styles.formulePrix}>
-                      {tarif?.libelle ?? '—'}
-                    </p>
-
-                    <p className={styles.formuleAide}>
-                      {t(LIBELLES[plan].aide)}
-                    </p>
-
-                    <button
-                      type="button"
-                      className={styles.boutonSombre}
-                      disabled={occupe || !token}
-                      onClick={() =>
-                        token && partirVers(startCheckout(token, plan))
-                      }
-                    >
-                      {t('subscription.subscribe')}
-                    </button>
+                    <ul className={styles.avantages}>
+                      {groupe.lignes.map((ligne) => (
+                        <li key={ligne} className={styles.avantage}>
+                          <CircleCheck
+                            size={16}
+                            className={styles.coche}
+                            fill="currentColor"
+                            stroke="var(--wim-surface)"
+                          />
+                          {t(ligne)}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className={styles.aide}>{t('subscription.saleOutsideApp')}</p>
-          )}
-        </section>
-      )}
-
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>
-          {t('subscription.paymentMethods')}
-        </h2>
-
-        {principal ? (
-          <div className={styles.ligne}>
-            <span>
-              {principal.libelle} · {principal.detail}
-            </span>
-
-            <span className={styles.badge}>{t('subscription.primary')}</span>
+                ))
+              : null}
           </div>
-        ) : (
-          <p className={styles.aide}>{t('subscription.noPaymentMethod')}</p>
-        )}
 
-        {autres.length > 0 ? (
-          <div className={styles.sousBloc}>
-            <p className={styles.sousTitre}>
-              {t('subscription.otherMethods')}
-            </p>
+          {abonnement.accesLibreJusquAu ? (
+            <>
+              <h2 className={styles.sectionTitre}>
+                {t('subscription.freeUntilLabel')}
+              </h2>
 
-            {autres.map((moyen) => (
-              <div key={moyen.id} className={styles.ligne}>
-                <span>
-                  {moyen.libelle} · {moyen.detail}
-                </span>
+              <dl className={styles.lignes}>
+                <div className={styles.ligne}>
+                  <dt>{t('subscription.paymentDate')}</dt>
+                  <dd>{dates.format(new Date(abonnement.accesLibreJusquAu))}</dd>
+                </div>
+              </dl>
+            </>
+          ) : null}
 
-                <span className={styles.actions}>
+          {abonnement.actif && (abonnement.finDePeriode || tarif) ? (
+            <>
+              <h2 className={styles.sectionTitre}>
+                {abonnement.annuleLe
+                  ? t('subscription.activeUntilLabel')
+                  : t('subscription.nextPayment')}
+              </h2>
+
+              <dl className={styles.lignes}>
+                {abonnement.finDePeriode ? (
+                  <div className={styles.ligne}>
+                    <dt>{t('subscription.paymentDate')}</dt>
+                    <dd>{dates.format(new Date(abonnement.finDePeriode))}</dd>
+                  </div>
+                ) : null}
+
+                {tarif ? (
+                  <div className={styles.ligne}>
+                    <dt>{t('subscription.price')}</dt>
+                    <dd>{tarif.libelle}</dd>
+                  </div>
+                ) : null}
+              </dl>
+            </>
+          ) : null}
+
+          {abonnement.actif && !abonnement.facturable ? (
+            <p className={styles.aide}>{t('subscription.offeredNoBilling')}</p>
+          ) : null}
+
+          {abonnement.actif ? null : (
+            <p className={styles.aide}>{t('subscription.noSubscription')}</p>
+          )}
+
+          {abonnement.actif && abonnement.facturable ? null : (
+            <div className={styles.formules}>
+              {abonnement.venteDansLApp ? (
+                PLANS.map((plan) => {
+                  const formule = abonnement.tarifs[plan];
+
+                  return (
+                    <div key={plan} className={styles.formule}>
+                      <p className={styles.formuleNom}>{t(LIBELLES[plan].nom)}</p>
+
+                      <p className={styles.formulePrix}>
+                        {formule?.libelle ?? '—'}
+                      </p>
+
+                      <p className={styles.formuleAide}>
+                        {t(LIBELLES[plan].aide)}
+                      </p>
+
+                      <button
+                        type="button"
+                        className={styles.boutonSombre}
+                        disabled={occupe || !token}
+                        onClick={() =>
+                          token && partirVers(startCheckout(token, plan))
+                        }
+                      >
+                        {t('subscription.subscribe')}
+                      </button>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className={styles.aide}>{t('subscription.saleOutsideApp')}</p>
+              )}
+            </div>
+          )}
+
+          {abonnement.facturable && !abonnement.annuleLe ? (
+            confirmeResiliation ? (
+              <div className={styles.confirmation}>
+                <p className={styles.aide}>{t('subscription.cancelConfirm')}</p>
+
+                <div className={styles.actions}>
                   <button
                     type="button"
-                    className={styles.boutonClair}
-                    disabled={occupe || !token}
-                    onClick={() =>
-                      token &&
-                      agirSurLeMoyen(setPrimaryPaymentMethod(token, moyen.id))
-                    }
+                    className={styles.boutonContour}
+                    onClick={() => setConfirmeResiliation(false)}
                   >
-                    {t('subscription.setPrimary')}
+                    {t('common.cancel')}
                   </button>
 
                   <button
                     type="button"
                     className={styles.boutonDanger}
-                    disabled={occupe || !token}
-                    onClick={() =>
-                      token &&
-                      agirSurLeMoyen(removePaymentMethod(token, moyen.id))
-                    }
+                    disabled={occupe}
+                    onClick={resilier}
                   >
-                    {t('subscription.remove')}
+                    {t('subscription.cancel')}
                   </button>
-                </span>
+                </div>
               </div>
-            ))}
-          </div>
-        ) : null}
+            ) : (
+              <button
+                type="button"
+                className={styles.boutonContour}
+                onClick={() => setConfirmeResiliation(true)}
+              >
+                {t('subscription.cancelMine')}
+              </button>
+            )
+          ) : null}
+        </div>
 
-        <button
-          type="button"
-          className={styles.boutonClair}
-          disabled={occupe || !token}
-          onClick={() => token && partirVers(addPaymentMethod(token))}
-        >
-          {t('subscription.addMethod')}
-        </button>
-      </section>
-
-      {abonnement.facturable ? (
-        <section className={styles.bloc}>
-          <h2 className={styles.blocTitre}>
-            {t('subscription.manageValue')}
+        <div className={styles.colonne}>
+          <h2 className={styles.sectionTitre}>
+            {t('subscription.paymentMethods')}
           </h2>
 
-          <p className={styles.aide}>{t('subscription.manageHint')}</p>
+          {principal ? (
+            <>
+              <p className={styles.etiquette}>{t('subscription.primary')}</p>
+
+              {carteDeMoyen(principal)}
+            </>
+          ) : (
+            <p className={styles.aide}>{t('subscription.noPaymentMethod')}</p>
+          )}
+
+          {autres.length > 0 ? (
+            <>
+              <p className={styles.etiquette}>
+                {t('subscription.otherMethods')}
+              </p>
+
+              {autres.map(carteDeMoyen)}
+            </>
+          ) : null}
 
           <button
             type="button"
-            className={styles.boutonClair}
+            className={styles.boutonContour}
             disabled={occupe || !token}
-            onClick={() => token && partirVers(openBillingPortal(token))}
+            onClick={() => token && partirVers(addPaymentMethod(token))}
           >
-            {t('subscription.openPortal')}
+            {t('subscription.addMethod')}
           </button>
 
-          {abonnement.annuleLe ? null : confirmeResiliation ? (
-            <div className={styles.sousBloc}>
-              <p className={styles.aide}>{t('subscription.cancelConfirm')}</p>
+          {abonnement.facturable ? (
+            <>
+              <h2 className={styles.sectionTitre}>
+                {t('subscription.manageValue')}
+              </h2>
 
-              <span className={styles.actions}>
-                <button
-                  type="button"
-                  className={styles.boutonClair}
-                  onClick={() => setConfirmeResiliation(false)}
-                >
-                  {t('common.cancel')}
-                </button>
+              <p className={styles.aide}>{t('subscription.manageHint')}</p>
 
-                <button
-                  type="button"
-                  className={styles.boutonDanger}
-                  disabled={occupe}
-                  onClick={resilier}
-                >
-                  {t('subscription.cancel')}
-                </button>
-              </span>
-            </div>
-          ) : (
-            <button
-              type="button"
-              className={styles.boutonDanger}
-              onClick={() => setConfirmeResiliation(true)}
-            >
-              {t('subscription.cancelMine')}
-            </button>
-          )}
-        </section>
-      ) : null}
+              <button
+                type="button"
+                className={styles.boutonContour}
+                disabled={occupe || !token}
+                onClick={() => token && partirVers(openBillingPortal(token))}
+              >
+                {t('subscription.openPortal')}
+              </button>
+            </>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }

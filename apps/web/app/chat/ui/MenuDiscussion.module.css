@@ -1,0 +1,94 @@
+.porte {
+  position: relative;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.declencheur {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--wim-bordure);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
+  cursor: pointer;
+}
+
+.declencheur:hover {
+  background: var(--wim-surface-douce);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 248px;
+  padding: 6px;
+
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-carte);
+  background: var(--wim-surface);
+  box-shadow: var(--wim-ombre-flottante);
+}
+
+.titre {
+  margin: 0;
+  padding: 10px 12px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wim-texte-doux);
+}
+
+.entree,
+.danger,
+.annuler {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.entree {
+  color: var(--wim-texte);
+}
+
+.danger {
+  color: var(--wim-danger);
+  font-weight: 600;
+}
+
+.annuler {
+  color: var(--wim-texte-doux);
+}
+
+.entree:hover,
+.danger:hover,
+.annuler:hover {
+  background: var(--wim-surface-douce);
+}
+
+.entree:disabled,
+.danger:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.erreur {
+  margin: 0;
+  padding: 8px 12px 4px;
+  font-size: 12px;
+  color: var(--wim-danger);
+}

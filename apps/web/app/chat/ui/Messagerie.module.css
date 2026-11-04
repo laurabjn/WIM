@@ -1,7 +1,7 @@
 .messagerie {
   display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 20px;
+  grid-template-columns: minmax(320px, 0.54fr) 1fr;
+  gap: 24px;
   height: calc(100vh - 190px);
   min-height: 460px;
 }
@@ -57,6 +57,23 @@
 
 .entreeActive {
   background: #eaf6fe;
+}
+
+.porteAvatar {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.pastilleEnLigne {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #22c55e;
+  border: 2px solid var(--wim-surface);
 }
 
 .avatar {
@@ -232,8 +249,8 @@
   border: 0;
   border-radius: 18px;
   border-bottom-right-radius: 6px;
-  background: #2da7f3;
-  color: #ffffff;
+  background: var(--wim-bulle-mienne);
+  color: var(--wim-sur-bulle-mienne);
 }
 
 .texte {
@@ -269,12 +286,66 @@
   opacity: 0.65;
 }
 
+.avisTraduction {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 8px 16px 0;
+  text-align: center;
+  font-size: 11px;
+  color: var(--wim-texte-doux);
+}
+
+.lienTraduction {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--wim-texte-doux);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .composeur {
   display: flex;
   flex: 0 0 auto;
   gap: 10px;
   padding: 12px 16px;
   border-top: 1px solid #eef1f2;
+}
+
+.photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--wim-bordure);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
+  cursor: pointer;
+}
+
+.photo:hover {
+  background: var(--wim-surface-douce);
+}
+
+.photo:has(input:disabled) {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+/* Lisible par les lecteurs d ecran, invisible a l ecran. */
+.invisible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .champ {
@@ -295,22 +366,37 @@
 }
 
 .envoyer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
-  height: 44px;
-  padding: 0 22px;
+  width: 40px;
+  height: 40px;
   border: 0;
   border-radius: 999px;
-  background: #111111;
+  background: var(--wim-info);
   color: #ffffff;
-  font: inherit;
-  font-weight: 700;
   cursor: pointer;
 }
 
 .envoyer:disabled {
-  background: #c3cace;
+  background: var(--wim-texte-pale);
   cursor: default;
 }
+
+.enteteTextes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.enteteEnLigne {
+  color: #22c55e;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 
 .vide {
   display: flex;
@@ -366,34 +452,36 @@
 
 .onglets {
   display: flex;
-  gap: 6px;
-  padding: 4px;
-  margin-bottom: 6px;
-  border-radius: 999px;
-  background: #f4f6f7;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 10px;
 }
 
 .onglet {
-  flex: 1 1 0;
-  height: 34px;
+  padding: 0;
   border: 0;
-  border-radius: 999px;
   background: transparent;
   font: inherit;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  color: #5c6b72;
+  color: var(--wim-texte-doux);
   cursor: pointer;
 }
 
 .ongletActif {
-  background: #ffffff;
-  color: #111111;
-  font-weight: 700;
+  color: var(--wim-texte);
+  font-weight: 800;
 }
 
-a.onglet {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.ongletDemandes {
+  margin-left: auto;
+  color: var(--wim-info);
+  font-size: 13px;
 }
+
+.lienDiscret {
+  color: var(--wim-texte-doux);
+  font-size: 13px;
+}
+
+

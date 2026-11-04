@@ -76,6 +76,19 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
         pathname: '/**',
       },
+      // Les cartes statiques de la fiche d'un logement.
+      {
+        protocol: 'https',
+        hostname: 'api.mapbox.com',
+        pathname: '/**',
+      },
+      // Les avatars des comptes de demonstration, au meme titre qu'Unsplash
+      // pour leurs photos de logement.
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+        pathname: '/**',
+      },
     ],
   },
 };

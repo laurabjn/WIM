@@ -6,10 +6,15 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+
+:root[data-theme='dark'] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 html,
@@ -46,14 +51,91 @@ button {
 }
 
 @media (prefers-color-scheme: dark) {
-  html {
+  html:not([data-theme='light']) {
     color-scheme: dark;
   }
 
-  .imgLight {
+  html:not([data-theme='light']) .imgLight {
     display: none;
   }
-  .imgDark {
+  html:not([data-theme='light']) .imgDark {
     display: unset;
   }
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+html[data-theme='dark'] .imgLight {
+  display: none;
+}
+
+html[data-theme='dark'] .imgDark {
+  display: unset;
+}
+
+:root {
+  --wim-fond: #efefef;
+  --wim-surface: #ffffff;
+  --wim-surface-douce: #f4f4f5;
+
+  --wim-texte: #111111;
+  --wim-texte-doux: #6b7280;
+  --wim-texte-pale: #b4b4b8;
+  --wim-bordure: #e5e7eb;
+
+  --wim-vert: #12aa72;
+  --wim-accent: #52d1a6;
+  --wim-info: #2da7f3;
+  --wim-primaire: #087ebe;
+  --wim-danger: #dc2626;
+  --wim-degrade: linear-gradient(90deg, #52d1a6, #2da7f3);
+
+  --wim-bulle-mienne: #111111;
+  --wim-sur-bulle-mienne: #ffffff;
+
+  --wim-rayon-champ: 12px;
+  --wim-rayon-carte: 16px;
+  --wim-rayon-bloc: 24px;
+  --wim-rayon-pilule: 999px;
+
+  --wim-ombre-carte: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --wim-ombre-flottante: 0 10px 28px rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --wim-fond: #000000;
+    --wim-surface: #1c1c1e;
+    --wim-surface-douce: #232326;
+
+    --wim-texte: #f5f5f5;
+    --wim-texte-doux: #a1a1aa;
+    --wim-texte-pale: #6b6b70;
+    --wim-bordure: #2c2c2e;
+
+    --wim-bulle-mienne: #0b6fa4;
+    --wim-sur-bulle-mienne: #ffffff;
+
+    --wim-ombre-carte: 0 2px 12px rgba(0, 0, 0, 0.4);
+    --wim-ombre-flottante: 0 10px 28px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme='dark'] {
+  --wim-fond: #000000;
+  --wim-surface: #1c1c1e;
+  --wim-surface-douce: #232326;
+
+  --wim-texte: #f5f5f5;
+  --wim-texte-doux: #a1a1aa;
+  --wim-texte-pale: #6b6b70;
+  --wim-bordure: #2c2c2e;
+
+  --wim-bulle-mienne: #0b6fa4;
+  --wim-sur-bulle-mienne: #ffffff;
+
+  --wim-ombre-carte: 0 2px 12px rgba(0, 0, 0, 0.4);
+  --wim-ombre-flottante: 0 10px 28px rgba(0, 0, 0, 0.5);
 }

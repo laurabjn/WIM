@@ -89,3 +89,29 @@ export async function resetPasswordApi(payload: {
     throw new Error(message);
   }
 }
+export async function socialSignInApi(payload: {
+  provider: 'GOOGLE' | 'APPLE';
+  idToken: string;
+  firstName?: string | null;
+  lastName?: string | null;
+}): Promise<LoginResult> {
+  const response = await fetch(`${API_URL}/auth/social`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const message = data?.message || 'Social sign-in failed';
+    throw new Error(message);
+  }
+
+  saveSession(data as LoginResult);
+
+  return data as LoginResult;
+}

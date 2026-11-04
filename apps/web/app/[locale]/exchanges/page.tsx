@@ -15,6 +15,8 @@ export default async function ExchangesPage() {
       <section className={styles.contenu}>
         <h1 className={styles.titre}>{t('common.exchanges')}</h1>
 
+        <p className={styles.sousTitre}>{t('exchange.pageSubtitle')}</p>
+
         <Echanges />
       </section>
     </main>

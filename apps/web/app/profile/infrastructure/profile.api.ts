@@ -35,9 +35,13 @@ export async function getPublicProfileById(userId: string) {
   };
 }
 
+export type UpdateProfilePayload = Partial<UserProfile> & {
+  statusText?: string | null;
+};
+
 export async function updateMyProfile(
   token: string,
-  payload: Partial<UserProfile>,
+  payload: UpdateProfilePayload,
 ): Promise<UserProfile> {
   const response = await fetch(`${API_URL}/users/me/profile`, {
     method: 'PATCH',

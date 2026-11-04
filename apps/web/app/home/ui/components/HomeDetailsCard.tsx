@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { MouseEvent, useState } from 'react';
 import { addFavoriteHome, removeFavoriteHome } from 'app/home/infrastructure/home.api';
 import { getSession } from 'app/auth/infrastructure/authStorage';
+import { trancheDePrix } from './trancheDePrix';
 
 type Props = {
   home: Home;
@@ -106,7 +107,7 @@ export function HomeDetailsCard({ home, initialFavorite = false }: Props) {
           )}
 
           <span className={styles.price}>
-            ✈ {t('home.from')} {home.pricePerNight ?? 0}€
+            {trancheDePrix(home.pricePerNight)}
           </span>
         </div>
       </div>

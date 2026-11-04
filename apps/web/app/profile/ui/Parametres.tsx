@@ -4,13 +4,41 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { IdentityStatus, type UserProfile } from '@wim/shared';
-
 import {
-  clearSession,
-  getSession,
-} from 'app/auth/infrastructure/authStorage';
+  ArrowLeftRight,
+  BadgeCheck,
+  Ban,
+  Bell,
+  Cake,
+  ChevronRight,
+  CircleHelp,
+  Coins,
+  CreditCard,
+  Download,
+  Eye,
+  FileText,
+  Flag,
+  Heart,
+  Languages,
+  LifeBuoy,
+  Lock,
+  LogOut,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Ruler,
+  Share2,
+  Shield,
+  SunMoon,
+  Trash2,
+  User,
+  type LucideIcon,
+} from 'lucide-react';
+
+import { clearSession, getSession } from 'app/auth/infrastructure/authStorage';
 import { SITE_URL } from 'app/home/infrastructure/api';
 import {
   deleteMyAccount,
@@ -24,6 +52,7 @@ import {
   getMyProfile,
   updateMyProfile,
 } from 'app/profile/infrastructure/profile.api';
+import { enregistrerTheme, lireTheme, type Theme } from 'app/ui/theme/theme';
 
 import styles from './Parametres.module.css';
 
@@ -31,6 +60,7 @@ type Etat = 'chargement' | 'anonyme' | 'prete' | 'erreur';
 
 type Reglage = keyof Pick<
   UserProfile,
+  | 'notifyPush'
   | 'notifyNewMessages'
   | 'notifyExchanges'
   | 'notifySms'
@@ -42,20 +72,136 @@ type Reglage = keyof Pick<
   | 'dataSharing'
 >;
 
-const NOTIFICATIONS: { cle: Reglage; libelle: string }[] = [
-  { cle: 'notifyNewMessages', libelle: 'profile.settings.newMessages' },
-  { cle: 'notifyExchanges', libelle: 'profile.settings.updateMessages' },
-  { cle: 'notifySms', libelle: 'profile.settings.smsNotifications' },
-  { cle: 'marketingEmails', libelle: 'profile.settings.emailMarketing' },
+type Bascule = { cle: Reglage; libelle: string; Icone: LucideIcon };
+
+const NOTIFICATIONS: Bascule[] = [
+  {
+    cle: 'notifyPush',
+    libelle: 'profile.settings.pushNotifications',
+    Icone: Bell,
+  },
+  {
+    cle: 'notifyNewMessages',
+    libelle: 'profile.settings.newMessages',
+    Icone: MessageCircle,
+  },
+  {
+    cle: 'notifyExchanges',
+    libelle: 'profile.settings.updateMessages',
+    Icone: ArrowLeftRight,
+  },
+  { cle: 'notifySms', libelle: 'profile.settings.smsNotifications', Icone: Phone },
+  { cle: 'marketingEmails', libelle: 'profile.settings.emailMarketing', Icone: Mail },
 ];
 
-const CONFIDENTIALITE: { cle: Reglage; libelle: string }[] = [
-  { cle: 'profileVisible', libelle: 'profile.settings.profileVisibility' },
-  { cle: 'showPreciseLocation', libelle: 'profile.settings.preciseLocation' },
-  { cle: 'showAge', libelle: 'profile.settings.yearSharing' },
-  { cle: 'allowMessages', libelle: 'profile.settings.allowMessage' },
-  { cle: 'dataSharing', libelle: 'profile.settings.dataSharing' },
+const CONFIDENTIALITE: Bascule[] = [
+  { cle: 'profileVisible', libelle: 'profile.settings.profileVisibility', Icone: Eye },
+  {
+    cle: 'showPreciseLocation',
+    libelle: 'profile.settings.preciseLocation',
+    Icone: MapPin,
+  },
+  { cle: 'showAge', libelle: 'profile.settings.yearSharing', Icone: Cake },
+  {
+    cle: 'allowMessages',
+    libelle: 'profile.settings.allowMessage',
+    Icone: MessageCircle,
+  },
+  { cle: 'dataSharing', libelle: 'profile.settings.dataSharing', Icone: Share2 },
 ];
+
+function Carte({ titre, children }: { titre: string; children: ReactNode }) {
+  return (
+    <section className={styles.section}>
+      <h2 className={styles.sectionTitre}>{titre}</h2>
+
+      <div className={styles.carte}>{children}</div>
+    </section>
+  );
+}
+
+function Ligne({
+  Icone,
+  libelle,
+  valeur,
+  teinte,
+  href,
+  externe,
+  onClick,
+  danger,
+}: {
+  Icone: LucideIcon;
+  libelle: string;
+  valeur?: string;
+  teinte?: 'verte' | 'rouge' | 'orange';
+  href?: string;
+  externe?: boolean;
+  onClick?: () => void;
+  danger?: boolean;
+}) {
+  const classe = danger ? `${styles.ligne} ${styles.ligneDanger}` : styles.ligne;
+
+  const contenu = (
+    <>
+      <Icone size={18} className={styles.icone} />
+
+      <span className={styles.libelle}>{libelle}</span>
+
+      {valeur ? (
+        <span
+          className={teinte ? `${styles.valeur} ${styles[teinte]}` : styles.valeur}
+        >
+          {teinte ? <span className={styles.pastille} /> : null}
+          {valeur}
+        </span>
+      ) : null}
+
+      <ChevronRight size={18} className={styles.chevron} />
+    </>
+  );
+
+  if (href && externe) {
+    return (
+      <a className={classe} href={href} target="_blank" rel="noreferrer">
+        {contenu}
+      </a>
+    );
+  }
+
+  if (href) {
+    return (
+      <Link className={classe} href={href}>
+        {contenu}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" className={classe} onClick={onClick}>
+      {contenu}
+    </button>
+  );
+}
+
+function LigneChoix({
+  Icone,
+  libelle,
+  children,
+}: {
+  Icone: LucideIcon;
+  libelle: string;
+  children: ReactNode;
+}) {
+  return (
+    <label className={styles.ligne}>
+      <Icone size={18} className={styles.icone} />
+
+      <span className={styles.libelle}>{libelle}</span>
+
+      {children}
+    </label>
+  );
+}
 
 export function Parametres() {
   const t = useTranslations();
@@ -65,12 +211,16 @@ export function Parametres() {
   const [token, setToken] = useState<string | null>(null);
   const [profil, setProfil] = useState<UserProfile | null>(null);
   const [bloques, setBloques] = useState<BlockedUser[]>([]);
+  const [theme, setTheme] = useState<Theme>('system');
 
   const [erreur, setErreur] = useState<string | null>(null);
   const [exporte, setExporte] = useState(false);
+  const [listeBloques, setListeBloques] = useState(false);
   const [confirmation, setConfirmation] = useState(0);
 
   useEffect(() => {
+    setTheme(lireTheme());
+
     const session = getSession();
 
     if (!session) {
@@ -117,6 +267,11 @@ export function Parametres() {
       setProfil(precedent);
       setErreur(t('profile.settings.saveError'));
     }
+  }
+
+  function changerTheme(choix: Theme) {
+    setTheme(choix);
+    enregistrerTheme(choix);
   }
 
   async function demanderMesDonnees() {
@@ -198,30 +353,50 @@ export function Parametres() {
     return <p className={styles.etat}>{t('profile.profileNotFound')}</p>;
   }
 
-  const statutIdentite =
-    profil.identityStatus === IdentityStatus.VERIFIED || profil.identityVerified
-      ? t('profile.settings.verified')
-      : profil.identityStatus === IdentityStatus.REFUSED
-        ? t('profile.settings.refused')
-        : profil.identityStatus === IdentityStatus.IN_PROGRESS
-          ? t('profile.settings.inProgress')
-          : t('profile.settings.notVerified');
-
   const identiteFaite =
     profil.identityStatus === IdentityStatus.VERIFIED ||
     profil.identityVerified === true;
 
-  function bascule({ cle, libelle }: { cle: Reglage; libelle: string }) {
+  const statutIdentite = identiteFaite
+    ? t('profile.settings.verified')
+    : profil.identityStatus === IdentityStatus.REFUSED
+      ? t('profile.settings.refused')
+      : profil.identityStatus === IdentityStatus.IN_PROGRESS
+        ? t('profile.settings.inProgress')
+        : t('profile.settings.notVerified');
+
+  const teinteIdentite = identiteFaite
+    ? 'verte'
+    : profil.identityStatus === IdentityStatus.REFUSED
+      ? 'rouge'
+      : 'orange';
+
+  const nomComplet =
+    `${profil.firstName ?? ''} ${profil.lastName ?? ''}`.trim() ||
+    t('common.notProvided');
+
+  const libelleTheme =
+    theme === 'dark'
+      ? t('profile.settings.themeDark')
+      : theme === 'light'
+        ? t('profile.settings.themeLight')
+        : t('profile.settings.themeSystem');
+
+  function bascule({ cle, libelle, Icone }: Bascule) {
     return (
       <label key={cle} className={styles.ligne}>
-        <span>{t(libelle)}</span>
+        <Icone size={18} className={styles.icone} />
+
+        <span className={styles.libelle}>{t(libelle)}</span>
 
         <input
           type="checkbox"
           className={styles.interrupteur}
           checked={profil?.[cle] === true}
           onChange={(evenement) =>
-            enregistrer({ [cle]: evenement.target.checked } as Partial<UserProfile>)
+            enregistrer({
+              [cle]: evenement.target.checked,
+            } as Partial<UserProfile>)
           }
         />
       </label>
@@ -232,284 +407,328 @@ export function Parametres() {
     <div className={styles.page}>
       {erreur ? <p className={styles.erreur}>{erreur}</p> : null}
 
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>{t('profile.settings.account')}</h2>
+      <div className={styles.colonnes}>
+        <div className={styles.colonne}>
+          <Carte titre={t('profile.settings.account')}>
+            <Ligne
+              Icone={User}
+              libelle={t('profile.settings.personalInfo')}
+              valeur={nomComplet}
+              href="/account/edit"
+            />
 
-        <Link href="/account/edit" className={styles.ligneLien}>
-          {t('profile.settings.personalInfo')}
-        </Link>
+            <Ligne
+              Icone={Mail}
+              libelle={t('auth.register.email')}
+              valeur={profil.email || t('common.notProvided')}
+              href="/account/edit"
+            />
 
-        <Link href="/subscription" className={styles.ligneLien}>
-          {t('profile.settings.subscription')}
-        </Link>
-      </section>
+            <Ligne
+              Icone={Phone}
+              libelle={t('auth.register.phone')}
+              valeur={profil.phone || t('common.notProvided')}
+              href="/account/edit"
+            />
 
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>
-          {t('profile.settings.verification')}
-        </h2>
+            <Ligne
+              Icone={Lock}
+              libelle={t('auth.register.password')}
+              valeur="••••••••"
+              href="/account/edit"
+            />
+          </Carte>
 
-        <div className={styles.ligne}>
-          <span>{t('profile.settings.verificationStatus')}</span>
-          <span className={styles.valeur}>{statutIdentite}</span>
+          <Carte titre={t('profile.settings.display')}>
+            <LigneChoix Icone={SunMoon} libelle={t('profile.settings.theme')}>
+              <select
+                className={styles.choix}
+                value={theme}
+                aria-label={libelleTheme}
+                onChange={(evenement) =>
+                  changerTheme(evenement.target.value as Theme)
+                }
+              >
+                <option value="system">
+                  {t('profile.settings.themeSystem')}
+                </option>
+                <option value="light">
+                  {t('profile.settings.themeLight')}
+                </option>
+                <option value="dark">{t('profile.settings.themeDark')}</option>
+              </select>
+            </LigneChoix>
+          </Carte>
+
+          <Carte titre={t('profile.settings.verification')}>
+            <Ligne
+              Icone={BadgeCheck}
+              libelle={t('profile.settings.verificationStatus')}
+              valeur={statutIdentite}
+              teinte={teinteIdentite}
+              onClick={identiteFaite ? undefined : verifierMonIdentite}
+            />
+          </Carte>
+
+          <Carte titre={t('profile.settings.subscription')}>
+            <Ligne
+              Icone={CreditCard}
+              libelle={t('subscription.mine')}
+              valeur={t('subscription.manageValue')}
+              href="/subscription"
+            />
+          </Carte>
+
+          <Carte titre={t('profile.settings.notifications')}>
+            {NOTIFICATIONS.map(bascule)}
+
+            <Ligne
+              Icone={Bell}
+              libelle={t('notifications.title')}
+              href="/notifications"
+            />
+          </Carte>
         </div>
 
-        {identiteFaite ? null : (
-          <button
-            type="button"
-            className={styles.boutonClair}
-            onClick={verifierMonIdentite}
-          >
-            {t('auth.identity.gateAction')}
-          </button>
-        )}
-      </section>
+        <div className={styles.colonne}>
+          <Carte titre={t('profile.settings.privacy')}>
+            {CONFIDENTIALITE.map(bascule)}
 
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>
-          {t('profile.settings.notifications')}
-        </h2>
+            <Ligne
+              Icone={Ban}
+              libelle={t('profile.blocked.title')}
+              valeur={
+                bloques.length > 0
+                  ? String(bloques.length)
+                  : t('profile.blocked.manage')
+              }
+              onClick={() => setListeBloques((ouverte) => !ouverte)}
+            />
 
-        {NOTIFICATIONS.map(bascule)}
+            {listeBloques ? (
+              <div className={styles.sousListe}>
+                {bloques.length === 0 ? (
+                  <p className={styles.sousTexte}>{t('common.notProvided')}</p>
+                ) : (
+                  bloques.map((bloque) => (
+                    <div key={bloque.id} className={styles.bloque}>
+                      <span className={styles.avatar}>
+                        {bloque.avatarUrl ? (
+                          <Image
+                            src={bloque.avatarUrl}
+                            alt=""
+                            fill
+                            className={styles.avatarImage}
+                          />
+                        ) : null}
+                      </span>
 
-        <Link href="/notifications" className={styles.ligneLien}>
-          {t('notifications.title')}
-        </Link>
-      </section>
+                      <span className={styles.bloqueNom}>
+                        {[bloque.firstName, bloque.lastName]
+                          .filter(Boolean)
+                          .join(' ')}
+                      </span>
 
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>{t('profile.settings.privacy')}</h2>
-
-        {CONFIDENTIALITE.map(bascule)}
-
-        <div className={styles.sousBloc}>
-          <p className={styles.sousTitre}>{t('profile.blocked.title')}</p>
-
-          {bloques.length === 0 ? (
-            <p className={styles.valeur}>{t('common.notProvided')}</p>
-          ) : (
-            bloques.map((bloque) => (
-              <div key={bloque.id} className={styles.ligne}>
-                <span className={styles.bloqueNom}>
-                  <span className={styles.avatar}>
-                    {bloque.avatarUrl ? (
-                      <Image
-                        src={bloque.avatarUrl}
-                        alt=""
-                        fill
-                        className={styles.avatarImage}
-                      />
-                    ) : null}
-                  </span>
-
-                  {[bloque.firstName, bloque.lastName]
-                    .filter(Boolean)
-                    .join(' ')}
-                </span>
-
-                <button
-                  type="button"
-                  className={styles.boutonClair}
-                  onClick={() => debloquer(bloque.id)}
-                >
-                  {t('profile.blocked.unblock')}
-                </button>
+                      <button
+                        type="button"
+                        className={styles.boutonClair}
+                        onClick={() => debloquer(bloque.id)}
+                      >
+                        {t('profile.blocked.unblock')}
+                      </button>
+                    </div>
+                  ))
+                )}
               </div>
-            ))
-          )}
+            ) : null}
+          </Carte>
+
+          <Carte titre={t('profile.settings.preferences')}>
+            <Ligne
+              Icone={Heart}
+              libelle={t('profile.settings.managePreferences')}
+              valeur={t('profile.settings.customize')}
+              href="/account/preferences"
+            />
+
+            <LigneChoix
+              Icone={Languages}
+              libelle={t('profile.settings.language')}
+            >
+              <select
+                className={styles.choix}
+                value={profil.preferredLocale}
+                onChange={(evenement) =>
+                  enregistrer({
+                    preferredLocale: evenement.target.value as 'fr' | 'en',
+                  })
+                }
+              >
+                <option value="fr">{t('profile.language.french')}</option>
+                <option value="en">{t('profile.language.english')}</option>
+              </select>
+            </LigneChoix>
+
+            <LigneChoix Icone={Coins} libelle={t('profile.settings.currency')}>
+              <select
+                className={styles.choix}
+                value={profil.currency ?? 'EUR'}
+                onChange={(evenement) =>
+                  enregistrer({
+                    currency: evenement.target.value as 'EUR' | 'USD',
+                  })
+                }
+              >
+                <option value="EUR">EUR (€)</option>
+                <option value="USD">USD ($)</option>
+              </select>
+            </LigneChoix>
+
+            <LigneChoix
+              Icone={Ruler}
+              libelle={t('profile.settings.distanceUnit')}
+            >
+              <select
+                className={styles.choix}
+                value={profil.distanceUnit ?? 'km'}
+                onChange={(evenement) =>
+                  enregistrer({
+                    distanceUnit: evenement.target.value as 'km' | 'mi',
+                  })
+                }
+              >
+                <option value="km">{t('profile.settings.kilometers')}</option>
+                <option value="mi">{t('profile.settings.miles')}</option>
+              </select>
+            </LigneChoix>
+          </Carte>
+
+          <Carte titre={t('profile.settings.assistance')}>
+            <Ligne
+              Icone={CircleHelp}
+              libelle={t('profile.settings.helpCenter')}
+              href="/account/support"
+            />
+
+            <Ligne
+              Icone={LifeBuoy}
+              libelle={t('profile.settings.contactSupport')}
+              href="/account/support"
+            />
+
+            <Ligne
+              Icone={Flag}
+              libelle={t('profile.settings.problemReport')}
+              href="/account/support?sujet=technical"
+            />
+          </Carte>
+
+          <Carte titre={t('profile.settings.legal')}>
+            <Ligne
+              Icone={FileText}
+              libelle={t('profile.settings.termsOfService')}
+              href={`${SITE_URL}/conditions.html`}
+              externe
+            />
+
+            <Ligne
+              Icone={Shield}
+              libelle={t('profile.settings.privacyPolicy')}
+              href={`${SITE_URL}/confidentialite.html`}
+              externe
+            />
+          </Carte>
+
+          <Carte titre={t('profile.settings.myData')}>
+            <Ligne
+              Icone={Download}
+              libelle={t('profile.settings.exportData')}
+              valeur={exporte ? profil.email : undefined}
+              onClick={exporte ? undefined : demanderMesDonnees}
+            />
+
+            {exporte ? (
+              <div className={styles.sousListe}>
+                <p className={styles.sousTexte}>
+                  {t('profile.settings.exportRequested')}
+                </p>
+              </div>
+            ) : null}
+          </Carte>
+
+          <Carte titre={t('profile.settings.dangerZone')}>
+            <Ligne
+              Icone={LogOut}
+              libelle={t('profile.logout')}
+              onClick={seDeconnecter}
+              danger
+            />
+
+            <Ligne
+              Icone={Trash2}
+              libelle={t('profile.settings.deleteAccount')}
+              onClick={() => setConfirmation(1)}
+              danger
+            />
+
+            {confirmation === 1 ? (
+              <div className={styles.sousListe}>
+                <p className={styles.sousTexte}>
+                  {t('profile.settings.deleteAccountBody')}
+                </p>
+
+                <div className={styles.actions}>
+                  <button
+                    type="button"
+                    className={styles.boutonClair}
+                    onClick={() => setConfirmation(0)}
+                  >
+                    {t('common.cancel')}
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.boutonDanger}
+                    onClick={() => setConfirmation(2)}
+                  >
+                    {t('profile.settings.deleteAccountContinue')}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {confirmation === 2 ? (
+              <div className={styles.sousListe}>
+                <p className={styles.sousTitre}>
+                  {t('profile.settings.deleteAccountLastTitle')}
+                </p>
+
+                <p className={styles.sousTexte}>
+                  {t('profile.settings.deleteAccountLastBody')}
+                </p>
+
+                <div className={styles.actions}>
+                  <button
+                    type="button"
+                    className={styles.boutonClair}
+                    onClick={() => setConfirmation(0)}
+                  >
+                    {t('common.cancel')}
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.boutonDanger}
+                    onClick={supprimerLeCompte}
+                  >
+                    {t('profile.settings.deleteAccountConfirm')}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </Carte>
         </div>
-      </section>
-
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>
-          {t('profile.settings.preferences')}
-        </h2>
-
-        <Link href="/account/preferences" className={styles.ligneLien}>
-          {t('profile.settings.managePreferences')}
-        </Link>
-
-        <label className={styles.ligne}>
-          <span>{t('profile.settings.language')}</span>
-
-          <select
-            className={styles.choix}
-            value={profil.preferredLocale}
-            onChange={(evenement) =>
-              enregistrer({
-                preferredLocale: evenement.target.value as 'fr' | 'en',
-              })
-            }
-          >
-            <option value="fr">{t('profile.language.french')}</option>
-            <option value="en">{t('profile.language.english')}</option>
-          </select>
-        </label>
-
-        <label className={styles.ligne}>
-          <span>{t('profile.settings.currency')}</span>
-
-          <select
-            className={styles.choix}
-            value={profil.currency ?? 'EUR'}
-            onChange={(evenement) =>
-              enregistrer({
-                currency: evenement.target.value as 'EUR' | 'USD',
-              })
-            }
-          >
-            <option value="EUR">EUR (€)</option>
-            <option value="USD">USD ($)</option>
-          </select>
-        </label>
-
-        <label className={styles.ligne}>
-          <span>{t('profile.settings.distanceUnit')}</span>
-
-          <select
-            className={styles.choix}
-            value={profil.distanceUnit ?? 'km'}
-            onChange={(evenement) =>
-              enregistrer({
-                distanceUnit: evenement.target.value as 'km' | 'mi',
-              })
-            }
-          >
-            <option value="km">{t('profile.settings.kilometers')}</option>
-            <option value="mi">{t('profile.settings.miles')}</option>
-          </select>
-        </label>
-      </section>
-
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>{t('profile.settings.assistance')}</h2>
-
-        <Link href="/account/support" className={styles.ligneLien}>
-          {t('profile.settings.contactSupport')}
-        </Link>
-      </section>
-
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>{t('profile.settings.legal')}</h2>
-
-        <a
-          className={styles.ligneLien}
-          href={`${SITE_URL}/conditions.html`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {t('profile.settings.termsOfService')}
-        </a>
-
-        <a
-          className={styles.ligneLien}
-          href={`${SITE_URL}/confidentialite.html`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {t('profile.settings.privacyPolicy')}
-        </a>
-      </section>
-
-      <section className={styles.bloc}>
-        <h2 className={styles.blocTitre}>{t('profile.settings.myData')}</h2>
-
-        {exporte ? (
-          <div className={styles.sousBloc}>
-            <p className={styles.valeur}>
-              {t('profile.settings.exportRequested')}
-            </p>
-
-            <p className={styles.sousTitre}>{profil.email}</p>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className={styles.boutonClair}
-            onClick={demanderMesDonnees}
-          >
-            {t('profile.settings.exportData')}
-          </button>
-        )}
-      </section>
-
-      <section className={styles.blocDanger}>
-        <h2 className={styles.blocTitre}>{t('profile.settings.dangerZone')}</h2>
-
-        <button
-          type="button"
-          className={styles.boutonDanger}
-          onClick={seDeconnecter}
-        >
-          {t('profile.logout')}
-        </button>
-
-        {confirmation === 0 ? (
-          <button
-            type="button"
-            className={styles.boutonDanger}
-            onClick={() => setConfirmation(1)}
-          >
-            {t('profile.settings.deleteAccount')}
-          </button>
-        ) : null}
-
-        {confirmation === 1 ? (
-          <div className={styles.sousBloc}>
-            <p className={styles.valeur}>
-              {t('profile.settings.deleteAccountBody')}
-            </p>
-
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.boutonClair}
-                onClick={() => setConfirmation(0)}
-              >
-                {t('common.cancel')}
-              </button>
-
-              <button
-                type="button"
-                className={styles.boutonDanger}
-                onClick={() => setConfirmation(2)}
-              >
-                {t('profile.settings.deleteAccountContinue')}
-              </button>
-            </div>
-          </div>
-        ) : null}
-
-        {confirmation === 2 ? (
-          <div className={styles.sousBloc}>
-            <p className={styles.sousTitre}>
-              {t('profile.settings.deleteAccountLastTitle')}
-            </p>
-
-            <p className={styles.valeur}>
-              {t('profile.settings.deleteAccountLastBody')}
-            </p>
-
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.boutonClair}
-                onClick={() => setConfirmation(0)}
-              >
-                {t('common.cancel')}
-              </button>
-
-              <button
-                type="button"
-                className={styles.boutonDanger}
-                onClick={supprimerLeCompte}
-              >
-                {t('profile.settings.deleteAccountConfirm')}
-              </button>
-            </div>
-          </div>
-        ) : null}
-      </section>
+      </div>
     </div>
   );
 }

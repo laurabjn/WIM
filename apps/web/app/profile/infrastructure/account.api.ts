@@ -69,6 +69,35 @@ export async function getBlockedUsers(token: string): Promise<BlockedUser[]> {
   }));
 }
 
+export async function blockUser(
+  token: string,
+  userId: string,
+): Promise<void> {
+  const response = await fetch(`${API_URL}/moderation/block/${userId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) throw new Error('Le blocage a échoué');
+}
+
+export async function reportUser(
+  token: string,
+  userId: string,
+  reason: string,
+): Promise<void> {
+  const response = await fetch(`${API_URL}/moderation/report/${userId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ reason }),
+  });
+
+  if (!response.ok) throw new Error("Le signalement a échoué");
+}
+
 export async function unblockUser(
   token: string,
   userId: string,

@@ -2,122 +2,167 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 22px;
-  border: 1px solid #e8eaec;
-  border-radius: 18px;
-  background: #ffffff;
-}
-
-.titre {
-  font-size: 18px;
-  font-weight: 800;
 }
 
 .appelTexte {
-  color: #5c6b72;
-  font-size: 15px;
+  margin: 0;
+  color: var(--wim-texte-doux);
+  font-size: 14px;
   line-height: 1.5;
 }
 
-.formulaire {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+.reservation {
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-champ);
+  overflow: hidden;
 }
 
-.lignes {
+.dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.dates .boite + .boite {
+  border-left: 1px solid var(--wim-bordure);
+}
+
+.boite {
   display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.boiteVoyageurs {
+  border-top: 1px solid var(--wim-bordure);
+}
+
+.etiquette {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wim-texte);
+}
+
+.valeur {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.saisie {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--wim-texte);
+  appearance: none;
+  cursor: pointer;
+}
+
+.saisie::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+.saisie:focus {
+  outline: none;
+}
+
+.saisieVide,
+.saisieVide::-webkit-datetime-edit {
+  color: transparent;
+}
+
+.invite {
+  position: absolute;
+  left: 0;
+  pointer-events: none;
+  font-size: 14px;
+  color: var(--wim-texte-doux);
+}
+
+.chevron {
+  position: absolute;
+  right: 0;
+  pointer-events: none;
+  color: var(--wim-texte-doux);
 }
 
 .champ {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 1 1 160px;
   min-width: 0;
 }
 
 .libelle {
   font-size: 13px;
   font-weight: 600;
-  color: #5c6b72;
+  color: var(--wim-texte-doux);
 }
 
 .aide {
-  color: #5c6b72;
   font-size: 12px;
   line-height: 1.4;
+  color: var(--wim-texte-doux);
 }
 
-.champ input,
-.champ select {
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid #dfe3e6;
-  border-radius: 10px;
-  background: #ffffff;
-  font: inherit;
-  color: inherit;
-}
-
+.champ select,
 .champ textarea {
   padding: 10px 12px;
-  border: 1px solid #dfe3e6;
-  border-radius: 12px;
-  background: #ffffff;
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-champ);
+  background: var(--wim-surface);
   font: inherit;
   color: inherit;
   resize: vertical;
 }
 
-.champ input:focus,
 .champ select:focus,
 .champ textarea:focus {
-  outline: 2px solid #2da7f3;
+  outline: 2px solid var(--wim-info);
   outline-offset: 1px;
 }
 
 .erreur {
-  color: #c0392b;
+  margin: 0;
+  color: var(--wim-danger);
   font-size: 14px;
 }
 
-.actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-.boutonSombre,
-.boutonClair {
+.boutonDegrade {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  align-self: flex-start;
-  height: 44px;
+  height: 48px;
   padding: 0 24px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--wim-rayon-pilule);
+  background: var(--wim-degrade);
+  color: #ffffff;
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
 }
 
-.boutonSombre {
-  background: #111111;
-  color: #ffffff;
-}
-
-.boutonSombre:disabled {
-  background: #c3cace;
+.boutonDegrade:disabled {
+  opacity: 0.55;
   cursor: default;
 }
 
-.boutonClair {
-  border: 1px solid #dfe3e6;
-  background: #ffffff;
-  color: #111111;
+.mention {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--wim-texte-doux);
 }

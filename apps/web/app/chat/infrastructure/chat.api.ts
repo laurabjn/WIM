@@ -71,10 +71,12 @@ export async function getChatMessages(
   token: string,
   chatId: string,
   cursor?: string,
+  traduire = false,
 ): Promise<ChatMessagesPage> {
   const parametres = new URLSearchParams();
 
   if (cursor) parametres.set('cursor', cursor);
+  if (traduire) parametres.set('translate', 'true');
 
   const requete = parametres.toString();
 
@@ -102,6 +104,26 @@ export async function sendMessage(
     method: 'POST',
     headers: { ...entetes(token), 'Content-Type': 'application/json' },
     body: JSON.stringify({ content }),
+  });
+
+  return normaliserMessage(await lireReponse(response));
+}
+
+export const TAILLE_PHOTO_MAX = 8 * 1024 * 1024;
+
+export async function sendPhotoMessage(
+  token: string,
+  chatId: string,
+  fichier: File,
+): Promise<ChatMessages> {
+  const formulaire = new FormData();
+
+  formulaire.append('file', fichier);
+
+  const response = await fetch(`${API_URL}/chats/${chatId}/photos`, {
+    method: 'POST',
+    headers: entetes(token),
+    body: formulaire,
   });
 
   return normaliserMessage(await lireReponse(response));
