@@ -64,7 +64,7 @@ dig +short api.worldismine.fr    # doit afficher 91.134.134.251
 Le VPS n'est pas vierge. Avant toute chose, regarde ce qui y tourne :
 
 ```bash
-ssh debian@91.134.134.251     # ou ubuntu@ / root@ selon l'image OVH
+ssh ubuntu@91.134.134.251     # l'image OVH de ce VPS ouvre le compte ubuntu
 
 lsb_release -a                    # version d'Ubuntu
 ls -l /etc/nginx/sites-enabled/   # ce que nginx sert déjà
@@ -598,7 +598,7 @@ ports:
 Puis, depuis ton poste, ouvre un tunnel SSH et connecte-toi sur `localhost:5433` :
 
 ```bash
-ssh -L 5433:localhost:5432 debian@91.134.134.251 -N
+ssh -L 5433:localhost:5432 ubuntu@91.134.134.251 -N
 ```
 
 Le préfixe `127.0.0.1:` est essentiel — sans lui, Docker ouvre le port sur
