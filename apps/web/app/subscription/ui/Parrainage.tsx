@@ -35,7 +35,7 @@ export function Parrainage() {
     () =>
       new Intl.DateTimeFormat(locale, {
         day: 'numeric',
-        month: 'long',
+        month: 'short',
         year: 'numeric',
       }),
     [locale],
@@ -124,122 +124,142 @@ export function Parrainage() {
     }
   }
 
-  if (!token) return null;
+  if (!token || (!parrainage && !etudiant)) return null;
 
   return (
     <>
       {erreur ? <p className={styles.erreur}>{erreur}</p> : null}
 
-      {parrainage ? (
-        <section className={styles.bloc}>
-          <h2 className={styles.blocTitre}>
-            {t('subscription.referralTitle')}
-          </h2>
-
-          <div className={styles.ligne}>
-            <span>{t('subscription.yourCode')}</span>
-            <span className={styles.valeur}>{parrainage.code}</span>
-          </div>
-
-          <div className={styles.ligne}>
-            <span>{t('subscription.godchildren')}</span>
-            <span className={styles.valeur}>{parrainage.filleuls}</span>
-          </div>
-
-          <div className={styles.ligne}>
-            <span>{t('subscription.rewarded')}</span>
-            <span className={styles.valeur}>{parrainage.recompenses}</span>
-          </div>
-
-          {parrainage.parraine ? (
-            <p className={styles.aide}>
-              {t('subscription.alreadyReferred')}
-            </p>
-          ) : (
-            <form className={styles.enLigne} onSubmit={appliquerLeCode}>
-              <input
-                className={styles.champ}
-                value={code}
-                placeholder={t('subscription.enterCode')}
-                onChange={(evenement) => setCode(evenement.target.value)}
-              />
-
-              <button
-                type="submit"
-                className={styles.boutonSombre}
-                disabled={occupe}
-              >
-                {t('subscription.apply')}
-              </button>
-            </form>
-          )}
-        </section>
-      ) : null}
-
-      {etudiant ? (
-        <section className={styles.bloc}>
-          <h2 className={styles.blocTitre}>
-            {t('subscription.studentTitle')}
-          </h2>
-
-          <p className={styles.aide}>{t('subscription.studentHint')}</p>
-
-          {etudiant.etudiant ? (
-            <div className={styles.ligne}>
-              <span>{etudiant.email}</span>
-
-              <span className={styles.valeur}>
-                {etudiant.jusquAu
-                  ? dates.format(new Date(etudiant.jusquAu))
-                  : ''}
-              </span>
-            </div>
-          ) : (
+      <div className={styles.colonnes}>
+        <div className={styles.colonne}>
+          {parrainage ? (
             <>
-              <form className={styles.enLigne} onSubmit={demanderLeCode}>
-                <input
-                  className={styles.champ}
-                  type="email"
-                  value={email}
-                  placeholder={t('subscription.studentEmail')}
-                  onChange={(evenement) => setEmail(evenement.target.value)}
-                />
+              <h2 className={styles.sectionTitre}>
+                {t('subscription.referralTitle')}
+              </h2>
 
-                <button
-                  type="submit"
-                  className={styles.boutonClair}
-                  disabled={occupe}
-                >
-                  {etudiant.codeEnvoye
-                    ? t('subscription.studentResend')
-                    : t('subscription.studentSend')}
-                </button>
-              </form>
+              <div className={styles.carte}>
+                <p className={styles.etiquetteCarte}>
+                  {t('subscription.yourCode')}
+                </p>
 
-              {etudiant.codeEnvoye ? (
-                <form className={styles.enLigne} onSubmit={confirmerLeCode}>
-                  <input
-                    className={styles.champ}
-                    value={codeRecu}
-                    placeholder={t('subscription.studentCode')}
-                    onChange={(evenement) =>
-                      setCodeRecu(evenement.target.value)
-                    }
-                  />
+                <p className={styles.code}>{parrainage.code}</p>
 
-                  <button
-                    type="submit"
-                    className={styles.boutonSombre}
-                    disabled={occupe}
-                  >
-                    {t('subscription.apply')}
-                  </button>
-                </form>
-              ) : null}
+                <dl className={styles.lignes}>
+                  <div className={styles.ligne}>
+                    <dt>{t('subscription.godchildren')}</dt>
+                    <dd>{parrainage.filleuls}</dd>
+                  </div>
+
+                  <div className={styles.ligne}>
+                    <dt>{t('subscription.rewarded')}</dt>
+                    <dd>{parrainage.recompenses}</dd>
+                  </div>
+                </dl>
+
+                {parrainage.parraine ? (
+                  <p className={styles.aide}>
+                    {t('subscription.alreadyReferred')}
+                  </p>
+                ) : (
+                  <form className={styles.enLigne} onSubmit={appliquerLeCode}>
+                    <input
+                      className={styles.champ}
+                      value={code}
+                      placeholder={t('subscription.enterCode')}
+                      onChange={(evenement) => setCode(evenement.target.value)}
+                    />
+
+                    <button
+                      type="submit"
+                      className={styles.boutonSombre}
+                      disabled={occupe}
+                    >
+                      {t('subscription.apply')}
+                    </button>
+                  </form>
+                )}
+              </div>
             </>
-          )}
-        </section>
-      ) : null}
+          ) : null}
+        </div>
+
+        <div className={styles.colonne}>
+          {etudiant ? (
+            <>
+              <h2 className={styles.sectionTitre}>
+                {t('subscription.studentTitle')}
+              </h2>
+
+              <div className={styles.carte}>
+                <p className={styles.aide}>{t('subscription.studentHint')}</p>
+
+                {etudiant.etudiant ? (
+                  <dl className={styles.lignes}>
+                    <div className={styles.ligne}>
+                      <dt>{etudiant.email}</dt>
+
+                      <dd>
+                        {etudiant.jusquAu
+                          ? dates.format(new Date(etudiant.jusquAu))
+                          : ''}
+                      </dd>
+                    </div>
+                  </dl>
+                ) : (
+                  <>
+                    <form className={styles.enLigne} onSubmit={demanderLeCode}>
+                      <input
+                        className={styles.champ}
+                        type="email"
+                        value={email}
+                        placeholder={t('subscription.studentEmail')}
+                        onChange={(evenement) =>
+                          setEmail(evenement.target.value)
+                        }
+                      />
+
+                      <button
+                        type="submit"
+                        className={styles.boutonContour}
+                        disabled={occupe}
+                      >
+                        {etudiant.codeEnvoye
+                          ? t('subscription.studentResend')
+                          : t('subscription.studentSend')}
+                      </button>
+                    </form>
+
+                    {etudiant.codeEnvoye ? (
+                      <form
+                        className={styles.enLigne}
+                        onSubmit={confirmerLeCode}
+                      >
+                        <input
+                          className={styles.champ}
+                          value={codeRecu}
+                          placeholder={t('subscription.studentCode')}
+                          onChange={(evenement) =>
+                            setCodeRecu(evenement.target.value)
+                          }
+                        />
+
+                        <button
+                          type="submit"
+                          className={styles.boutonSombre}
+                          disabled={occupe}
+                        >
+                          {t('subscription.apply')}
+                        </button>
+                      </form>
+                    ) : null}
+                  </>
+                )}
+              </div>
+            </>
+          ) : null}
+        </div>
+      </div>
     </>
   );
 }

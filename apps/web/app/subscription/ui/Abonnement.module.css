@@ -120,7 +120,13 @@
 .lignes {
   display: flex;
   flex-direction: column;
+  width: 100%;
   margin: 0;
+}
+
+.carte .lignes .ligne:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 
 .ligne {
@@ -146,6 +152,51 @@
   margin: 8px 0 0;
   font-size: 12px;
   color: var(--wim-texte-doux);
+}
+
+.etiquetteCarte {
+  margin: 0;
+  font-size: 12px;
+  color: var(--wim-texte-doux);
+}
+
+.code {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--wim-texte);
+}
+
+.enLigne {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.champ {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-champ);
+  background: var(--wim-surface);
+  font: inherit;
+  font-size: 14px;
+  color: var(--wim-texte);
+}
+
+.champ:focus {
+  outline: 2px solid var(--wim-info);
+  outline-offset: 1px;
+}
+
+.enLigne .boutonContour,
+.enLigne .boutonSombre {
+  flex: 0 0 auto;
+  width: auto;
+  margin-top: 0;
 }
 
 .moyen {
