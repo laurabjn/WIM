@@ -1,32 +1,48 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import type { Home, UserProfile } from '@wim/shared';
-
 import {
-  clearSession,
-  getSession,
-} from 'app/auth/infrastructure/authStorage';
+  Bell,
+  ChevronRight,
+  CreditCard,
+  Heart,
+  LifeBuoy,
+  LogOut,
+  Pencil,
+  Plus,
+  Settings,
+  Sliders,
+  type LucideIcon,
+} from 'lucide-react';
+
+import { clearSession, getSession } from 'app/auth/infrastructure/authStorage';
 import { getMyHomes } from 'app/home/infrastructure/home.api';
 import { HomeDetailsCard } from 'app/home/ui/components/HomeDetailsCard';
 import { getMyProfile } from 'app/profile/infrastructure/profile.api';
+import { ProfileCard } from 'app/profile/ui/components/ProfileCard';
 
 import styles from './MonCompte.module.css';
 
 type Etat = 'chargement' | 'anonyme' | 'prete' | 'erreur';
 
-const RACCOURCIS = [
-  { href: '/favorites', cle: 'profile.favorites' },
-  { href: '/notifications', cle: 'notifications.title' },
-  { href: '/account/preferences', cle: 'profile.preferences' },
-  { href: '/account/settings', cle: 'profile.parameters' },
-  { href: '/subscription', cle: 'profile.settings.subscription' },
-  { href: '/account/support', cle: 'profile.help' },
-] as const;
+type Raccourci = { href: string; cle: string; Icone: LucideIcon };
+
+const RACCOURCIS: Raccourci[] = [
+  { href: '/favorites', cle: 'profile.favorites', Icone: Heart },
+  { href: '/notifications', cle: 'notifications.title', Icone: Bell },
+  { href: '/account/preferences', cle: 'profile.preferences', Icone: Sliders },
+  { href: '/account/settings', cle: 'profile.parameters', Icone: Settings },
+  {
+    href: '/subscription',
+    cle: 'profile.settings.subscription',
+    Icone: CreditCard,
+  },
+  { href: '/account/support', cle: 'profile.help', Icone: LifeBuoy },
+];
 
 export function MonCompte() {
   const t = useTranslations();
@@ -92,61 +108,59 @@ export function MonCompte() {
     return <p className={styles.etat}>{t('profile.profileNotFound')}</p>;
   }
 
-  const nom = [profil.firstName, profil.lastName].filter(Boolean).join(' ');
-
   return (
-    <div className={styles.page}>
-      <section className={styles.carte}>
-        <span className={styles.avatar}>
-          {profil.avatarUrl ? (
-            <Image
-              src={profil.avatarUrl}
-              alt={nom}
-              fill
-              className={styles.avatarImage}
-            />
-          ) : (
-            (profil.firstName?.[0] ?? '?').toUpperCase()
-          )}
-        </span>
+    <div className={styles.colonnes}>
+      <div className={styles.colonneGauche}>
+        <ProfileCard
+          profile={profil}
+          actions={
+            <>
+              <Link href="/account/edit" className={styles.boutonSombre}>
+                <Pencil size={15} />
+                {t('profile.editProfile.title')}
+              </Link>
 
-        <div className={styles.identite}>
-          <h2 className={styles.nom}>{nom}</h2>
+              <Link
+                href={`/profile?userId=${profil.id}`}
+                className={styles.boutonClair}
+              >
+                {t('profile.publicProfile')}
+              </Link>
+            </>
+          }
+        />
 
-          <p className={styles.email}>{profil.email}</p>
+        <nav className={styles.carte}>
+          {RACCOURCIS.map(({ href, cle, Icone }) => (
+            <Link key={href} href={href} className={styles.ligne}>
+              <Icone size={18} className={styles.icone} />
 
-          <p className={styles.chiffres}>
-            {profil.homesCount ?? logements.length} {t('profile.homes')} ·{' '}
-            {profil.exchangesCount ?? 0} {t('profile.exchanges')} ·{' '}
-            {(profil.averageRating ?? 0).toFixed(1)} {t('profile.rate')}
-          </p>
+              <span className={styles.libelle}>{t(cle)}</span>
 
-          <p className={styles.identiteEtat}>
-            {profil.identityVerified
-              ? t('profile.identityVerified')
-              : t('common.notVerified')}
-          </p>
-        </div>
+              <ChevronRight size={18} className={styles.chevron} />
+            </Link>
+          ))}
 
-        <div className={styles.actions}>
-          <Link href="/account/edit" className={styles.boutonSombre}>
-            {t('profile.editProfile.title')}
-          </Link>
-
-          <Link
-            href={`/profile?userId=${profil.id}`}
-            className={styles.boutonClair}
+          <button
+            type="button"
+            className={`${styles.ligne} ${styles.ligneDanger}`}
+            onClick={seDeconnecter}
           >
-            {t('common.seeMore')}
-          </Link>
-        </div>
-      </section>
+            <LogOut size={18} className={styles.icone} />
 
-      <section className={styles.bloc}>
-        <div className={styles.blocEntete}>
-          <h2 className={styles.blocTitre}>{t('profile.homes')}</h2>
+            <span className={styles.libelle}>{t('profile.logout')}</span>
+
+            <ChevronRight size={18} className={styles.chevron} />
+          </button>
+        </nav>
+      </div>
+
+      <div className={styles.colonneDroite}>
+        <div className={styles.sectionEntete}>
+          <h2 className={styles.sectionTitre}>{t('profile.homes')}</h2>
 
           <Link href="/homes/new" className={styles.boutonClair}>
+            <Plus size={15} />
             {t('profile.addHome')}
           </Link>
         </div>
@@ -154,42 +168,11 @@ export function MonCompte() {
         {logements.length === 0 ? (
           <p className={styles.vide}>{t('profile.noHomes')}</p>
         ) : (
-          <div className={styles.grille}>
-            {logements.map((logement) => (
-              <div key={logement.id} className={styles.mien}>
-                <HomeDetailsCard home={logement} />
-
-                <Link
-                  href={`/homes/${logement.id}/edit`}
-                  className={styles.boutonClair}
-                >
-                  {t('common.edit')}
-                </Link>
-              </div>
-            ))}
-          </div>
+          logements.map((logement) => (
+            <HomeDetailsCard key={logement.id} home={logement} />
+          ))
         )}
-      </section>
-
-      <nav className={styles.liens}>
-        {RACCOURCIS.map((raccourci) => (
-          <Link
-            key={raccourci.href}
-            href={raccourci.href}
-            className={styles.ligne}
-          >
-            {t(raccourci.cle)}
-          </Link>
-        ))}
-
-        <button
-          type="button"
-          className={styles.ligneDanger}
-          onClick={seDeconnecter}
-        >
-          {t('profile.logout')}
-        </button>
-      </nav>
+      </div>
     </div>
   );
 }

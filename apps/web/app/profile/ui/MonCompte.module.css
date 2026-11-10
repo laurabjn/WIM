@@ -1,187 +1,145 @@
-.page {
+.colonnes {
+  display: grid;
+  grid-template-columns: 560px 330px;
+  gap: 52px;
+  align-items: start;
+}
+
+.colonneGauche {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
+  min-width: 0;
+}
+
+.colonneDroite {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.sectionEntete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: -6px;
+}
+
+.sectionTitre {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--wim-texte);
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--wim-surface);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.1);
+}
+
+.ligne {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px 28px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  color: var(--wim-texte);
+  cursor: pointer;
+}
+
+.ligne + .ligne {
+  border-top: 1px solid var(--wim-bordure);
+}
+
+.ligne:hover {
+  background: var(--wim-surface-douce);
+}
+
+.icone {
+  flex: 0 0 auto;
+  color: var(--wim-texte);
+}
+
+.libelle {
+  font-size: 14px;
+  color: var(--wim-texte);
+}
+
+.chevron {
+  justify-self: end;
+  color: var(--wim-texte-pale);
+}
+
+.ligneDanger,
+.ligneDanger .icone,
+.ligneDanger .libelle {
+  color: var(--wim-danger);
+}
+
+.vide {
+  margin: 0;
+  padding: 32px;
+  border-radius: 28px;
+  background: var(--wim-surface);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 14px;
+  color: var(--wim-texte-doux);
+}
+
+.boutonClair,
+.boutonSombre {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--wim-rayon-pilule);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.boutonClair {
+  border: 1px solid var(--wim-bordure);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
+}
+
+.boutonSombre {
+  background: var(--wim-texte);
+  color: var(--wim-surface);
 }
 
 .etat {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 60px 28px;
-  border: 1px dashed #d7dcdf;
-  border-radius: 18px;
-  text-align: center;
-  color: #5c6b72;
-}
-
-.boutonSombre,
-.boutonClair {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  padding: 0 20px;
-  border: 0;
-  border-radius: 999px;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.boutonSombre {
-  background: #111111;
-  color: #ffffff;
-}
-
-.boutonClair {
-  border: 1px solid #dfe3e6;
-  background: #ffffff;
-  color: #111111;
-}
-
-.carte {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 20px;
-  border: 1px solid #e8eaec;
-  border-radius: 18px;
-  background: #ffffff;
-}
-
-.avatar {
-  position: relative;
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 76px;
-  height: 76px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #d9e6ee;
-  color: #38515e;
-  font-size: 26px;
-  font-weight: 800;
-}
-
-.avatarImage {
-  object-fit: cover;
-}
-
-.identite {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.nom {
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.email,
-.chiffres,
-.identiteEtat {
-  color: #5c6b72;
-  font-size: 13px;
-}
-
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.bloc {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.blocEntete {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.blocTitre {
-  font-size: 18px;
-  font-weight: 800;
-}
-
-/* auto-fill et non auto-fit : avec deux logements, auto-fit les
-   etirerait sur toute la largeur au lieu de garder leur taille. Le
-   plafond de 380 evite qu une colonne isolee ne devienne demesuree. */
-.grille {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 380px));
-  gap: 24px;
-}
-
-.vide {
-  padding: 28px;
-  border: 1px dashed #d7dcdf;
-  border-radius: 16px;
-  text-align: center;
-  color: #5c6b72;
-}
-
-.liens {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid #e8eaec;
-  border-radius: 18px;
-  background: #ffffff;
-}
-
-.ligne,
-.ligneDanger {
-  padding: 16px 20px;
-  border: 0;
-  border-bottom: 1px solid #eef1f2;
-  background: transparent;
-  font: inherit;
+  align-items: flex-start;
+  gap: 14px;
   font-size: 15px;
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
+  color: var(--wim-texte-doux);
 }
 
-.ligne:last-child,
-.ligneDanger:last-child {
-  border-bottom: 0;
-}
-
-.ligne:hover,
-.ligneDanger:hover {
-  background: #f4f6f7;
-}
-
-.ligneDanger {
-  color: #c0392b;
-}
-
-@media (max-width: 680px) {
-  .carte {
-    flex-direction: column;
-    align-items: flex-start;
+@media (max-width: 980px) {
+  .colonnes {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
   }
-
-  .actions {
-    flex-direction: row;
-    width: 100%;
-  }
-}
-
-.mien {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
