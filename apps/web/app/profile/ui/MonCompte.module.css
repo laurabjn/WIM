@@ -1,55 +1,53 @@
-.page {
+.colonnes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 28px 32px;
+  align-items: start;
+}
+
+.colonne {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0;
 }
 
-.etat {
+.section {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 60px 28px;
-  border: 1px dashed #d7dcdf;
-  border-radius: 18px;
-  text-align: center;
-  color: #5c6b72;
+  gap: 10px;
 }
 
-.boutonSombre,
-.boutonClair {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  padding: 0 20px;
-  border: 0;
-  border-radius: 999px;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.boutonSombre {
-  background: #111111;
-  color: #ffffff;
-}
-
-.boutonClair {
-  border: 1px solid #dfe3e6;
-  background: #ffffff;
-  color: #111111;
-}
-
-.carte {
+.sectionEntete {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sectionTitre {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--wim-texte);
+}
+
+.profil {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 18px;
-  padding: 20px;
-  border: 1px solid #e8eaec;
-  border-radius: 18px;
-  background: #ffffff;
+  padding: 24px;
+  border-radius: var(--wim-rayon-bloc);
+  background: var(--wim-surface);
+  box-shadow: var(--wim-ombre-carte);
+}
+
+.entete {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  width: 100%;
 }
 
 .avatar {
@@ -58,14 +56,14 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 76px;
-  height: 76px;
+  width: 96px;
+  height: 96px;
   overflow: hidden;
   border-radius: 999px;
-  background: #d9e6ee;
-  color: #38515e;
-  font-size: 26px;
+  background: var(--wim-surface-douce);
+  font-size: 32px;
   font-weight: 800;
+  color: var(--wim-texte-doux);
 }
 
 .avatarImage {
@@ -74,114 +72,255 @@
 
 .identite {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
   flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
   min-width: 0;
 }
 
 .nom {
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 24px;
   font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--wim-texte);
 }
 
-.email,
-.chiffres,
-.identiteEtat {
-  color: #5c6b72;
-  font-size: 13px;
+.verifie {
+  flex: 0 0 auto;
+  color: var(--wim-vert);
 }
 
-.actions {
+.age {
+  margin: 0;
+  font-size: 14px;
+  color: var(--wim-texte-doux);
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--wim-texte);
+}
+
+.etoile {
+  flex: 0 0 auto;
+  fill: currentColor;
+}
+
+.commentaires {
+  font-weight: 500;
+  color: var(--wim-texte-doux);
+}
+
+.bio {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--wim-texte-doux);
+}
+
+.groupe {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
-.bloc {
+.groupeTitre {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--wim-texte);
+}
+
+.pilules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pilule {
+  padding: 5px 12px;
+  border: 1px solid var(--wim-bordure);
+  border-radius: var(--wim-rayon-pilule);
+  font-size: 13px;
+  color: var(--wim-texte);
+}
+
+.chiffres {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--wim-bordure);
+}
+
+.chiffre {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.blocEntete {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 2px;
+  text-align: center;
 }
 
-.blocTitre {
-  font-size: 18px;
+.chiffreValeur {
+  font-size: 20px;
   font-weight: 800;
+  color: var(--wim-texte);
 }
 
-/* auto-fill et non auto-fit : avec deux logements, auto-fit les
-   etirerait sur toute la largeur au lieu de garder leur taille. Le
-   plafond de 380 evite qu une colonne isolee ne devienne demesuree. */
+.chiffreLibelle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--wim-texte-doux);
+}
+
 .grille {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 380px));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
 }
 
 .vide {
-  padding: 28px;
-  border: 1px dashed #d7dcdf;
-  border-radius: 16px;
+  margin: 0;
+  padding: 32px;
+  border-radius: var(--wim-rayon-carte);
+  background: var(--wim-surface);
+  box-shadow: var(--wim-ombre-carte);
   text-align: center;
-  color: #5c6b72;
+  font-size: 14px;
+  color: var(--wim-texte-doux);
 }
 
-.liens {
+.carte {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #e8eaec;
-  border-radius: 18px;
-  background: #ffffff;
+  border-radius: var(--wim-rayon-carte);
+  background: var(--wim-surface);
+  box-shadow: var(--wim-ombre-carte);
 }
 
-.ligne,
-.ligneDanger {
-  padding: 16px 20px;
+.ligne {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
   border: 0;
-  border-bottom: 1px solid #eef1f2;
   background: transparent;
   font: inherit;
-  font-size: 15px;
-  font-weight: 600;
   text-align: left;
+  text-decoration: none;
+  color: var(--wim-texte);
   cursor: pointer;
 }
 
-.ligne:last-child,
-.ligneDanger:last-child {
-  border-bottom: 0;
+.ligne + .ligne {
+  border-top: 1px solid var(--wim-bordure);
 }
 
-.ligne:hover,
-.ligneDanger:hover {
-  background: #f4f6f7;
+.ligne:hover {
+  background: var(--wim-surface-douce);
 }
 
-.ligneDanger {
-  color: #c0392b;
+.icone {
+  flex: 0 0 auto;
+  color: var(--wim-texte);
+}
+
+.libelle {
+  font-size: 14px;
+  color: var(--wim-texte);
+}
+
+.chevron {
+  justify-self: end;
+  color: var(--wim-texte-pale);
+}
+
+.ligneDanger,
+.ligneDanger .icone,
+.ligneDanger .libelle {
+  color: var(--wim-danger);
+}
+
+.boutonClair,
+.boutonSombre {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--wim-rayon-pilule);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.boutonClair {
+  border: 1px solid var(--wim-bordure);
+  background: var(--wim-surface);
+  color: var(--wim-texte);
+}
+
+.boutonSombre {
+  background: var(--wim-texte);
+  color: var(--wim-surface);
+}
+
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.etat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 15px;
+  color: var(--wim-texte-doux);
+}
+
+@media (max-width: 1100px) {
+  .colonnes {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 680px) {
-  .carte {
-    flex-direction: column;
-    align-items: flex-start;
+  .entete {
+    flex-wrap: wrap;
   }
 
   .actions {
     flex-direction: row;
     width: 100%;
   }
-}
 
-.mien {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  .actions > * {
+    flex: 1 1 0;
+  }
 }

@@ -12,7 +12,7 @@ export default async function AccountPage() {
     <main className={styles.page}>
       <Navbar />
 
-      <section className={styles.contenu}>
+      <section className={`${styles.contenu} ${styles.contenuLarge}`}>
         <h1 className={styles.titre}>{t('common.account')}</h1>
 
         <MonCompte />

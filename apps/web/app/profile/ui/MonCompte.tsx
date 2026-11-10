@@ -3,14 +3,26 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import type { Home, UserProfile } from '@wim/shared';
-
 import {
-  clearSession,
-  getSession,
-} from 'app/auth/infrastructure/authStorage';
+  BadgeCheck,
+  Bell,
+  ChevronRight,
+  CreditCard,
+  Heart,
+  LifeBuoy,
+  LogOut,
+  Pencil,
+  Plus,
+  Settings,
+  Sliders,
+  Star,
+  type LucideIcon,
+} from 'lucide-react';
+
+import { clearSession, getSession } from 'app/auth/infrastructure/authStorage';
 import { getMyHomes } from 'app/home/infrastructure/home.api';
 import { HomeDetailsCard } from 'app/home/ui/components/HomeDetailsCard';
 import { getMyProfile } from 'app/profile/infrastructure/profile.api';
@@ -19,17 +31,41 @@ import styles from './MonCompte.module.css';
 
 type Etat = 'chargement' | 'anonyme' | 'prete' | 'erreur';
 
-const RACCOURCIS = [
-  { href: '/favorites', cle: 'profile.favorites' },
-  { href: '/notifications', cle: 'notifications.title' },
-  { href: '/account/preferences', cle: 'profile.preferences' },
-  { href: '/account/settings', cle: 'profile.parameters' },
-  { href: '/subscription', cle: 'profile.settings.subscription' },
-  { href: '/account/support', cle: 'profile.help' },
-] as const;
+type Raccourci = { href: string; cle: string; Icone: LucideIcon };
+
+const RACCOURCIS: Raccourci[] = [
+  { href: '/favorites', cle: 'profile.favorites', Icone: Heart },
+  { href: '/notifications', cle: 'notifications.title', Icone: Bell },
+  { href: '/account/preferences', cle: 'profile.preferences', Icone: Sliders },
+  { href: '/account/settings', cle: 'profile.parameters', Icone: Settings },
+  {
+    href: '/subscription',
+    cle: 'profile.settings.subscription',
+    Icone: CreditCard,
+  },
+  { href: '/account/support', cle: 'profile.help', Icone: LifeBuoy },
+];
+
+function age(naissance: string | null): number | null {
+  if (!naissance) return null;
+
+  const jour = new Date(naissance);
+
+  if (Number.isNaN(jour.getTime())) return null;
+
+  const aujourdhui = new Date();
+  const ecart = aujourdhui.getFullYear() - jour.getFullYear();
+  const passe =
+    aujourdhui.getMonth() > jour.getMonth() ||
+    (aujourdhui.getMonth() === jour.getMonth() &&
+      aujourdhui.getDate() >= jour.getDate());
+
+  return passe ? ecart : ecart - 1;
+}
 
 export function MonCompte() {
   const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
 
   const [etat, setEtat] = useState<Etat>('chargement');
@@ -93,103 +129,168 @@ export function MonCompte() {
   }
 
   const nom = [profil.firstName, profil.lastName].filter(Boolean).join(' ');
+  const ans = age(profil.birthDate);
+  const note = profil.averageRating ?? 0;
+  const commentaires = profil.reviewsCount ?? 0;
+  const langues = profil.languages ?? [];
+
+  const chiffres = [
+    { valeur: profil.homesCount ?? logements.length, libelle: 'profile.homes' },
+    { valeur: profil.exchangesCount ?? 0, libelle: 'profile.exchanges' },
+    { valeur: commentaires, libelle: 'profile.reviews' },
+  ];
 
   return (
-    <div className={styles.page}>
-      <section className={styles.carte}>
-        <span className={styles.avatar}>
-          {profil.avatarUrl ? (
-            <Image
-              src={profil.avatarUrl}
-              alt={nom}
-              fill
-              className={styles.avatarImage}
-            />
-          ) : (
-            (profil.firstName?.[0] ?? '?').toUpperCase()
-          )}
-        </span>
+    <div className={styles.colonnes}>
+      <div className={styles.colonne}>
+        <section className={styles.profil}>
+          <div className={styles.entete}>
+            <span className={styles.avatar}>
+              {profil.avatarUrl ? (
+                <Image
+                  src={profil.avatarUrl}
+                  alt={nom}
+                  fill
+                  sizes="96px"
+                  className={styles.avatarImage}
+                />
+              ) : (
+                (profil.firstName?.[0] ?? '?').toUpperCase()
+              )}
+            </span>
 
-        <div className={styles.identite}>
-          <h2 className={styles.nom}>{nom}</h2>
+            <div className={styles.identite}>
+              <h2 className={styles.nom}>
+                {nom}
 
-          <p className={styles.email}>{profil.email}</p>
+                {profil.identityVerified ? (
+                  <BadgeCheck
+                    size={20}
+                    className={styles.verifie}
+                    aria-label={t('profile.identityVerified')}
+                  />
+                ) : null}
+              </h2>
 
-          <p className={styles.chiffres}>
-            {profil.homesCount ?? logements.length} {t('profile.homes')} ·{' '}
-            {profil.exchangesCount ?? 0} {t('profile.exchanges')} ·{' '}
-            {(profil.averageRating ?? 0).toFixed(1)} {t('profile.rate')}
-          </p>
+              {ans !== null ? (
+                <p className={styles.age}>
+                  {ans} {t('profile.years')}
+                </p>
+              ) : null}
 
-          <p className={styles.identiteEtat}>
-            {profil.identityVerified
-              ? t('profile.identityVerified')
-              : t('common.notVerified')}
-          </p>
-        </div>
+              <p className={styles.note}>
+                <Star size={15} className={styles.etoile} />
 
-        <div className={styles.actions}>
-          <Link href="/account/edit" className={styles.boutonSombre}>
-            {t('profile.editProfile.title')}
-          </Link>
+                {note.toLocaleString(locale, {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                })}
 
-          <Link
-            href={`/profile?userId=${profil.id}`}
-            className={styles.boutonClair}
-          >
-            {t('common.seeMore')}
-          </Link>
-        </div>
-      </section>
+                <span className={styles.commentaires}>
+                  ({commentaires} {t('profile.reviews')})
+                </span>
+              </p>
+            </div>
 
-      <section className={styles.bloc}>
-        <div className={styles.blocEntete}>
-          <h2 className={styles.blocTitre}>{t('profile.homes')}</h2>
+            <div className={styles.actions}>
+              <Link href="/account/edit" className={styles.boutonSombre}>
+                <Pencil size={15} />
+                {t('profile.editProfile.title')}
+              </Link>
 
-          <Link href="/homes/new" className={styles.boutonClair}>
-            {t('profile.addHome')}
-          </Link>
-        </div>
+              <Link
+                href={`/profile?userId=${profil.id}`}
+                className={styles.boutonClair}
+              >
+                {t('profile.publicProfile')}
+              </Link>
+            </div>
+          </div>
 
-        {logements.length === 0 ? (
-          <p className={styles.vide}>{t('profile.noHomes')}</p>
-        ) : (
-          <div className={styles.grille}>
-            {logements.map((logement) => (
-              <div key={logement.id} className={styles.mien}>
-                <HomeDetailsCard home={logement} />
+          {profil.bio ? <p className={styles.bio}>{profil.bio}</p> : null}
 
-                <Link
-                  href={`/homes/${logement.id}/edit`}
-                  className={styles.boutonClair}
-                >
-                  {t('common.edit')}
-                </Link>
+          {langues.length > 0 ? (
+            <div className={styles.groupe}>
+              <h3 className={styles.groupeTitre}>
+                {t('profile.editProfile.languages')}
+              </h3>
+
+              <ul className={styles.pilules}>
+                {langues.map((langue) => {
+                  const cle = `profile.language.${langue}`;
+
+                  return (
+                    <li key={langue} className={styles.pilule}>
+                      {t.has(cle) ? t(cle) : langue}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
+
+          <dl className={styles.chiffres}>
+            {chiffres.map((chiffre) => (
+              <div key={chiffre.libelle} className={styles.chiffre}>
+                <dt className={styles.chiffreValeur}>{chiffre.valeur}</dt>
+
+                <dd className={styles.chiffreLibelle}>{t(chiffre.libelle)}</dd>
               </div>
             ))}
+          </dl>
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.sectionEntete}>
+            <h2 className={styles.sectionTitre}>{t('profile.homes')}</h2>
+
+            <Link href="/homes/new" className={styles.boutonClair}>
+              <Plus size={15} />
+              {t('profile.addHome')}
+            </Link>
           </div>
-        )}
-      </section>
 
-      <nav className={styles.liens}>
-        {RACCOURCIS.map((raccourci) => (
-          <Link
-            key={raccourci.href}
-            href={raccourci.href}
-            className={styles.ligne}
-          >
-            {t(raccourci.cle)}
-          </Link>
-        ))}
+          {logements.length === 0 ? (
+            <p className={styles.vide}>{t('profile.noHomes')}</p>
+          ) : (
+            <div className={styles.grille}>
+              {logements.map((logement) => (
+                <HomeDetailsCard key={logement.id} home={logement} />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
 
-        <button
-          type="button"
-          className={styles.ligneDanger}
-          onClick={seDeconnecter}
-        >
-          {t('profile.logout')}
-        </button>
-      </nav>
+      <div className={styles.colonne}>
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitre}>{t('profile.shortcuts')}</h2>
+
+          <nav className={styles.carte}>
+            {RACCOURCIS.map(({ href, cle, Icone }) => (
+              <Link key={href} href={href} className={styles.ligne}>
+                <Icone size={18} className={styles.icone} />
+
+                <span className={styles.libelle}>{t(cle)}</span>
+
+                <ChevronRight size={18} className={styles.chevron} />
+              </Link>
+            ))}
+
+            <button
+              type="button"
+              className={`${styles.ligne} ${styles.ligneDanger}`}
+              onClick={seDeconnecter}
+            >
+              <LogOut size={18} className={styles.icone} />
+
+              <span className={styles.libelle}>{t('profile.logout')}</span>
+
+              <ChevronRight size={18} className={styles.chevron} />
+            </button>
+          </nav>
+        </section>
+      </div>
     </div>
   );
 }
