@@ -1,6 +1,6 @@
 .profilePage {
   min-height: 100vh;
-  background: #f7f7f7;
+  background: var(--wim-fond);
   padding-top: 86px;
 }
 
@@ -30,7 +30,7 @@
   margin: 0 0 8px;
   font-size: 13px;
   font-weight: 800;
-  color: #111111;
+  color: var(--wim-texte);
 }
 
 @media (max-width: 900px) {

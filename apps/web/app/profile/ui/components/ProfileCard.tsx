@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import styles from './ProfileCard.module.css';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 
 type Profile = {
   id: string;
@@ -18,6 +19,7 @@ type Profile = {
 
 type Props = {
   profile: Profile;
+  actions?: ReactNode;
 };
 
 function calculateAge(birthDate?: string | null) {
@@ -38,8 +40,9 @@ function calculateAge(birthDate?: string | null) {
   return age;
 }
 
-export function ProfileCard({ profile }: Props) {
+export function ProfileCard({ profile, actions }: Props) {
   const t = useTranslations();
+  const locale = useLocale();
 
   const fullName = `${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim();
   const age = calculateAge(profile.birthDate);
@@ -47,6 +50,11 @@ export function ProfileCard({ profile }: Props) {
   const reviewsCount = profile.reviewsCount ?? 0;
   const exchangesCount = profile.exchangesCount ?? 0;
   const languages = profile.languages ?? [];
+
+  const note = rating.toLocaleString(locale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
 
   return (
     <article className={styles.card}>
@@ -57,6 +65,7 @@ export function ProfileCard({ profile }: Props) {
               src={profile.avatarUrl || '/images/default-avatar.png'}
               alt={fullName || 'Utilisateur'}
               fill
+              sizes="94px"
               className={styles.avatar}
             />
 
@@ -72,7 +81,7 @@ export function ProfileCard({ profile }: Props) {
             {age ? <p className={styles.age}>{age} {t('profile.years')}</p> : null}
 
             <p className={styles.rating}>
-              ★ {rating.toFixed(1)} ({reviewsCount} {t('profile.reviews')})
+              ★ {note} ({reviewsCount} {t('profile.reviews')})
             </p>
           </div>
         </div>
@@ -82,11 +91,15 @@ export function ProfileCard({ profile }: Props) {
 
       {languages.length > 0 ? (
         <div className={styles.languageRow}>
-          {languages.map((language) => (
-            <span key={language} className={styles.languagePill}>
-              {language}
-            </span>
-          ))}
+          {languages.map((language) => {
+            const cle = `profile.language.${language}`;
+
+            return (
+              <span key={language} className={styles.languagePill}>
+                {t.has(cle) ? t(cle) : language}
+              </span>
+            );
+          })}
         </div>
       ) : null}
 
@@ -104,10 +117,12 @@ export function ProfileCard({ profile }: Props) {
         </div>
 
         <div>
-          <strong>{rating.toFixed(1)}</strong>
+          <strong>{note}</strong>
           <span>{t('profile.rate')}</span>
         </div>
       </div>
+
+      {actions ? <div className={styles.actions}>{actions}</div> : null}
     </article>
   );
 }
